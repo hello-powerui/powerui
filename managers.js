@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.17 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.13 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -776,24 +776,15 @@ window.CustomPalettesManager = {
                 paletteContainer.appendChild(shadeElement);
             });
 
-            // Configure dropdown and buttons
+            // Configure dropdown buttons
             const deleteButton = element.querySelector('.delete-button');
             if (deleteButton) {
                 deleteButton.setAttribute('data-delete-type', 'neutral-palette');
             }
 
-            // Configure ellipsis button
-            const ellipsisButton = element.querySelector('.ellipsis-button');
-            if (ellipsisButton) {
-                ellipsisButton.setAttribute('data-palette-type', 'neutral');
-            }
-
             // Hide dropdown by default
             const dropdown = element.querySelector('.palette-dropdown');
-            if (dropdown) {
-                dropdown.style.display = 'none';
-                dropdown.classList.add('neutral-palette-dropdown');
-            }
+            if (dropdown) dropdown.style.display = 'none';
 
             container.appendChild(element);
         });
@@ -897,6 +888,7 @@ window.EventManager = {
         this.registerClickHandlers();
         this.registerChangeHandlers();
         this.registerInputHandlers();
+        this.registerDropdownHandlers();
         this.registerDeleteHandlers();
     },
 
@@ -905,59 +897,237 @@ window.EventManager = {
         this.addHandler('click', '#download-theme-button', () => window.ThemeManager.downloadTheme());
         this.addHandler('click', '#add-theme-button', () => window.ThemeManager.createNewTheme());
 
-        // Handle palette selection
+        // Add handler for custom palette wrapper clicks
         this.addHandler('click', '.custom-palette-wrapper', (e) => {
-            // Don't handle clicks on controls
-            if (e.target.closest('.custom-palette-header')) {
+            // Don't trigger if clicking dropdown or its children
+            if (e.target.closest('.palette-dropdown') || e.target.closest('.ellipsis-button')) {
                 return;
             }
             
-            const radio = e.target.closest('.custom-palette-wrapper').querySelector('input[type="radio"]');
-            if (!radio?.checked) {
-                radio.checked = true;
-                radio.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-        });
-
-        // Dropdown handlers
-        this.addHandler('click', '.ellipsis-button, .ellipsis-button img', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Get the button element whether we clicked the button or its image
-            const button = e.target.classList.contains('ellipsis-button') ? e.target : e.target.closest('.ellipsis-button');
-            if (!button) return;
-            
-            // Get parent wrapper and determine type
-            const themeWrapper = button.closest('.theme-wrapper');
-            const isTheme = !!themeWrapper;
-            const isNeutral = button.getAttribute('data-palette-type') === 'neutral';
-            
-            // Find the header and dropdown
-            const header = button.closest(isTheme ? '.custom-theme-header' : '.custom-palette-header');
-            const dropdown = header?.querySelector(isTheme ? '.theme-dropdown' : '.palette-dropdown');
-            
-            if (!dropdown) return;
-            
-            // Hide all other dropdowns
-            document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
-                if (d !== dropdown) d.style.display = 'none';
-            });
-            
-            // Toggle this dropdown
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-        });
-
-        // Hide dropdowns when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.ellipsis-button') && 
-                !e.target.closest('.palette-dropdown') && 
-                !e.target.closest('.theme-dropdown') && 
-                !e.target.closest('.neutral-palette-dropdown')) {
-                document.querySelectorAll('.palette-dropdown, .theme-dropdown, .neutral-palette-dropdown').forEach(d => {
-                    d.style.display = 'none';
+            // Find the radio input and its associated custom radio input
+            const radio = e.currentTarget.querySelector('input[type="radio"]');
+            if (radio && !radio.checked) {
+                // Clear any existing checked radios in the same group
+                document.querySelectorAll(`input[name="${radio.name}"]`).forEach(r => {
+                    r.checked = false;
+                    const customRadio = r.previousElementSibling;
+                    if (customRadio?.classList.contains('w-radio-input')) {
+                        customRadio.classList.remove('w--redirected-checked');
+                    }
                 });
+
+                // Check the clicked radio
+                radio.checked = true;
+                const customRadio = radio.previousElementSibling;
+                if (customRadio?.classList.contains('w-radio-input')) {
+                    customRadio.classList.add('w--redirected-checked');
+                }
+                radio.dispatchEvent(new Event('change'));
             }
+        });
+
+        // Theme editing handlers
+        this.addHandler('click', '[data-edit-type="theme"]', (e) => {
+            const wrapper = e.target.closest('.theme-wrapper');
+            const themeId = wrapper.querySelector('input[type="radio"]').value;
+            window.ThemeManager.editTheme(themeId);
+            
+            // Hide the dropdown
+            const dropdown = e.target.closest('.theme-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
+        });
+
+        // Theme update handler (refresh button)
+        this.addHandler('click', '[data-update-type="theme"]', async (e) => {
+            const wrapper = e.target.closest('.theme-wrapper');
+            const themeId = wrapper.querySelector('input[type="radio"]').value;
+            // Find the neutral-button by searching the clicked container
+            const container = e.target.closest('[data-update-type="theme"]');
+            const button = container?.querySelector('.neutral-button');
+            
+            try {
+                const success = await window.ThemeManager.saveThemeState(themeId);
+                if (success && button) {
+                    await window.DOMUtils.showSaveAnimation(button);
+                }
+            } catch (error) {
+                console.error('Error updating theme:', error);
+            }
+            
+            // Hide the dropdown
+            const dropdown = e.target.closest('.theme-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
+        });
+
+        // Theme delete handler
+        this.addHandler('click', '[data-delete-type="theme"]', (e) => {
+            const wrapper = e.target.closest('.theme-wrapper');
+            const themeId = wrapper.querySelector('input[type="radio"]').value;
+            window.ThemeManager.deleteTheme(themeId);
+            
+            // Hide the dropdown
+            const dropdown = e.target.closest('.theme-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
+        });
+
+        this.addHandler('click', '#save-edit-theme-button', async () => {
+            const modal = document.getElementById('edit-theme-lightbox-modal');
+            const themeId = modal.dataset.themeId;
+            const nameInput = modal.querySelector('#Edit-Theme-Name');
+            const descInput = modal.querySelector('#Edit-Theme-Description');
+            
+            const name = nameInput.value.trim();
+            if (!name) {
+                alert('Please enter a theme name');
+                return;
+            }
+            
+            const updates = {
+                name: name,
+                description: descInput?.value.trim() || ''
+            };
+            
+            if (await window.ThemeManager.saveEditedTheme(themeId, updates)) {
+                modal.style.display = 'none';
+            }
+        });
+
+        this.addHandler('click', '#close-edit-theme-modal', () => {
+            document.getElementById('edit-theme-lightbox-modal').style.display = 'none';
+        });
+
+        // Close modal handlers for all modals
+        const modalCloseSelectors = [
+            '#close-create-palette-modal',
+            '#close-edit-palette-modal',
+            '#close-create-neutral-palette-modal',
+            '#close-delete-palette-modal',
+            '.modal-close-button',  // Generic class for any modal close button
+            '.lightbox-modal-overlay'  // Click on overlay to close
+        ];
+
+        modalCloseSelectors.forEach(selector => {
+            this.addHandler('click', selector, (e) => {
+                // If clicking overlay, only close if clicked directly on overlay
+                if (selector === '.lightbox-modal-overlay' && e.target !== e.currentTarget) return;
+                
+                // Find the closest modal and hide it
+                const modal = e.target.closest('.lightbox-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    // Clear any input fields
+                    modal.querySelectorAll('input[type="text"]').forEach(input => input.value = '');
+                    // Clear any selected shades
+                    modal.querySelectorAll('.palette-shade.selected').forEach(shade => shade.classList.remove('selected'));
+                }
+            });
+        });
+
+        // Palette creation
+        this.addHandler('click', '#show-create-palette-modal', () => {
+            document.getElementById('create-palette-lightbox-modal').style.display = 'flex';
+            window.CustomPalettesManager.initializePaletteModal('create');
+        });
+        this.addHandler('click', '#save-new-palette-button', () => {
+            window.CustomPalettesManager.handlePaletteAction('create');
+        });
+
+        // Palette editing
+        this.addHandler('click', '#edit-palette-lightbox-modal .palette-container.custom .palette-shade', (e) => {
+            window.CustomPalettesManager.handleShadeSelection(e.target, 'edit');
+        });
+        this.addHandler('click', '#create-palette-lightbox-modal .palette-container.custom .palette-shade', (e) => {
+            window.CustomPalettesManager.handleShadeSelection(e.target, 'create');
+        });
+
+        // Shade management buttons
+        ['edit', 'create'].forEach(modalType => {
+            const prefix = modalType === 'edit' ? 'edit-' : '';
+            this.addHandler('click', `#${prefix}increase-shades-btn`, () => {
+                window.CustomPalettesManager.handleShadeManagement('increase', modalType);
+            });
+            this.addHandler('click', `#${prefix}decrease-shades-btn`, () => {
+                window.CustomPalettesManager.handleShadeManagement('decrease', modalType);
+            });
+        });
+
+        // Edit palette modal
+        this.addHandler('click', '[data-edit-type="palette"]', (e) => {
+            const wrapper = e.target.closest('.custom-palette-wrapper');
+            const paletteId = wrapper.querySelector('input[type="radio"]').value;
+            const modal = document.getElementById('edit-palette-lightbox-modal');
+            
+            if (modal) {
+                modal.style.display = 'flex';
+                window.CustomPalettesManager.initializePaletteModal('edit', paletteId);
+                
+                const dropdown = e.target.closest('.palette-dropdown');
+                if (dropdown) dropdown.style.display = 'none';
+            }
+        });
+
+        this.addHandler('click', '#save-edit-palette-button', () => {
+            window.CustomPalettesManager.handlePaletteAction('edit');
+        });
+
+        // Neutral palette creation
+        this.addHandler('click', '#show-create-neutral-palette-modal', () => {
+            const modal = document.getElementById('create-neutral-palette-modal');
+            const hexInput = document.getElementById('neutral-palette-hex-input');
+            const saveButton = document.getElementById('save-neutral-palette-button');
+            const paletteContainer = modal.querySelector('.palette-container');
+            
+            // Reset the modal state
+            modal.style.display = 'flex';
+            if (hexInput) {
+                hexInput.value = '';
+                hexInput.focus();
+            }
+            if (paletteContainer) {
+                paletteContainer.innerHTML = '';
+            }
+            if (saveButton) {
+                saveButton.classList.add('disabled');
+                saveButton.style.opacity = '0.5';
+                saveButton.style.pointerEvents = 'none';
+            }
+        });
+
+        this.addHandler('click', '#generate-neutral-palette-button', async () => {
+            const hexInput = document.getElementById('neutral-palette-hex-input');
+            const hexColor = hexInput.value.trim();
+            const generateButton = document.getElementById('generate-neutral-palette-button');
+            const saveButton = document.getElementById('save-neutral-palette-button');
+            
+            if (!hexColor) {
+                alert('Please enter a hex color');
+                return;
+            }
+
+            if (!ColorUtils.isValidHexColor(hexColor)) {
+                alert('Please enter a valid hex color (e.g., #f49d0c or f49d0c)');
+                return;
+            }
+
+            try {
+                generateButton.textContent = 'Generating...';
+                generateButton.disabled = true;
+                
+                const success = await window.CustomPalettesManager.generateNeutralPalette(hexColor);
+                if (success) {
+                    // Enable save button after successful generation
+                    saveButton.classList.remove('disabled');
+                    saveButton.style.opacity = '1';
+                    saveButton.style.pointerEvents = 'auto';
+                }
+            } finally {
+                generateButton.textContent = '✨ Generate Palette';
+                generateButton.disabled = false;
+            }
+        });
+
+        this.addHandler('click', '#save-neutral-palette-button', async () => {
+            await window.CustomPalettesManager.saveNeutralPalette();
         });
     },
 
@@ -1030,8 +1200,33 @@ window.EventManager = {
         });
     },
 
+    registerDropdownHandlers() {
+        // Handle ellipsis button click
+        this.addHandler('click', '.ellipsis-button', (e) => {
+            e.stopPropagation();
+            const header = e.target.closest('.custom-palette-header, .custom-theme-header');
+            const dropdown = header.querySelector('.palette-dropdown, .theme-dropdown');
+            
+            // Close all other dropdowns first
+            document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
+                if (d !== dropdown) d.style.display = 'none';
+            });
+            
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.palette-dropdown, .theme-dropdown') && !e.target.closest('.ellipsis-button')) {
+                document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(dropdown => {
+                    dropdown.style.display = 'none';
+                });
+            }
+        });
+    },
+
     registerDeleteHandlers() {
-        // Delete custom palette handler
+        // Delete palette handlers
         this.addHandler('click', '[data-delete-type="palette"]', (e) => {
             const wrapper = e.target.closest('.custom-palette-wrapper');
             const paletteId = wrapper.querySelector('input[type="radio"]').value;
@@ -1041,7 +1236,7 @@ window.EventManager = {
         });
 
         // Delete neutral palette handler
-        this.addHandler('click', '[data-delete-type="neutral-palette"]', (e) => {
+        this.addHandler('click', '.delete-button', (e) => {
             const deleteButton = e.target.closest('.delete-button');
             if (!deleteButton) return;
             
@@ -1114,6 +1309,33 @@ window.EventManager = {
 
         this.addHandler('click', '#cancel-delete-palette-button, #close-delete-palette-modal', () => {
             document.getElementById('delete-palette-lightbox-modal').style.display = 'none';
+        });
+
+        // Theme deletion modal handlers
+        this.addHandler('click', '#confirm-delete-theme-button', () => {
+            const modal = document.getElementById('delete-theme-lightbox-modal');
+            const themeId = modal.dataset.themeId;
+            const themeName = window.ThemeManager.themes.find(t => t.id === themeId)?.name;
+            
+            if (window.ThemeManager.confirmDeleteTheme(themeId)) {
+                const wrapper = document.querySelector(`input[value="${themeId}"]`)?.closest('.theme-wrapper');
+                if (wrapper) {
+                    // If this was the active theme, switch to default
+                    if (wrapper.querySelector('input[type="radio"]').checked) {
+                        const defaultRadio = document.querySelector('input[name="themes"][value="default"]');
+                        if (defaultRadio) {
+                            defaultRadio.checked = true;
+                            window.ThemeManager.applyDefaultTheme();
+                        }
+                    }
+                    wrapper.remove();
+                    
+                    // Show success notification
+                    window.DOMUtils.showNotification(`Theme "${themeName}" was deleted successfully`);
+                }
+            }
+            
+            modal.style.display = 'none';
         });
 
         this.addHandler('click', '#cancel-delete-theme-button, #close-delete-theme-modal', () => {
@@ -1513,20 +1735,17 @@ window.TooltipManager = {
         if (!tooltip) return;
         
         document.addEventListener('mouseover', e => {
-            // Find closest parent with data-tooltip attribute
-            const target = e.target.closest('[data-tooltip]');
-            if (target) {
-                tooltip.querySelector('.tooltip-text').textContent = target.getAttribute('data-tooltip');
+            const text = e.target.getAttribute('data-tooltip');
+            if (text) {
+                tooltip.querySelector('.tooltip-text').textContent = text;
                 tooltip.style.display = 'block';
-                tooltip.style.left = `${target.getBoundingClientRect().right + 10}px`;
-                tooltip.style.top = `${target.getBoundingClientRect().top}px`;
+                tooltip.style.left = `${e.target.getBoundingClientRect().right + 10}px`;
+                tooltip.style.top = `${e.target.getBoundingClientRect().top}px`;
             }
         });
 
         document.addEventListener('mouseout', e => {
-            // Check if we're leaving an element with tooltip or its parent
-            const target = e.target.closest('[data-tooltip]');
-            if (target && !target.contains(e.relatedTarget)) {
+            if (e.target.hasAttribute('data-tooltip')) {
                 tooltip.style.display = 'none';
             }
         });
