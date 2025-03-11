@@ -750,8 +750,11 @@ window.CustomPalettesManager = {
         const modal = document.getElementById(modalId);
         if (!modal) return;
 
-        // Toggle selected class
-        shade.classList.toggle('selected');
+        // Remove selected class from all shades first
+        modal.querySelectorAll('.palette-shade.selected').forEach(s => s.classList.remove('selected'));
+        
+        // Add selected class to clicked shade
+        shade.classList.add('selected');
         
         // Update hex input with selected color
         const hexInput = modal.querySelector(`#${modalType === 'edit' ? 'edit-' : ''}palette-hex-input`);
@@ -761,7 +764,6 @@ window.CustomPalettesManager = {
         }
     },
 
-    // Add the missing handleHexInput function
     handleHexInput(modalType, hexColor) {
         if (!hexColor) return;
         
@@ -779,7 +781,7 @@ window.CustomPalettesManager = {
         const formattedHex = hexColor.startsWith('#') ? hexColor : '#' + hexColor;
 
         // Update selected shade color
-        const selectedShade = modal.querySelector('.palette-shade.selected');
+        const selectedShade = modal.querySelector('.palette-container.custom .palette-shade.selected');
         if (selectedShade) {
             selectedShade.style.backgroundColor = formattedHex;
         }
