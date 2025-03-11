@@ -554,24 +554,28 @@ window.CustomPalettesManager = {
     },
 
     deletePalette(paletteId) {
-        console.log('Delete palette button clicked', e.target);
-        console.log('Target classList:', e.target.classList);
-        console.log('Target attributes:', Array.from(e.target.attributes).map(attr => `${attr.name}="${attr.value}"`).join(', '));
         const affectedThemes = window.ThemeManager?.themes.filter(t => t.dataPalette === paletteId) || [];
         const palette = this.customPalettes.find(p => p.id === paletteId);
-        console.log('Found palette:', palette);
-        console.log('Affected themes:', affectedThemes);
         
         const lightboxModal = document.getElementById('delete-palette-lightbox-modal');
-        const messageElement = lightboxModal.querySelector('.delete-message');
+        if (!lightboxModal) {
+            console.error('5. Delete modal not found in DOM');
+            return;
+        }
+        console.log('5. Found delete modal');
         
-        if (messageElement && palette) {
-            if (affectedThemes.length > 0) {
-                const themeText = affectedThemes.length === 1 ? 'theme' : 'themes';
-                messageElement.textContent = `"${palette.name}" is currently used by ${affectedThemes.length} ${themeText}. These ${themeText} will be set to use the default palette if you delete it.`;
-            } else {
-                messageElement.textContent = `Are you sure you want to delete "${palette.name}"?`;
-            }
+        const messageElement = lightboxModal.querySelector('.delete-message');
+        if (!messageElement || !palette) {
+            console.error('6. Missing message element or palette');
+            return;
+        }
+        console.log('6. Found message element and palette');
+        
+        if (affectedThemes.length > 0) {
+            const themeText = affectedThemes.length === 1 ? 'theme' : 'themes';
+            messageElement.textContent = `"${palette.name}" is currently used by ${affectedThemes.length} ${themeText}. These ${themeText} will be set to use the default palette if you delete it.`;
+        } else {
+            messageElement.textContent = `Are you sure you want to delete "${palette.name}"?`;
         }
         
         // Store the palette ID and affected themes for use in the confirmation handler
@@ -579,8 +583,7 @@ window.CustomPalettesManager = {
         lightboxModal.dataset.hasAffectedThemes = affectedThemes.length > 0;
         lightboxModal.dataset.isNeutralPalette = 'false';
         
-        console.log('Showing delete modal');
-        // Show the modal
+        console.log('7. Showing delete modal');
         lightboxModal.style.display = 'flex';
     },
 
@@ -1257,26 +1260,33 @@ window.EventManager = {
         
         // Delete palette handlers
         this.addHandler('click', '[data-delete-type="palette"], [data-delete-type="palette"] *', (e) => {
-            console.log('Delete palette button clicked', e.target);
-            console.log('Target classList:', e.target.classList);
-            console.log('Target attributes:', Array.from(e.target.attributes).map(attr => `${attr.name}="${attr.value}"`).join(', '));
+            console.log('1. Click handler triggered');
             e.preventDefault();
             e.stopPropagation();
             
             // Get the delete button element
             const deleteButton = e.target.closest('[data-delete-type="palette"]');
-            console.log('Found delete button:', deleteButton);
-            if (!deleteButton) return;
+            if (!deleteButton) {
+                console.log('2. No delete button found');
+                return;
+            }
+            console.log('2. Found delete button');
             
             const wrapper = deleteButton.closest('.radio-button-card');
-            console.log('Found wrapper:', wrapper);
-            if (!wrapper) return;
+            if (!wrapper) {
+                console.log('3. No radio-button-card wrapper found');
+                return;
+            }
+            console.log('3. Found wrapper');
             
             const paletteId = wrapper.querySelector('input[type="radio"]').value;
-            console.log('Found paletteId:', paletteId);
-            if (!paletteId) return;
+            if (!paletteId) {
+                console.log('4. No palette ID found');
+                return;
+            }
+            console.log('4. Found palette ID:', paletteId);
 
-            // Call the deletePalette method instead of trying to handle it here
+            // Call the deletePalette method
             window.CustomPalettesManager.deletePalette(paletteId);
             
             // Hide the dropdown
