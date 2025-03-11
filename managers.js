@@ -736,7 +736,8 @@ window.CustomPalettesManager = {
 
     renderSavedNeutralPalettes() {
         const container = document.querySelector('.neutral-palettes-container');
-        if (!container) return;
+        const template = document.getElementById('palette-template');
+        if (!container || !template) return;
 
         // Remove any existing custom neutral palettes (those starting with 'neutral-')
         container.querySelectorAll('label.radio-button-card').forEach(label => {
@@ -748,31 +749,41 @@ window.CustomPalettesManager = {
 
         // Render saved neutral palettes
         this.neutralPalettes.forEach(palette => {
-            const label = document.createElement('label');
-            label.className = 'radio-button-card w-radio';
-            label.innerHTML = `
-                <div class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"></div>
-                <input type="radio" name="neutral-palettes" id="${palette.id}" data-name="neutral-palettes" style="opacity:0;position:absolute;z-index:-1" value="${palette.id}">
-                <span class="palette-title w-form-label" for="${palette.id}">${palette.name}</span>
-                <div class="palette-container custom small">
-                    ${['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950']
-                        .map(shade => `
-                            <div data-color="${shade}" class="w-layout-hflex palette-shade shade-${shade}" 
-                                 style="background-color: ${palette.palette[shade]}"></div>
-                        `).join('')}
-                </div>
-            `;
-            
-            // Add delete functionality
-            const deleteButton = document.createElement('div');
-            deleteButton.className = 'delete-button';
-            deleteButton.setAttribute('data-delete-type', 'neutral-palette');
-            deleteButton.innerHTML = `
-                <img src="https://assets.website-files.com/64760069e93084646c9ee428/6489c3864d0103415ed1b074_trash-2.svg" loading="lazy" alt="">
-            `;
-            label.appendChild(deleteButton);
-            
-            container.appendChild(label);
+            const element = template.cloneNode(true);
+            element.id = '';
+            element.style.display = 'flex';
+
+            const radio = element.querySelector('input[type="radio"]');
+            radio.id = palette.id;
+            radio.value = palette.id;
+            radio.name = 'neutral-palettes';
+            radio.setAttribute('data-name', 'neutral-palettes');
+
+            const label = element.querySelector('.palette-title');
+            label.setAttribute('for', palette.id);
+            label.textContent = palette.name;
+
+            const paletteContainer = element.querySelector('.palette-container');
+            const addColorWrapper = paletteContainer.querySelector('.add-color-wrapper');
+            if (addColorWrapper) addColorWrapper.remove();
+
+            // Add neutral palette shades
+            ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'].forEach(shade => {
+                const shadeElement = document.createElement('div');
+                shadeElement.classList.add('palette-shade');
+                shadeElement.classList.add(`shade-${shade}`);
+                shadeElement.setAttribute('data-color', shade);
+                shadeElement.style.backgroundColor = palette.palette[shade];
+                paletteContainer.appendChild(shadeElement);
+            });
+
+            // Update delete button type
+            const deleteButton = element.querySelector('.delete-button');
+            if (deleteButton) {
+                deleteButton.setAttribute('data-delete-type', 'neutral-palette');
+            }
+
+            container.appendChild(element);
         });
     },
 
@@ -1090,29 +1101,30 @@ window.EventManager = {
         });
 
         // Delete neutral palette handler
-        this.addHandler('click', '[data-delete-type="neutral-palette"]', async (e) => {
+        this.addHandler('click', '[data-delete-type="neutral-palette"]', (e) => {
             const label = e.target.closest('label.radio-button-card');
             const input = label.querySelector('input[type="radio"]');
             const paletteId = input.value;
+            const palette = this.neutralPalettes.find(p => p.id === paletteId);
             
-            // Remove from array
-            window.CustomPalettesManager.neutralPalettes = 
-                window.CustomPalettesManager.neutralPalettes.filter(p => p.id !== paletteId);
+            // Show confirmation modal
+            const lightboxModal = document.getElementById('delete-palette-lightbox-modal');
+            const messageElement = lightboxModal.querySelector('.delete-message');
             
-            // Save to MemberStack
-            await window.StateManager.saveNeutralPalettes(window.CustomPalettesManager.neutralPalettes);
-            
-            // If this palette was selected, switch to default
-            if (input.checked) {
-                const defaultNeutral = document.querySelector('input[name="neutral-palettes"][value="azure"]');
-                if (defaultNeutral) {
-                    defaultNeutral.checked = true;
-                    window.StyleManager.updateNeutralPalette('azure');
-                }
+            if (messageElement && palette) {
+                messageElement.textContent = `Are you sure you want to delete "${palette.name}"?`;
             }
             
-            // Remove from DOM
-            label.remove();
+            // Store the palette ID for use in the confirmation handler
+            lightboxModal.dataset.paletteId = paletteId;
+            lightboxModal.dataset.isNeutralPalette = 'true';
+            
+            // Show the modal
+            lightboxModal.style.display = 'flex';
+            
+            // Hide the dropdown
+            const dropdown = e.target.closest('.palette-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
         });
 
         this.addHandler('click', '.delete-button[data-delete-type="theme"]', (e) => {
@@ -1134,11 +1146,39 @@ window.EventManager = {
         this.addHandler('click', '#confirm-delete-palette-button', () => {
             const modal = document.getElementById('delete-palette-lightbox-modal');
             const paletteId = modal.dataset.paletteId;
+            const isNeutralPalette = modal.dataset.isNeutralPalette === 'true';
             const hasAffectedThemes = modal.dataset.hasAffectedThemes === 'true';
             
-            if (window.CustomPalettesManager.confirmDeletePalette(paletteId, hasAffectedThemes)) {
-                const wrapper = document.querySelector(`input[value="${paletteId}"]`)?.closest('.custom-palette-wrapper');
-                if (wrapper) wrapper.remove();
+            if (isNeutralPalette) {
+                // Handle neutral palette deletion
+                this.neutralPalettes = this.neutralPalettes.filter(p => p.id !== paletteId);
+                window.StateManager.saveNeutralPalettes(this.neutralPalettes);
+                
+                // If this palette was selected, switch to default
+                const input = document.querySelector(`input[value="${paletteId}"]`);
+                if (input?.checked) {
+                    const defaultNeutral = document.querySelector('input[name="neutral-palettes"][value="azure"]');
+                    if (defaultNeutral) {
+                        defaultNeutral.checked = true;
+                        window.StyleManager.updateNeutralPalette('azure');
+                    }
+                }
+                
+                // Remove from DOM
+                const label = document.querySelector(`label.radio-button-card input[value="${paletteId}"]`)?.closest('label');
+                if (label) label.remove();
+                
+                // Show success notification
+                const palette = this.neutralPalettes.find(p => p.id === paletteId);
+                if (palette) {
+                    window.DOMUtils.showNotification(`Neutral palette "${palette.name}" was deleted successfully`);
+                }
+            } else {
+                // Handle regular palette deletion
+                if (window.CustomPalettesManager.confirmDeletePalette(paletteId, hasAffectedThemes)) {
+                    const wrapper = document.querySelector(`input[value="${paletteId}"]`)?.closest('.custom-palette-wrapper');
+                    if (wrapper) wrapper.remove();
+                }
             }
             
             modal.style.display = 'none';
