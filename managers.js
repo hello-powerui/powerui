@@ -909,14 +909,15 @@ window.EventManager = {
         });
 
         // Theme update handler (refresh button)
-        this.addHandler('click', '.theme-dropdown .neutral-button', async (e) => {
+        this.addHandler('click', '[data-update-type="theme"]', async (e) => {
             const wrapper = e.target.closest('.theme-wrapper');
             const themeId = wrapper.querySelector('input[type="radio"]').value;
-            const button = e.target.closest('.neutral-button');
+            // Find the neutral-button within the clicked container for animation
+            const button = e.target.querySelector('.neutral-button') || e.target.closest('.neutral-button');
             
             try {
                 const success = await window.ThemeManager.saveThemeState(themeId);
-                if (success) {
+                if (success && button) {
                     await window.DOMUtils.showSaveAnimation(button);
                 }
             } catch (error) {
