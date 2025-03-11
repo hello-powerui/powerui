@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.13 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.14 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
