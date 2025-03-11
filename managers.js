@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.8 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.9 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -1149,14 +1149,26 @@ window.EventManager = {
         });
 
         // Delete neutral palette handler
-        this.addHandler('click', '.delete-button[data-delete-type="neutral-palette"]', (e) => {
-            console.log('Delete neutral palette clicked', e.target);
+        this.addHandler('click', '.delete-button', (e) => {
+            // Get the actual delete button div, even if we clicked on a child element
+            const deleteButton = e.target.closest('.delete-button');
+            if (!deleteButton) return;
             
-            // First find the parent radio-button-card
-            const paletteWrapper = e.target.closest('label.radio-button-card');
+            console.log('Delete button clicked:', deleteButton);
+            
+            // First find the parent radio-button-card by going up to the palette wrapper
+            const paletteWrapper = deleteButton.closest('label.radio-button-card');
             if (!paletteWrapper) {
-                console.error('Could not find palette wrapper');
-                return;
+                // Try finding through the dropdown and header structure
+                const dropdown = deleteButton.closest('.palette-dropdown');
+                const header = dropdown?.closest('.custom-palette-header');
+                const alternateWrapper = header?.querySelector('label.radio-button-card');
+                if (alternateWrapper) {
+                    console.log('Found palette wrapper through alternate path');
+                } else {
+                    console.error('Could not find palette wrapper');
+                    return;
+                }
             }
             
             // Get the radio input and palette ID
@@ -1195,12 +1207,12 @@ window.EventManager = {
             lightboxModal.style.display = 'flex';
             
             // Hide the dropdown
-            const dropdown = e.target.closest('.palette-dropdown');
+            const dropdown = deleteButton.closest('.palette-dropdown');
             if (dropdown) dropdown.style.display = 'none';
         });
 
         // Delete theme handler
-        this.addHandler('click', '.delete-button[data-delete-type="theme"]', (e) => {
+        this.addHandler('click', '.delete-button-theme', (e) => {
             const wrapper = e.target.closest('.theme-wrapper');
             const themeId = wrapper.querySelector('input[type="radio"]').value;
             if (window.ThemeManager.deleteTheme(themeId)) {
