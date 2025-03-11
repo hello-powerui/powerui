@@ -910,7 +910,7 @@ window.EventManager = {
 
         // Theme editing handlers
         this.addHandler('click', '[data-edit-type="theme"]', (e) => {
-            const wrapper = e.target.closest('.theme-wrapper');
+            const wrapper = e.target.closest('.radio-button-card');
             const themeId = wrapper.querySelector('input[type="radio"]').value;
             window.ThemeManager.editTheme(themeId);
             
@@ -921,7 +921,7 @@ window.EventManager = {
 
         // Theme update handler (refresh button)
         this.addHandler('click', '[data-update-type="theme"]', async (e) => {
-            const wrapper = e.target.closest('.theme-wrapper');
+            const wrapper = e.target.closest('.radio-button-card');
             const themeId = wrapper.querySelector('input[type="radio"]').value;
             // Find the neutral-button by searching the clicked container
             const container = e.target.closest('[data-update-type="theme"]');
@@ -943,7 +943,7 @@ window.EventManager = {
 
         // Theme delete handler
         this.addHandler('click', '[data-delete-type="theme"]', (e) => {
-            const wrapper = e.target.closest('.theme-wrapper');
+            const wrapper = e.target.closest('.radio-button-card');
             const themeId = wrapper.querySelector('input[type="radio"]').value;
             window.ThemeManager.deleteTheme(themeId);
             
@@ -1273,7 +1273,7 @@ window.EventManager = {
 
         // Delete theme handler
         this.addHandler('click', '.delete-button-theme', (e) => {
-            const wrapper = e.target.closest('.theme-wrapper');
+            const wrapper = e.target.closest('.radio-button-card');
             const themeId = wrapper.querySelector('input[type="radio"]').value;
             if (window.ThemeManager.deleteTheme(themeId)) {
                 wrapper.remove();
@@ -1587,7 +1587,7 @@ window.ThemeManager = {
             
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${document.querySelector('input[name="themes"]:checked')?.closest('.theme-wrapper')?.querySelector('.palette-title')?.textContent?.toLowerCase().replace(/\s+/g, '-') || 'custom'}-theme.json`;
+            a.download = `${document.querySelector('input[name="themes"]:checked')?.closest('.radio-button-card')?.querySelector('.theme-title')?.textContent?.toLowerCase().replace(/\s+/g, '-') || 'custom'}-theme.json`;
             a.click();
             window.URL.revokeObjectURL(url);
 
@@ -1700,9 +1700,9 @@ window.ThemeManager = {
             Object.assign(theme, updates);
             
             // Update the theme name in the UI
-            const themeWrapper = document.querySelector(`input[value="${themeId}"]`)?.closest('.theme-wrapper');
+            const themeWrapper = document.querySelector(`input[value="${themeId}"]`)?.closest('.radio-button-card');
             if (themeWrapper) {
-                const titleElement = themeWrapper.querySelector('.palette-title');
+                const titleElement = themeWrapper.querySelector('.theme-title');
                 if (titleElement) titleElement.textContent = updates.name;
             }
             
