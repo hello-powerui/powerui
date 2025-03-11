@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.10 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.11 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -866,10 +866,13 @@ window.CustomPalettesManager = {
             }
         }
 
-        // Remove from DOM
-        const label = document.querySelector(`label.radio-button-card input[value="${paletteId}"]`)?.closest('label');
-        if (label) {
-            label.remove();
+        // Remove from DOM - find the entire custom-palette-wrapper
+        const wrapper = input?.closest('.custom-palette-wrapper');
+        if (wrapper) {
+            console.log('Removing palette wrapper from DOM:', wrapper);
+            wrapper.remove();
+        } else {
+            console.error('Could not find palette wrapper to remove');
         }
 
         // Show success notification
