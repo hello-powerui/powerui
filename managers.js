@@ -386,7 +386,7 @@ window.CustomPalettesManager = {
         const template = document.getElementById('palette-template');
         if (!container || !template) return;
 
-        container.querySelectorAll('.custom-palette-wrapper:not(#palette-template)').forEach(el => el.remove());
+        container.querySelectorAll('.radio-button-card.custom:not(#palette-template)').forEach(el => el.remove());
         this.customPalettes.forEach(palette => {
             container.appendChild(this.createPaletteElement(template, palette));
         });
@@ -408,26 +408,12 @@ window.CustomPalettesManager = {
         label.textContent = palette.name;
 
         const paletteContainer = element.querySelector('.palette-container');
-        const addColorWrapper = paletteContainer.querySelector('.add-color-wrapper');
-
         palette.colors.forEach(color => {
             const shade = document.createElement('div');
             shade.classList.add('palette-shade');
             shade.style.backgroundColor = color;
-            paletteContainer.insertBefore(shade, addColorWrapper);
+            paletteContainer.appendChild(shade);
         });
-
-        ['edit-button', 'delete-button'].forEach(buttonClass => {
-            const button = element.querySelector(`.${buttonClass}`);
-            if (button) {
-                button.setAttribute(`data-${buttonClass.split('-')[0]}-type`, 'palette');
-            }
-        });
-
-        const dropdown = element.querySelector('.palette-dropdown');
-        if (dropdown) {
-            dropdown.style.display = 'none';
-        }
 
         return element;
     },
@@ -854,8 +840,8 @@ window.CustomPalettesManager = {
             }
         }
 
-        // Remove from DOM - find the entire custom-palette-wrapper
-        const wrapper = input?.closest('.custom-palette-wrapper');
+        // Remove from DOM
+        const wrapper = input?.closest('.radio-button-card.custom');
         if (wrapper) {
             wrapper.remove();
         }
@@ -897,25 +883,6 @@ window.EventManager = {
         // Theme management
         this.addHandler('click', '#download-theme-button', () => window.ThemeManager.downloadTheme());
         this.addHandler('click', '#add-theme-button', () => window.ThemeManager.createNewTheme());
-
-        // Add handler for custom palette wrapper clicks
-        this.addHandler('click', '.custom-palette-wrapper', (e) => {
-            // Don't trigger if clicking dropdown, ellipsis button, or if event was prevented
-            if (e.target.closest('.palette-dropdown') || 
-                e.target.closest('.ellipsis-button') || 
-                e.defaultPrevented ||
-                e.target.closest('.delete-button') ||
-                e.target.closest('[data-edit-type="palette"]')) {
-                return;
-            }
-            
-            // Find the radio input
-            const radio = e.currentTarget.querySelector('input[type="radio"]');
-            if (!radio || radio.checked) return;
-
-            // Use the DOMUtils helper to handle radio selection
-            DOMUtils.setRadioChecked(radio.name, radio.value, true);
-        });
 
         // Theme editing handlers
         this.addHandler('click', '[data-edit-type="theme"]', (e) => {
@@ -1128,7 +1095,7 @@ window.EventManager = {
             'theme-colors': (value) => {
                 if (value.startsWith('custom-')) {
                     const colors = Array.from(document.querySelector(`input[value="${value}"]`)
-                        ?.closest('.custom-palette-wrapper')
+                        ?.closest('.radio-button-card.custom')
                         ?.querySelectorAll('.palette-shade') || [])
                         .map(shade => ColorUtils.rgbToHex(shade.style.backgroundColor));
                     window.StyleManager.updateDataColors({ colors });
@@ -1232,7 +1199,7 @@ window.EventManager = {
     registerDeleteHandlers() {
         // Delete palette handlers
         this.addHandler('click', '[data-delete-type="palette"]', (e) => {
-            const wrapper = e.target.closest('.custom-palette-wrapper');
+            const wrapper = e.target.closest('.radio-button-card.custom');
             const paletteId = wrapper.querySelector('input[type="radio"]').value;
             window.CustomPalettesManager.deletePalette(paletteId);
             const dropdown = e.target.closest('.palette-dropdown');
