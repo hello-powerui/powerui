@@ -101,12 +101,6 @@ window.DOMUtils = {
             description.textContent = theme.description || '';
         }
 
-        // Make sure ellipsis button has static position if needed
-        const ellipsisButton = element.querySelector('.ellipsis-button');
-        if (ellipsisButton) {
-            ellipsisButton.classList.add('static');
-        }
-
         return element;
     },
 
@@ -1216,7 +1210,17 @@ window.EventManager = {
             });
             
             // Toggle the clicked dropdown
-            dropdown.style.display = dropdown.style.display === 'none' || !dropdown.style.display ? 'block' : 'none';
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.ellipsis-button') && !e.target.closest('.palette-dropdown') && !e.target.closest('.theme-dropdown')) {
+                document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
+                    d.style.display = 'none';
+                });
+            }
         });
     },
 
