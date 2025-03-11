@@ -197,15 +197,19 @@ window.StateManager = {
     saveTimeout: null,
     async saveData(themes, customPalettes, neutralPalettes) {
         clearTimeout(this.saveTimeout);
-        this.saveTimeout = setTimeout(async () => {
-            try {
-                await window.$memberstackDom.updateMemberJSON({
-                    json: { themes, customPalettes, neutralPalettes }
-                });
-            } catch (error) {
-                console.error('StateManager: Error saving data:', error);
-            }
-        }, 500);
+        return new Promise((resolve, reject) => {
+            this.saveTimeout = setTimeout(async () => {
+                try {
+                    await window.$memberstackDom.updateMemberJSON({
+                        json: { themes, customPalettes, neutralPalettes }
+                    });
+                    resolve();
+                } catch (error) {
+                    console.error('StateManager: Error saving data:', error);
+                    reject(error);
+                }
+            }, 500);
+        });
     },
 
     async saveThemes(themes) {
@@ -1143,7 +1147,7 @@ window.EventManager = {
         });
 
         // Delete confirmation modal handlers
-        this.addHandler('click', '#confirm-delete-palette-button', () => {
+        this.addHandler('click', '#confirm-delete-palette-button', async () => {
             const modal = document.getElementById('delete-palette-lightbox-modal');
             const paletteId = modal.dataset.paletteId;
             const isNeutralPalette = modal.dataset.isNeutralPalette === 'true';
@@ -1153,7 +1157,12 @@ window.EventManager = {
                 // Handle neutral palette deletion
                 window.CustomPalettesManager.neutralPalettes = 
                     window.CustomPalettesManager.neutralPalettes.filter(p => p.id !== paletteId);
-                window.StateManager.saveNeutralPalettes(window.CustomPalettesManager.neutralPalettes);
+                
+                // Update StateManager's memberData to reflect the change
+                window.StateManager.memberData.neutralPalettes = window.CustomPalettesManager.neutralPalettes;
+                
+                // Save the updated state to MemberStack
+                await window.StateManager.saveNeutralPalettes(window.CustomPalettesManager.neutralPalettes);
                 
                 // If this palette was selected, switch to default
                 const input = document.querySelector(`input[value="${paletteId}"]`);
