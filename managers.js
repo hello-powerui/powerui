@@ -554,8 +554,12 @@ window.CustomPalettesManager = {
     },
 
     deletePalette(paletteId) {
+        console.log('deletePalette called with ID:', paletteId);
         const affectedThemes = window.ThemeManager?.themes.filter(t => t.dataPalette === paletteId) || [];
         const palette = this.customPalettes.find(p => p.id === paletteId);
+        console.log('Found palette:', palette);
+        console.log('Affected themes:', affectedThemes);
+        
         const lightboxModal = document.getElementById('delete-palette-lightbox-modal');
         const messageElement = lightboxModal.querySelector('.delete-message');
         
@@ -571,7 +575,9 @@ window.CustomPalettesManager = {
         // Store the palette ID and affected themes for use in the confirmation handler
         lightboxModal.dataset.paletteId = paletteId;
         lightboxModal.dataset.hasAffectedThemes = affectedThemes.length > 0;
+        lightboxModal.dataset.isNeutralPalette = 'false';
         
+        console.log('Showing delete modal');
         // Show the modal
         lightboxModal.style.display = 'flex';
     },
@@ -1247,31 +1253,19 @@ window.EventManager = {
     registerDeleteHandlers() {
         // Delete palette handlers
         this.addHandler('click', '[data-delete-type="palette"]', (e) => {
+            console.log('Delete palette button clicked', e.target);
             e.preventDefault();
             e.stopPropagation();
             const wrapper = e.target.closest('.radio-button-card');
+            console.log('Found wrapper:', wrapper);
             if (!wrapper) return;
             
             const paletteId = wrapper.querySelector('input[type="radio"]').value;
+            console.log('Found paletteId:', paletteId);
             if (!paletteId) return;
 
-            const palette = window.CustomPalettesManager.customPalettes.find(p => p.id === paletteId);
-            if (!palette) return;
-
-            // Show confirmation modal
-            const lightboxModal = document.getElementById('delete-palette-lightbox-modal');
-            const messageElement = lightboxModal.querySelector('.delete-message');
-            
-            if (messageElement) {
-                messageElement.textContent = `Are you sure you want to delete "${palette.name}"?`;
-            }
-            
-            // Store the palette ID for use in the confirmation handler
-            lightboxModal.dataset.paletteId = paletteId;
-            lightboxModal.dataset.isNeutralPalette = 'false';
-            
-            // Show the modal
-            lightboxModal.style.display = 'flex';
+            // Call the deletePalette method instead of trying to handle it here
+            window.CustomPalettesManager.deletePalette(paletteId);
             
             // Hide the dropdown
             const dropdown = e.target.closest('.palette-dropdown');
