@@ -904,8 +904,10 @@ window.EventManager = {
                 return;
             }
             
-            // Find the radio input and its associated custom radio input
-            const radio = e.currentTarget.querySelector('input[type="radio"]');
+            // Find the radio input within this wrapper
+            const wrapper = e.target.closest('.custom-palette-wrapper');
+            const radio = wrapper.querySelector('input[type="radio"]');
+            
             if (radio && !radio.checked) {
                 // Clear any existing checked radios in the same group
                 document.querySelectorAll(`input[name="${radio.name}"]`).forEach(r => {
@@ -1735,17 +1737,20 @@ window.TooltipManager = {
         if (!tooltip) return;
         
         document.addEventListener('mouseover', e => {
-            const text = e.target.getAttribute('data-tooltip');
-            if (text) {
-                tooltip.querySelector('.tooltip-text').textContent = text;
+            // Find closest parent with data-tooltip attribute
+            const target = e.target.closest('[data-tooltip]');
+            if (target) {
+                tooltip.querySelector('.tooltip-text').textContent = target.getAttribute('data-tooltip');
                 tooltip.style.display = 'block';
-                tooltip.style.left = `${e.target.getBoundingClientRect().right + 10}px`;
-                tooltip.style.top = `${e.target.getBoundingClientRect().top}px`;
+                tooltip.style.left = `${target.getBoundingClientRect().right + 10}px`;
+                tooltip.style.top = `${target.getBoundingClientRect().top}px`;
             }
         });
 
         document.addEventListener('mouseout', e => {
-            if (e.target.hasAttribute('data-tooltip')) {
+            // Check if we're leaving an element with tooltip or its parent
+            const target = e.target.closest('[data-tooltip]');
+            if (target && !target.contains(e.relatedTarget)) {
                 tooltip.style.display = 'none';
             }
         });
