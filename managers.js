@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.13 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.14 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -1203,6 +1203,7 @@ window.EventManager = {
     registerDropdownHandlers() {
         // Handle ellipsis button click
         this.addHandler('click', '.ellipsis-button', (e) => {
+            console.log('Ellipsis clicked!');
             e.stopPropagation();
             const header = e.target.closest('.custom-palette-header, .custom-theme-header');
             const dropdown = header.querySelector('.palette-dropdown, .theme-dropdown');
