@@ -6,7 +6,7 @@ console.log('PowerUI Managers v1.0.4 loaded - ' + new Date().toISOString());
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
 
 // Remove duplicate global helper functions and keep only ColorUtils
-const ColorUtils = {
+window.ColorUtils = {
     isValidHexColor(color) {
         const cleanColor = color.trim().replace(/\s/g, '');
         const hexValue = cleanColor.startsWith('#') ? cleanColor : '#' + cleanColor;
