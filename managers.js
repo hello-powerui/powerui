@@ -914,10 +914,28 @@ window.EventManager = {
         // Simple dropdown toggle
         this.addHandler('click', '.ellipsis-button', (e) => {
             e.stopPropagation();
-            const dropdown = e.target.closest('.custom-palette-header').querySelector('.palette-dropdown');
+            console.log('Ellipsis clicked:', e.target);
             
-            // Hide all other dropdowns
-            document.querySelectorAll('.palette-dropdown').forEach(d => {
+            // Get the button and check if it's in a theme or palette
+            const button = e.target.closest('.ellipsis-button');
+            const isTheme = button?.closest('.theme-wrapper');
+            console.log('Is theme:', isTheme);
+            
+            // Find the dropdown based on context
+            const header = button?.closest(isTheme ? '.custom-theme-header' : '.custom-palette-header');
+            console.log('Found header:', header);
+            
+            const dropdown = header?.querySelector(isTheme ? '.theme-dropdown' : '.palette-dropdown');
+            console.log('Found dropdown:', dropdown);
+            
+            if (!dropdown) {
+                console.error('Could not find dropdown for button:', button);
+                return;
+            }
+            
+            // Hide all other dropdowns of the same type
+            const dropdownClass = isTheme ? '.theme-dropdown' : '.palette-dropdown';
+            document.querySelectorAll(dropdownClass).forEach(d => {
                 if (d !== dropdown) d.style.display = 'none';
             });
             
@@ -927,7 +945,7 @@ window.EventManager = {
 
         // Hide dropdowns when clicking elsewhere
         document.addEventListener('click', () => {
-            document.querySelectorAll('.palette-dropdown').forEach(d => d.style.display = 'none');
+            document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => d.style.display = 'none');
         });
     },
 
@@ -1004,10 +1022,28 @@ window.EventManager = {
         // Simple dropdown toggle
         this.addHandler('click', '.ellipsis-button', (e) => {
             e.stopPropagation();
-            const dropdown = e.target.closest('.custom-palette-header').querySelector('.palette-dropdown');
+            console.log('Ellipsis clicked:', e.target);
             
-            // Hide all other dropdowns
-            document.querySelectorAll('.palette-dropdown').forEach(d => {
+            // Get the button and check if it's in a theme or palette
+            const button = e.target.closest('.ellipsis-button');
+            const isTheme = button?.closest('.theme-wrapper');
+            console.log('Is theme:', isTheme);
+            
+            // Find the dropdown based on context
+            const header = button?.closest(isTheme ? '.custom-theme-header' : '.custom-palette-header');
+            console.log('Found header:', header);
+            
+            const dropdown = header?.querySelector(isTheme ? '.theme-dropdown' : '.palette-dropdown');
+            console.log('Found dropdown:', dropdown);
+            
+            if (!dropdown) {
+                console.error('Could not find dropdown for button:', button);
+                return;
+            }
+            
+            // Hide all other dropdowns of the same type
+            const dropdownClass = isTheme ? '.theme-dropdown' : '.palette-dropdown';
+            document.querySelectorAll(dropdownClass).forEach(d => {
                 if (d !== dropdown) d.style.display = 'none';
             });
             
@@ -1017,7 +1053,7 @@ window.EventManager = {
 
         // Hide dropdowns when clicking elsewhere
         document.addEventListener('click', () => {
-            document.querySelectorAll('.palette-dropdown').forEach(d => d.style.display = 'none');
+            document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => d.style.display = 'none');
         });
     },
 
