@@ -900,7 +900,9 @@ window.EventManager = {
         // Add handler for custom palette wrapper clicks
         this.addHandler('click', '.custom-palette-wrapper', (e) => {
             // Don't trigger if clicking dropdown or its children
-            if (e.target.closest('.palette-dropdown') || e.target.closest('.ellipsis-button')) {
+            if (e.target.closest('.palette-dropdown') || 
+                e.target.closest('.ellipsis-button') || 
+                e.defaultPrevented) {
                 return;
             }
             
@@ -1201,11 +1203,21 @@ window.EventManager = {
     },
 
     registerDropdownHandlers() {
+        console.log('Registering dropdown handlers...');
         // Handle ellipsis button click
-        this.addHandler('click', '.ellipsis-button', (e) => {
-            console.log('Ellipsis clicked!');
+        this.addHandler('click', '.ellipsis-button, .ellipsis-button img', (e) => {
+            console.log('Ellipsis clicked!', {
+                target: e.target,
+                targetClasses: e.target.className,
+                parentClasses: e.target.parentElement.className,
+                isImg: e.target.tagName === 'IMG'
+            });
+            e.preventDefault();  // Prevent event from bubbling
             e.stopPropagation();
-            const header = e.target.closest('.custom-palette-header, .custom-theme-header');
+            // Get the ellipsis button element (whether clicked directly or via img)
+            const ellipsisButton = e.target.classList.contains('ellipsis-button') ? 
+                e.target : e.target.closest('.ellipsis-button');
+            const header = ellipsisButton.closest('.custom-palette-header, .custom-theme-header');
             const dropdown = header.querySelector('.palette-dropdown, .theme-dropdown');
             
             // Close all other dropdowns first
@@ -1218,7 +1230,9 @@ window.EventManager = {
 
         // Close dropdowns when clicking outside
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.palette-dropdown, .theme-dropdown') && !e.target.closest('.ellipsis-button')) {
+            // Only handle if not clicking inside dropdown or ellipsis
+            if (!e.target.closest('.palette-dropdown, .theme-dropdown') && 
+                !e.target.closest('.ellipsis-button')) {
                 document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(dropdown => {
                     dropdown.style.display = 'none';
                 });
@@ -1352,12 +1366,17 @@ window.EventManager = {
     },
 
     handleEvent(eventType, event) {
+        let handled = false;
         for (const [selector, handler] of this.handlers[eventType]) {
             if (event.target.matches(selector) || event.target.closest(selector)) {
                 handler(event);
-                break;
+                if (event.defaultPrevented) {
+                    handled = true;
+                    break;
+                }
             }
         }
+        return handled;
     }
 };
 
