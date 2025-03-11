@@ -1728,12 +1728,37 @@ window.ThemeManager = {
     }
 };
 
-// Update the initialization to include default theme
+// Tooltip Manager
+window.TooltipManager = {
+    initialize() {
+        const tooltip = document.querySelector('.tooltip');
+        if (!tooltip) return;
+        
+        document.addEventListener('mouseover', e => {
+            const text = e.target.getAttribute('data-tooltip');
+            if (text) {
+                tooltip.querySelector('.tooltip-text').textContent = text;
+                tooltip.style.display = 'block';
+                tooltip.style.left = `${e.target.getBoundingClientRect().right + 10}px`;
+                tooltip.style.top = `${e.target.getBoundingClientRect().top}px`;
+            }
+        });
+
+        document.addEventListener('mouseout', e => {
+            if (e.target.hasAttribute('data-tooltip')) {
+                tooltip.style.display = 'none';
+            }
+        });
+    }
+};
+
+// Update the initialization to include TooltipManager
 document.addEventListener('DOMContentLoaded', async () => {
     await window.StateManager.initialize();
     await window.CustomPalettesManager.initialize();
     await window.ThemeManager.initialize();
     window.EventManager.initialize();
+    window.TooltipManager.initialize();
     
     // Apply default theme if no theme is selected
     const selectedTheme = document.querySelector('input[name="themes"]:checked');
