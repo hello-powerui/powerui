@@ -904,9 +904,15 @@ window.EventManager = {
                 return;
             }
             
+            // Find the radio input and its associated custom radio input
             const radio = e.currentTarget.querySelector('input[type="radio"]');
             if (radio && !radio.checked) {
                 radio.checked = true;
+                // Handle Webflow's custom radio styling
+                const customRadio = radio.previousElementSibling;
+                if (customRadio?.classList.contains('w-radio-input')) {
+                    customRadio.classList.add('w--redirected-checked');
+                }
                 radio.dispatchEvent(new Event('change'));
             }
         });
