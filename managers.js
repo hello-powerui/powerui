@@ -912,8 +912,9 @@ window.EventManager = {
         this.addHandler('click', '[data-update-type="theme"]', async (e) => {
             const wrapper = e.target.closest('.theme-wrapper');
             const themeId = wrapper.querySelector('input[type="radio"]').value;
-            // Find the neutral-button within the clicked container for animation
-            const button = e.target.querySelector('.neutral-button') || e.target.closest('.neutral-button');
+            // Find the neutral-button by searching the clicked container
+            const container = e.target.closest('[data-update-type="theme"]');
+            const button = container?.querySelector('.neutral-button');
             
             try {
                 const success = await window.ThemeManager.saveThemeState(themeId);
