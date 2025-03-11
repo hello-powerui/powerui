@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.3 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.4 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -206,8 +206,37 @@ window.StyleManager = {
     },
 
     updateNeutralPalette(palette) {
-        this.NEUTRAL_PALETTES.forEach(p => document.documentElement.classList.remove(p));
-        document.documentElement.classList.add(palette);
+        const root = document.documentElement;
+        
+        // First remove all neutral palette classes
+        this.NEUTRAL_PALETTES.forEach(p => root.classList.remove(p));
+        
+        // Clean up any custom neutral palette CSS variables
+        const shades = ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+        shades.forEach(shade => {
+            root.style.removeProperty(`--neutral-${shade}`);
+        });
+        
+        // If it's a built-in palette, just add the class
+        if (this.NEUTRAL_PALETTES.includes(palette)) {
+            root.classList.add(palette);
+            return;
+        }
+        
+        // If it's a custom neutral palette (starts with 'neutral-')
+        if (palette.startsWith('neutral-')) {
+            // Find the palette in CustomPalettesManager
+            const customPalette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === palette);
+            if (customPalette) {
+                // Apply each shade as a CSS variable
+                shades.forEach(shade => {
+                    const color = customPalette.palette[shade];
+                    if (color) {
+                        root.style.setProperty(`--neutral-${shade}`, color);
+                    }
+                });
+            }
+        }
     },
 
     updateBorderRadius(radius) {
@@ -252,9 +281,10 @@ window.StyleManager = {
 // Custom Palettes Manager
 window.CustomPalettesManager = {
     customPalettes: [],
+    neutralPalettes: [],  // Add storage for neutral palettes
     MIN_COLORS: 3,
     MAX_COLORS: 10,
-    DEFAULT_COLORS: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56', '#3498DB', '#A66999' ],
+    DEFAULT_COLORS: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56', '#3498DB', '#A66999'],
     currentEditingPaletteId: null,
     lastGeneratedPalette: null,
 
@@ -279,7 +309,9 @@ window.CustomPalettesManager = {
 
     async initialize() {
         await this.loadSavedPalettes();
+        await this.loadSavedNeutralPalettes();
         this.initializeNeutralPalettesContainer();
+        await this.renderSavedNeutralPalettes();
     },
 
     initializeNeutralPalettesContainer() {
@@ -307,6 +339,11 @@ window.CustomPalettesManager = {
         const { customPalettes } = await window.StateManager.getMemberData();
         this.customPalettes = customPalettes;
         await this.renderSavedPalettes();
+    },
+
+    async loadSavedNeutralPalettes() {
+        const { neutralPalettes } = await window.StateManager.getMemberData();
+        this.neutralPalettes = neutralPalettes || [];
     },
 
     renderSavedPalettes() {
@@ -622,6 +659,90 @@ window.CustomPalettesManager = {
                 hexInput.value = colors[0];
             }
         }
+    },
+
+    // Update the save neutral palette handler
+    async saveNeutralPalette() {
+        const modal = document.getElementById('create-neutral-palette-modal');
+        const paletteContainer = modal.querySelector('.palette-container');
+        const saveButton = document.getElementById('save-neutral-palette-button');
+        
+        if (!this.lastGeneratedPalette) {
+            alert('Please generate a palette first');
+            return;
+        }
+
+        const { name, palette } = this.lastGeneratedPalette;
+        const paletteId = `neutral-${Date.now()}`;
+        
+        // Create new neutral palette entry
+        const newPalette = {
+            id: paletteId,
+            name: name,
+            palette: palette
+        };
+
+        // Add to neutral palettes array
+        this.neutralPalettes.push(newPalette);
+        
+        // Save to MemberStack
+        await window.StateManager.saveNeutralPalettes(this.neutralPalettes);
+        
+        // Render all neutral palettes
+        this.renderSavedNeutralPalettes();
+        
+        // Close modal and reset
+        modal.style.display = 'none';
+        paletteContainer.innerHTML = '';
+        document.getElementById('neutral-palette-hex-input').value = '';
+        saveButton.classList.add('disabled');
+        saveButton.style.opacity = '0.5';
+        saveButton.style.pointerEvents = 'none';
+        
+        // Clear the stored palette
+        this.lastGeneratedPalette = null;
+    },
+
+    renderSavedNeutralPalettes() {
+        const container = document.querySelector('.neutral-palettes-container');
+        if (!container) return;
+
+        // Remove any existing custom neutral palettes (those starting with 'neutral-')
+        container.querySelectorAll('label.radio-button-card').forEach(label => {
+            const input = label.querySelector('input[type="radio"]');
+            if (input && input.value.startsWith('neutral-')) {
+                label.remove();
+            }
+        });
+
+        // Render saved neutral palettes
+        this.neutralPalettes.forEach(palette => {
+            const label = document.createElement('label');
+            label.className = 'radio-button-card w-radio';
+            label.innerHTML = `
+                <div class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"></div>
+                <input type="radio" name="neutral-palettes" id="${palette.id}" data-name="neutral-palettes" style="opacity:0;position:absolute;z-index:-1" value="${palette.id}">
+                <span class="palette-title w-form-label" for="${palette.id}">${palette.name}</span>
+                <div class="palette-container custom small">
+                    ${['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950']
+                        .map(shade => `
+                            <div data-color="${shade}" class="w-layout-hflex palette-shade shade-${shade}" 
+                                 style="background-color: ${palette.palette[shade]}"></div>
+                        `).join('')}
+                </div>
+            `;
+            
+            // Add delete functionality
+            const deleteButton = document.createElement('div');
+            deleteButton.className = 'delete-button';
+            deleteButton.setAttribute('data-delete-type', 'neutral-palette');
+            deleteButton.innerHTML = `
+                <img src="https://assets.website-files.com/64760069e93084646c9ee428/6489c3864d0103415ed1b074_trash-2.svg" loading="lazy" alt="">
+            `;
+            label.appendChild(deleteButton);
+            
+            container.appendChild(label);
+        });
     }
 };
 
@@ -788,49 +909,7 @@ window.EventManager = {
         });
 
         this.addHandler('click', '#save-neutral-palette-button', async () => {
-            const modal = document.getElementById('create-neutral-palette-modal');
-            const paletteContainer = modal.querySelector('.palette-container');
-            const saveButton = document.getElementById('save-neutral-palette-button');
-            
-            if (!window.CustomPalettesManager.lastGeneratedPalette) {
-                alert('Please generate a palette first');
-                return;
-            }
-
-            const { name, palette } = window.CustomPalettesManager.lastGeneratedPalette;
-            const paletteId = `neutral-${Date.now()}`;
-            
-            // Create new neutral palette entry with correct format
-            const neutralPaletteContainer = document.querySelector('.neutral-palettes-container');
-            if (neutralPaletteContainer) {
-                const label = document.createElement('label');
-                label.className = 'radio-button-card w-radio';
-                label.innerHTML = `
-                    <div class="w-form-formradioinput w-form-formradioinput--inputType-custom radio-button w-radio-input"></div>
-                    <input type="radio" name="neutral-palettes" id="${paletteId}" data-name="neutral-palettes" style="opacity:0;position:absolute;z-index:-1" value="${paletteId}">
-                    <span class="palette-title w-form-label" for="${paletteId}">${name}</span>
-                    <div class="palette-container custom small">
-                        ${['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950']
-                            .map(shade => `
-                                <div data-color="${shade}" class="w-layout-hflex palette-shade shade-${shade}" 
-                                     style="background-color: ${palette[shade]}"></div>
-                            `).join('')}
-                    </div>
-                `;
-                
-                neutralPaletteContainer.appendChild(label);
-            }
-            
-            // Close modal and reset
-            modal.style.display = 'none';
-            paletteContainer.innerHTML = '';
-            document.getElementById('neutral-palette-hex-input').value = '';
-            saveButton.classList.add('disabled');
-            saveButton.style.opacity = '0.5';
-            saveButton.style.pointerEvents = 'none';
-            
-            // Clear the stored palette
-            window.CustomPalettesManager.lastGeneratedPalette = null;
+            await window.CustomPalettesManager.saveNeutralPalette();
         });
     },
 
@@ -935,6 +1014,32 @@ window.EventManager = {
             window.CustomPalettesManager.deletePalette(paletteId);
             const dropdown = e.target.closest('.palette-dropdown');
             if (dropdown) dropdown.style.display = 'none';
+        });
+
+        // Delete neutral palette handler
+        this.addHandler('click', '[data-delete-type="neutral-palette"]', async (e) => {
+            const label = e.target.closest('label.radio-button-card');
+            const input = label.querySelector('input[type="radio"]');
+            const paletteId = input.value;
+            
+            // Remove from array
+            window.CustomPalettesManager.neutralPalettes = 
+                window.CustomPalettesManager.neutralPalettes.filter(p => p.id !== paletteId);
+            
+            // Save to MemberStack
+            await window.StateManager.saveNeutralPalettes(window.CustomPalettesManager.neutralPalettes);
+            
+            // If this palette was selected, switch to default
+            if (input.checked) {
+                const defaultNeutral = document.querySelector('input[name="neutral-palettes"][value="azure"]');
+                if (defaultNeutral) {
+                    defaultNeutral.checked = true;
+                    window.StyleManager.updateNeutralPalette('azure');
+                }
+            }
+            
+            // Remove from DOM
+            label.remove();
         });
 
         this.addHandler('click', '.delete-button[data-delete-type="theme"]', (e) => {
