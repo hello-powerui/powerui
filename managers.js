@@ -1011,14 +1011,20 @@ window.EventManager = {
 
         // Edit palette modal
         this.addHandler('click', '[data-edit-type="palette"]', (e) => {
-            const wrapper = e.target.closest('.custom-palette-wrapper');
-            const paletteId = wrapper.querySelector('input[type="radio"]').value;
+            const wrapper = e.target.closest('.radio-button-card');
+            if (!wrapper) return;
+            
+            const radio = wrapper.querySelector('input[type="radio"]');
+            if (!radio) return;
+            
+            const paletteId = radio.value;
             const modal = document.getElementById('edit-palette-lightbox-modal');
             
             if (modal) {
                 modal.style.display = 'flex';
                 window.CustomPalettesManager.initializePaletteModal('edit', paletteId);
                 
+                // Hide the dropdown
                 const dropdown = e.target.closest('.palette-dropdown');
                 if (dropdown) dropdown.style.display = 'none';
             }
@@ -1159,15 +1165,8 @@ window.EventManager = {
     },
 
     registerDropdownHandlers() {
-        console.log('Registering dropdown handlers...');
         // Handle ellipsis button click
         this.addHandler('click', '.ellipsis-button, .ellipsis-button img', (e) => {
-            console.log('Ellipsis clicked!', {
-                target: e.target,
-                targetClasses: e.target.className,
-                parentClasses: e.target.parentElement.className,
-                isImg: e.target.tagName === 'IMG'
-            });
             e.preventDefault();  // Prevent event from bubbling
             e.stopPropagation();
             
@@ -1175,9 +1174,9 @@ window.EventManager = {
             const ellipsisButton = e.target.classList.contains('ellipsis-button') ? 
                 e.target : e.target.closest('.ellipsis-button');
                 
-            // Find the dropdown within the same radio-button-card
-            const radioCard = ellipsisButton.closest('.radio-button-card');
-            const dropdown = radioCard.querySelector('.palette-dropdown, .theme-dropdown');
+            // Find the dropdown within the same radio-button-card or theme-wrapper
+            const wrapper = ellipsisButton.closest('.radio-button-card, .theme-wrapper');
+            const dropdown = wrapper?.querySelector('.palette-dropdown, .theme-dropdown');
             
             if (!dropdown) return;
             
@@ -1186,18 +1185,8 @@ window.EventManager = {
                 if (d !== dropdown) d.style.display = 'none';
             });
             
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-        });
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', (e) => {
-            // Only handle if not clicking inside dropdown or ellipsis
-            if (!e.target.closest('.palette-dropdown, .theme-dropdown') && 
-                !e.target.closest('.ellipsis-button')) {
-                document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(dropdown => {
-                    dropdown.style.display = 'none';
-                });
-            }
+            // Toggle the clicked dropdown
+            dropdown.style.display = dropdown.style.display === 'none' || !dropdown.style.display ? 'block' : 'none';
         });
     },
 
