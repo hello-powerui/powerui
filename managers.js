@@ -1214,12 +1214,10 @@ window.EventManager = {
     registerDropdownHandlers() {
         // Handle ellipsis button click
         this.addHandler('click', '.ellipsis-button', (e) => {
-            e.preventDefault();
-            e.stopPropagation(); // Prevent the palette wrapper click from firing
-            const header = e.target.closest('.custom-palette-header, .custom-theme-header');
-            const dropdown = header.querySelector('.palette-dropdown, .theme-dropdown');
+            e.stopPropagation();
+            const dropdown = e.target.closest('.custom-palette-header, .custom-theme-header').querySelector('.palette-dropdown, .theme-dropdown');
             
-            // Close all other dropdowns first
+            // Close all other dropdowns
             document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
                 if (d !== dropdown) d.style.display = 'none';
             });
@@ -1229,10 +1227,8 @@ window.EventManager = {
 
         // Close dropdowns when clicking outside
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.palette-dropdown, .theme-dropdown') && !e.target.closest('.ellipsis-button')) {
-                document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(dropdown => {
-                    dropdown.style.display = 'none';
-                });
+            if (!e.target.closest('.palette-dropdown, .theme-dropdown, .ellipsis-button')) {
+                document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => d.style.display = 'none');
             }
         });
     },
