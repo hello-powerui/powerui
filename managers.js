@@ -743,6 +743,22 @@ window.CustomPalettesManager = {
             
             container.appendChild(label);
         });
+    },
+
+    handleShadeSelection(shade, modalType = 'create') {
+        const { modalId } = this.getModalElements(modalType);
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        // Toggle selected class
+        shade.classList.toggle('selected');
+        
+        // Update hex input with selected color
+        const hexInput = modal.querySelector(`#${modalType === 'edit' ? 'edit-' : ''}palette-hex-input`);
+        if (hexInput) {
+            const color = window.ColorUtils.rgbToHex(shade.style.backgroundColor);
+            hexInput.value = color;
+        }
     }
 };
 
@@ -816,10 +832,10 @@ window.EventManager = {
 
         // Palette editing
         this.addHandler('click', '#edit-palette-lightbox-modal .palette-container.custom .palette-shade', (e) => {
-            window.CustomPalettesManager.handleShadeSelection('edit', e.target);
+            window.CustomPalettesManager.handleShadeSelection(e.target, 'edit');
         });
         this.addHandler('click', '#create-palette-lightbox-modal .palette-container.custom .palette-shade', (e) => {
-            window.CustomPalettesManager.handleShadeSelection('create', e.target);
+            window.CustomPalettesManager.handleShadeSelection(e.target, 'create');
         });
 
         // Shade management buttons
@@ -1283,10 +1299,29 @@ window.ThemeManager = {
         this.isDownloading = true;
 
         try {
+            // Get current neutral palette
+            const selectedNeutralPalette = document.querySelector('input[name="neutral-palettes"]:checked')?.value || 'azure';
+            let neutralPaletteData = {};
+            
+            if (selectedNeutralPalette.startsWith('neutral-')) {
+                // For custom neutral palettes
+                const customPalette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === selectedNeutralPalette);
+                if (customPalette) {
+                    neutralPaletteData = customPalette.palette;
+                }
+            } else {
+                // For built-in palettes, get computed values
+                const shades = ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+                shades.forEach(shade => {
+                    neutralPaletteData[shade] = getComputedStyle(document.documentElement)
+                        .getPropertyValue(`--neutral-${shade}`).trim();
+                });
+            }
+
             // Get current theme state
             const themeData = {
                 mode: document.querySelector('input[name="color-mode"]:checked')?.value || 'light',
-                neutralPalette: document.querySelector('input[name="neutral-palettes"]:checked')?.value || 'azure',
+                neutralPalette: neutralPaletteData,
                 fontFamily: document.querySelector('input[name="font-family"]:checked')?.value || 'segoe-ui',
                 borderRadius: document.querySelector('input[name="borders"]:checked')?.value || '4',
                 name: "Custom Theme",
