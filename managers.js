@@ -77,6 +77,32 @@ window.DOMUtils = {
         const element = template.cloneNode(true);
         element.id = '';
         element.style.display = 'flex';
+        element.classList.add('theme-wrapper');
+
+        // Configure radio and label - adjust selectors to match the actual structure
+        const radio = element.querySelector('.w-radio-input, input[type="radio"]');
+        const label = element.querySelector('.w-form-label, .palette-title');
+        
+        if (radio) {
+            radio.id = theme.id;
+            radio.value = theme.id;
+            radio.name = 'themes';
+            radio.setAttribute('data-name', 'themes');
+            radio.classList.add('w-radio-input');  // Ensure Webflow class is present
+        }
+        
+        if (label) {
+            label.setAttribute('for', theme.id);
+            label.textContent = theme.name;
+            label.classList.add('w-form-label');  // Ensure Webflow class is present
+        }
+
+        // Make sure ellipsis button has static position if needed
+        const ellipsisButton = element.querySelector('.ellipsis-button');
+        if (ellipsisButton) {
+            ellipsisButton.classList.add('static');
+        }
+
         return element;
     },
 
@@ -1476,22 +1502,6 @@ window.ThemeManager = {
         if (!container || !template) return;
 
         const element = DOMUtils.createThemeElement(template, theme);
-        
-        // Configure radio and label
-        const radio = element.querySelector('input[type="radio"]');
-        const label = element.querySelector('.palette-title');
-        
-        if (radio) {
-            radio.id = theme.id;
-            radio.value = theme.id;
-            radio.name = 'themes';
-        }
-        
-        if (label) {
-            label.setAttribute('for', theme.id);
-            label.textContent = theme.name;
-        }
-
         container.appendChild(element);
         this.initializeThemeFunctionality(element);
     },
