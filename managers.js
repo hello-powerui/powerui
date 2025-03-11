@@ -1111,10 +1111,14 @@ window.EventManager = {
 
         // Delete neutral palette handler
         this.addHandler('click', '[data-delete-type="neutral-palette"]', (e) => {
+            console.log('🎯 Delete neutral palette clicked');
             const label = e.target.closest('label.radio-button-card');
             const input = label.querySelector('input[type="radio"]');
             const paletteId = input.value;
-            const palette = this.neutralPalettes.find(p => p.id === paletteId);
+            
+            // Use the correct reference to CustomPalettesManager
+            const palette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === paletteId);
+            console.log('Found palette:', palette);
             
             // Show confirmation modal
             const lightboxModal = document.getElementById('delete-palette-lightbox-modal');
