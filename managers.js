@@ -77,24 +77,28 @@ window.DOMUtils = {
         const element = template.cloneNode(true);
         element.id = '';
         element.style.display = 'flex';
-        element.classList.add('theme-wrapper');
+        element.classList.add('radio-button-card', 'custom');
 
-        // Configure radio and label - adjust selectors to match the actual structure
-        const radio = element.querySelector('.w-radio-input, input[type="radio"]');
-        const label = element.querySelector('.w-form-label, .palette-title');
-        
+        // Configure radio button
+        const radio = element.querySelector('.radio-button');
         if (radio) {
             radio.id = theme.id;
             radio.value = theme.id;
             radio.name = 'themes';
             radio.setAttribute('data-name', 'themes');
-            radio.classList.add('w-radio-input');  // Ensure Webflow class is present
         }
         
-        if (label) {
-            label.setAttribute('for', theme.id);
-            label.textContent = theme.name;
-            label.classList.add('w-form-label');  // Ensure Webflow class is present
+        // Configure title
+        const title = element.querySelector('.theme-title');
+        if (title) {
+            title.setAttribute('for', theme.id);
+            title.textContent = theme.name;
+        }
+
+        // Configure description if exists
+        const description = element.querySelector('.theme-description');
+        if (description) {
+            description.textContent = theme.description || '';
         }
 
         // Make sure ellipsis button has static position if needed
