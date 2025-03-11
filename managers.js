@@ -1,7 +1,7 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
 
-console.log('PowerUI Managers v1.0.15 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.15 loaded');
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -1170,11 +1170,16 @@ window.EventManager = {
             });
             e.preventDefault();  // Prevent event from bubbling
             e.stopPropagation();
+            
             // Get the ellipsis button element (whether clicked directly or via img)
             const ellipsisButton = e.target.classList.contains('ellipsis-button') ? 
                 e.target : e.target.closest('.ellipsis-button');
-            const header = ellipsisButton.closest('.custom-palette-header, .custom-theme-header');
-            const dropdown = header.querySelector('.palette-dropdown, .theme-dropdown');
+                
+            // Find the dropdown within the same radio-button-card
+            const radioCard = ellipsisButton.closest('.radio-button-card');
+            const dropdown = radioCard.querySelector('.palette-dropdown, .theme-dropdown');
+            
+            if (!dropdown) return;
             
             // Close all other dropdowns first
             document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
@@ -1211,10 +1216,10 @@ window.EventManager = {
             const deleteButton = e.target.closest('.delete-button');
             if (!deleteButton) return;
             
-            const header = deleteButton.closest('.custom-palette-header');
-            if (!header) return;
+            const radioCard = deleteButton.closest('.radio-button-card');
+            if (!radioCard) return;
 
-            const input = header.querySelector('input[type="radio"][name="neutral-palettes"]');
+            const input = radioCard.querySelector('input[type="radio"][name="neutral-palettes"]');
             if (!input) return;
             
             const paletteId = input.value;
