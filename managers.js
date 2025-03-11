@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.12 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.13 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -897,6 +897,74 @@ window.EventManager = {
         this.addHandler('click', '#download-theme-button', () => window.ThemeManager.downloadTheme());
         this.addHandler('click', '#add-theme-button', () => window.ThemeManager.createNewTheme());
 
+        // Theme editing handlers
+        this.addHandler('click', '[data-edit-type="theme"]', (e) => {
+            const wrapper = e.target.closest('.theme-wrapper');
+            const themeId = wrapper.querySelector('input[type="radio"]').value;
+            window.ThemeManager.editTheme(themeId);
+            
+            // Hide the dropdown
+            const dropdown = e.target.closest('.theme-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
+        });
+
+        // Theme update handler (refresh button)
+        this.addHandler('click', '.theme-dropdown .neutral-button', async (e) => {
+            const wrapper = e.target.closest('.theme-wrapper');
+            const themeId = wrapper.querySelector('input[type="radio"]').value;
+            const button = e.target.closest('.neutral-button');
+            
+            try {
+                const success = await window.ThemeManager.saveThemeState(themeId);
+                if (success) {
+                    await window.DOMUtils.showSaveAnimation(button);
+                }
+            } catch (error) {
+                console.error('Error updating theme:', error);
+            }
+            
+            // Hide the dropdown
+            const dropdown = e.target.closest('.theme-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
+        });
+
+        // Theme delete handler
+        this.addHandler('click', '[data-delete-type="theme"]', (e) => {
+            const wrapper = e.target.closest('.theme-wrapper');
+            const themeId = wrapper.querySelector('input[type="radio"]').value;
+            window.ThemeManager.deleteTheme(themeId);
+            
+            // Hide the dropdown
+            const dropdown = e.target.closest('.theme-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
+        });
+
+        this.addHandler('click', '#save-edit-theme-button', async () => {
+            const modal = document.getElementById('edit-theme-lightbox-modal');
+            const themeId = modal.dataset.themeId;
+            const nameInput = modal.querySelector('#Edit-Theme-Name');
+            const descInput = modal.querySelector('#Edit-Theme-Description');
+            
+            const name = nameInput.value.trim();
+            if (!name) {
+                alert('Please enter a theme name');
+                return;
+            }
+            
+            const updates = {
+                name: name,
+                description: descInput?.value.trim() || ''
+            };
+            
+            if (await window.ThemeManager.saveEditedTheme(themeId, updates)) {
+                modal.style.display = 'none';
+            }
+        });
+
+        this.addHandler('click', '#close-edit-theme-modal', () => {
+            document.getElementById('edit-theme-lightbox-modal').style.display = 'none';
+        });
+
         // Close modal handlers for all modals
         const modalCloseSelectors = [
             '#close-create-palette-modal',
@@ -1105,10 +1173,11 @@ window.EventManager = {
         // Handle ellipsis button click
         this.addHandler('click', '.ellipsis-button', (e) => {
             e.stopPropagation();
-            const header = e.target.closest('.custom-palette-header');
-            const dropdown = header.querySelector('.palette-dropdown');
+            const header = e.target.closest('.custom-palette-header, .custom-theme-header');
+            const dropdown = header.querySelector('.palette-dropdown, .theme-dropdown');
             
-            document.querySelectorAll('.palette-dropdown').forEach(d => {
+            // Close all other dropdowns first
+            document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
                 if (d !== dropdown) d.style.display = 'none';
             });
             
@@ -1117,8 +1186,8 @@ window.EventManager = {
 
         // Close dropdowns when clicking outside
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.palette-dropdown') && !e.target.closest('.ellipsis-button')) {
-                document.querySelectorAll('.palette-dropdown').forEach(dropdown => {
+            if (!e.target.closest('.palette-dropdown, .theme-dropdown') && !e.target.closest('.ellipsis-button')) {
+                document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(dropdown => {
                     dropdown.style.display = 'none';
                 });
             }
@@ -1580,6 +1649,49 @@ window.ThemeManager = {
             return true;
         } catch (error) {
             console.error('Error saving theme state:', error);
+            return false;
+        }
+    },
+
+    editTheme(themeId) {
+        const theme = this.themes.find(t => t.id === themeId);
+        if (!theme) return false;
+
+        const modal = document.getElementById('edit-theme-lightbox-modal');
+        const nameInput = modal.querySelector('#Edit-Theme-Name');
+        const descInput = modal.querySelector('#Edit-Theme-Description');
+        
+        if (nameInput) nameInput.value = theme.name || '';
+        if (descInput) descInput.value = theme.description || '';
+        
+        // Store the theme ID for use in the save handler
+        modal.dataset.themeId = themeId;
+        
+        // Show the modal
+        modal.style.display = 'flex';
+        return true;
+    },
+
+    async saveEditedTheme(themeId, updates) {
+        const theme = this.themes.find(t => t.id === themeId);
+        if (!theme) return false;
+
+        try {
+            // Update theme properties
+            Object.assign(theme, updates);
+            
+            // Update the theme name in the UI
+            const themeWrapper = document.querySelector(`input[value="${themeId}"]`)?.closest('.theme-wrapper');
+            if (themeWrapper) {
+                const titleElement = themeWrapper.querySelector('.palette-title');
+                if (titleElement) titleElement.textContent = updates.name;
+            }
+            
+            await this.saveState();
+            window.DOMUtils.showNotification(`Theme "${updates.name}" was updated successfully`);
+            return true;
+        } catch (error) {
+            console.error('Error saving edited theme:', error);
             return false;
         }
     }
