@@ -769,9 +769,7 @@ window.CustomPalettesManager = {
     renderSavedNeutralPalettes() {
         const container = document.querySelector('.neutral-palettes-container');
         const template = document.getElementById('palette-template');
-        if (!container || !template) {
-            return;
-        }
+        if (!container || !template) return;
 
         // Remove any existing custom neutral palettes (those starting with 'neutral-')
         container.querySelectorAll('label.radio-button-card').forEach(label => {
@@ -813,13 +811,20 @@ window.CustomPalettesManager = {
             });
 
             // Configure dropdown buttons
-            const deleteButton = element.querySelector('.delete-button');
-            if (deleteButton) {
-                deleteButton.setAttribute('data-delete-type', 'neutral-palette');
+            const dropdown = element.querySelector('.palette-dropdown');
+            if (dropdown) {
+                // Remove edit button from dropdown
+                const editButton = dropdown.querySelector('[data-edit-type="palette"]');
+                if (editButton) editButton.remove();
+                
+                // Configure delete button
+                const deleteButton = dropdown.querySelector('.delete-button');
+                if (deleteButton) {
+                    deleteButton.setAttribute('data-delete-type', 'neutral-palette');
+                }
             }
 
             // Hide dropdown by default
-            const dropdown = element.querySelector('.palette-dropdown');
             if (dropdown) dropdown.style.display = 'none';
 
             container.appendChild(element);
@@ -1768,11 +1773,21 @@ window.ThemeManager = {
             // Update theme properties
             Object.assign(theme, updates);
             
-            // Update the theme name in the UI
+            // Update the theme name and description in the UI
             const themeWrapper = document.querySelector(`input[value="${themeId}"]`)?.closest('.radio-button-card');
             if (themeWrapper) {
                 const titleElement = themeWrapper.querySelector('.theme-title');
                 if (titleElement) titleElement.textContent = updates.name;
+                
+                const descElement = themeWrapper.querySelector('.theme-description');
+                if (descElement) {
+                    if (updates.description) {
+                        descElement.textContent = updates.description;
+                        descElement.style.display = 'block';
+                    } else {
+                        descElement.style.display = 'none';
+                    }
+                }
             }
             
             await this.saveState();
