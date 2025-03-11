@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.5 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.6 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -1113,22 +1113,21 @@ window.EventManager = {
         this.addHandler('click', '[data-delete-type="neutral-palette"]', (e) => {
             console.log('🎯 Delete neutral palette clicked');
             
-            // Get the radio-button-card label that contains the input
-            const radioButtonCard = e.target.closest('label.radio-button-card');
-            console.log('Found radio button card:', radioButtonCard);
+            // First find the closest parent that contains both the delete button and the radio input
+            const paletteWrapper = e.target.closest('.radio-button-card');
+            console.log('Found palette wrapper:', paletteWrapper);
             
-            if (!radioButtonCard) {
-                console.error('Could not find radio button card');
+            if (!paletteWrapper) {
+                console.error('Could not find palette wrapper');
                 return;
             }
             
-            // Get the input by its ID which matches the label's "for" attribute
-            const inputId = radioButtonCard.getAttribute('for');
-            const input = document.getElementById(inputId);
+            // Get the radio input directly
+            const input = paletteWrapper.querySelector('input[type="radio"]');
             console.log('Found input:', input);
             
             if (!input) {
-                console.error('Could not find input with id:', inputId);
+                console.error('Could not find radio input');
                 return;
             }
             
