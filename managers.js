@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.9 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.10 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -1156,23 +1156,15 @@ window.EventManager = {
             
             console.log('Delete button clicked:', deleteButton);
             
-            // First find the parent radio-button-card by going up to the palette wrapper
-            const paletteWrapper = deleteButton.closest('label.radio-button-card');
-            if (!paletteWrapper) {
-                // Try finding through the dropdown and header structure
-                const dropdown = deleteButton.closest('.palette-dropdown');
-                const header = dropdown?.closest('.custom-palette-header');
-                const alternateWrapper = header?.querySelector('label.radio-button-card');
-                if (alternateWrapper) {
-                    console.log('Found palette wrapper through alternate path');
-                } else {
-                    console.error('Could not find palette wrapper');
-                    return;
-                }
+            // Navigate up to find the custom-palette-header, then find the radio input
+            const header = deleteButton.closest('.custom-palette-header');
+            if (!header) {
+                console.error('Could not find palette header');
+                return;
             }
-            
-            // Get the radio input and palette ID
-            const input = paletteWrapper.querySelector('input[type="radio"][name="neutral-palettes"]');
+
+            // Find the radio input within the header
+            const input = header.querySelector('input[type="radio"][name="neutral-palettes"]');
             if (!input) {
                 console.error('Could not find neutral palette radio input');
                 return;
