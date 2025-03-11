@@ -757,6 +757,7 @@ window.CustomPalettesManager = {
             element.id = '';
             element.style.display = 'flex';
 
+            // Configure radio and label
             const radio = element.querySelector('input[type="radio"]');
             radio.id = palette.id;
             radio.value = palette.id;
@@ -767,6 +768,7 @@ window.CustomPalettesManager = {
             label.setAttribute('for', palette.id);
             label.textContent = palette.name;
 
+            // Configure palette container
             const paletteContainer = element.querySelector('.palette-container');
             const addColorWrapper = paletteContainer.querySelector('.add-color-wrapper');
             if (addColorWrapper) addColorWrapper.remove();
@@ -774,18 +776,21 @@ window.CustomPalettesManager = {
             // Add neutral palette shades
             ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'].forEach(shade => {
                 const shadeElement = document.createElement('div');
-                shadeElement.classList.add('palette-shade');
-                shadeElement.classList.add(`shade-${shade}`);
+                shadeElement.classList.add('palette-shade', `shade-${shade}`);
                 shadeElement.setAttribute('data-color', shade);
                 shadeElement.style.backgroundColor = palette.palette[shade];
                 paletteContainer.appendChild(shadeElement);
             });
 
-            // Update delete button type
-            const deleteButton = element.querySelector('.delete-button');
-            if (deleteButton) {
-                deleteButton.setAttribute('data-delete-type', 'neutral-palette');
-            }
+            // Update dropdown buttons
+            const editButton = element.querySelector('[data-edit-type="palette"]');
+            const deleteButton = element.querySelector('[data-delete-type="palette"]');
+            if (editButton) editButton.setAttribute('data-edit-type', 'neutral-palette');
+            if (deleteButton) deleteButton.setAttribute('data-delete-type', 'neutral-palette');
+
+            // Hide dropdown by default
+            const dropdown = element.querySelector('.palette-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
 
             container.appendChild(element);
         });
@@ -1148,25 +1153,39 @@ window.EventManager = {
 
         // Delete confirmation modal handlers
         this.addHandler('click', '#confirm-delete-palette-button', async () => {
+            console.log('🗑️ Delete confirmation clicked');
             const modal = document.getElementById('delete-palette-lightbox-modal');
             const paletteId = modal.dataset.paletteId;
             const isNeutralPalette = modal.dataset.isNeutralPalette === 'true';
             const hasAffectedThemes = modal.dataset.hasAffectedThemes === 'true';
             
+            console.log('Delete params:', { paletteId, isNeutralPalette, hasAffectedThemes });
+            
             if (isNeutralPalette) {
+                console.log('📊 Current neutral palettes:', window.CustomPalettesManager.neutralPalettes);
+                
                 // Handle neutral palette deletion
                 window.CustomPalettesManager.neutralPalettes = 
                     window.CustomPalettesManager.neutralPalettes.filter(p => p.id !== paletteId);
                 
+                console.log('📊 Filtered neutral palettes:', window.CustomPalettesManager.neutralPalettes);
+                
                 // Update StateManager's memberData to reflect the change
                 window.StateManager.memberData.neutralPalettes = window.CustomPalettesManager.neutralPalettes;
                 
-                // Save the updated state to MemberStack
-                await window.StateManager.saveNeutralPalettes(window.CustomPalettesManager.neutralPalettes);
+                console.log('💾 Saving to MemberStack...');
+                try {
+                    // Save the updated state to MemberStack
+                    await window.StateManager.saveNeutralPalettes(window.CustomPalettesManager.neutralPalettes);
+                    console.log('✅ Successfully saved to MemberStack');
+                } catch (error) {
+                    console.error('❌ Error saving to MemberStack:', error);
+                }
                 
                 // If this palette was selected, switch to default
                 const input = document.querySelector(`input[value="${paletteId}"]`);
                 if (input?.checked) {
+                    console.log('🔄 Switching to default neutral palette');
                     const defaultNeutral = document.querySelector('input[name="neutral-palettes"][value="azure"]');
                     if (defaultNeutral) {
                         defaultNeutral.checked = true;
@@ -1176,11 +1195,15 @@ window.EventManager = {
                 
                 // Remove from DOM
                 const label = document.querySelector(`label.radio-button-card input[value="${paletteId}"]`)?.closest('label');
-                if (label) label.remove();
+                if (label) {
+                    console.log('🗑️ Removing palette from DOM');
+                    label.remove();
+                }
                 
                 // Show success notification
                 const palette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === paletteId);
                 if (palette) {
+                    console.log('📢 Showing success notification');
                     window.DOMUtils.showNotification(`Neutral palette "${palette.name}" was deleted successfully`);
                 }
             } else {
