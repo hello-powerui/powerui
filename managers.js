@@ -125,7 +125,6 @@ window.DOMUtils = {
         // Find the Webflow notification template
         let notification = document.querySelector('.notification-toast');
         if (!notification) {
-            console.error('Could not find .notification-toast element. Please create one in Webflow.');
             return;
         }
 
@@ -609,7 +608,6 @@ window.CustomPalettesManager = {
 
     async generateNeutralPalette(hexColor) {
         try {
-            console.log('🎨 Making API request to generate neutral palette for color:', hexColor);
             const response = await fetch(`${API_URL}/generate-neutral-palette`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -617,14 +615,10 @@ window.CustomPalettesManager = {
             });
 
             if (!response.ok) {
-                console.error('❌ API request failed:', response.status, response.statusText);
                 throw new Error('Failed to generate palette');
             }
 
             const data = await response.json();
-            console.log('✅ Palette generated successfully:', data);
-            
-            // Store the palette data for later use when saving
             this.lastGeneratedPalette = data;
             
             // Show preview in modal
@@ -632,7 +626,6 @@ window.CustomPalettesManager = {
             const paletteContainer = modal.querySelector('.palette-container');
             if (paletteContainer) {
                 paletteContainer.innerHTML = '';
-                // Convert palette object to array of ordered shades
                 const shades = ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
                 shades.forEach(shade => {
                     if (data.palette[shade]) {
@@ -646,7 +639,6 @@ window.CustomPalettesManager = {
 
             return true;
         } catch (error) {
-            console.error('❌ Error generating neutral palette:', error);
             alert('Failed to generate neutral palette. Please try again.');
             return false;
         }
@@ -1153,38 +1145,20 @@ window.EventManager = {
 
         // Delete neutral palette handler
         this.addHandler('click', '.delete-button', (e) => {
-            // Get the actual delete button div, even if we clicked on a child element
             const deleteButton = e.target.closest('.delete-button');
             if (!deleteButton) return;
             
-            console.log('Delete button clicked:', deleteButton);
-            
-            // Navigate up to find the custom-palette-header, then find the radio input
             const header = deleteButton.closest('.custom-palette-header');
-            if (!header) {
-                console.error('Could not find palette header');
-                return;
-            }
+            if (!header) return;
 
-            // Find the radio input within the header
             const input = header.querySelector('input[type="radio"][name="neutral-palettes"]');
-            if (!input) {
-                console.error('Could not find neutral palette radio input');
-                return;
-            }
+            if (!input) return;
             
             const paletteId = input.value;
-            if (!paletteId) {
-                console.error('Could not find palette ID');
-                return;
-            }
+            if (!paletteId) return;
             
-            // Find the palette in the manager
             const palette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === paletteId);
-            if (!palette) {
-                console.error('Could not find palette with id:', paletteId);
-                return;
-            }
+            if (!palette) return;
             
             // Show confirmation modal
             const lightboxModal = document.getElementById('delete-palette-lightbox-modal');
