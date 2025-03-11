@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.11 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.12 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -122,33 +122,33 @@ window.DOMUtils = {
 
     // Notification system
     showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.style.position = 'fixed';
-        notification.style.top = '0';
-        notification.style.left = '50%';
-        notification.style.transform = 'translateX(-50%) translateY(-100%)';
-        notification.style.transition = 'transform 0.3s ease-in-out';
-        notification.style.zIndex = '9999';
-        notification.innerHTML = `
-            <div class="notification-content">
-                ${type === 'success' ? '<span class="notification-icon">✓</span>' : ''}
-                ${message}
-            </div>
-        `;
+        // Find the Webflow notification template
+        let notification = document.querySelector('.notification-toast');
+        if (!notification) {
+            console.error('Could not find .notification-toast element. Please create one in Webflow.');
+            return;
+        }
+
+        // Find the message element
+        const messageElement = notification.querySelector('.notification-message');
+        if (messageElement) {
+            messageElement.textContent = message;
+        }
+
+        // Handle the icon visibility based on type
+        const iconElement = notification.querySelector('.notification-icon');
+        if (iconElement) {
+            iconElement.style.display = type === 'success' ? '' : 'none';
+        }
+
+        // Show the notification
+        notification.style.display = 'flex';
+        notification.classList.remove('hide');
         
-        document.body.appendChild(notification);
-        
-        // Trigger animation
-        requestAnimationFrame(() => {
-            notification.style.transform = 'translateX(-50%) translateY(20px)';
-            
-            // Remove after animation
-            setTimeout(() => {
-                notification.style.transform = 'translateX(-50%) translateY(-100%)';
-                setTimeout(() => notification.remove(), 300); // Match transition duration
-            }, 2000);
-        });
+        // Hide after delay
+        setTimeout(() => {
+            notification.classList.add('hide');
+        }, 2000);
     }
 };
 
