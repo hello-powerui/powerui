@@ -734,7 +734,6 @@ window.CustomPalettesManager = {
         const container = document.querySelector('.neutral-palettes-container');
         const template = document.getElementById('palette-template');
         if (!container || !template) {
-            console.error('Could not find container or template for neutral palettes');
             return;
         }
 
@@ -781,9 +780,6 @@ window.CustomPalettesManager = {
             const deleteButton = element.querySelector('.delete-button');
             if (deleteButton) {
                 deleteButton.setAttribute('data-delete-type', 'neutral-palette');
-                console.log('Configured delete button:', deleteButton);
-            } else {
-                console.error('Could not find delete button in template');
             }
 
             // Hide dropdown by default
@@ -791,7 +787,6 @@ window.CustomPalettesManager = {
             if (dropdown) dropdown.style.display = 'none';
 
             container.appendChild(element);
-            console.log('Added neutral palette element:', element);
         });
     },
 
@@ -861,10 +856,7 @@ window.CustomPalettesManager = {
         // Remove from DOM - find the entire custom-palette-wrapper
         const wrapper = input?.closest('.custom-palette-wrapper');
         if (wrapper) {
-            console.log('Removing palette wrapper from DOM:', wrapper);
             wrapper.remove();
-        } else {
-            console.error('Could not find palette wrapper to remove');
         }
 
         // Show success notification
