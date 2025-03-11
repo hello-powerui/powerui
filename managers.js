@@ -924,7 +924,16 @@ window.EventManager = {
                 if (customRadio?.classList.contains('w-radio-input')) {
                     customRadio.classList.add('w--redirected-checked');
                 }
-                radio.dispatchEvent(new Event('change'));
+
+                // Create and dispatch a proper change event
+                const event = new Event('change', {
+                    bubbles: true,
+                    cancelable: true
+                });
+                radio.dispatchEvent(event);
+
+                // Also trigger a click on the radio for Webflow's internal handlers
+                radio.click();
             }
         });
 
@@ -1205,7 +1214,8 @@ window.EventManager = {
     registerDropdownHandlers() {
         // Handle ellipsis button click
         this.addHandler('click', '.ellipsis-button', (e) => {
-            e.stopPropagation();
+            e.preventDefault();
+            e.stopPropagation(); // Prevent the palette wrapper click from firing
             const header = e.target.closest('.custom-palette-header, .custom-theme-header');
             const dropdown = header.querySelector('.palette-dropdown, .theme-dropdown');
             
