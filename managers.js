@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.6 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.7 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -836,6 +836,38 @@ window.CustomPalettesManager = {
         if (selectedShade) {
             selectedShade.style.backgroundColor = formattedHex;
         }
+    },
+
+    // Add new method for neutral palette deletion
+    async deleteNeutralPalette(paletteId) {
+        const palette = this.neutralPalettes.find(p => p.id === paletteId);
+        if (!palette) return false;
+
+        // Update the neutral palettes array
+        this.neutralPalettes = this.neutralPalettes.filter(p => p.id !== paletteId);
+        
+        // Save to MemberStack
+        await window.StateManager.saveNeutralPalettes(this.neutralPalettes);
+
+        // If this palette was selected, switch to default
+        const input = document.querySelector(`input[value="${paletteId}"]`);
+        if (input?.checked) {
+            const defaultNeutral = document.querySelector('input[name="neutral-palettes"][value="azure"]');
+            if (defaultNeutral) {
+                defaultNeutral.checked = true;
+                window.StyleManager.updateNeutralPalette('azure');
+            }
+        }
+
+        // Remove from DOM
+        const label = document.querySelector(`label.radio-button-card input[value="${paletteId}"]`)?.closest('label');
+        if (label) {
+            label.remove();
+        }
+
+        // Show success notification
+        window.DOMUtils.showNotification(`Neutral palette "${palette.name}" was deleted successfully`);
+        return true;
     }
 };
 
@@ -1111,37 +1143,12 @@ window.EventManager = {
 
         // Delete neutral palette handler
         this.addHandler('click', '[data-delete-type="neutral-palette"]', (e) => {
-            console.log('🎯 Delete neutral palette clicked');
-            
-            // First find the closest parent that contains both the delete button and the radio input
-            const paletteWrapper = e.target.closest('.radio-button-card');
-            console.log('Found palette wrapper:', paletteWrapper);
-            
-            if (!paletteWrapper) {
-                console.error('Could not find palette wrapper');
-                return;
-            }
-            
-            // Get the radio input directly
-            const input = paletteWrapper.querySelector('input[type="radio"]');
-            console.log('Found input:', input);
-            
-            if (!input) {
-                console.error('Could not find radio input');
-                return;
-            }
-            
-            const paletteId = input.value;
-            console.log('Palette ID:', paletteId);
-            
-            // Use the correct reference to CustomPalettesManager
+            const paletteWrapper = e.target.closest('label.radio-button-card');
+            const input = paletteWrapper?.querySelector('input[type="radio"]');
+            const paletteId = input?.value;
             const palette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === paletteId);
-            console.log('Found palette:', palette);
             
-            if (!palette) {
-                console.error('Could not find palette with id:', paletteId);
-                return;
-            }
+            if (!palette) return;
             
             // Show confirmation modal
             const lightboxModal = document.getElementById('delete-palette-lightbox-modal');
@@ -1151,7 +1158,7 @@ window.EventManager = {
                 messageElement.textContent = `Are you sure you want to delete "${palette.name}"?`;
             }
             
-            // Store the palette ID for use in the confirmation handler
+            // Store the palette ID and type for use in the confirmation handler
             lightboxModal.dataset.paletteId = paletteId;
             lightboxModal.dataset.isNeutralPalette = 'true';
             
@@ -1163,6 +1170,7 @@ window.EventManager = {
             if (dropdown) dropdown.style.display = 'none';
         });
 
+        // Delete theme handler
         this.addHandler('click', '.delete-button[data-delete-type="theme"]', (e) => {
             const wrapper = e.target.closest('.theme-wrapper');
             const themeId = wrapper.querySelector('input[type="radio"]').value;
@@ -1180,61 +1188,14 @@ window.EventManager = {
 
         // Delete confirmation modal handlers
         this.addHandler('click', '#confirm-delete-palette-button', async () => {
-            console.log('🗑️ Delete confirmation clicked');
             const modal = document.getElementById('delete-palette-lightbox-modal');
             const paletteId = modal.dataset.paletteId;
             const isNeutralPalette = modal.dataset.isNeutralPalette === 'true';
             const hasAffectedThemes = modal.dataset.hasAffectedThemes === 'true';
             
-            console.log('Delete params:', { paletteId, isNeutralPalette, hasAffectedThemes });
-            
             if (isNeutralPalette) {
-                console.log('📊 Current neutral palettes:', window.CustomPalettesManager.neutralPalettes);
-                
-                // Handle neutral palette deletion
-                window.CustomPalettesManager.neutralPalettes = 
-                    window.CustomPalettesManager.neutralPalettes.filter(p => p.id !== paletteId);
-                
-                console.log('📊 Filtered neutral palettes:', window.CustomPalettesManager.neutralPalettes);
-                
-                // Update StateManager's memberData to reflect the change
-                window.StateManager.memberData.neutralPalettes = window.CustomPalettesManager.neutralPalettes;
-                
-                console.log('💾 Saving to MemberStack...');
-                try {
-                    // Save the updated state to MemberStack
-                    await window.StateManager.saveNeutralPalettes(window.CustomPalettesManager.neutralPalettes);
-                    console.log('✅ Successfully saved to MemberStack');
-                } catch (error) {
-                    console.error('❌ Error saving to MemberStack:', error);
-                }
-                
-                // If this palette was selected, switch to default
-                const input = document.querySelector(`input[value="${paletteId}"]`);
-                if (input?.checked) {
-                    console.log('🔄 Switching to default neutral palette');
-                    const defaultNeutral = document.querySelector('input[name="neutral-palettes"][value="azure"]');
-                    if (defaultNeutral) {
-                        defaultNeutral.checked = true;
-                        window.StyleManager.updateNeutralPalette('azure');
-                    }
-                }
-                
-                // Remove from DOM
-                const label = document.querySelector(`label.radio-button-card input[value="${paletteId}"]`)?.closest('label');
-                if (label) {
-                    console.log('🗑️ Removing palette from DOM');
-                    label.remove();
-                }
-                
-                // Show success notification
-                const palette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === paletteId);
-                if (palette) {
-                    console.log('📢 Showing success notification');
-                    window.DOMUtils.showNotification(`Neutral palette "${palette.name}" was deleted successfully`);
-                }
+                await window.CustomPalettesManager.deleteNeutralPalette(paletteId);
             } else {
-                // Handle regular palette deletion
                 if (window.CustomPalettesManager.confirmDeletePalette(paletteId, hasAffectedThemes)) {
                     const wrapper = document.querySelector(`input[value="${paletteId}"]`)?.closest('.custom-palette-wrapper');
                     if (wrapper) wrapper.remove();
