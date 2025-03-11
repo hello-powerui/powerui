@@ -1,5 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
+
 console.log('PowerUI Managers v1.0.14 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
@@ -899,33 +900,21 @@ window.EventManager = {
 
         // Add handler for custom palette wrapper clicks
         this.addHandler('click', '.custom-palette-wrapper', (e) => {
-            // Don't trigger if clicking dropdown or its children
+            // Don't trigger if clicking dropdown, ellipsis button, or if event was prevented
             if (e.target.closest('.palette-dropdown') || 
                 e.target.closest('.ellipsis-button') || 
-                e.defaultPrevented) {
+                e.defaultPrevented ||
+                e.target.closest('.delete-button') ||
+                e.target.closest('[data-edit-type="palette"]')) {
                 return;
             }
             
-            // Find the radio input and its associated custom radio input
+            // Find the radio input
             const radio = e.currentTarget.querySelector('input[type="radio"]');
-            if (radio && !radio.checked) {
-                // Clear any existing checked radios in the same group
-                document.querySelectorAll(`input[name="${radio.name}"]`).forEach(r => {
-                    r.checked = false;
-                    const customRadio = r.previousElementSibling;
-                    if (customRadio?.classList.contains('w-radio-input')) {
-                        customRadio.classList.remove('w--redirected-checked');
-                    }
-                });
+            if (!radio || radio.checked) return;
 
-                // Check the clicked radio
-                radio.checked = true;
-                const customRadio = radio.previousElementSibling;
-                if (customRadio?.classList.contains('w-radio-input')) {
-                    customRadio.classList.add('w--redirected-checked');
-                }
-                radio.dispatchEvent(new Event('change'));
-            }
+            // Use the DOMUtils helper to handle radio selection
+            DOMUtils.setRadioChecked(radio.name, radio.value, true);
         });
 
         // Theme editing handlers
