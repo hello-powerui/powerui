@@ -124,6 +124,12 @@ window.DOMUtils = {
     showNotification(message, type = 'success') {
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
+        notification.style.position = 'fixed';
+        notification.style.top = '0';
+        notification.style.left = '50%';
+        notification.style.transform = 'translateX(-50%) translateY(-100%)';
+        notification.style.transition = 'transform 0.3s ease-in-out';
+        notification.style.zIndex = '9999';
         notification.innerHTML = `
             <div class="notification-content">
                 ${type === 'success' ? '<span class="notification-icon">✓</span>' : ''}
@@ -135,11 +141,11 @@ window.DOMUtils = {
         
         // Trigger animation
         requestAnimationFrame(() => {
-            notification.classList.add('show');
+            notification.style.transform = 'translateX(-50%) translateY(20px)';
             
             // Remove after animation
             setTimeout(() => {
-                notification.classList.remove('show');
+                notification.style.transform = 'translateX(-50%) translateY(-100%)';
                 setTimeout(() => notification.remove(), 300); // Match transition duration
             }, 2000);
         });
