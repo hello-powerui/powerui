@@ -897,6 +897,20 @@ window.EventManager = {
         this.addHandler('click', '#download-theme-button', () => window.ThemeManager.downloadTheme());
         this.addHandler('click', '#add-theme-button', () => window.ThemeManager.createNewTheme());
 
+        // Add handler for custom palette wrapper clicks
+        this.addHandler('click', '.custom-palette-wrapper', (e) => {
+            // Don't trigger if clicking dropdown or its children
+            if (e.target.closest('.palette-dropdown') || e.target.closest('.ellipsis-button')) {
+                return;
+            }
+            
+            const radio = e.currentTarget.querySelector('input[type="radio"]');
+            if (radio && !radio.checked) {
+                radio.checked = true;
+                radio.dispatchEvent(new Event('change'));
+            }
+        });
+
         // Theme editing handlers
         this.addHandler('click', '[data-edit-type="theme"]', (e) => {
             const wrapper = e.target.closest('.theme-wrapper');

@@ -457,49 +457,33 @@ svg path {
                 stroke-dashoffset 0.3s ease;
 }
 
-/* Notification styles */
-.notification {
-    position: fixed;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    border-radius: 8px;
-    padding: 12px 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 9999;
-    transition: top 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--neutral-900);
-    border: 1px solid var(--neutral-200);
+/* Notification Toast Animations */
+.notification-toast {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.notification.show {
-    top: 24px;
+.notification-toast.hide {
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+    pointer-events: none;
 }
 
-.notification-content {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
 
 .notification-icon {
-    color: #2ACF56;
-    font-size: 16px;
-    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
-.notification.notification-success {
-    background: #f0fdf4;
-    border-color: #86efac;
+/* Hide scrollbars while maintaining scroll functionality */
+* {
+    -ms-overflow-style: none;  /* Internet Explorer and Edge */
+    scrollbar-width: none;     /* Firefox */
 }
 
-.notification.notification-error {
-    background: #fef2f2;
-    border-color: #fca5a5;
-    color: #991b1b;
+/* Webkit browsers like Chrome, Safari, newer versions of Opera */
+*::-webkit-scrollbar {
+    display: none;
 }
