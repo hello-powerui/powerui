@@ -924,8 +924,8 @@ window.EventManager = {
         this.registerClickHandlers();
         this.registerChangeHandlers();
         this.registerInputHandlers();
-        this.registerDropdownHandlers();
         this.registerDeleteHandlers();
+        this.registerDropdownHandlers();
     },
 
     registerClickHandlers() {
@@ -1213,78 +1213,21 @@ window.EventManager = {
         });
     },
 
-    registerDropdownHandlers() {
-        // Handle ellipsis button click
-        this.addHandler('click', '.ellipsis-button, .ellipsis-button img', (e) => {
-            e.preventDefault();  // Prevent event from bubbling
-            e.stopPropagation();
-            
-            // Get the ellipsis button element (whether clicked directly or via img)
-            const ellipsisButton = e.target.classList.contains('ellipsis-button') ? 
-                e.target : e.target.closest('.ellipsis-button');
-                
-            // Find the dropdown within the same radio-button-card or theme-wrapper
-            const wrapper = ellipsisButton.closest('.radio-button-card, .theme-wrapper');
-            const dropdown = wrapper?.querySelector('.palette-dropdown, .theme-dropdown');
-            
-            if (!dropdown) return;
-            
-            // Close all other dropdowns first
-            document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
-                if (d !== dropdown) d.style.display = 'none';
-            });
-            
-            // Toggle the clicked dropdown
-            const isVisible = dropdown.style.display === 'block';
-            dropdown.style.display = isVisible ? 'none' : 'block';
-        });
-        
-        // Prevent theme selection when clicking dropdown items
-        this.addHandler('click', '.palette-dropdown, .theme-dropdown', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-        });
-        
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.ellipsis-button') && !e.target.closest('.palette-dropdown') && !e.target.closest('.theme-dropdown')) {
-                document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
-                    d.style.display = 'none';
-                });
-            }
-        });
-    },
-
     registerDeleteHandlers() {
-        console.log('Registering delete handlers...');
-        
         // Delete palette handlers
-        this.addHandler('click', '[data-delete-type="palette"], [data-delete-type="palette"] *', (e) => {
-            console.log('1. Click handler triggered');
+        this.addHandler('click', '[data-delete-type="palette"]', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
             // Get the delete button element
             const deleteButton = e.target.closest('[data-delete-type="palette"]');
-            if (!deleteButton) {
-                console.log('2. No delete button found');
-                return;
-            }
-            console.log('2. Found delete button');
+            if (!deleteButton) return;
             
             const wrapper = deleteButton.closest('.radio-button-card');
-            if (!wrapper) {
-                console.log('3. No radio-button-card wrapper found');
-                return;
-            }
-            console.log('3. Found wrapper');
+            if (!wrapper) return;
             
             const paletteId = wrapper.querySelector('input[type="radio"]').value;
-            if (!paletteId) {
-                console.log('4. No palette ID found');
-                return;
-            }
-            console.log('4. Found palette ID:', paletteId);
+            if (!paletteId) return;
 
             // Call the deletePalette method
             window.CustomPalettesManager.deletePalette(paletteId);
@@ -1402,6 +1345,48 @@ window.EventManager = {
 
         this.addHandler('click', '#cancel-delete-theme-button, #close-delete-theme-modal', () => {
             document.getElementById('delete-theme-lightbox-modal').style.display = 'none';
+        });
+    },
+
+    registerDropdownHandlers() {
+        // Handle ellipsis button click
+        this.addHandler('click', '.ellipsis-button, .ellipsis-button img', (e) => {
+            e.preventDefault();  // Prevent event from bubbling
+            e.stopPropagation();
+            
+            // Get the ellipsis button element (whether clicked directly or via img)
+            const ellipsisButton = e.target.classList.contains('ellipsis-button') ? 
+                e.target : e.target.closest('.ellipsis-button');
+                
+            // Find the dropdown within the same radio-button-card or theme-wrapper
+            const wrapper = ellipsisButton.closest('.radio-button-card, .theme-wrapper');
+            const dropdown = wrapper?.querySelector('.palette-dropdown, .theme-dropdown');
+            
+            if (!dropdown) return;
+            
+            // Close all other dropdowns first
+            document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
+                if (d !== dropdown) d.style.display = 'none';
+            });
+            
+            // Toggle the clicked dropdown
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+        });
+        
+        // Prevent theme selection when clicking dropdown items
+        this.addHandler('click', '.palette-dropdown, .theme-dropdown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.ellipsis-button') && !e.target.closest('.palette-dropdown') && !e.target.closest('.theme-dropdown')) {
+                document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
+                    d.style.display = 'none';
+                });
+            }
         });
     },
 
