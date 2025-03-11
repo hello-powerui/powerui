@@ -118,6 +118,31 @@ window.DOMUtils = {
                 }, 1500);
             }, 600);
         });
+    },
+
+    // Notification system
+    showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                ${type === 'success' ? '<span class="notification-icon">✓</span>' : ''}
+                ${message}
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Trigger animation
+        requestAnimationFrame(() => {
+            notification.classList.add('show');
+            
+            // Remove after animation
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300); // Match transition duration
+            }, 2000);
+        });
     }
 };
 
@@ -824,7 +849,7 @@ window.EventManager = {
         const modalCloseSelectors = [
             '#close-create-palette-modal',
             '#close-edit-palette-modal',
-            '#close-neutral-palette-modal',
+            '#close-create-neutral-palette-modal',
             '#close-delete-palette-modal',
             '.modal-close-button',  // Generic class for any modal close button
             '.lightbox-modal-overlay'  // Click on overlay to close
@@ -1121,6 +1146,7 @@ window.EventManager = {
         this.addHandler('click', '#confirm-delete-theme-button', () => {
             const modal = document.getElementById('delete-theme-lightbox-modal');
             const themeId = modal.dataset.themeId;
+            const themeName = this.themes.find(t => t.id === themeId)?.name;
             
             if (window.ThemeManager.confirmDeleteTheme(themeId)) {
                 const wrapper = document.querySelector(`input[value="${themeId}"]`)?.closest('.theme-wrapper');
@@ -1134,6 +1160,9 @@ window.EventManager = {
                         }
                     }
                     wrapper.remove();
+                    
+                    // Show success notification
+                    window.DOMUtils.showNotification(`Theme "${themeName}" was deleted successfully`);
                 }
             }
             
