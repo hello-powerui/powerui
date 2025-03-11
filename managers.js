@@ -899,8 +899,10 @@ window.EventManager = {
 
         // Add handler for custom palette wrapper clicks
         this.addHandler('click', '.custom-palette-wrapper', (e) => {
-            // Don't trigger if clicking dropdown or its children
-            if (e.target.closest('.palette-dropdown') || e.target.closest('.ellipsis-button')) {
+            // Don't trigger if clicking dropdown, ellipsis button, or any of their children
+            if (e.target.closest('.palette-dropdown') || 
+                e.target.closest('.ellipsis-button') || 
+                e.target.closest('.custom-palette-header .neutral-button')) {
                 return;
             }
             
