@@ -1,5 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
+console.log('PowerUI Managers v1.0.2 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -576,6 +577,50 @@ window.CustomPalettesManager = {
             console.error('❌ Error generating neutral palette:', error);
             alert('Failed to generate neutral palette. Please try again.');
             return false;
+        }
+    },
+
+    handleCoolorsUrl(modalType, url) {
+        if (!url) return;
+        
+        // Extract colors from Coolors URL
+        // Format examples:
+        // https://coolors.co/264653-2a9d8f-e9c46a-f4a261-e76f51
+        // https://coolors.co/palettes/264653-2a9d8f-e9c46a-f4a261-e76f51
+        const colors = url.split('/').pop().split('-').map(c => '#' + c);
+        
+        if (!colors.length || !colors.every(c => ColorUtils.isValidHexColor(c))) {
+            alert('Invalid Coolors URL. Please make sure you copy the full URL from Coolors.');
+            return;
+        }
+
+        // Get modal elements
+        const elements = this.getModalElements(modalType);
+        const lightboxModal = document.getElementById(elements.modalId);
+        const paletteContainer = lightboxModal.querySelector('.palette-container.custom');
+        
+        // Clear existing shades
+        paletteContainer.innerHTML = '';
+        
+        // Add new shades
+        colors.forEach(color => {
+            const shade = document.createElement('div');
+            shade.classList.add('palette-shade');
+            shade.style.backgroundColor = color;
+            paletteContainer.appendChild(shade);
+        });
+        
+        // Update shade buttons state
+        this.updateShadeButtons(lightboxModal, colors.length, modalType);
+        
+        // Select the first shade
+        const firstShade = paletteContainer.querySelector('.palette-shade');
+        if (firstShade) {
+            firstShade.classList.add('selected');
+            const hexInput = lightboxModal.querySelector(`#${elements.hexInputId}`);
+            if (hexInput) {
+                hexInput.value = colors[0];
+            }
         }
     }
 };
