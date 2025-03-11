@@ -1254,13 +1254,13 @@ window.EventManager = {
         console.log('Registering delete handlers...');
         
         // Delete palette handlers
-        this.addHandler('click', 'div[data-delete-type="palette"], div[data-delete-type="palette"] *', (e) => {
+        this.addHandler('click', '.delete-button[data-delete-type="palette"], .delete-button[data-delete-type="palette"] *', (e) => {
             console.log('Delete palette button clicked', e.target);
             e.preventDefault();
             e.stopPropagation();
             
             // Get the delete button element
-            const deleteButton = e.target.closest('div[data-delete-type="palette"]');
+            const deleteButton = e.target.closest('.delete-button[data-delete-type="palette"]');
             console.log('Found delete button:', deleteButton);
             if (!deleteButton) return;
             
