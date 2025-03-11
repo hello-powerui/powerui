@@ -1146,7 +1146,7 @@ window.EventManager = {
         this.addHandler('click', '#confirm-delete-theme-button', () => {
             const modal = document.getElementById('delete-theme-lightbox-modal');
             const themeId = modal.dataset.themeId;
-            const themeName = this.themes.find(t => t.id === themeId)?.name;
+            const themeName = window.ThemeManager.themes.find(t => t.id === themeId)?.name;
             
             if (window.ThemeManager.confirmDeleteTheme(themeId)) {
                 const wrapper = document.querySelector(`input[value="${themeId}"]`)?.closest('.theme-wrapper');
