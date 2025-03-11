@@ -1251,8 +1251,10 @@ window.EventManager = {
     },
 
     registerDeleteHandlers() {
+        console.log('Registering delete handlers...');
+        
         // Delete palette handlers
-        this.addHandler('click', '[data-delete-type="palette"]', (e) => {
+        this.addHandler('click', 'div[data-delete-type="palette"]', (e) => {
             console.log('Delete palette button clicked', e.target);
             e.preventDefault();
             e.stopPropagation();
