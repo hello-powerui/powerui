@@ -1755,17 +1755,21 @@ window.TooltipManager = {
         if (!tooltip) return;
         
         document.addEventListener('mouseover', e => {
-            const text = e.target.getAttribute('data-tooltip');
-            if (text) {
+            // Find closest parent with tooltip, including the element itself
+            const tooltipElement = e.target.closest('[data-tooltip]');
+            if (tooltipElement) {
+                const text = tooltipElement.getAttribute('data-tooltip');
                 tooltip.querySelector('.tooltip-text').textContent = text;
                 tooltip.style.display = 'block';
-                tooltip.style.left = `${e.target.getBoundingClientRect().right + 10}px`;
-                tooltip.style.top = `${e.target.getBoundingClientRect().top}px`;
+                tooltip.style.left = `${tooltipElement.getBoundingClientRect().right + 10}px`;
+                tooltip.style.top = `${tooltipElement.getBoundingClientRect().top}px`;
             }
         });
 
         document.addEventListener('mouseout', e => {
-            if (e.target.hasAttribute('data-tooltip')) {
+            // Hide tooltip only when moving out of the element with tooltip or its children
+            const tooltipElement = e.target.closest('[data-tooltip]');
+            if (tooltipElement && !tooltipElement.contains(e.relatedTarget)) {
                 tooltip.style.display = 'none';
             }
         });
