@@ -554,7 +554,9 @@ window.CustomPalettesManager = {
     },
 
     deletePalette(paletteId) {
-        console.log('deletePalette called with ID:', paletteId);
+        console.log('Delete palette button clicked', e.target);
+        console.log('Target classList:', e.target.classList);
+        console.log('Target attributes:', Array.from(e.target.attributes).map(attr => `${attr.name}="${attr.value}"`).join(', '));
         const affectedThemes = window.ThemeManager?.themes.filter(t => t.dataPalette === paletteId) || [];
         const palette = this.customPalettes.find(p => p.id === paletteId);
         console.log('Found palette:', palette);
@@ -1254,13 +1256,15 @@ window.EventManager = {
         console.log('Registering delete handlers...');
         
         // Delete palette handlers
-        this.addHandler('click', '.delete-button[data-delete-type="palette"], .delete-button[data-delete-type="palette"] *', (e) => {
+        this.addHandler('click', '[data-delete-type="palette"], [data-delete-type="palette"] *', (e) => {
             console.log('Delete palette button clicked', e.target);
+            console.log('Target classList:', e.target.classList);
+            console.log('Target attributes:', Array.from(e.target.attributes).map(attr => `${attr.name}="${attr.value}"`).join(', '));
             e.preventDefault();
             e.stopPropagation();
             
             // Get the delete button element
-            const deleteButton = e.target.closest('.delete-button[data-delete-type="palette"]');
+            const deleteButton = e.target.closest('[data-delete-type="palette"]');
             console.log('Found delete button:', deleteButton);
             if (!deleteButton) return;
             
