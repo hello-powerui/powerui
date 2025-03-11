@@ -899,10 +899,9 @@ window.EventManager = {
 
         // Add handler for custom palette wrapper clicks
         this.addHandler('click', '.custom-palette-wrapper', (e) => {
-            // Don't trigger if clicking dropdown, ellipsis button, or any of their children
-            if (e.target.closest('.palette-dropdown') || 
-                e.target.closest('.ellipsis-button') || 
-                e.target.closest('.custom-palette-header .neutral-button')) {
+            // If clicking any control elements, exit early and let those handlers take over
+            const isControlElement = e.target.closest('.palette-dropdown, .ellipsis-button, .custom-palette-header .neutral-button, .delete-button, [data-edit-type="palette"]');
+            if (isControlElement) {
                 return;
             }
             
@@ -1214,16 +1213,25 @@ window.EventManager = {
     },
 
     registerDropdownHandlers() {
-        // Handle ellipsis button click
+        // Handle ellipsis button click with explicit stopPropagation
         this.addHandler('click', '.ellipsis-button', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            const dropdown = e.target.closest('.custom-palette-header, .custom-theme-header').querySelector('.palette-dropdown, .theme-dropdown');
+            
+            // Get the actual button element whether we clicked the button or its child image
+            const button = e.target.closest('.ellipsis-button');
+            if (!button) return;
+            
+            // Find the dropdown relative to this specific button
+            const dropdown = button.nextElementSibling;
+            if (!dropdown || !dropdown.classList.contains('palette-dropdown')) return;
             
             // Close all other dropdowns
             document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
                 if (d !== dropdown) d.style.display = 'none';
             });
             
+            // Toggle this dropdown
             dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
         });
 
