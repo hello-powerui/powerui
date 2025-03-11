@@ -1151,8 +1151,9 @@ window.EventManager = {
             
             if (isNeutralPalette) {
                 // Handle neutral palette deletion
-                this.neutralPalettes = this.neutralPalettes.filter(p => p.id !== paletteId);
-                window.StateManager.saveNeutralPalettes(this.neutralPalettes);
+                window.CustomPalettesManager.neutralPalettes = 
+                    window.CustomPalettesManager.neutralPalettes.filter(p => p.id !== paletteId);
+                window.StateManager.saveNeutralPalettes(window.CustomPalettesManager.neutralPalettes);
                 
                 // If this palette was selected, switch to default
                 const input = document.querySelector(`input[value="${paletteId}"]`);
@@ -1169,7 +1170,7 @@ window.EventManager = {
                 if (label) label.remove();
                 
                 // Show success notification
-                const palette = this.neutralPalettes.find(p => p.id === paletteId);
+                const palette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === paletteId);
                 if (palette) {
                     window.DOMUtils.showNotification(`Neutral palette "${palette.name}" was deleted successfully`);
                 }
