@@ -1116,6 +1116,33 @@ window.EventManager = {
         this.addHandler('click', '#cancel-delete-palette-button, #close-delete-palette-modal', () => {
             document.getElementById('delete-palette-lightbox-modal').style.display = 'none';
         });
+
+        // Theme deletion modal handlers
+        this.addHandler('click', '#confirm-delete-theme-button', () => {
+            const modal = document.getElementById('delete-theme-lightbox-modal');
+            const themeId = modal.dataset.themeId;
+            
+            if (window.ThemeManager.confirmDeleteTheme(themeId)) {
+                const wrapper = document.querySelector(`input[value="${themeId}"]`)?.closest('.theme-wrapper');
+                if (wrapper) {
+                    // If this was the active theme, switch to default
+                    if (wrapper.querySelector('input[type="radio"]').checked) {
+                        const defaultRadio = document.querySelector('input[name="themes"][value="default"]');
+                        if (defaultRadio) {
+                            defaultRadio.checked = true;
+                            window.ThemeManager.applyDefaultTheme();
+                        }
+                    }
+                    wrapper.remove();
+                }
+            }
+            
+            modal.style.display = 'none';
+        });
+
+        this.addHandler('click', '#cancel-delete-theme-button, #close-delete-theme-modal', () => {
+            document.getElementById('delete-theme-lightbox-modal').style.display = 'none';
+        });
     },
 
     addHandler(eventType, selector, handler) {
@@ -1405,6 +1432,25 @@ window.ThemeManager = {
     },
 
     deleteTheme(themeId) {
+        const theme = this.themes.find(t => t.id === themeId);
+        if (!theme) return false;
+
+        const modal = document.getElementById('delete-theme-lightbox-modal');
+        const messageElement = modal.querySelector('.delete-message');
+        
+        if (messageElement) {
+            messageElement.textContent = `Are you sure you want to delete "${theme.name}"?`;
+        }
+        
+        // Store the theme ID for use in the confirmation handler
+        modal.dataset.themeId = themeId;
+        
+        // Show the modal
+        modal.style.display = 'flex';
+        return false;
+    },
+
+    confirmDeleteTheme(themeId) {
         this.themes = this.themes.filter(t => t.id !== themeId);
         this.saveState();
         return true;
