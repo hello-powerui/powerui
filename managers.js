@@ -912,16 +912,21 @@ window.EventManager = {
         });
 
         // Simple dropdown toggle
-        this.addHandler('click', '.ellipsis-button', (e) => {
+        this.addHandler('click', '.ellipsis-button, .ellipsis-button img', (e) => {
             e.stopPropagation();
             console.log('Ellipsis clicked:', e.target);
             
-            // Get the button and check if it's in a theme or palette
-            const button = e.target.closest('.ellipsis-button');
-            const isTheme = button?.closest('.theme-wrapper');
+            // Get the button element whether we clicked the button or its image
+            const button = e.target.classList.contains('ellipsis-button') ? e.target : e.target.closest('.ellipsis-button');
+            console.log('Found button:', button);
+            
+            // Get parent wrapper to determine if it's a theme or palette
+            const themeWrapper = button?.closest('.theme-wrapper');
+            const paletteWrapper = button?.closest('.custom-palette-wrapper');
+            const isTheme = !!themeWrapper;
             console.log('Is theme:', isTheme);
             
-            // Find the dropdown based on context
+            // Find the header and dropdown
             const header = button?.closest(isTheme ? '.custom-theme-header' : '.custom-palette-header');
             console.log('Found header:', header);
             
@@ -1020,16 +1025,21 @@ window.EventManager = {
 
     registerDropdownHandlers() {
         // Simple dropdown toggle
-        this.addHandler('click', '.ellipsis-button', (e) => {
+        this.addHandler('click', '.ellipsis-button, .ellipsis-button img', (e) => {
             e.stopPropagation();
             console.log('Ellipsis clicked:', e.target);
             
-            // Get the button and check if it's in a theme or palette
-            const button = e.target.closest('.ellipsis-button');
-            const isTheme = button?.closest('.theme-wrapper');
+            // Get the button element whether we clicked the button or its image
+            const button = e.target.classList.contains('ellipsis-button') ? e.target : e.target.closest('.ellipsis-button');
+            console.log('Found button:', button);
+            
+            // Get parent wrapper to determine if it's a theme or palette
+            const themeWrapper = button?.closest('.theme-wrapper');
+            const paletteWrapper = button?.closest('.custom-palette-wrapper');
+            const isTheme = !!themeWrapper;
             console.log('Is theme:', isTheme);
             
-            // Find the dropdown based on context
+            // Find the header and dropdown
             const header = button?.closest(isTheme ? '.custom-theme-header' : '.custom-palette-header');
             console.log('Found header:', header);
             
