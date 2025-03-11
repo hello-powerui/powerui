@@ -577,10 +577,11 @@ window.CustomPalettesManager = {
     },
 
     confirmDeletePalette(paletteId, hasAffectedThemes) {
-        const affectedThemes = hasAffectedThemes ? 
-            window.ThemeManager.themes.filter(t => t.dataPalette === paletteId) : [];
-        
+        const palette = this.customPalettes.find(p => p.id === paletteId);
+        if (!palette) return false;
+
         if (hasAffectedThemes) {
+            const affectedThemes = window.ThemeManager.themes.filter(t => t.dataPalette === paletteId);
             affectedThemes.forEach(theme => {
                 theme.dataPalette = 'power-ui';  // Set to default palette
             });
@@ -603,6 +604,16 @@ window.CustomPalettesManager = {
         
         this.customPalettes = this.customPalettes.filter(p => p.id !== paletteId);
         this.saveState();
+
+        // Show success notification
+        window.DOMUtils.showNotification(`Palette "${palette.name}" was deleted successfully`);
+
+        // Remove the palette element from DOM immediately
+        const paletteElement = document.querySelector(`input[value="${paletteId}"]`)?.closest('.radio-button-card');
+        if (paletteElement) {
+            paletteElement.remove();
+        }
+
         return true;
     },
 
@@ -1243,8 +1254,24 @@ window.EventManager = {
             
             const paletteId = wrapper.querySelector('input[type="radio"]').value;
             if (!paletteId) return;
+
+            const palette = window.CustomPalettesManager.customPalettes.find(p => p.id === paletteId);
+            if (!palette) return;
+
+            // Show confirmation modal
+            const lightboxModal = document.getElementById('delete-palette-lightbox-modal');
+            const messageElement = lightboxModal.querySelector('.delete-message');
             
-            window.CustomPalettesManager.deletePalette(paletteId);
+            if (messageElement) {
+                messageElement.textContent = `Are you sure you want to delete "${palette.name}"?`;
+            }
+            
+            // Store the palette ID for use in the confirmation handler
+            lightboxModal.dataset.paletteId = paletteId;
+            lightboxModal.dataset.isNeutralPalette = 'false';
+            
+            // Show the modal
+            lightboxModal.style.display = 'flex';
             
             // Hide the dropdown
             const dropdown = e.target.closest('.palette-dropdown');
