@@ -97,8 +97,11 @@ window.DOMUtils = {
 
         // Configure description if exists
         const description = element.querySelector('.theme-description');
-        if (description) {
-            description.textContent = theme.description || '';
+        if (description && theme.description) {
+            description.textContent = theme.description;
+            description.style.display = 'block';  // Ensure it's visible
+        } else if (description) {
+            description.style.display = 'none';  // Hide if no description
         }
 
         return element;
@@ -1212,6 +1215,12 @@ window.EventManager = {
             // Toggle the clicked dropdown
             const isVisible = dropdown.style.display === 'block';
             dropdown.style.display = isVisible ? 'none' : 'block';
+        });
+        
+        // Prevent theme selection when clicking dropdown items
+        this.addHandler('click', '.palette-dropdown, .theme-dropdown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
         });
         
         // Close dropdowns when clicking outside
