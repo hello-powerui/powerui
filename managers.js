@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.16 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.17 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -776,15 +776,24 @@ window.CustomPalettesManager = {
                 paletteContainer.appendChild(shadeElement);
             });
 
-            // Configure dropdown buttons
+            // Configure dropdown and buttons
             const deleteButton = element.querySelector('.delete-button');
             if (deleteButton) {
                 deleteButton.setAttribute('data-delete-type', 'neutral-palette');
             }
 
+            // Configure ellipsis button
+            const ellipsisButton = element.querySelector('.ellipsis-button');
+            if (ellipsisButton) {
+                ellipsisButton.setAttribute('data-palette-type', 'neutral');
+            }
+
             // Hide dropdown by default
             const dropdown = element.querySelector('.palette-dropdown');
-            if (dropdown) dropdown.style.display = 'none';
+            if (dropdown) {
+                dropdown.style.display = 'none';
+                dropdown.classList.add('neutral-palette-dropdown');
+            }
 
             container.appendChild(element);
         });
@@ -888,7 +897,6 @@ window.EventManager = {
         this.registerClickHandlers();
         this.registerChangeHandlers();
         this.registerInputHandlers();
-        this.registerDropdownHandlers();
         this.registerDeleteHandlers();
     },
 
@@ -911,36 +919,28 @@ window.EventManager = {
             }
         });
 
-        // Simple dropdown toggle
+        // Dropdown handlers
         this.addHandler('click', '.ellipsis-button, .ellipsis-button img', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            console.log('Ellipsis clicked:', e.target);
             
             // Get the button element whether we clicked the button or its image
             const button = e.target.classList.contains('ellipsis-button') ? e.target : e.target.closest('.ellipsis-button');
-            console.log('Found button:', button);
+            if (!button) return;
             
-            // Get parent wrapper to determine if it's a theme or palette
-            const themeWrapper = button?.closest('.theme-wrapper');
-            const paletteWrapper = button?.closest('.custom-palette-wrapper');
+            // Get parent wrapper and determine type
+            const themeWrapper = button.closest('.theme-wrapper');
             const isTheme = !!themeWrapper;
-            console.log('Is theme:', isTheme);
+            const isNeutral = button.getAttribute('data-palette-type') === 'neutral';
             
             // Find the header and dropdown
-            const header = button?.closest(isTheme ? '.custom-theme-header' : '.custom-palette-header');
-            console.log('Found header:', header);
-            
+            const header = button.closest(isTheme ? '.custom-theme-header' : '.custom-palette-header');
             const dropdown = header?.querySelector(isTheme ? '.theme-dropdown' : '.palette-dropdown');
-            console.log('Found dropdown:', dropdown);
             
-            if (!dropdown) {
-                console.error('Could not find dropdown for button:', button);
-                return;
-            }
+            if (!dropdown) return;
             
-            // Hide all other dropdowns of the same type
-            const dropdownClass = isTheme ? '.theme-dropdown' : '.palette-dropdown';
-            document.querySelectorAll(dropdownClass).forEach(d => {
+            // Hide all other dropdowns
+            document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => {
                 if (d !== dropdown) d.style.display = 'none';
             });
             
@@ -948,9 +948,16 @@ window.EventManager = {
             dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
         });
 
-        // Hide dropdowns when clicking elsewhere
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => d.style.display = 'none');
+        // Hide dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.ellipsis-button') && 
+                !e.target.closest('.palette-dropdown') && 
+                !e.target.closest('.theme-dropdown') && 
+                !e.target.closest('.neutral-palette-dropdown')) {
+                document.querySelectorAll('.palette-dropdown, .theme-dropdown, .neutral-palette-dropdown').forEach(d => {
+                    d.style.display = 'none';
+                });
+            }
         });
     },
 
@@ -1023,52 +1030,8 @@ window.EventManager = {
         });
     },
 
-    registerDropdownHandlers() {
-        // Simple dropdown toggle
-        this.addHandler('click', '.ellipsis-button, .ellipsis-button img', (e) => {
-            e.stopPropagation();
-            console.log('Ellipsis clicked:', e.target);
-            
-            // Get the button element whether we clicked the button or its image
-            const button = e.target.classList.contains('ellipsis-button') ? e.target : e.target.closest('.ellipsis-button');
-            console.log('Found button:', button);
-            
-            // Get parent wrapper to determine if it's a theme or palette
-            const themeWrapper = button?.closest('.theme-wrapper');
-            const paletteWrapper = button?.closest('.custom-palette-wrapper');
-            const isTheme = !!themeWrapper;
-            console.log('Is theme:', isTheme);
-            
-            // Find the header and dropdown
-            const header = button?.closest(isTheme ? '.custom-theme-header' : '.custom-palette-header');
-            console.log('Found header:', header);
-            
-            const dropdown = header?.querySelector(isTheme ? '.theme-dropdown' : '.palette-dropdown');
-            console.log('Found dropdown:', dropdown);
-            
-            if (!dropdown) {
-                console.error('Could not find dropdown for button:', button);
-                return;
-            }
-            
-            // Hide all other dropdowns of the same type
-            const dropdownClass = isTheme ? '.theme-dropdown' : '.palette-dropdown';
-            document.querySelectorAll(dropdownClass).forEach(d => {
-                if (d !== dropdown) d.style.display = 'none';
-            });
-            
-            // Toggle this dropdown
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-        });
-
-        // Hide dropdowns when clicking elsewhere
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.palette-dropdown, .theme-dropdown').forEach(d => d.style.display = 'none');
-        });
-    },
-
     registerDeleteHandlers() {
-        // Delete palette handlers
+        // Delete custom palette handler
         this.addHandler('click', '[data-delete-type="palette"]', (e) => {
             const wrapper = e.target.closest('.custom-palette-wrapper');
             const paletteId = wrapper.querySelector('input[type="radio"]').value;
@@ -1078,7 +1041,7 @@ window.EventManager = {
         });
 
         // Delete neutral palette handler
-        this.addHandler('click', '.delete-button', (e) => {
+        this.addHandler('click', '[data-delete-type="neutral-palette"]', (e) => {
             const deleteButton = e.target.closest('.delete-button');
             if (!deleteButton) return;
             
@@ -1151,33 +1114,6 @@ window.EventManager = {
 
         this.addHandler('click', '#cancel-delete-palette-button, #close-delete-palette-modal', () => {
             document.getElementById('delete-palette-lightbox-modal').style.display = 'none';
-        });
-
-        // Theme deletion modal handlers
-        this.addHandler('click', '#confirm-delete-theme-button', () => {
-            const modal = document.getElementById('delete-theme-lightbox-modal');
-            const themeId = modal.dataset.themeId;
-            const themeName = window.ThemeManager.themes.find(t => t.id === themeId)?.name;
-            
-            if (window.ThemeManager.confirmDeleteTheme(themeId)) {
-                const wrapper = document.querySelector(`input[value="${themeId}"]`)?.closest('.theme-wrapper');
-                if (wrapper) {
-                    // If this was the active theme, switch to default
-                    if (wrapper.querySelector('input[type="radio"]').checked) {
-                        const defaultRadio = document.querySelector('input[name="themes"][value="default"]');
-                        if (defaultRadio) {
-                            defaultRadio.checked = true;
-                            window.ThemeManager.applyDefaultTheme();
-                        }
-                    }
-                    wrapper.remove();
-                    
-                    // Show success notification
-                    window.DOMUtils.showNotification(`Theme "${themeName}" was deleted successfully`);
-                }
-            }
-            
-            modal.style.display = 'none';
         });
 
         this.addHandler('click', '#cancel-delete-theme-button, #close-delete-theme-modal', () => {
