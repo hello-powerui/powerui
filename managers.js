@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.2 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.3 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -657,13 +657,37 @@ window.EventManager = {
         this.addHandler('click', '#download-theme-button', () => window.ThemeManager.downloadTheme());
         this.addHandler('click', '#add-theme-button', () => window.ThemeManager.createNewTheme());
 
+        // Close modal handlers for all modals
+        const modalCloseSelectors = [
+            '#close-create-palette-modal',
+            '#close-edit-palette-modal',
+            '#close-neutral-palette-modal',
+            '#close-delete-palette-modal',
+            '.modal-close-button',  // Generic class for any modal close button
+            '.lightbox-modal-overlay'  // Click on overlay to close
+        ];
+
+        modalCloseSelectors.forEach(selector => {
+            this.addHandler('click', selector, (e) => {
+                // If clicking overlay, only close if clicked directly on overlay
+                if (selector === '.lightbox-modal-overlay' && e.target !== e.currentTarget) return;
+                
+                // Find the closest modal and hide it
+                const modal = e.target.closest('.lightbox-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    // Clear any input fields
+                    modal.querySelectorAll('input[type="text"]').forEach(input => input.value = '');
+                    // Clear any selected shades
+                    modal.querySelectorAll('.palette-shade.selected').forEach(shade => shade.classList.remove('selected'));
+                }
+            });
+        });
+
         // Palette creation
         this.addHandler('click', '#show-create-palette-modal', () => {
             document.getElementById('create-palette-lightbox-modal').style.display = 'flex';
             window.CustomPalettesManager.initializePaletteModal('create');
-        });
-        this.addHandler('click', '#close-create-palette-modal', () => {
-            document.getElementById('create-palette-lightbox-modal').style.display = 'none';
         });
         this.addHandler('click', '#save-new-palette-button', () => {
             window.CustomPalettesManager.handlePaletteAction('create');
@@ -703,12 +727,6 @@ window.EventManager = {
             }
         });
 
-        this.addHandler('click', '#close-edit-palette-modal', () => {
-            const modal = document.getElementById('edit-palette-lightbox-modal');
-            modal.style.display = 'none';
-            window.CustomPalettesManager.currentEditingPaletteId = null;
-        });
-
         this.addHandler('click', '#save-edit-palette-button', () => {
             window.CustomPalettesManager.handlePaletteAction('edit');
         });
@@ -729,26 +747,6 @@ window.EventManager = {
             if (paletteContainer) {
                 paletteContainer.innerHTML = '';
             }
-            if (saveButton) {
-                saveButton.classList.add('disabled');
-                saveButton.style.opacity = '0.5';
-                saveButton.style.pointerEvents = 'none';
-            }
-        });
-
-        this.addHandler('click', '#close-neutral-palette-modal', () => {
-            const modal = document.getElementById('create-neutral-palette-modal');
-            const paletteContainer = modal.querySelector('.palette-container');
-            const saveButton = document.getElementById('save-neutral-palette-button');
-            
-            // Hide modal
-            modal.style.display = 'none';
-            
-            // Reset modal state
-            if (paletteContainer) {
-                paletteContainer.innerHTML = '';
-            }
-            document.getElementById('neutral-palette-hex-input').value = '';
             if (saveButton) {
                 saveButton.classList.add('disabled');
                 saveButton.style.opacity = '0.5';
