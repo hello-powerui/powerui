@@ -1254,11 +1254,17 @@ window.EventManager = {
         console.log('Registering delete handlers...');
         
         // Delete palette handlers
-        this.addHandler('click', 'div[data-delete-type="palette"]', (e) => {
+        this.addHandler('click', 'div[data-delete-type="palette"], div[data-delete-type="palette"] *', (e) => {
             console.log('Delete palette button clicked', e.target);
             e.preventDefault();
             e.stopPropagation();
-            const wrapper = e.target.closest('.radio-button-card');
+            
+            // Get the delete button element
+            const deleteButton = e.target.closest('div[data-delete-type="palette"]');
+            console.log('Found delete button:', deleteButton);
+            if (!deleteButton) return;
+            
+            const wrapper = deleteButton.closest('.radio-button-card');
             console.log('Found wrapper:', wrapper);
             if (!wrapper) return;
             
@@ -1270,7 +1276,7 @@ window.EventManager = {
             window.CustomPalettesManager.deletePalette(paletteId);
             
             // Hide the dropdown
-            const dropdown = e.target.closest('.palette-dropdown');
+            const dropdown = deleteButton.closest('.palette-dropdown');
             if (dropdown) dropdown.style.display = 'none';
         });
 
