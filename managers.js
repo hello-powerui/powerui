@@ -759,6 +759,30 @@ window.CustomPalettesManager = {
             const color = window.ColorUtils.rgbToHex(shade.style.backgroundColor);
             hexInput.value = color;
         }
+    },
+
+    // Add the missing handleHexInput function
+    handleHexInput(modalType, hexColor) {
+        if (!hexColor) return;
+        
+        const { modalId } = this.getModalElements(modalType);
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        // Validate hex color
+        if (!window.ColorUtils.isValidHexColor(hexColor)) {
+            alert('Please enter a valid hex color (e.g., #f49d0c or f49d0c)');
+            return;
+        }
+
+        // Ensure hex color starts with #
+        const formattedHex = hexColor.startsWith('#') ? hexColor : '#' + hexColor;
+
+        // Update selected shade color
+        const selectedShade = modal.querySelector('.palette-shade.selected');
+        if (selectedShade) {
+            selectedShade.style.backgroundColor = formattedHex;
+        }
     }
 };
 
