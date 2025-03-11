@@ -1465,7 +1465,7 @@ window.ThemeManager = {
             // Handle custom palette
             if (theme.dataPalette?.startsWith('custom-')) {
                 const colors = Array.from(document.querySelector(`input[value="${theme.dataPalette}"]`)
-                    ?.closest('.custom-palette-wrapper')
+                    ?.closest('.radio-button-card.custom')
                     ?.querySelectorAll('.palette-shade') || [])
                     .map(shade => ColorUtils.rgbToHex(shade.style.backgroundColor));
                 if (colors.length) window.StyleManager.updateDataColors({ colors });
