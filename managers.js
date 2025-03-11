@@ -1,6 +1,6 @@
 // Constants
 const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
-console.log('PowerUI Managers v1.0.4 loaded - ' + new Date().toISOString());
+console.log('PowerUI Managers v1.0.5 loaded - ' + new Date().toISOString());
 
 // test: https://power-ui-test-53e235d2888e.herokuapp.com/
 // Prod https://power-ui-88fa0fe861ac.herokuapp.com/
@@ -1112,19 +1112,43 @@ window.EventManager = {
         // Delete neutral palette handler
         this.addHandler('click', '[data-delete-type="neutral-palette"]', (e) => {
             console.log('🎯 Delete neutral palette clicked');
-            const label = e.target.closest('label.radio-button-card');
-            const input = label.querySelector('input[type="radio"]');
+            
+            // Get the radio-button-card label that contains the input
+            const radioButtonCard = e.target.closest('label.radio-button-card');
+            console.log('Found radio button card:', radioButtonCard);
+            
+            if (!radioButtonCard) {
+                console.error('Could not find radio button card');
+                return;
+            }
+            
+            // Get the input by its ID which matches the label's "for" attribute
+            const inputId = radioButtonCard.getAttribute('for');
+            const input = document.getElementById(inputId);
+            console.log('Found input:', input);
+            
+            if (!input) {
+                console.error('Could not find input with id:', inputId);
+                return;
+            }
+            
             const paletteId = input.value;
+            console.log('Palette ID:', paletteId);
             
             // Use the correct reference to CustomPalettesManager
             const palette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === paletteId);
             console.log('Found palette:', palette);
             
+            if (!palette) {
+                console.error('Could not find palette with id:', paletteId);
+                return;
+            }
+            
             // Show confirmation modal
             const lightboxModal = document.getElementById('delete-palette-lightbox-modal');
             const messageElement = lightboxModal.querySelector('.delete-message');
             
-            if (messageElement && palette) {
+            if (messageElement) {
                 messageElement.textContent = `Are you sure you want to delete "${palette.name}"?`;
             }
             
