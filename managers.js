@@ -741,7 +741,10 @@ window.CustomPalettesManager = {
     renderSavedNeutralPalettes() {
         const container = document.querySelector('.neutral-palettes-container');
         const template = document.getElementById('palette-template');
-        if (!container || !template) return;
+        if (!container || !template) {
+            console.error('Could not find container or template for neutral palettes');
+            return;
+        }
 
         // Remove any existing custom neutral palettes (those starting with 'neutral-')
         container.querySelectorAll('label.radio-button-card').forEach(label => {
@@ -782,17 +785,21 @@ window.CustomPalettesManager = {
                 paletteContainer.appendChild(shadeElement);
             });
 
-            // Update dropdown buttons
-            const editButton = element.querySelector('[data-edit-type="palette"]');
-            const deleteButton = element.querySelector('[data-delete-type="palette"]');
-            if (editButton) editButton.setAttribute('data-edit-type', 'neutral-palette');
-            if (deleteButton) deleteButton.setAttribute('data-delete-type', 'neutral-palette');
+            // Configure dropdown buttons
+            const deleteButton = element.querySelector('.delete-button');
+            if (deleteButton) {
+                deleteButton.setAttribute('data-delete-type', 'neutral-palette');
+                console.log('Configured delete button:', deleteButton);
+            } else {
+                console.error('Could not find delete button in template');
+            }
 
             // Hide dropdown by default
             const dropdown = element.querySelector('.palette-dropdown');
             if (dropdown) dropdown.style.display = 'none';
 
             container.appendChild(element);
+            console.log('Added neutral palette element:', element);
         });
     },
 
@@ -1142,13 +1149,35 @@ window.EventManager = {
         });
 
         // Delete neutral palette handler
-        this.addHandler('click', '[data-delete-type="neutral-palette"]', (e) => {
-            const paletteWrapper = e.target.closest('label.radio-button-card');
-            const input = paletteWrapper?.querySelector('input[type="radio"]');
-            const paletteId = input?.value;
-            const palette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === paletteId);
+        this.addHandler('click', '.delete-button[data-delete-type="neutral-palette"]', (e) => {
+            console.log('Delete neutral palette clicked', e.target);
             
-            if (!palette) return;
+            // First find the parent radio-button-card
+            const paletteWrapper = e.target.closest('label.radio-button-card');
+            if (!paletteWrapper) {
+                console.error('Could not find palette wrapper');
+                return;
+            }
+            
+            // Get the radio input and palette ID
+            const input = paletteWrapper.querySelector('input[type="radio"][name="neutral-palettes"]');
+            if (!input) {
+                console.error('Could not find neutral palette radio input');
+                return;
+            }
+            
+            const paletteId = input.value;
+            if (!paletteId) {
+                console.error('Could not find palette ID');
+                return;
+            }
+            
+            // Find the palette in the manager
+            const palette = window.CustomPalettesManager.neutralPalettes.find(p => p.id === paletteId);
+            if (!palette) {
+                console.error('Could not find palette with id:', paletteId);
+                return;
+            }
             
             // Show confirmation modal
             const lightboxModal = document.getElementById('delete-palette-lightbox-modal');
