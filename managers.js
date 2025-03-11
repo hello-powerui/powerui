@@ -1236,15 +1236,25 @@ window.EventManager = {
     registerDeleteHandlers() {
         // Delete palette handlers
         this.addHandler('click', '[data-delete-type="palette"]', (e) => {
-            const wrapper = e.target.closest('.radio-button-card.custom');
+            e.preventDefault();
+            e.stopPropagation();
+            const wrapper = e.target.closest('.radio-button-card');
+            if (!wrapper) return;
+            
             const paletteId = wrapper.querySelector('input[type="radio"]').value;
+            if (!paletteId) return;
+            
             window.CustomPalettesManager.deletePalette(paletteId);
+            
+            // Hide the dropdown
             const dropdown = e.target.closest('.palette-dropdown');
             if (dropdown) dropdown.style.display = 'none';
         });
 
         // Delete neutral palette handler
-        this.addHandler('click', '.delete-button', (e) => {
+        this.addHandler('click', '[data-delete-type="neutral-palette"]', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const deleteButton = e.target.closest('.delete-button');
             if (!deleteButton) return;
             
@@ -1281,19 +1291,20 @@ window.EventManager = {
         });
 
         // Delete theme handler
-        this.addHandler('click', '.delete-button-theme', (e) => {
+        this.addHandler('click', '[data-delete-type="theme"]', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const wrapper = e.target.closest('.radio-button-card');
+            if (!wrapper) return;
+            
             const themeId = wrapper.querySelector('input[type="radio"]').value;
-            if (window.ThemeManager.deleteTheme(themeId)) {
-                wrapper.remove();
-                if (wrapper.querySelector('input[type="radio"]').checked) {
-                    const defaultRadio = document.querySelector('input[name="themes"][value="default"]');
-                    if (defaultRadio) {
-                        defaultRadio.checked = true;
-                        window.ThemeManager.applyDefaultTheme();
-                    }
-                }
-            }
+            if (!themeId) return;
+            
+            window.ThemeManager.deleteTheme(themeId);
+            
+            // Hide the dropdown
+            const dropdown = e.target.closest('.theme-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
         });
 
         // Delete confirmation modal handlers
@@ -1646,8 +1657,29 @@ window.ThemeManager = {
     },
 
     confirmDeleteTheme(themeId) {
+        const theme = this.themes.find(t => t.id === themeId);
+        if (!theme) return false;
+
         this.themes = this.themes.filter(t => t.id !== themeId);
         this.saveState();
+
+        // Show success notification
+        window.DOMUtils.showNotification(`Theme "${theme.name}" was deleted successfully`);
+
+        // Remove the theme element from DOM immediately
+        const themeElement = document.querySelector(`input[value="${themeId}"]`)?.closest('.radio-button-card');
+        if (themeElement) {
+            // If this was the active theme, switch to default
+            if (themeElement.querySelector('input[type="radio"]').checked) {
+                const defaultRadio = document.querySelector('input[name="themes"][value="default"]');
+                if (defaultRadio) {
+                    defaultRadio.checked = true;
+                    this.applyDefaultTheme();
+                }
+            }
+            themeElement.remove();
+        }
+
         return true;
     },
 
