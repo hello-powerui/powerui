@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/managers.js",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable",
+        "access-control-allow-origin": "*",
+        "content-type": "application/javascript; charset=utf-8"
+      },
+      "continue": true
+    }
+  ],
+  "github": {
+    "enabled": true,
+    "silent": true
+  }
+} 
