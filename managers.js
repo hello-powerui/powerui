@@ -1039,6 +1039,7 @@ window.EventManager = {
             '#close-edit-palette-modal',
             '#close-create-neutral-palette-modal',
             '#close-delete-palette-modal',
+            '#close-premium-required-modal',  // Add premium required modal close button
             '.modal-close-button',  // Generic class for any modal close button
             '.lightbox-modal-overlay'  // Click on overlay to close
         ];
@@ -1058,6 +1059,11 @@ window.EventManager = {
                     modal.querySelectorAll('.palette-shade.selected').forEach(shade => shade.classList.remove('selected'));
                 }
             });
+        });
+
+        // Add specific handler for premium required modal cancel button
+        this.addHandler('click', '#cancel-premium-required-modal', () => {
+            document.getElementById('premium-required-modal').style.display = 'none';
         });
 
         // Palette creation
