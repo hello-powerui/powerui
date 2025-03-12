@@ -6,7 +6,7 @@ const API_URL = IS_DEVELOPMENT
     ? "https://power-ui-test-53e235d2888e.herokuapp.com"
     : "https://power-ui-88fa0fe861ac.herokuapp.com";
 
-console.log('PowerUI Managers v1.0.15 [DEV] loaded');
+console.log('PowerUI Managers v1.0.16 loaded');
 
 // Remove duplicate global helper functions and keep only ColorUtils
 window.ColorUtils = {
@@ -1819,6 +1819,7 @@ window.ThemeManager = {
             // Update theme and save
             Object.assign(theme, currentState);
             await this.saveState();
+            window.DOMUtils.showNotification(`Theme "${theme.name}" was saved successfully`);
             return true;
         } catch (error) {
             console.error('Error saving theme state:', error);
