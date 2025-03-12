@@ -1626,7 +1626,7 @@ window.ThemeManager = {
                 planId: member?.data?.planConnections?.[0]?.planId
             });
 
-            if (!member?.data?.planConnections?.length || member.data.planConnections[0].planId === 'free') {
+            if (!member?.data?.planConnections?.length || member.data.planConnections[0].planId === 'pln_power-ui-free-qp4c0t5k') {
                 // Show premium required modal
                 const premiumModal = document.getElementById('premium-required-modal');
                 if (premiumModal) {
