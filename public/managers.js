@@ -6,7 +6,7 @@ const API_URL = IS_DEVELOPMENT
     ? "https://power-ui-test-53e235d2888e.herokuapp.com/"
     : "https://power-ui-88fa0fe861ac.herokuapp.com/";
 
-console.log('PowerUI Managers v1.0.15 loaded');
+console.log('PowerUI Managers v1.0.15 [DEV] loaded');
 
 // Remove duplicate global helper functions and keep only ColorUtils
 window.ColorUtils = {
