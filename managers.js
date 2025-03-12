@@ -1,10 +1,10 @@
 // Constants
-const API_URL = "https://power-ui-test-53e235d2888e.herokuapp.com/";
+const IS_DEVELOPMENT = window.location.hostname.includes('webflow.io') || window.location.hostname.includes('localhost');
+const API_URL = IS_DEVELOPMENT 
+    ? "https://power-ui-test-53e235d2888e.herokuapp.com/"
+    : "https://power-ui-88fa0fe861ac.herokuapp.com/";
 
 console.log('PowerUI Managers v1.0.15 loaded');
-
-// test: https://power-ui-test-53e235d2888e.herokuapp.com/
-// Prod https://power-ui-88fa0fe861ac.herokuapp.com/
 
 // Remove duplicate global helper functions and keep only ColorUtils
 window.ColorUtils = {
