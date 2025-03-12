@@ -42,5 +42,19 @@
   "github": {
     "enabled": true,
     "silent": true
-  }
+  },
+  "routes": [
+    {
+      "src": "/managers.js",
+      "dest": "/managers.js",
+      "continue": true,
+      "check": false
+    },
+    {
+      "src": "/styles.css",
+      "dest": "/styles.css",
+      "continue": true,
+      "check": false
+    }
+  ]
 } 
