@@ -1748,6 +1748,7 @@ window.ThemeManager = {
         this.themes.push(newTheme);
         this.createThemeElement(newTheme);
         this.saveState();
+        window.DOMUtils.showNotification(`Theme "${newTheme.name}" was created successfully`);
     },
 
     deleteTheme(themeId) {
