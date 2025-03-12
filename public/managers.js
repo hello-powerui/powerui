@@ -1,7 +1,7 @@
 // Constants
 const IS_DEVELOPMENT = window.location.hostname.includes('webflow.io') || 
     window.location.hostname.includes('localhost') ||
-    window.location.hostname.includes('vercel.app');
+    window.location.hostname.includes('dev.');
 const API_URL = IS_DEVELOPMENT 
     ? "https://power-ui-test-53e235d2888e.herokuapp.com/"
     : "https://power-ui-88fa0fe861ac.herokuapp.com/";
