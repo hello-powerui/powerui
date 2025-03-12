@@ -162,11 +162,14 @@ window.DOMUtils = {
             messageElement.textContent = message;
         }
 
-        // Handle the icon visibility based on type
+        // Handle the icon visibility and style based on type
         const iconElement = notification.querySelector('.notification-icon');
         if (iconElement) {
             iconElement.style.display = type === 'success' ? '' : 'none';
         }
+
+        // Add error styling if type is error
+        notification.classList.toggle('error', type === 'error');
 
         // Show the notification
         notification.style.display = 'flex';
@@ -175,6 +178,10 @@ window.DOMUtils = {
         // Hide after delay
         setTimeout(() => {
             notification.classList.add('hide');
+            // Remove error class after animation
+            setTimeout(() => {
+                notification.classList.remove('error');
+            }, 300);
         }, 2000);
     }
 };
@@ -227,12 +234,30 @@ window.StateManager = {
         return new Promise((resolve, reject) => {
             this.saveTimeout = setTimeout(async () => {
                 try {
+                    // Check if MemberStack is initialized and user is authenticated
+                    if (!window.$memberstackDom) {
+                        throw new Error('MemberStack is not initialized');
+                    }
+
+                    const member = await window.$memberstackDom.getCurrentMember();
+                    if (!member?.data) {
+                        // User is not authenticated, show notification
+                        window.DOMUtils.showNotification('Please log in to save changes', 'error');
+                        throw new Error('User not authenticated');
+                    }
+
                     await window.$memberstackDom.updateMemberJSON({
                         json: { themes, customPalettes, neutralPalettes }
                     });
                     resolve();
                 } catch (error) {
                     console.error('StateManager: Error saving data:', error);
+                    // Show user-friendly error message
+                    if (error.message === 'User not authenticated') {
+                        window.location.href = '/login'; // Redirect to login page
+                    } else {
+                        window.DOMUtils.showNotification('Failed to save changes. Please try again.', 'error');
+                    }
                     reject(error);
                 }
             }, 500);
@@ -1591,6 +1616,25 @@ window.ThemeManager = {
         this.isDownloading = true;
 
         try {
+            // Check if user is on free plan
+            const member = await window.$memberstackDom.getCurrentMember();
+            
+            // Log member information for testing
+            console.log('Member Information:', {
+                member: member,
+                planConnections: member?.data?.planConnections,
+                planId: member?.data?.planConnections?.[0]?.planId
+            });
+
+            if (!member?.data?.planConnections?.length || member.data.planConnections[0].planId === 'free') {
+                // Show premium required modal
+                const premiumModal = document.getElementById('premium-required-modal');
+                if (premiumModal) {
+                    premiumModal.style.display = 'flex';
+                }
+                return;
+            }
+
             // Get current neutral palette
             const selectedNeutralPalette = document.querySelector('input[name="neutral-palettes"]:checked')?.value || 'azure';
             let neutralPaletteData = {};
@@ -1795,6 +1839,7 @@ window.ThemeManager = {
             return true;
         } catch (error) {
             console.error('Error saving edited theme:', error);
+            // Don't show error notification here as StateManager will handle it
             return false;
         }
     }
