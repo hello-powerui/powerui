@@ -361,6 +361,42 @@
     outline: none !important;
 }
 
+/* Palette shade selection styles */
+.palette-shade {
+    position: relative;
+}
+
+.palette-shade.selected::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--base-white);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Use dark dot for light colors */
+.palette-shade.selected[style*="rgb(255,"], 
+.palette-shade.selected[style*="rgb(240,"],
+.palette-shade.selected[style*="rgb(230,"],
+.palette-shade.selected[style*="rgb(220,"],
+.palette-shade.selected[style*="rgb(210,"],
+.palette-shade.selected[style*="rgb(200,"],
+.palette-shade.selected[style*="#f"],
+.palette-shade.selected[style*="#e"],
+.palette-shade.selected[style*="#F"],
+.palette-shade.selected[style*="#E"] {
+    --dot-color: var(--base-black);
+}
+
+.palette-shade.selected[style*="--dot-color"]::after {
+    background-color: var(--dot-color);
+}
+
 /* Save button animation styles */
 .save-checkmark {
     position: absolute;

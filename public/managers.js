@@ -230,6 +230,42 @@ window.StateManager = {
         }
     },
 
+    // Check if user is on a premium plan
+    async isPremiumUser() {
+        try {
+            // Check if MemberStack is initialized
+            if (!window.$memberstackDom) {
+                throw new Error('MemberStack is not initialized');
+            }
+
+            const member = await window.$memberstackDom.getCurrentMember();
+            
+            // User is premium if they have plan connections and are not on the free plan
+            const isPremium = member?.data?.planConnections?.length > 0 && 
+                member.data.planConnections[0].planId !== 'pln_power-ui-free-qp4c0t5k';
+            
+            return isPremium;
+        } catch (error) {
+            console.error('StateManager: Error checking premium status:', error);
+            return false;
+        }
+    },
+
+    // Show premium required modal if user is not on premium plan
+    async requirePremium() {
+        const isPremium = await this.isPremiumUser();
+        
+        if (!isPremium) {
+            // Show premium required modal
+            const premiumModal = document.getElementById('premium-required-modal');
+            if (premiumModal) {
+                premiumModal.style.display = 'flex';
+            }
+        }
+        
+        return isPremium;
+    },
+
     saveTimeout: null,
     async saveData(themes, customPalettes, neutralPalettes) {
         clearTimeout(this.saveTimeout);
@@ -1122,7 +1158,12 @@ window.EventManager = {
         });
 
         // Neutral palette creation
-        this.addHandler('click', '#show-create-neutral-palette-modal', () => {
+        this.addHandler('click', '#show-create-neutral-palette-modal', async () => {
+            // Check if user is on premium plan
+            if (!(await window.StateManager.requirePremium())) {
+                return;
+            }
+            
             const modal = document.getElementById('create-neutral-palette-modal');
             const hexInput = document.getElementById('neutral-palette-hex-input');
             const saveButton = document.getElementById('save-neutral-palette-button');
@@ -1624,22 +1665,9 @@ window.ThemeManager = {
         this.isDownloading = true;
 
         try {
-            // Check if user is on free plan
-            const member = await window.$memberstackDom.getCurrentMember();
-            
-            // Log member information for testing
-            console.log('Member Information:', {
-                member: member,
-                planConnections: member?.data?.planConnections,
-                planId: member?.data?.planConnections?.[0]?.planId
-            });
-
-            if (!member?.data?.planConnections?.length || member.data.planConnections[0].planId === 'pln_power-ui-free-qp4c0t5k') {
-                // Show premium required modal
-                const premiumModal = document.getElementById('premium-required-modal');
-                if (premiumModal) {
-                    premiumModal.style.display = 'flex';
-                }
+            // Check if user is on premium plan
+            if (!(await window.StateManager.requirePremium())) {
+                this.isDownloading = false;
                 return;
             }
 
