@@ -240,11 +240,15 @@ window.StateManager = {
 
             const member = await window.$memberstackDom.getCurrentMember();
             
-            // User is premium if they have plan connections and are not on the free plan
-            const isPremium = member?.data?.planConnections?.length > 0 && 
+            // Check for direct plan connections
+            const hasDirectPlan = member?.data?.planConnections?.length > 0 && 
                 member.data.planConnections[0].planId !== 'pln_power-ui-free-qp4c0t5k';
             
-            return isPremium;
+            // Check for team membership with a plan
+            const hasTeamPlan = member?.data?.teams?.belongsToTeam === true && 
+                member.data.teams.joinedTeams?.length > 0;
+            
+            return hasDirectPlan || hasTeamPlan;
         } catch (error) {
             console.error('StateManager: Error checking premium status:', error);
             return false;
