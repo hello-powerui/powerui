@@ -124,6 +124,33 @@
 .radius-md { --radius: 8px; }
 .radius-lg { --radius: 12px; }
 
+/* Border style variations */
+.border-style-default {
+    --border-color: var(--border-primary);
+    --border-width: 1px;
+}
+
+.border-style-subtle {
+    --border-color: var(--border-tertiary);
+    --border-width: 1px;
+}
+
+.border-style-none {
+    --border-color: transparent;
+    --border-width: 0;
+}
+
+/* Padding style variations */
+.padding-style-default {
+    --padding-vertical: 16px;
+    --padding-horizontal: 16px;
+}
+
+.padding-style-large {
+    --padding-vertical: 20px;
+    --padding-horizontal: 20px;
+}
+
 .dark {
     /* Dark mode text (default) */
     --text-primary: var(--neutral-50);

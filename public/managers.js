@@ -328,6 +328,8 @@ window.StyleManager = {
     NEUTRAL_PALETTES: ['cool', 'ice', 'neutral', 'stone', 'warm', 'eclipse', 'jungle', 'lava'],
     RADIUS_CLASSES: ['radius-none', 'radius-sm', 'radius-md', 'radius-lg'],
     CONTRAST_CLASSES: ['subtle-contrast', 'inversed-contrast'],
+    BORDER_STYLE_CLASSES: ['border-style-default', 'border-style-subtle', 'border-style-none'],
+    PADDING_STYLE_CLASSES: ['padding-style-default', 'padding-style-large'],
 
     updateFontFamily(fontFamily) {
         this.FONT_CLASSES.forEach(c => document.documentElement.classList.remove(c));
@@ -377,6 +379,16 @@ window.StyleManager = {
     updateBackgroundStyle(style) {
         this.CONTRAST_CLASSES.forEach(c => document.documentElement.classList.remove(c));
         if (style !== 'default') document.documentElement.classList.add(style);
+    },
+
+    updateBorderStyle(style) {
+        this.BORDER_STYLE_CLASSES.forEach(c => document.documentElement.classList.remove(c));
+        if (style !== 'default') document.documentElement.classList.add(`border-style-${style}`);
+    },
+
+    updatePaddingStyle(style) {
+        this.PADDING_STYLE_CLASSES.forEach(c => document.documentElement.classList.remove(c));
+        if (style !== 'default') document.documentElement.classList.add(`padding-style-${style}`);
     },
 
     updateColorMode(mode) {
@@ -1509,7 +1521,9 @@ window.ThemeManager = {
         colorMode: 'light',
         borders: '4',
         bgStyle: 'default',
-        showBorders: true
+        showBorders: true,
+        borderStyle: 'default',
+        paddingStyle: 'default'
     },
 
     // Theme property to style mapping
@@ -1520,7 +1534,9 @@ window.ThemeManager = {
         colorMode: (value) => window.StyleManager.updateColorMode(value),
         borders: (value) => window.StyleManager.updateBorderRadius(value),
         bgStyle: (value) => window.StyleManager.updateBackgroundStyle(value),
-        showBorders: (value) => window.StyleManager.updateBorderVisibility(value)
+        showBorders: (value) => window.StyleManager.updateBorderVisibility(value),
+        borderStyle: (value) => window.StyleManager.updateBorderStyle(value),
+        paddingStyle: (value) => window.StyleManager.updatePaddingStyle(value)
     },
 
     // Radio group mapping
@@ -1530,7 +1546,9 @@ window.ThemeManager = {
         fontFamily: 'font-family',
         colorMode: 'color-mode',
         borders: 'borders',
-        bgStyle: 'background'
+        bgStyle: 'background',
+        borderStyle: 'borderStyle',
+        paddingStyle: 'paddingStyle'
     },
 
     async initialize() {
@@ -1705,7 +1723,9 @@ window.ThemeManager = {
                     getComputedStyle(document.documentElement).getPropertyValue(`--theme-color${i + 1}`).trim()
                 ).filter(color => color !== 'none'),
                 showBorders: document.getElementById('borders-checkbox')?.checked ?? true,
-                bgStyle: document.querySelector('input[name="background"]:checked')?.value || 'default'
+                bgStyle: document.querySelector('input[name="background"]:checked')?.value || 'default',
+                borderStyle: document.querySelector('input[name="borderStyle"]:checked')?.value || 'default',
+                paddingStyle: document.querySelector('input[name="paddingStyle"]:checked')?.value || 'default'
             };
 
             // Generate and download theme
