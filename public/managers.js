@@ -1258,6 +1258,8 @@ window.EventManager = {
             'background': (value) => window.StyleManager.updateBackgroundStyle(value),
             'borders': (value) => window.StyleManager.updateBorderRadius(value),
             'font-family': (value) => window.StyleManager.updateFontFamily(value),
+            'borderStyle': (value) => window.StyleManager.updateBorderStyle(value),
+            'paddingStyle': (value) => window.StyleManager.updatePaddingStyle(value),
             'themes': (value) => {
                 const theme = value === 'default' 
                     ? window.ThemeManager.defaultTheme 
