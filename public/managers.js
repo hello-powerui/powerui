@@ -1521,7 +1521,6 @@ window.ThemeManager = {
         colorMode: 'light',
         borders: '4',
         bgStyle: 'default',
-        showBorders: true,
         borderStyle: 'default',
         paddingStyle: 'default'
     },
@@ -1534,7 +1533,6 @@ window.ThemeManager = {
         colorMode: (value) => window.StyleManager.updateColorMode(value),
         borders: (value) => window.StyleManager.updateBorderRadius(value),
         bgStyle: (value) => window.StyleManager.updateBackgroundStyle(value),
-        showBorders: (value) => window.StyleManager.updateBorderVisibility(value),
         borderStyle: (value) => window.StyleManager.updateBorderStyle(value),
         paddingStyle: (value) => window.StyleManager.updatePaddingStyle(value)
     },
@@ -1722,7 +1720,6 @@ window.ThemeManager = {
                 dataColors: Array.from({ length: 8 }, (_, i) => 
                     getComputedStyle(document.documentElement).getPropertyValue(`--theme-color${i + 1}`).trim()
                 ).filter(color => color !== 'none'),
-                showBorders: document.getElementById('borders-checkbox')?.checked ?? true,
                 bgStyle: document.querySelector('input[name="background"]:checked')?.value || 'default',
                 borderStyle: document.querySelector('input[name="borderStyle"]:checked')?.value || 'default',
                 paddingStyle: document.querySelector('input[name="paddingStyle"]:checked')?.value || 'default'
@@ -1765,8 +1762,7 @@ window.ThemeManager = {
                     prop,
                     document.querySelector(`input[name="${groupName}"]:checked`)?.value || this.defaultTheme[prop]
                 ])
-            ),
-            showBorders: document.getElementById('borders-checkbox')?.checked ?? this.defaultTheme.showBorders
+            )
         };
 
         this.themes.push(newTheme);
@@ -1837,9 +1833,6 @@ window.ThemeManager = {
                     document.querySelector(`input[name="${groupName}"]:checked`)?.value || this.defaultTheme[prop]
                 ])
             );
-
-            // Add checkbox state
-            currentState.showBorders = document.getElementById('borders-checkbox')?.checked ?? this.defaultTheme.showBorders;
 
             // Update theme and save
             Object.assign(theme, currentState);

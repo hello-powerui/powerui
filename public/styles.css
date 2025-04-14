@@ -8,6 +8,9 @@
     --base-white: #FFFFFF;
     --base-black: #000000;
 
+    /* Padding variables */
+    --padding-vertical: 16px;
+    --padding-horizontal: 16px;
 
     /* Azure Gray palette */
     --neutral-25: #F7F8F8;
@@ -128,16 +131,19 @@
 .border-style-default {
     --border-color: var(--border-primary);
     --border-width: 1px;
+    --visual-border: var(--border-primary);
 }
 
 .border-style-subtle {
     --border-color: var(--border-tertiary);
     --border-width: 1px;
+    --visual-border: var(--border-tertiary);
 }
 
 .border-style-none {
     --border-color: transparent;
     --border-width: 0;
+    --visual-border: transparent;
 }
 
 /* Padding style variations */
