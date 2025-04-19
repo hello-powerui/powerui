@@ -194,10 +194,15 @@ window.StateManager = {
     memberData: null,
 
     async initialize() {
-        if (this.initialized) return;
+        console.log('StateManager.initialize() called');
+        if (this.initialized) {
+            console.log('StateManager already initialized');
+            return;
+        }
 
         // Wait for MemberStack with timeout and better error handling
         if (!window.$memberstackDom) {
+            console.log('Waiting for MemberStack to initialize...');
             try {
                 await new Promise((resolve, reject) => {
                     let attempts = 0;
@@ -205,9 +210,11 @@ window.StateManager = {
                     const check = setInterval(() => {
                         attempts++;
                         if (window.$memberstackDom) {
+                            console.log('MemberStack initialized after', attempts, 'attempts');
                             clearInterval(check);
                             resolve();
                         } else if (attempts >= maxAttempts) {
+                            console.error('MemberStack initialization timeout after', attempts, 'attempts');
                             clearInterval(check);
                             reject(new Error('MemberStack initialization timeout'));
                         }
@@ -215,14 +222,15 @@ window.StateManager = {
                 });
             } catch (error) {
                 console.error('StateManager: Failed to initialize MemberStack:', error);
-                // Show user-friendly error message
                 window.DOMUtils?.showNotification('Unable to load your account data. Please refresh the page.', 'error');
                 return;
             }
         }
 
         try {
+            console.log('Getting member data...');
             this.memberData = await this.getMemberData();
+            console.log('Member data retrieved:', this.memberData);
             this.initialized = true;
             return this.memberData;
         } catch (error) {
@@ -233,15 +241,22 @@ window.StateManager = {
     },
 
     async getMemberData() {
-        if (this.memberData) return this.memberData;
+        console.log('StateManager.getMemberData() called');
+        if (this.memberData) {
+            console.log('Using cached member data');
+            return this.memberData;
+        }
 
         try {
+            console.log('Fetching member data from MemberStack...');
             const { data } = await window.$memberstackDom.getMemberJSON();
+            console.log('Raw member data from MemberStack:', data);
             this.memberData = {
                 themes: data?.themes || [],
                 customPalettes: data?.customPalettes || [],
                 neutralPalettes: data?.neutralPalettes || []
             };
+            console.log('Processed member data:', this.memberData);
             return this.memberData;
         } catch (error) {
             console.error('StateManager: Error getting member data:', error);
@@ -1951,27 +1966,46 @@ window.TooltipManager = {
 
 // Update the initialization to include TooltipManager
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('DOMContentLoaded event fired');
     try {
+        console.log('Starting initialization sequence...');
+        
         // Initialize StateManager first
+        console.log('Initializing StateManager...');
         const memberData = await window.StateManager.initialize();
         if (!memberData) {
-            console.error('Failed to initialize StateManager');
+            console.error('StateManager initialization failed - no member data returned');
             return;
         }
+        console.log('StateManager initialized successfully:', memberData);
 
         // Initialize other managers in sequence
+        console.log('Initializing CustomPalettesManager...');
         await window.CustomPalettesManager.initialize();
+        console.log('CustomPalettesManager initialized');
+
+        console.log('Initializing ThemeManager...');
         await window.ThemeManager.initialize();
+        console.log('ThemeManager initialized');
+
+        console.log('Initializing EventManager...');
         window.EventManager.initialize();
+        console.log('EventManager initialized');
+
+        console.log('Initializing TooltipManager...');
         window.TooltipManager.initialize();
+        console.log('TooltipManager initialized');
         
         // Apply default theme if no theme is selected
         const selectedTheme = document.querySelector('input[name="themes"]:checked');
+        console.log('Current theme selection:', selectedTheme?.value || 'none');
         if (!selectedTheme) {
+            console.log('No theme selected, applying default theme...');
             window.ThemeManager.applyDefaultTheme();
         }
 
         // Show success notification
+        console.log('All managers initialized successfully');
         window.DOMUtils?.showNotification('Your account has been loaded successfully', 'success');
     } catch (error) {
         console.error('Error during initialization:', error);
