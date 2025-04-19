@@ -196,21 +196,40 @@ window.StateManager = {
     async initialize() {
         if (this.initialized) return;
 
-        // Wait for MemberStack
+        // Wait for MemberStack with timeout and better error handling
         if (!window.$memberstackDom) {
-            await new Promise(resolve => {
-                const check = setInterval(() => {
-                    if (window.$memberstackDom) {
-                        clearInterval(check);
-                        resolve();
-                    }
-                }, 100);
-            });
+            try {
+                await new Promise((resolve, reject) => {
+                    let attempts = 0;
+                    const maxAttempts = 50; // 5 seconds total
+                    const check = setInterval(() => {
+                        attempts++;
+                        if (window.$memberstackDom) {
+                            clearInterval(check);
+                            resolve();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(check);
+                            reject(new Error('MemberStack initialization timeout'));
+                        }
+                    }, 100);
+                });
+            } catch (error) {
+                console.error('StateManager: Failed to initialize MemberStack:', error);
+                // Show user-friendly error message
+                window.DOMUtils?.showNotification('Unable to load your account data. Please refresh the page.', 'error');
+                return;
+            }
         }
 
-        this.memberData = await this.getMemberData();
-        this.initialized = true;
-        return this.memberData;
+        try {
+            this.memberData = await this.getMemberData();
+            this.initialized = true;
+            return this.memberData;
+        } catch (error) {
+            console.error('StateManager: Error initializing:', error);
+            window.DOMUtils?.showNotification('Error loading your account data. Please refresh the page.', 'error');
+            return null;
+        }
     },
 
     async getMemberData() {
@@ -1932,15 +1951,30 @@ window.TooltipManager = {
 
 // Update the initialization to include TooltipManager
 document.addEventListener('DOMContentLoaded', async () => {
-    await window.StateManager.initialize();
-    await window.CustomPalettesManager.initialize();
-    await window.ThemeManager.initialize();
-    window.EventManager.initialize();
-    window.TooltipManager.initialize();
-    
-    // Apply default theme if no theme is selected
-    const selectedTheme = document.querySelector('input[name="themes"]:checked');
-    if (!selectedTheme) {
-        window.ThemeManager.applyDefaultTheme();
+    try {
+        // Initialize StateManager first
+        const memberData = await window.StateManager.initialize();
+        if (!memberData) {
+            console.error('Failed to initialize StateManager');
+            return;
+        }
+
+        // Initialize other managers in sequence
+        await window.CustomPalettesManager.initialize();
+        await window.ThemeManager.initialize();
+        window.EventManager.initialize();
+        window.TooltipManager.initialize();
+        
+        // Apply default theme if no theme is selected
+        const selectedTheme = document.querySelector('input[name="themes"]:checked');
+        if (!selectedTheme) {
+            window.ThemeManager.applyDefaultTheme();
+        }
+
+        // Show success notification
+        window.DOMUtils?.showNotification('Your account has been loaded successfully', 'success');
+    } catch (error) {
+        console.error('Error during initialization:', error);
+        window.DOMUtils?.showNotification('Error initializing the application. Please refresh the page.', 'error');
     }
 });
