@@ -1013,9 +1013,20 @@ window.CustomPalettesManager = {
 
 // Event Manager
 window.EventManager = {
-    handlers: new Map(),
+    handlers: {
+        click: new Map(),
+        change: new Map(),
+        keydown: new Map(),
+        paste: new Map(),
+        blur: new Map()
+    },
 
     initialize() {
+        // Set up global event delegation
+        Object.keys(this.handlers).forEach(eventType => {
+            document.addEventListener(eventType, (e) => this.handleEvent(eventType, e));
+        });
+
         this.registerHandlers();
     },
 
@@ -1948,20 +1959,28 @@ window.TooltipManager = {
 // Initialize all managers when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // Initialize StateManager first
         const memberData = await window.StateManager.initialize();
-        window.CustomPalettesManager.initialize();
-        window.ThemeManager.initialize();
+        if (!memberData) {
+            throw new Error('StateManager initialization failed - no member data returned');
+        }
+
+        // Initialize other managers in sequence
+        await window.CustomPalettesManager.initialize();
+        await window.ThemeManager.initialize();
         window.EventManager.initialize();
         window.TooltipManager.initialize();
-
-        const selectedTheme = memberData?.themes?.find(theme => theme.selected);
-        if (selectedTheme) {
-            await window.ThemeManager.applyTheme(selectedTheme);
-        } else {
+        
+        // Apply default theme if no theme is selected
+        const selectedTheme = document.querySelector('input[name="themes"]:checked');
+        if (!selectedTheme) {
             window.ThemeManager.applyDefaultTheme();
         }
+
+        // Show success notification
+        window.DOMUtils?.showNotification('Your account has been loaded successfully', 'success');
     } catch (error) {
         console.error('Error during initialization:', error);
-        window.DOMUtils?.showNotification('Error initializing PowerUI. Please refresh the page.', 'error');
+        window.DOMUtils?.showNotification('Error initializing the application. Please refresh the page.', 'error');
     }
 });
