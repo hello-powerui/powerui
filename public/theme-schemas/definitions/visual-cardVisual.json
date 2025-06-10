@@ -1,0 +1,3519 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/commonCards"
+    },
+    {
+      "properties": {
+        "*": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Left",
+                    "title": "Left"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom"
+                  },
+                  {
+                    "const": "Top",
+                    "title": "Top"
+                  }
+                ],
+                "title": "Position"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "width": {
+                "type": "number",
+                "title": "Width"
+              },
+              "style": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Cards",
+                    "title": "Cards"
+                  },
+                  {
+                    "const": "Table",
+                    "title": "Table"
+                  }
+                ],
+                "title": "Style"
+              },
+              "dividerColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "dividerIgnorePadding": {
+                "type": "boolean",
+                "title": "Ignore padding"
+              },
+              "dividerLineStyle": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "dividerTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "dividerWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "fillColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Fill color"
+              },
+              "image": {
+                "$ref": "#/definitions/image"
+              },
+              "imageSplitTransparency": {
+                "type": "boolean"
+              },
+              "imageTransparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "angle": {
+                "type": "number",
+                "title": "Angle"
+              },
+              "glowDistance": {
+                "type": "number",
+                "title": "Distance"
+              },
+              "glowPositionPreset": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "custom",
+                    "title": "Custom"
+                  },
+                  {
+                    "const": "top",
+                    "title": "Top"
+                  },
+                  {
+                    "const": "topLeft",
+                    "title": "Top left"
+                  },
+                  {
+                    "const": "topRight",
+                    "title": "Top right"
+                  },
+                  {
+                    "const": "center",
+                    "title": "Center"
+                  },
+                  {
+                    "const": "centerLeft",
+                    "title": "Left"
+                  },
+                  {
+                    "const": "centerRight",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "bottom",
+                    "title": "Bottom"
+                  },
+                  {
+                    "const": "bottomLeft",
+                    "title": "Bottom left"
+                  },
+                  {
+                    "const": "bottomRight",
+                    "title": "Bottom right"
+                  }
+                ],
+                "title": "Preset"
+              },
+              "glowSpread": {
+                "type": "number",
+                "title": "Size"
+              },
+              "shadowBlur": {
+                "type": "number",
+                "title": "Blur"
+              },
+              "altText": {
+                "type": "string",
+                "title": "Alt text"
+              },
+              "fixedSize": {
+                "type": "boolean",
+                "title": "Fix size"
+              },
+              "horizontalAlignment": {
+                "$ref": "#/definitions/alignment",
+                "title": "Horizontal alignment"
+              },
+              "imageAreaSize": {
+                "type": "integer",
+                "title": "Image area size"
+              },
+              "imageType": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "image",
+                    "title": "Image"
+                  },
+                  {
+                    "const": "imageUrl",
+                    "title": "Image URL"
+                  }
+                ],
+                "title": "Image type"
+              },
+              "imageUrl": {
+                "type": "string",
+                "title": "Image URL"
+              },
+              "padding": {
+                "type": "integer",
+                "title": "Space between image and callout"
+              },
+              "size": {
+                "type": "integer",
+                "title": "Size"
+              },
+              "verticalAlignment": {
+                "$ref": "#/definitions/verticalAlignment",
+                "title": "Vertical alignment"
+              },
+              "alignBaselines": {
+                "type": "boolean",
+                "title": "Align baselines"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "heading": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Normal",
+                    "title": "Normal"
+                  },
+                  {
+                    "const": "Heading2",
+                    "title": "Heading 2"
+                  },
+                  {
+                    "const": "Heading3",
+                    "title": "Heading 3"
+                  },
+                  {
+                    "const": "Heading4",
+                    "title": "Heading 4"
+                  },
+                  {
+                    "const": "Heading5",
+                    "title": "Heading 5"
+                  },
+                  {
+                    "const": "Heading6",
+                    "title": "Heading 6"
+                  }
+                ],
+                "title": "Heading"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "matchValueAlignment": {
+                "type": "boolean",
+                "title": "Match value alignment"
+              },
+              "text": {
+                "type": "string",
+                "title": "Text"
+              },
+              "textWrap": {
+                "type": "boolean",
+                "title": "Text wrap"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "alignment": {
+                "$ref": "#/definitions/alignment",
+                "title": "Alignment"
+              },
+              "backgroundFillColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "backgroundImage": {
+                "$ref": "#/definitions/image",
+                "title": "Background Image"
+              },
+              "backgroundImageTransparency": {
+                "type": "number",
+                "title": "Image transparency"
+              },
+              "backgroundShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "backgroundTransparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              },
+              "borderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "borderStyle": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "borderTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "borderWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "bottomOuterMargin": {
+                "type": "integer",
+                "title": "Bottom padding"
+              },
+              "calloutSize": {
+                "type": "number",
+                "title": "Callout size"
+              },
+              "cellPadding": {
+                "type": "integer",
+                "title": "Space between cards"
+              },
+              "columnCount": {
+                "type": "integer",
+                "title": "Columns shown"
+              },
+              "columnPadding": {
+                "type": "integer",
+                "title": "Space between columns"
+              },
+              "customizeLines": {
+                "type": "boolean",
+                "title": "Customize lines"
+              },
+              "customizePadding": {
+                "type": "boolean",
+                "title": "Customize spacing"
+              },
+              "gridlineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "gridlineStyle": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "gridlineTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "gridlineWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "leftOuterMargin": {
+                "type": "integer",
+                "title": "Left padding"
+              },
+              "lineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Outline color",
+                "description": "Color of the outline"
+              },
+              "lineStyle": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "lineTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "lineWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "maxTiles": {
+                "type": "integer",
+                "title": "Max cards shown"
+              },
+              "orientation": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 1,
+                    "title": "Single column"
+                  },
+                  {
+                    "const": 2,
+                    "title": "Single row"
+                  },
+                  {
+                    "const": 0,
+                    "title": "Grid"
+                  }
+                ],
+                "title": "Small multiples arrangement"
+              },
+              "rectangleRoundedCurve": {
+                "type": "integer",
+                "title": "Rounded Corners"
+              },
+              "rectangleRoundedCurveCustomStyle": {
+                "type": "boolean",
+                "title": "Customize corners"
+              },
+              "rectangleRoundedCurveLeftBottom": {
+                "type": "integer",
+                "title": "Bottom left corner"
+              },
+              "rectangleRoundedCurveLeftTop": {
+                "type": "integer",
+                "title": "Top left corner"
+              },
+              "rectangleRoundedCurveRightBottom": {
+                "type": "integer",
+                "title": "Bottom right corner"
+              },
+              "rectangleRoundedCurveRightTop": {
+                "type": "integer",
+                "title": "Top right corner"
+              },
+              "rightOuterMargin": {
+                "type": "integer",
+                "title": "Right padding"
+              },
+              "rowCount": {
+                "type": "integer",
+                "title": "Max rows shown"
+              },
+              "rowPadding": {
+                "type": "integer",
+                "title": "Space between rows"
+              },
+              "topOuterMargin": {
+                "type": "integer",
+                "title": "Top padding"
+              },
+              "weight": {
+                "type": "number",
+                "title": "Outline weight",
+                "description": "Thickness of the outline in pixels"
+              },
+              "overFlowDirection": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Vertical"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Horizontal"
+                  }
+                ],
+                "title": "Overflow direction"
+              },
+              "overFlowStyle": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Paginated"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Continuous scroll"
+                  }
+                ],
+                "title": "Overflow style"
+              },
+              "bottomMargin": {
+                "type": "integer",
+                "title": "Bottom padding"
+              },
+              "leftMargin": {
+                "type": "integer",
+                "title": "Left padding"
+              },
+              "paddingSelection": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Wide",
+                    "title": "Wide"
+                  },
+                  {
+                    "const": "Normal",
+                    "title": "Normal"
+                  },
+                  {
+                    "const": "Narrow",
+                    "title": "Narrow"
+                  },
+                  {
+                    "const": "Custom",
+                    "title": "Custom"
+                  }
+                ],
+                "title": "Size"
+              },
+              "rightMargin": {
+                "type": "integer",
+                "title": "Right padding"
+              },
+              "topMargin": {
+                "type": "integer",
+                "title": "Top padding"
+              },
+              "backgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "number",
+                  "integer",
+                  "boolean"
+                ],
+                "title": "Add label"
+              },
+              "customFormatString": {
+                "type": "string",
+                "title": "Format code",
+                "description": "Enter a custom number format for your callout."
+              },
+              "detailBackgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "detailBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "detailDisplayUnits": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Auto"
+                  },
+                  {
+                    "const": 1,
+                    "title": "None"
+                  },
+                  {
+                    "const": 1000,
+                    "title": "Thousands"
+                  },
+                  {
+                    "const": 1000000,
+                    "title": "Millions"
+                  },
+                  {
+                    "const": 1000000000,
+                    "title": "Billions"
+                  },
+                  {
+                    "const": 1000000000000,
+                    "title": "Trillions"
+                  },
+                  {
+                    "const": -1,
+                    "title": "Custom"
+                  }
+                ],
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "detailFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "detailFontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "detailFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "detailItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "detailPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "detailTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "detailUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "detailValue": {
+                "type": [
+                  "string",
+                  "number",
+                  "integer",
+                  "boolean"
+                ],
+                "title": "Field"
+              },
+              "showBlankAs": {
+                "type": "string",
+                "title": "Show blank as"
+              },
+              "arrangement": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "rows",
+                    "title": "Rows"
+                  },
+                  {
+                    "const": "columns",
+                    "title": "Columns"
+                  }
+                ],
+                "title": "Arrangement"
+              },
+              "labelSpace": {
+                "type": "number",
+                "title": "Space between labels"
+              },
+              "outerPadding": {
+                "type": "number",
+                "title": "Outer padding"
+              },
+              "paddingAfterDivider": {
+                "type": "number",
+                "title": "Padding after divider line"
+              },
+              "paddingBeforeDivider": {
+                "type": "number",
+                "title": "Padding before divider line"
+              },
+              "valueArea": {
+                "type": "number",
+                "title": "Value area"
+              },
+              "titleBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "titleContentType": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "custom",
+                    "title": "Custom"
+                  },
+                  {
+                    "const": "fieldName",
+                    "title": "Field name"
+                  }
+                ],
+                "title": "Content"
+              },
+              "titleFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "titleFontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "titleFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "titleItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "titleText": {
+                "type": "string",
+                "title": "Text"
+              },
+              "titleTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "titleUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "valueBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "valueDisplayUnits": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Auto"
+                  },
+                  {
+                    "const": 1,
+                    "title": "None"
+                  },
+                  {
+                    "const": 1000,
+                    "title": "Thousands"
+                  },
+                  {
+                    "const": 1000000,
+                    "title": "Millions"
+                  },
+                  {
+                    "const": 1000000000,
+                    "title": "Billions"
+                  },
+                  {
+                    "const": 1000000000000,
+                    "title": "Trillions"
+                  },
+                  {
+                    "const": -1,
+                    "title": "Custom"
+                  }
+                ],
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "valueFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "valueFontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "valueFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "valueItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "valuePrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "valueTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "valueUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "shapeAngle": {
+                "type": "integer",
+                "title": "Shape rotation"
+              },
+              "textAngle": {
+                "type": "integer",
+                "title": "Text rotation"
+              },
+              "shadowDistance": {
+                "type": "number",
+                "title": "Distance"
+              },
+              "shadowPositionPreset": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "custom",
+                    "title": "Custom"
+                  },
+                  {
+                    "const": "top",
+                    "title": "Top"
+                  },
+                  {
+                    "const": "topLeft",
+                    "title": "Top left"
+                  },
+                  {
+                    "const": "topRight",
+                    "title": "Top right"
+                  },
+                  {
+                    "const": "center",
+                    "title": "Center"
+                  },
+                  {
+                    "const": "centerLeft",
+                    "title": "Left"
+                  },
+                  {
+                    "const": "centerRight",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "bottom",
+                    "title": "Bottom"
+                  },
+                  {
+                    "const": "bottomLeft",
+                    "title": "Bottom left"
+                  },
+                  {
+                    "const": "bottomRight",
+                    "title": "Bottom right"
+                  }
+                ],
+                "title": "Preset"
+              },
+              "shadowSpread": {
+                "type": "number",
+                "title": "Size"
+              },
+              "tabCutCornerSnipSizeBottom": {
+                "type": "integer",
+                "title": "Size of bottom snips"
+              },
+              "tabCutCornerSnipSizeCustomStyle": {
+                "type": "boolean",
+                "title": "Customize style"
+              },
+              "tabCutCornerSnipSizeLeftBottom": {
+                "type": "integer",
+                "title": "Bottom left corner"
+              },
+              "tabCutCornerSnipSizeLeftTop": {
+                "type": "integer",
+                "title": "Top left corner"
+              },
+              "tabCutCornerSnipSizeRightBottom": {
+                "type": "integer",
+                "title": "Bottom right corner"
+              },
+              "tabCutCornerSnipSizeRightTop": {
+                "type": "integer",
+                "title": "Top right corner"
+              },
+              "tabCutCornerSnipSizeTop": {
+                "type": "integer",
+                "title": "Size of top snips"
+              },
+              "tileShape": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "arrow",
+                    "title": "Arrow"
+                  },
+                  {
+                    "const": "arrowChevron",
+                    "title": "Chevron arrow"
+                  },
+                  {
+                    "const": "arrowPentagon",
+                    "title": "Pentagon arrow"
+                  },
+                  {
+                    "const": "heart",
+                    "title": "Heart"
+                  },
+                  {
+                    "const": "hexagon",
+                    "title": "Hexagon"
+                  },
+                  {
+                    "const": "line",
+                    "title": "Line"
+                  },
+                  {
+                    "const": "octagon",
+                    "title": "Octagon"
+                  },
+                  {
+                    "const": "oval",
+                    "title": "Oval"
+                  },
+                  {
+                    "const": "parallelogram",
+                    "title": "Parallelogram"
+                  },
+                  {
+                    "const": "pentagon",
+                    "title": "Pentagon"
+                  },
+                  {
+                    "const": "pill",
+                    "title": "Pill"
+                  },
+                  {
+                    "const": "rectangle",
+                    "title": "Rectangle"
+                  },
+                  {
+                    "const": "rectangleRounded",
+                    "title": "Rounded Rectangle"
+                  },
+                  {
+                    "const": "rectangleRoundedByPixel",
+                    "title": "Rounded Rectangle"
+                  },
+                  {
+                    "const": "tabCutCorner",
+                    "title": "Snipped tab, top right"
+                  },
+                  {
+                    "const": "tabCutTopCorners",
+                    "title": "Snipped tab, both top"
+                  },
+                  {
+                    "const": "tabCutTopCornersByPixel",
+                    "title": "Snipped tab, both top"
+                  },
+                  {
+                    "const": "tabRoundCorner",
+                    "title": "Rounded tab, top right"
+                  },
+                  {
+                    "const": "tabRoundTopCorners",
+                    "title": "Rounded tab, both top"
+                  },
+                  {
+                    "const": "speechbubbleRectangle",
+                    "title": "Speech Bubble"
+                  },
+                  {
+                    "const": "trapezoid",
+                    "title": "Trapezoid"
+                  },
+                  {
+                    "const": "triangleIsoc",
+                    "title": "Isosceles Triangle"
+                  },
+                  {
+                    "const": "triangleRight",
+                    "title": "Right Triangle"
+                  }
+                ],
+                "title": "Shape"
+              },
+              "gridlineShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "gridlineRegion": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "all",
+                    "title": "All"
+                  },
+                  {
+                    "const": "inner",
+                    "title": "Horizontal and vertical"
+                  },
+                  {
+                    "const": "innerHorizontal",
+                    "title": "Horizontal only"
+                  },
+                  {
+                    "const": "innerVertical",
+                    "title": "Vertical only"
+                  }
+                ],
+                "title": "Gridlines"
+              },
+              "displayUnits": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Auto"
+                  },
+                  {
+                    "const": 1,
+                    "title": "None"
+                  },
+                  {
+                    "const": 1000,
+                    "title": "Thousands"
+                  },
+                  {
+                    "const": 1000000,
+                    "title": "Millions"
+                  },
+                  {
+                    "const": 1000000000,
+                    "title": "Billions"
+                  },
+                  {
+                    "const": 1000000000000,
+                    "title": "Trillions"
+                  },
+                  {
+                    "const": -1,
+                    "title": "Custom"
+                  }
+                ],
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "precision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "fixNumberOfTiles": {
+                "type": "boolean",
+                "title": "Fixed number of tiles"
+              },
+              "headerPosition": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Left",
+                    "title": "Left"
+                  },
+                  {
+                    "const": "Top",
+                    "title": "Top"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom"
+                  }
+                ],
+                "title": "Position"
+              },
+              "maxHeaderSize": {
+                "type": "integer",
+                "title": "Maximum header size",
+                "description": "The maximum percent of the visual allowed for the small multiple header"
+              },
+              "maxSmallMultiples": {
+                "type": "integer",
+                "title": "Max small multiples shown"
+              },
+              "titleOrientation": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Rotate all text 270°"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Horizontal"
+                  },
+                  {
+                    "const": 2,
+                    "title": "Rotate all text 90°"
+                  },
+                  {
+                    "const": 3,
+                    "title": "Stacked"
+                  }
+                ],
+                "title": "Orientation"
+              },
+              "verticalSpacing": {
+                "type": "integer",
+                "title": "Space between label and value"
+              },
+              "labelDisplayUnits": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Auto"
+                  },
+                  {
+                    "const": 1,
+                    "title": "None"
+                  },
+                  {
+                    "const": 1000,
+                    "title": "Thousands"
+                  },
+                  {
+                    "const": 1000000,
+                    "title": "Millions"
+                  },
+                  {
+                    "const": 1000000000,
+                    "title": "Billions"
+                  },
+                  {
+                    "const": 1000000000000,
+                    "title": "Trillions"
+                  },
+                  {
+                    "const": -1,
+                    "title": "Custom"
+                  }
+                ],
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "labelPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              }
+            }
+          }
+        },
+        "accentBar": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Left",
+                    "title": "Left"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom"
+                  },
+                  {
+                    "const": "Top",
+                    "title": "Top"
+                  }
+                ],
+                "title": "Position"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "width": {
+                "type": "number",
+                "title": "Width"
+              }
+            }
+          },
+          "title": "Accent bar"
+        },
+        "border": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "style": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "width": {
+                "type": "number",
+                "title": "Width"
+              }
+            }
+          },
+          "title": "Border"
+        },
+        "divider": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "dividerColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "dividerIgnorePadding": {
+                "type": "boolean",
+                "title": "Ignore padding"
+              },
+              "dividerLineStyle": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "dividerTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "dividerWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              }
+            }
+          },
+          "title": "Divider"
+        },
+        "fillCustom": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "fillColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Fill color"
+              },
+              "image": {
+                "$ref": "#/definitions/image"
+              },
+              "imageSplitTransparency": {
+                "type": "boolean"
+              },
+              "imageTransparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              }
+            }
+          },
+          "title": "Fill"
+        },
+        "general": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formatString": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "General"
+        },
+        "glowCustom": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "angle": {
+                "type": "number",
+                "title": "Angle"
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "glowDistance": {
+                "type": "number",
+                "title": "Distance"
+              },
+              "glowPositionPreset": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "custom",
+                    "title": "Custom"
+                  },
+                  {
+                    "const": "top",
+                    "title": "Top"
+                  },
+                  {
+                    "const": "topLeft",
+                    "title": "Top left"
+                  },
+                  {
+                    "const": "topRight",
+                    "title": "Top right"
+                  },
+                  {
+                    "const": "center",
+                    "title": "Center"
+                  },
+                  {
+                    "const": "centerLeft",
+                    "title": "Left"
+                  },
+                  {
+                    "const": "centerRight",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "bottom",
+                    "title": "Bottom"
+                  },
+                  {
+                    "const": "bottomLeft",
+                    "title": "Bottom left"
+                  },
+                  {
+                    "const": "bottomRight",
+                    "title": "Bottom right"
+                  }
+                ],
+                "title": "Preset"
+              },
+              "glowSpread": {
+                "type": "number",
+                "title": "Size"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Outer",
+                    "title": "Outside"
+                  },
+                  {
+                    "const": "Inner",
+                    "title": "Inside"
+                  }
+                ],
+                "title": "Offset"
+              },
+              "shadowBlur": {
+                "type": "number",
+                "title": "Blur"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              }
+            }
+          },
+          "title": "Shape glow"
+        },
+        "grid": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "style": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "width": {
+                "type": "number",
+                "title": "Width"
+              }
+            }
+          },
+          "title": "Grid"
+        },
+        "image": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "altText": {
+                "type": "string",
+                "title": "Alt text"
+              },
+              "fixedSize": {
+                "type": "boolean",
+                "title": "Fix size"
+              },
+              "horizontalAlignment": {
+                "$ref": "#/definitions/alignment",
+                "title": "Horizontal alignment"
+              },
+              "image": {
+                "$ref": "#/definitions/image"
+              },
+              "imageAreaSize": {
+                "type": "integer",
+                "title": "Image area size"
+              },
+              "imageType": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "image",
+                    "title": "Image"
+                  },
+                  {
+                    "const": "imageUrl",
+                    "title": "Image URL"
+                  }
+                ],
+                "title": "Image type"
+              },
+              "imageUrl": {
+                "type": "string",
+                "title": "Image URL"
+              },
+              "padding": {
+                "type": "integer",
+                "title": "Space between image and callout"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Left",
+                    "title": "Left of text"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Right of text"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Below text"
+                  },
+                  {
+                    "const": "Top",
+                    "title": "Above text"
+                  }
+                ],
+                "title": "Position"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "size": {
+                "type": "integer",
+                "title": "Size"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              },
+              "verticalAlignment": {
+                "$ref": "#/definitions/verticalAlignment",
+                "title": "Vertical alignment"
+              }
+            }
+          },
+          "title": "Images"
+        },
+        "label": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "alignBaselines": {
+                "type": "boolean",
+                "title": "Align baselines"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "heading": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Normal",
+                    "title": "Normal"
+                  },
+                  {
+                    "const": "Heading2",
+                    "title": "Heading 2"
+                  },
+                  {
+                    "const": "Heading3",
+                    "title": "Heading 3"
+                  },
+                  {
+                    "const": "Heading4",
+                    "title": "Heading 4"
+                  },
+                  {
+                    "const": "Heading5",
+                    "title": "Heading 5"
+                  },
+                  {
+                    "const": "Heading6",
+                    "title": "Heading 6"
+                  }
+                ],
+                "title": "Heading"
+              },
+              "horizontalAlignment": {
+                "$ref": "#/definitions/alignment",
+                "title": "Horizontal alignment"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "matchValueAlignment": {
+                "type": "boolean",
+                "title": "Match value alignment"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "belowValue",
+                    "title": "Below Value"
+                  },
+                  {
+                    "const": "aboveValue",
+                    "title": "Above Value"
+                  }
+                ],
+                "title": "Position"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "text": {
+                "type": "string",
+                "title": "Text"
+              },
+              "textWrap": {
+                "type": "boolean",
+                "title": "Text wrap"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Label"
+        },
+        "layout": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "alignment": {
+                "$ref": "#/definitions/alignment",
+                "title": "Alignment"
+              },
+              "backgroundFillColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "backgroundImage": {
+                "$ref": "#/definitions/image"
+              },
+              "backgroundImageTransparency": {
+                "type": "number",
+                "title": "Image transparency"
+              },
+              "backgroundShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "backgroundTransparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              },
+              "borderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "borderStyle": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "borderTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "borderWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "bottomOuterMargin": {
+                "type": "integer",
+                "title": "Bottom padding"
+              },
+              "calloutSize": {
+                "type": "number",
+                "title": "Callout size"
+              },
+              "cellPadding": {
+                "type": "integer",
+                "title": "Space between cards"
+              },
+              "columnCount": {
+                "type": "integer",
+                "title": "Columns"
+              },
+              "columnPadding": {
+                "type": "integer",
+                "title": "Space between columns"
+              },
+              "customizeLines": {
+                "type": "boolean",
+                "title": "Customize lines"
+              },
+              "customizePadding": {
+                "type": "boolean",
+                "title": "Customize spacing"
+              },
+              "gridlineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "gridlineStyle": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "gridlineTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "gridlineWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "leftOuterMargin": {
+                "type": "integer",
+                "title": "Left padding"
+              },
+              "lineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "lineStyle": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "lineTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "lineWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "maxTiles": {
+                "type": "integer",
+                "title": "Max cards shown"
+              },
+              "orientation": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 1,
+                    "title": "Single column"
+                  },
+                  {
+                    "const": 2,
+                    "title": "Single row"
+                  },
+                  {
+                    "const": 0,
+                    "title": "Grid"
+                  }
+                ],
+                "title": "Arrangement"
+              },
+              "rectangleRoundedCurve": {
+                "type": "integer",
+                "title": "Rounded Corners"
+              },
+              "rectangleRoundedCurveCustomStyle": {
+                "type": "boolean",
+                "title": "Customize corners"
+              },
+              "rectangleRoundedCurveLeftBottom": {
+                "type": "integer",
+                "title": "Bottom left corner"
+              },
+              "rectangleRoundedCurveLeftTop": {
+                "type": "integer",
+                "title": "Top left corner"
+              },
+              "rectangleRoundedCurveRightBottom": {
+                "type": "integer",
+                "title": "Bottom right corner"
+              },
+              "rectangleRoundedCurveRightTop": {
+                "type": "integer",
+                "title": "Top right corner"
+              },
+              "rightOuterMargin": {
+                "type": "integer",
+                "title": "Right padding"
+              },
+              "rowCount": {
+                "type": "integer",
+                "title": "Rows"
+              },
+              "rowPadding": {
+                "type": "integer",
+                "title": "Space between rows"
+              },
+              "style": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Cards",
+                    "title": "Cards"
+                  },
+                  {
+                    "const": "Table",
+                    "title": "Table"
+                  }
+                ],
+                "title": "Style"
+              },
+              "topOuterMargin": {
+                "type": "integer",
+                "title": "Top padding"
+              }
+            }
+          },
+          "title": "Layout"
+        },
+        "outline": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "lineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Outline color",
+                "description": "Color of the outline"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Set transparency for line color"
+              },
+              "weight": {
+                "type": "number",
+                "title": "Outline weight",
+                "description": "Thickness of the outline in pixels"
+              }
+            }
+          },
+          "title": "Outline"
+        },
+        "overFlow": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "overFlowDirection": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Vertical"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Horizontal"
+                  }
+                ],
+                "title": "Overflow direction"
+              },
+              "overFlowStyle": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Paginated"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Continuous scroll"
+                  }
+                ],
+                "title": "Overflow style"
+              }
+            }
+          },
+          "title": "Overflow"
+        },
+        "padding": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "bottomMargin": {
+                "type": "integer",
+                "title": "Bottom margin"
+              },
+              "leftMargin": {
+                "type": "integer",
+                "title": "Left margin"
+              },
+              "paddingSelection": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Wide",
+                    "title": "Wide"
+                  },
+                  {
+                    "const": "Normal",
+                    "title": "Normal"
+                  },
+                  {
+                    "const": "Narrow",
+                    "title": "Narrow"
+                  },
+                  {
+                    "const": "Custom",
+                    "title": "Custom"
+                  }
+                ],
+                "title": "Size"
+              },
+              "rightMargin": {
+                "type": "integer",
+                "title": "Right margin"
+              },
+              "topMargin": {
+                "type": "integer",
+                "title": "Top margin"
+              }
+            }
+          },
+          "title": "Padding"
+        },
+        "referenceLabel": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "backgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "backgroundShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "backgroundTransparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "number",
+                  "integer",
+                  "boolean"
+                ],
+                "title": "Add label"
+              }
+            }
+          },
+          "title": "Reference labels"
+        },
+        "referenceLabelDetail": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "customFormatString": {
+                "type": "string",
+                "title": "Format code",
+                "description": "Enter a custom number format for your callout."
+              },
+              "detailBackgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "detailBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "detailDisplayUnits": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Auto"
+                  },
+                  {
+                    "const": 1,
+                    "title": "None"
+                  },
+                  {
+                    "const": 1000,
+                    "title": "Thousands"
+                  },
+                  {
+                    "const": 1000000,
+                    "title": "Millions"
+                  },
+                  {
+                    "const": 1000000000,
+                    "title": "Billions"
+                  },
+                  {
+                    "const": 1000000000000,
+                    "title": "Trillions"
+                  },
+                  {
+                    "const": -1,
+                    "title": "Custom"
+                  }
+                ],
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "detailFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "detailFontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "detailFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "detailItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "detailPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "detailTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "detailUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "detailValue": {
+                "type": [
+                  "string",
+                  "number",
+                  "integer",
+                  "boolean"
+                ],
+                "title": "Field"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "showBlankAs": {
+                "type": "string",
+                "title": "Show blank as"
+              }
+            }
+          },
+          "title": "Detail"
+        },
+        "referenceLabelLayout": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "arrangement": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "rows",
+                    "title": "Rows"
+                  },
+                  {
+                    "const": "columns",
+                    "title": "Columns"
+                  }
+                ],
+                "title": "Arrangement"
+              },
+              "customizePadding": {
+                "type": "boolean",
+                "title": "Customize outer padding"
+              },
+              "horizontalAlignment": {
+                "$ref": "#/definitions/alignment",
+                "title": "Horizontal alignment"
+              },
+              "labelSpace": {
+                "type": "number",
+                "title": "Space between labels"
+              },
+              "outerPadding": {
+                "type": "number",
+                "title": "Outer padding"
+              },
+              "paddingAfterDivider": {
+                "type": "number",
+                "title": "Padding after divider line"
+              },
+              "paddingBeforeDivider": {
+                "type": "number",
+                "title": "Padding before divider line"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "below",
+                    "title": "Below callout"
+                  },
+                  {
+                    "const": "right",
+                    "title": "Right of callout"
+                  }
+                ],
+                "title": "Position"
+              },
+              "style": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "sentence",
+                    "title": "Sentence"
+                  },
+                  {
+                    "const": "tabular",
+                    "title": "Tabular"
+                  }
+                ],
+                "title": "Style"
+              },
+              "textWrap": {
+                "type": "boolean",
+                "title": "Text wrap"
+              },
+              "valueArea": {
+                "type": "number",
+                "title": "Value area"
+              },
+              "verticalAlignment": {
+                "$ref": "#/definitions/verticalAlignment",
+                "title": "Vertical alignment"
+              }
+            }
+          },
+          "title": "Layout"
+        },
+        "referenceLabelTitle": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "titleBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "titleContentType": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "custom",
+                    "title": "Custom"
+                  },
+                  {
+                    "const": "fieldName",
+                    "title": "Field name"
+                  }
+                ],
+                "title": "Content"
+              },
+              "titleFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "titleFontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "titleFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "titleItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "titleText": {
+                "type": "string",
+                "title": "Text"
+              },
+              "titleTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "titleUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Title"
+        },
+        "referenceLabelValue": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "customFormatString": {
+                "type": "string",
+                "title": "Format code",
+                "description": "Enter a custom number format for your callout."
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "showBlankAs": {
+                "type": "string",
+                "title": "Show blank as"
+              },
+              "valueBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "valueDisplayUnits": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Auto"
+                  },
+                  {
+                    "const": 1,
+                    "title": "None"
+                  },
+                  {
+                    "const": 1000,
+                    "title": "Thousands"
+                  },
+                  {
+                    "const": 1000000,
+                    "title": "Millions"
+                  },
+                  {
+                    "const": 1000000000,
+                    "title": "Billions"
+                  },
+                  {
+                    "const": 1000000000000,
+                    "title": "Trillions"
+                  },
+                  {
+                    "const": -1,
+                    "title": "Custom"
+                  }
+                ],
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "valueFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "valueFontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "valueFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "valueItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "valuePrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "valueTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "valueUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Value"
+        },
+        "rotation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "angle": {
+                "type": "number",
+                "title": "Rotation"
+              },
+              "shapeAngle": {
+                "type": "integer",
+                "title": "Shape rotation"
+              },
+              "textAngle": {
+                "type": "integer",
+                "title": "Text rotation"
+              }
+            }
+          },
+          "title": "Rotation"
+        },
+        "shadowCustom": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "angle": {
+                "type": "number",
+                "title": "Angle"
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Outer",
+                    "title": "Outside"
+                  },
+                  {
+                    "const": "Inner",
+                    "title": "Inside"
+                  }
+                ],
+                "title": "Offset"
+              },
+              "shadowBlur": {
+                "type": "number",
+                "title": "Blur"
+              },
+              "shadowDistance": {
+                "type": "number",
+                "title": "Distance"
+              },
+              "shadowPositionPreset": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "custom",
+                    "title": "Custom"
+                  },
+                  {
+                    "const": "top",
+                    "title": "Top"
+                  },
+                  {
+                    "const": "topLeft",
+                    "title": "Top left"
+                  },
+                  {
+                    "const": "topRight",
+                    "title": "Top right"
+                  },
+                  {
+                    "const": "center",
+                    "title": "Center"
+                  },
+                  {
+                    "const": "centerLeft",
+                    "title": "Left"
+                  },
+                  {
+                    "const": "centerRight",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "bottom",
+                    "title": "Bottom"
+                  },
+                  {
+                    "const": "bottomLeft",
+                    "title": "Bottom left"
+                  },
+                  {
+                    "const": "bottomRight",
+                    "title": "Bottom right"
+                  }
+                ],
+                "title": "Preset"
+              },
+              "shadowSpread": {
+                "type": "number",
+                "title": "Size"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              }
+            }
+          },
+          "title": "Shape shadow"
+        },
+        "shapeCustomRectangle": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rectangleRoundedCurve": {
+                "type": "integer",
+                "title": "Rounded Corners"
+              },
+              "rectangleRoundedCurveCustomStyle": {
+                "type": "boolean",
+                "title": "Customize style"
+              },
+              "rectangleRoundedCurveLeftBottom": {
+                "type": "integer",
+                "title": "Bottom left corner"
+              },
+              "rectangleRoundedCurveLeftTop": {
+                "type": "integer",
+                "title": "Top left corner"
+              },
+              "rectangleRoundedCurveRightBottom": {
+                "type": "integer",
+                "title": "Bottom right corner"
+              },
+              "rectangleRoundedCurveRightTop": {
+                "type": "integer",
+                "title": "Top right corner"
+              },
+              "tabCutCornerSnipSizeBottom": {
+                "type": "integer",
+                "title": "Size of bottom snips"
+              },
+              "tabCutCornerSnipSizeCustomStyle": {
+                "type": "boolean",
+                "title": "Customize style"
+              },
+              "tabCutCornerSnipSizeLeftBottom": {
+                "type": "integer",
+                "title": "Bottom left corner"
+              },
+              "tabCutCornerSnipSizeLeftTop": {
+                "type": "integer",
+                "title": "Top left corner"
+              },
+              "tabCutCornerSnipSizeRightBottom": {
+                "type": "integer",
+                "title": "Bottom right corner"
+              },
+              "tabCutCornerSnipSizeRightTop": {
+                "type": "integer",
+                "title": "Top right corner"
+              },
+              "tabCutCornerSnipSizeTop": {
+                "type": "integer",
+                "title": "Size of top snips"
+              },
+              "tileShape": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "arrow",
+                    "title": "Arrow"
+                  },
+                  {
+                    "const": "arrowChevron",
+                    "title": "Chevron arrow"
+                  },
+                  {
+                    "const": "arrowPentagon",
+                    "title": "Pentagon arrow"
+                  },
+                  {
+                    "const": "heart",
+                    "title": "Heart"
+                  },
+                  {
+                    "const": "hexagon",
+                    "title": "Hexagon"
+                  },
+                  {
+                    "const": "line",
+                    "title": "Line"
+                  },
+                  {
+                    "const": "octagon",
+                    "title": "Octagon"
+                  },
+                  {
+                    "const": "oval",
+                    "title": "Oval"
+                  },
+                  {
+                    "const": "parallelogram",
+                    "title": "Parallelogram"
+                  },
+                  {
+                    "const": "pentagon",
+                    "title": "Pentagon"
+                  },
+                  {
+                    "const": "pill",
+                    "title": "Pill"
+                  },
+                  {
+                    "const": "rectangle",
+                    "title": "Rectangle"
+                  },
+                  {
+                    "const": "rectangleRounded",
+                    "title": "Rounded Rectangle"
+                  },
+                  {
+                    "const": "rectangleRoundedByPixel",
+                    "title": "Rounded Rectangle"
+                  },
+                  {
+                    "const": "tabCutCorner",
+                    "title": "Snipped tab, top right"
+                  },
+                  {
+                    "const": "tabCutTopCorners",
+                    "title": "Snipped tab, both top"
+                  },
+                  {
+                    "const": "tabCutTopCornersByPixel",
+                    "title": "Snipped tab, both top"
+                  },
+                  {
+                    "const": "tabRoundCorner",
+                    "title": "Rounded tab, top right"
+                  },
+                  {
+                    "const": "tabRoundTopCorners",
+                    "title": "Rounded tab, both top"
+                  },
+                  {
+                    "const": "speechbubbleRectangle",
+                    "title": "Speech Bubble"
+                  },
+                  {
+                    "const": "trapezoid",
+                    "title": "Trapezoid"
+                  },
+                  {
+                    "const": "triangleIsoc",
+                    "title": "Isosceles Triangle"
+                  },
+                  {
+                    "const": "triangleRight",
+                    "title": "Right Triangle"
+                  }
+                ],
+                "title": "Shape"
+              }
+            }
+          },
+          "title": "Shape"
+        },
+        "smallMultiplesAccentBar": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Left",
+                    "title": "Left"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom"
+                  },
+                  {
+                    "const": "Top",
+                    "title": "Top"
+                  }
+                ],
+                "title": "Position"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "width": {
+                "type": "number",
+                "title": "Width"
+              }
+            }
+          },
+          "title": "Accent bar"
+        },
+        "smallMultiplesBorder": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "gridlineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "gridlineShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "gridlineStyle": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "gridlineTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "gridlineWidth": {
+                "type": "number",
+                "title": "Width"
+              }
+            }
+          },
+          "title": "Border"
+        },
+        "smallMultiplesCellBackGround": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "backgroundFillColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "backgroundImage": {
+                "$ref": "#/definitions/image"
+              },
+              "backgroundImageTransparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              },
+              "backgroundShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "backgroundTransparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              }
+            }
+          },
+          "title": "Background"
+        },
+        "smallMultiplesGrid": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "gridlineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "gridlineRegion": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "all",
+                    "title": "All"
+                  },
+                  {
+                    "const": "inner",
+                    "title": "Horizontal and vertical"
+                  },
+                  {
+                    "const": "innerHorizontal",
+                    "title": "Horizontal only"
+                  },
+                  {
+                    "const": "innerVertical",
+                    "title": "Vertical only"
+                  }
+                ],
+                "title": "Gridlines"
+              },
+              "gridlineShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "gridlineStyle": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "solid",
+                    "title": "Solid"
+                  },
+                  {
+                    "const": "dashed",
+                    "title": "Dashed"
+                  },
+                  {
+                    "const": "dotted",
+                    "title": "Dotted"
+                  }
+                ],
+                "title": "Line style"
+              },
+              "gridlineTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "gridlineWidth": {
+                "type": "number",
+                "title": "Width"
+              }
+            }
+          },
+          "title": "Gridlines"
+        },
+        "smallMultiplesHeader": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "backgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "backgroundImage": {
+                "$ref": "#/definitions/image",
+                "title": "Background Image"
+              },
+              "backgroundImageTransparency": {
+                "type": "number",
+                "title": "Image transparency"
+              },
+              "backgroundShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "backgroundTransparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "bottomMargin": {
+                "type": "integer",
+                "title": "Bottom padding"
+              },
+              "customFormatString": {
+                "type": "string",
+                "title": "Format code",
+                "description": "Enter a custom number format for your callout."
+              },
+              "displayUnits": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Auto"
+                  },
+                  {
+                    "const": 1,
+                    "title": "None"
+                  },
+                  {
+                    "const": 1000,
+                    "title": "Thousands"
+                  },
+                  {
+                    "const": 1000000,
+                    "title": "Millions"
+                  },
+                  {
+                    "const": 1000000000,
+                    "title": "Billions"
+                  },
+                  {
+                    "const": 1000000000000,
+                    "title": "Trillions"
+                  },
+                  {
+                    "const": -1,
+                    "title": "Custom"
+                  }
+                ],
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "horizontalAlignment": {
+                "$ref": "#/definitions/alignment",
+                "title": "Horizontal alignment"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "leftMargin": {
+                "type": "integer",
+                "title": "Left padding"
+              },
+              "precision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "rightMargin": {
+                "type": "integer",
+                "title": "Right padding"
+              },
+              "showBlankAs": {
+                "type": "string",
+                "title": "Show blank as"
+              },
+              "textWrap": {
+                "type": "boolean",
+                "title": "Text wrap"
+              },
+              "topMargin": {
+                "type": "integer",
+                "title": "Top padding"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "verticalAlignment": {
+                "$ref": "#/definitions/verticalAlignment",
+                "title": "Vertical alignment"
+              }
+            }
+          },
+          "title": "Small multiples header"
+        },
+        "smallMultiplesLayout": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "cellPadding": {
+                "type": "integer",
+                "title": "Space between cards"
+              },
+              "columnCount": {
+                "type": "integer",
+                "title": "Columns shown"
+              },
+              "columnPadding": {
+                "type": "integer",
+                "title": "Space between columns"
+              },
+              "customizePadding": {
+                "type": "boolean",
+                "title": "Customize spacing"
+              },
+              "fixNumberOfTiles": {
+                "type": "boolean",
+                "title": "Fixed number of tiles"
+              },
+              "headerPosition": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Left",
+                    "title": "Left"
+                  },
+                  {
+                    "const": "Top",
+                    "title": "Top"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom"
+                  }
+                ],
+                "title": "Position"
+              },
+              "maxHeaderSize": {
+                "type": "integer",
+                "title": "Maximum header size",
+                "description": "The maximum percent of the visual allowed for the small multiple header"
+              },
+              "maxSmallMultiples": {
+                "type": "integer",
+                "title": "Max small multiples shown"
+              },
+              "orientation": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 1,
+                    "title": "Single column"
+                  },
+                  {
+                    "const": 2,
+                    "title": "Single row"
+                  },
+                  {
+                    "const": 0,
+                    "title": "Grid"
+                  }
+                ],
+                "title": "Small multiples arrangement"
+              },
+              "rowCount": {
+                "type": "integer",
+                "title": "Max rows shown"
+              },
+              "rowPadding": {
+                "type": "integer",
+                "title": "Space between rows"
+              },
+              "style": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Cards",
+                    "title": "Cards"
+                  },
+                  {
+                    "const": "Table",
+                    "title": "Table"
+                  }
+                ],
+                "title": "Style"
+              },
+              "titleOrientation": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Rotate all text 270°"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Horizontal"
+                  },
+                  {
+                    "const": 2,
+                    "title": "Rotate all text 90°"
+                  },
+                  {
+                    "const": 3,
+                    "title": "Stacked"
+                  }
+                ],
+                "title": "Orientation"
+              }
+            }
+          },
+          "title": "Small multiples layout"
+        },
+        "smallMultiplesOuterShape": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rectangleRoundedCurve": {
+                "type": "integer",
+                "title": "Rounded Corners"
+              },
+              "rectangleRoundedCurveCustomStyle": {
+                "type": "boolean",
+                "title": "Customize corners"
+              },
+              "rectangleRoundedCurveLeftBottom": {
+                "type": "integer",
+                "title": "Bottom left corner"
+              },
+              "rectangleRoundedCurveLeftTop": {
+                "type": "integer",
+                "title": "Top left corner"
+              },
+              "rectangleRoundedCurveRightBottom": {
+                "type": "integer",
+                "title": "Bottom right corner"
+              },
+              "rectangleRoundedCurveRightTop": {
+                "type": "integer",
+                "title": "Top right corner"
+              }
+            }
+          },
+          "title": "Shape"
+        },
+        "smallMultiplesOverFlow": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "overFlowDirection": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Vertical"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Horizontal"
+                  }
+                ],
+                "title": "Overflow direction"
+              },
+              "overFlowStyle": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Paginated"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Continuous scroll"
+                  }
+                ],
+                "title": "Overflow style"
+              }
+            }
+          },
+          "title": "Overflow"
+        },
+        "spacing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "verticalSpacing": {
+                "type": "integer",
+                "title": "Space between label and value"
+              }
+            }
+          },
+          "title": "Spacing"
+        },
+        "value": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "$id": {
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "default"
+                    ]
+                  },
+                  {
+                    "pattern": "^[A-Za-z0-9]+$"
+                  }
+                ]
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "customFormatString": {
+                "type": "string",
+                "title": "Format code",
+                "description": "Enter a custom number format for your callout."
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "horizontalAlignment": {
+                "$ref": "#/definitions/alignment",
+                "title": "Horizontal alignment"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "labelDisplayUnits": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Auto"
+                  },
+                  {
+                    "const": 1,
+                    "title": "None"
+                  },
+                  {
+                    "const": 1000,
+                    "title": "Thousands"
+                  },
+                  {
+                    "const": 1000000,
+                    "title": "Millions"
+                  },
+                  {
+                    "const": 1000000000,
+                    "title": "Billions"
+                  },
+                  {
+                    "const": 1000000000000,
+                    "title": "Trillions"
+                  },
+                  {
+                    "const": -1,
+                    "title": "Custom"
+                  }
+                ],
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "labelPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "showBlankAs": {
+                "type": "string",
+                "title": "Show blank as"
+              },
+              "textWrap": {
+                "type": "boolean",
+                "title": "Text wrap"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Values"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,397 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/commonCards"
+    },
+    {
+      "properties": {
+        "*": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "defaultColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Color of shapes with no data"
+              },
+              "fill": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color"
+              },
+              "fillRule": {
+                "$ref": "#/definitions/fillRule",
+                "title": "Values",
+                "description": "The numeric amounts to plot"
+              },
+              "showAllDataPoints": {
+                "type": "boolean",
+                "title": "Show all"
+              },
+              "borderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Border color"
+              },
+              "borderThickness": {
+                "type": "number",
+                "title": "Border thickness"
+              },
+              "defaultShow": {
+                "type": "boolean",
+                "title": "Show",
+                "description": "Show shapes with no data"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "labelColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Top",
+                    "title": "Top left"
+                  },
+                  {
+                    "const": "TopCenter",
+                    "title": "Top center"
+                  },
+                  {
+                    "const": "TopRight",
+                    "title": "Top right"
+                  },
+                  {
+                    "const": "Left",
+                    "title": "Top left stacked"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Top right stacked"
+                  },
+                  {
+                    "const": "LeftCenter",
+                    "title": "Center left"
+                  },
+                  {
+                    "const": "RightCenter",
+                    "title": "Center right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom left"
+                  },
+                  {
+                    "const": "BottomCenter",
+                    "title": "Bottom center"
+                  },
+                  {
+                    "const": "BottomRight",
+                    "title": "Bottom right"
+                  }
+                ],
+                "title": "Position",
+                "description": "Select the location for the legend"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "showTitle": {
+                "type": "boolean",
+                "title": "Title",
+                "description": "Display a title for legend symbols"
+              },
+              "titleText": {
+                "type": "string",
+                "title": "Legend Name",
+                "description": "Title text"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "projectionEnum": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "albersUsa",
+                    "title": "Albers USA"
+                  },
+                  {
+                    "const": "equirectangular",
+                    "title": "Equirectangular"
+                  },
+                  {
+                    "const": "mercator",
+                    "title": "Mercator"
+                  },
+                  {
+                    "const": "orthographic",
+                    "title": "Orthographic"
+                  }
+                ],
+                "title": "Projection",
+                "description": "Projection"
+              },
+              "autoZoom": {
+                "type": "boolean",
+                "title": "Auto zoom",
+                "description": "Zoom in on shapes with available data"
+              },
+              "manualZoom": {
+                "type": "boolean",
+                "title": "Manual zoom",
+                "description": "Allow user to zoom and pan"
+              },
+              "selectionZoom": {
+                "type": "boolean",
+                "title": "Zoom on selection",
+                "description": "Zoom in on selected shapes"
+              }
+            }
+          }
+        },
+        "dataPoint": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "defaultColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color"
+              },
+              "fill": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color"
+              },
+              "fillRule": {
+                "$ref": "#/definitions/fillRule",
+                "title": "Values",
+                "description": "The numeric amounts to plot"
+              },
+              "showAllDataPoints": {
+                "type": "boolean",
+                "title": "Show all"
+              }
+            }
+          },
+          "title": "Data colors",
+          "description": "Display data color options"
+        },
+        "defaultColors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "borderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Border color"
+              },
+              "borderThickness": {
+                "type": "number",
+                "title": "Border thickness"
+              },
+              "defaultColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Color of shapes with no data"
+              },
+              "defaultShow": {
+                "type": "boolean",
+                "title": "Show",
+                "description": "Show shapes with no data"
+              }
+            }
+          },
+          "title": "Default Color",
+          "description": "Default Color"
+        },
+        "general": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formatString": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "General"
+        },
+        "legend": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "labelColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Top",
+                    "title": "Top left"
+                  },
+                  {
+                    "const": "TopCenter",
+                    "title": "Top center"
+                  },
+                  {
+                    "const": "TopRight",
+                    "title": "Top right"
+                  },
+                  {
+                    "const": "Left",
+                    "title": "Top left stacked"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Top right stacked"
+                  },
+                  {
+                    "const": "LeftCenter",
+                    "title": "Center left"
+                  },
+                  {
+                    "const": "RightCenter",
+                    "title": "Center right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom left"
+                  },
+                  {
+                    "const": "BottomCenter",
+                    "title": "Bottom center"
+                  },
+                  {
+                    "const": "BottomRight",
+                    "title": "Bottom right"
+                  }
+                ],
+                "title": "Position",
+                "description": "Select the location for the legend"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "showTitle": {
+                "type": "boolean",
+                "title": "Title",
+                "description": "Display a title for legend symbols"
+              },
+              "titleText": {
+                "type": "string",
+                "title": "Legend Name",
+                "description": "Title text"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Legend",
+          "description": "Display legend options"
+        },
+        "shape": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "projectionEnum": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "albersUsa",
+                    "title": "Albers USA"
+                  },
+                  {
+                    "const": "equirectangular",
+                    "title": "Equirectangular"
+                  },
+                  {
+                    "const": "mercator",
+                    "title": "Mercator"
+                  },
+                  {
+                    "const": "orthographic",
+                    "title": "Orthographic"
+                  }
+                ],
+                "title": "Projection",
+                "description": "Projection"
+              }
+            }
+          },
+          "title": "Shape",
+          "description": "Shape"
+        },
+        "zoom": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "autoZoom": {
+                "type": "boolean",
+                "title": "Auto zoom",
+                "description": "Zoom in on shapes with available data"
+              },
+              "manualZoom": {
+                "type": "boolean",
+                "title": "Manual zoom",
+                "description": "Allow user to zoom and pan"
+              },
+              "selectionZoom": {
+                "type": "boolean",
+                "title": "Zoom on selection",
+                "description": "Zoom in on selected shapes"
+              }
+            }
+          },
+          "title": "Zoom",
+          "description": "Zoom"
+        }
+      }
+    }
+  ]
+}

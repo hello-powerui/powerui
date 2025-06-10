@@ -1,0 +1,1383 @@
+{
+  "type": "object",
+  "properties": {
+    "*": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "$ref": "#/definitions/fill",
+            "title": "Color"
+          },
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          },
+          "transparency": {
+            "type": "number",
+            "title": "Transparency",
+            "description": "Set transparency for the tooltip background"
+          },
+          "radius": {
+            "type": "number",
+            "title": "Radius"
+          },
+          "width": {
+            "type": "number",
+            "title": "Width"
+          },
+          "ignorePadding": {
+            "type": "boolean",
+            "title": "Ignore padding"
+          },
+          "style": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "solid",
+                "title": "Solid"
+              },
+              {
+                "const": "dashed",
+                "title": "Dashed"
+              },
+              {
+                "const": "dotted",
+                "title": "Dotted"
+              }
+            ],
+            "title": "Line style"
+          },
+          "angle": {
+            "type": "number",
+            "title": "Angle"
+          },
+          "position": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Outer",
+                "title": "Outside"
+              },
+              {
+                "const": "Inner",
+                "title": "Inside"
+              }
+            ],
+            "title": "Shadow position"
+          },
+          "preset": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "BottomRight",
+                "title": "Bottom right"
+              },
+              {
+                "const": "Bottom",
+                "title": "Bottom"
+              },
+              {
+                "const": "BottomLeft",
+                "title": "Bottom left"
+              },
+              {
+                "const": "CenterRight",
+                "title": "Right"
+              },
+              {
+                "const": "Center",
+                "title": "Center"
+              },
+              {
+                "const": "CenterLeft",
+                "title": "Left"
+              },
+              {
+                "const": "TopRight",
+                "title": "Top right"
+              },
+              {
+                "const": "Top",
+                "title": "Top"
+              },
+              {
+                "const": "TopLeft",
+                "title": "Top left"
+              },
+              {
+                "const": "Custom",
+                "title": "Custom"
+              }
+            ],
+            "title": "Preset"
+          },
+          "shadowBlur": {
+            "type": "number",
+            "title": "Blur"
+          },
+          "shadowDistance": {
+            "type": "number",
+            "title": "Distance"
+          },
+          "shadowSpread": {
+            "type": "number",
+            "title": "Size"
+          },
+          "allowBinnedLineSample": {
+            "type": "boolean",
+            "title": "High density sampling"
+          },
+          "allowOverlappingPointsSample": {
+            "type": "boolean",
+            "title": "High density sampling"
+          },
+          "altText": {
+            "type": "string",
+            "title": "Alt text"
+          },
+          "height": {
+            "type": "number",
+            "title": "Height"
+          },
+          "keepLayerOrder": {
+            "type": "boolean",
+            "title": "Maintain layer order",
+            "description": "Maintain layer order in reading view, even when selected"
+          },
+          "x": {
+            "type": "number",
+            "title": "X Position"
+          },
+          "y": {
+            "type": "number",
+            "title": "Y Position"
+          },
+          "bottom": {
+            "type": "number",
+            "title": "Bottom padding"
+          },
+          "left": {
+            "type": "number",
+            "title": "Left padding"
+          },
+          "right": {
+            "type": "number",
+            "title": "Right padding"
+          },
+          "top": {
+            "type": "number",
+            "title": "Top padding"
+          },
+          "customizeSpacing": {
+            "type": "boolean",
+            "title": "Customize spacing"
+          },
+          "spaceBelowSubTitle": {
+            "type": "number",
+            "title": "Space below subtitle"
+          },
+          "spaceBelowTitle": {
+            "type": "number",
+            "title": "Space below title"
+          },
+          "spaceBelowTitleArea": {
+            "type": "number",
+            "title": "Space below title area"
+          },
+          "verticalSpacing": {
+            "type": "number",
+            "title": "Space between label and value"
+          },
+          "name": {
+            "type": "string",
+            "title": "Style"
+          },
+          "alignment": {
+            "$ref": "#/definitions/alignment",
+            "title": "Alignment",
+            "description": "Alignment position for the title"
+          },
+          "bold": {
+            "type": "boolean",
+            "title": "Bold"
+          },
+          "fontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Font color",
+            "description": "Font color for the title"
+          },
+          "fontFamily": {
+            "type": "string",
+            "title": "Font family",
+            "description": "Font family for the tooltip"
+          },
+          "fontSize": {
+            "$ref": "#/definitions/fontSize",
+            "title": "Text size",
+            "description": "Font size for the tooltip"
+          },
+          "heading": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Normal",
+                "title": "Normal"
+              },
+              {
+                "const": "Heading2",
+                "title": "Heading 2"
+              },
+              {
+                "const": "Heading3",
+                "title": "Heading 3"
+              },
+              {
+                "const": "Heading4",
+                "title": "Heading 4"
+              },
+              {
+                "const": "Heading5",
+                "title": "Heading 5"
+              },
+              {
+                "const": "Heading6",
+                "title": "Heading 6"
+              }
+            ],
+            "title": "Title heading",
+            "description": "Set the heading tag for your visual titles to help with screen reader accessibility. This won't impact the visual styling of your titles."
+          },
+          "italic": {
+            "type": "boolean",
+            "title": "Italic"
+          },
+          "text": {
+            "type": "string",
+            "title": "Tooltip text",
+            "description": "Write the custom tooltip that will show up when a report page tooltip hasn't been chosen or isn't supported"
+          },
+          "titleWrap": {
+            "type": "boolean",
+            "title": "Word wrap"
+          },
+          "underline": {
+            "type": "boolean",
+            "title": "Underline"
+          },
+          "background": {
+            "$ref": "#/definitions/fill",
+            "title": "Background color",
+            "description": "Background color for the tooltip"
+          },
+          "border": {
+            "$ref": "#/definitions/fill",
+            "title": "Border",
+            "description": "Border"
+          },
+          "foreground": {
+            "$ref": "#/definitions/fill",
+            "title": "Icon color",
+            "description": "The color for the visual header icons"
+          },
+          "showCommentButton": {
+            "type": "boolean",
+            "title": "Comment button",
+            "description": "Select to show comment indicator button. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showCopyVisualImageButton": {
+            "type": "boolean",
+            "title": "Copy icon",
+            "description": "Turn on the copy icon to allow people in reading view to copy visuals and paste them elsewhere"
+          },
+          "showDrillDownExpandButton": {
+            "type": "boolean",
+            "title": "Expand to next level icon",
+            "description": "Select to turn on expand to next level icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showDrillDownLevelButton": {
+            "type": "boolean",
+            "title": "Show next level icon",
+            "description": "Select to turn on show next level icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showDrillRoleSelector": {
+            "type": "boolean",
+            "title": "Drill on dropdown",
+            "description": "Select to turn on drill on dropdown. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showDrillToggleButton": {
+            "type": "boolean",
+            "title": "Drill down icon",
+            "description": "Select to turn on drill down icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showDrillUpButton": {
+            "type": "boolean",
+            "title": "Drill up icon",
+            "description": "Select to turn on drill up icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showFilterRestatementButton": {
+            "type": "boolean",
+            "title": "Filter icon",
+            "description": "Turn on the filter icon to show users a summary of the visual-level filters applied to each visual."
+          },
+          "showFocusModeButton": {
+            "type": "boolean",
+            "title": "Focus mode icon",
+            "description": "Select to turn on focus mode icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showFollowVisualButton": {
+            "type": "boolean",
+            "title": "Follow visual button",
+            "description": "Turn on the follow visual icon to allow people to get alerts whenever a measure changes in the visual. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showOptionsMenu": {
+            "type": "boolean",
+            "title": "More options icon",
+            "description": "Select to turn on more options icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showPersonalizeVisualButton": {
+            "type": "boolean",
+            "title": "Personalize visual",
+            "description": "Allow report readers to personalize this visual to suit their needs."
+          },
+          "showPinButton": {
+            "type": "boolean",
+            "title": "Pin icon",
+            "description": "Select to turn on pin icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showSeeDataLayoutToggleButton": {
+            "type": "boolean",
+            "title": "See data layout icon",
+            "description": "Select to turn on See Data layout icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showSetAlertButton": {
+            "type": "boolean",
+            "title": "Set alert button",
+            "description": "Turn on the set alert icon to allow people to create an alert on a measure in the visual. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showSmartNarrativeButton": {
+            "type": "boolean",
+            "title": "Smart narrative",
+            "description": "Select to turn on smart narrative icon."
+          },
+          "showTooltipButton": {
+            "type": "boolean",
+            "title": "Visual header tooltip icon",
+            "description": "Select to show the visual header tooltip icon"
+          },
+          "showVisualErrorButton": {
+            "type": "boolean",
+            "title": "Visual error icon",
+            "description": "Select to turn on visual error icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showVisualInformationButton": {
+            "type": "boolean",
+            "title": "Visual information icon",
+            "description": "Select to turn on visual information icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showVisualWarningButton": {
+            "type": "boolean",
+            "title": "Visual warning icon",
+            "description": "Select to turn on visual warning icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "section": {
+            "type": "string",
+            "title": "Page",
+            "description": "Choose the page you want to use for your tooltip"
+          },
+          "themedBackground": {
+            "$ref": "#/definitions/fill",
+            "title": "Background color",
+            "description": "Background color for the tooltip"
+          },
+          "themedTitleFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Label text color",
+            "description": "Text color for the tooltip label"
+          },
+          "titleFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Label text color",
+            "description": "Text color for the tooltip label"
+          },
+          "type": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Default",
+                "title": "Default"
+              },
+              {
+                "const": "Canvas",
+                "title": "Report page"
+              }
+            ],
+            "title": "Type",
+            "description": "Allows report pages to be used as tooltips for this visual"
+          },
+          "bookmark": {
+            "type": "string",
+            "title": "Bookmark",
+            "description": "Choose which bookmark will open when this element is selected."
+          },
+          "dataFunction": {
+            "$ref": "#/definitions/itemLocation",
+            "title": "Data function"
+          },
+          "disabledTooltip": {
+            "type": "string",
+            "title": "Disabled tooltip"
+          },
+          "drillthroughSection": {
+            "type": "string",
+            "title": "Destination",
+            "description": "Select a single destination or use conditional formatting for custom destination logic, such as multi-destination support."
+          },
+          "enabledTooltip": {
+            "type": "string",
+            "title": "Enabled tooltip"
+          },
+          "navigationSection": {
+            "type": "string",
+            "title": "Destination",
+            "description": "Select a single destination or use conditional formatting for custom destination logic, such as multi-destination support."
+          },
+          "showDefaultTooltip": {
+            "type": "boolean",
+            "title": "Show tooltips"
+          },
+          "suppressDefaultTooltip": {
+            "type": "boolean",
+            "title": "No tooltips"
+          },
+          "tooltip": {
+            "type": "string",
+            "title": "Tooltip",
+            "description": "Write the custom tooltip that will show when users hover over this element."
+          },
+          "tooltipPlaceholderText": {
+            "type": "string",
+            "title": "Placeholder for tooltip"
+          },
+          "webUrl": {
+            "type": "string",
+            "title": "Web URL"
+          },
+          "actionFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Drill text and icon color",
+            "description": "Color for drill icon and text"
+          },
+          "themedValueFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Value text color",
+            "description": "Text color for the tooltip value"
+          },
+          "valueFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Value text color",
+            "description": "Text color for the tooltip value"
+          }
+        }
+      }
+    },
+    "background": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "$ref": "#/definitions/fill",
+            "title": "Color",
+            "description": "The background color for the visual"
+          },
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          },
+          "transparency": {
+            "type": "number",
+            "title": "Transparency",
+            "description": "Background color transparency"
+          }
+        }
+      },
+      "title": "Background"
+    },
+    "border": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "$ref": "#/definitions/fill",
+            "title": "Color"
+          },
+          "radius": {
+            "type": "number",
+            "title": "Radius"
+          },
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          },
+          "width": {
+            "type": "number",
+            "title": "Width"
+          }
+        }
+      },
+      "title": "Border"
+    },
+    "divider": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "$ref": "#/definitions/fill",
+            "title": "Color"
+          },
+          "ignorePadding": {
+            "type": "boolean",
+            "title": "Ignore padding"
+          },
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          },
+          "style": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "solid",
+                "title": "Solid"
+              },
+              {
+                "const": "dashed",
+                "title": "Dashed"
+              },
+              {
+                "const": "dotted",
+                "title": "Dotted"
+              }
+            ],
+            "title": "Line style"
+          },
+          "width": {
+            "type": "number",
+            "title": "Width"
+          }
+        }
+      },
+      "title": "Divider"
+    },
+    "dropShadow": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "angle": {
+            "type": "number",
+            "title": "Angle"
+          },
+          "color": {
+            "$ref": "#/definitions/fill",
+            "title": "Color"
+          },
+          "position": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Outer",
+                "title": "Outside"
+              },
+              {
+                "const": "Inner",
+                "title": "Inside"
+              }
+            ],
+            "title": "Shadow position"
+          },
+          "preset": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "BottomRight",
+                "title": "Bottom right"
+              },
+              {
+                "const": "Bottom",
+                "title": "Bottom"
+              },
+              {
+                "const": "BottomLeft",
+                "title": "Bottom left"
+              },
+              {
+                "const": "CenterRight",
+                "title": "Right"
+              },
+              {
+                "const": "Center",
+                "title": "Center"
+              },
+              {
+                "const": "CenterLeft",
+                "title": "Left"
+              },
+              {
+                "const": "TopRight",
+                "title": "Top right"
+              },
+              {
+                "const": "Top",
+                "title": "Top"
+              },
+              {
+                "const": "TopLeft",
+                "title": "Top left"
+              },
+              {
+                "const": "Custom",
+                "title": "Custom"
+              }
+            ],
+            "title": "Preset"
+          },
+          "shadowBlur": {
+            "type": "number",
+            "title": "Blur"
+          },
+          "shadowDistance": {
+            "type": "number",
+            "title": "Distance"
+          },
+          "shadowSpread": {
+            "type": "number",
+            "title": "Size"
+          },
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          },
+          "transparency": {
+            "type": "number",
+            "title": "Transparency"
+          }
+        }
+      },
+      "title": "Shadow"
+    },
+    "general": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "allowBinnedLineSample": {
+            "type": "boolean",
+            "title": "High density sampling"
+          },
+          "allowOverlappingPointsSample": {
+            "type": "boolean",
+            "title": "High density sampling"
+          },
+          "altText": {
+            "type": "string",
+            "title": "Alt text"
+          },
+          "height": {
+            "type": "number",
+            "title": "Height"
+          },
+          "keepLayerOrder": {
+            "type": "boolean",
+            "title": "Maintain layer order",
+            "description": "Maintain layer order in reading view, even when selected"
+          },
+          "width": {
+            "type": "number",
+            "title": "Width"
+          },
+          "x": {
+            "type": "number",
+            "title": "X Position"
+          },
+          "y": {
+            "type": "number",
+            "title": "Y Position"
+          }
+        }
+      },
+      "title": "General"
+    },
+    "lockAspect": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          }
+        }
+      },
+      "title": "Lock aspect"
+    },
+    "padding": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "bottom": {
+            "type": "number",
+            "title": "Bottom padding"
+          },
+          "left": {
+            "type": "number",
+            "title": "Left padding"
+          },
+          "right": {
+            "type": "number",
+            "title": "Right padding"
+          },
+          "top": {
+            "type": "number",
+            "title": "Top padding"
+          }
+        }
+      },
+      "title": "Padding"
+    },
+    "spacing": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "customizeSpacing": {
+            "type": "boolean",
+            "title": "Customize spacing"
+          },
+          "spaceBelowSubTitle": {
+            "type": "number",
+            "title": "Space below subtitle"
+          },
+          "spaceBelowTitle": {
+            "type": "number",
+            "title": "Space below title"
+          },
+          "spaceBelowTitleArea": {
+            "type": "number",
+            "title": "Space below title area"
+          },
+          "verticalSpacing": {
+            "type": "number",
+            "title": "Space between label and value"
+          }
+        }
+      }
+    },
+    "stylePreset": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Style"
+          }
+        }
+      },
+      "title": "Style"
+    },
+    "subTitle": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "alignment": {
+            "$ref": "#/definitions/alignment",
+            "title": "Alignment",
+            "description": "Alignment position for the title"
+          },
+          "bold": {
+            "type": "boolean",
+            "title": "Bold"
+          },
+          "fontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Font color",
+            "description": "Font color for the title"
+          },
+          "fontFamily": {
+            "type": "string",
+            "title": "Font family"
+          },
+          "fontSize": {
+            "$ref": "#/definitions/fontSize",
+            "title": "Text size",
+            "description": "Font size for the title"
+          },
+          "heading": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Normal",
+                "title": "Normal"
+              },
+              {
+                "const": "Heading2",
+                "title": "Heading 2"
+              },
+              {
+                "const": "Heading3",
+                "title": "Heading 3"
+              },
+              {
+                "const": "Heading4",
+                "title": "Heading 4"
+              },
+              {
+                "const": "Heading5",
+                "title": "Heading 5"
+              },
+              {
+                "const": "Heading6",
+                "title": "Heading 6"
+              }
+            ],
+            "title": "Title heading",
+            "description": "Set the heading tag for your visual titles to help with screen reader accessibility. This won't impact the visual styling of your titles."
+          },
+          "italic": {
+            "type": "boolean",
+            "title": "Italic"
+          },
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          },
+          "text": {
+            "type": "string",
+            "title": "Title text",
+            "description": "The name of the visual"
+          },
+          "titleWrap": {
+            "type": "boolean",
+            "title": "Word wrap"
+          },
+          "underline": {
+            "type": "boolean",
+            "title": "Underline"
+          }
+        }
+      },
+      "title": "Subtitle",
+      "description": "Display subtitle options"
+    },
+    "title": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "alignment": {
+            "$ref": "#/definitions/alignment",
+            "title": "Alignment",
+            "description": "Alignment position for the title"
+          },
+          "background": {
+            "$ref": "#/definitions/fill",
+            "title": "Background color",
+            "description": "Background color for the title"
+          },
+          "bold": {
+            "type": "boolean",
+            "title": "Bold"
+          },
+          "fontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Font color",
+            "description": "Font color for the title"
+          },
+          "fontFamily": {
+            "type": "string",
+            "title": "Font family"
+          },
+          "fontSize": {
+            "$ref": "#/definitions/fontSize",
+            "title": "Text size",
+            "description": "Font size for the title"
+          },
+          "heading": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Normal",
+                "title": "Normal"
+              },
+              {
+                "const": "Heading2",
+                "title": "Heading 2"
+              },
+              {
+                "const": "Heading3",
+                "title": "Heading 3"
+              },
+              {
+                "const": "Heading4",
+                "title": "Heading 4"
+              },
+              {
+                "const": "Heading5",
+                "title": "Heading 5"
+              },
+              {
+                "const": "Heading6",
+                "title": "Heading 6"
+              }
+            ],
+            "title": "Title heading",
+            "description": "Set the heading tag for your visual titles to help with screen reader accessibility. This won't impact the visual styling of your titles."
+          },
+          "italic": {
+            "type": "boolean",
+            "title": "Italic"
+          },
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          },
+          "text": {
+            "type": "string",
+            "title": "Title text",
+            "description": "The name of the visual"
+          },
+          "titleWrap": {
+            "type": "boolean",
+            "title": "Word wrap"
+          },
+          "underline": {
+            "type": "boolean",
+            "title": "Underline"
+          }
+        }
+      },
+      "title": "Title",
+      "description": "Display title options"
+    },
+    "visualHeader": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "background": {
+            "$ref": "#/definitions/fill",
+            "title": "Background color",
+            "description": "The background color for the visual header"
+          },
+          "border": {
+            "$ref": "#/definitions/fill",
+            "title": "Border",
+            "description": "Border"
+          },
+          "foreground": {
+            "$ref": "#/definitions/fill",
+            "title": "Icon color",
+            "description": "The color for the visual header icons"
+          },
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          },
+          "showCommentButton": {
+            "type": "boolean",
+            "title": "Comment button",
+            "description": "Select to show comment indicator button. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showCopyVisualImageButton": {
+            "type": "boolean",
+            "title": "Copy icon",
+            "description": "Turn on the copy icon to allow people in reading view to copy visuals and paste them elsewhere"
+          },
+          "showDrillDownExpandButton": {
+            "type": "boolean",
+            "title": "Expand to next level icon",
+            "description": "Select to turn on expand to next level icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showDrillDownLevelButton": {
+            "type": "boolean",
+            "title": "Show next level icon",
+            "description": "Select to turn on show next level icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showDrillRoleSelector": {
+            "type": "boolean",
+            "title": "Drill on dropdown",
+            "description": "Select to turn on drill on dropdown. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showDrillToggleButton": {
+            "type": "boolean",
+            "title": "Drill down icon",
+            "description": "Select to turn on drill down icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showDrillUpButton": {
+            "type": "boolean",
+            "title": "Drill up icon",
+            "description": "Select to turn on drill up icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showFilterRestatementButton": {
+            "type": "boolean",
+            "title": "Filter icon",
+            "description": "Turn on the filter icon to show users a summary of the visual-level filters applied to each visual."
+          },
+          "showFocusModeButton": {
+            "type": "boolean",
+            "title": "Focus mode icon",
+            "description": "Select to turn on focus mode icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showFollowVisualButton": {
+            "type": "boolean",
+            "title": "Follow visual button",
+            "description": "Turn on the follow visual icon to allow people to get alerts whenever a measure changes in the visual. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showOptionsMenu": {
+            "type": "boolean",
+            "title": "More options icon",
+            "description": "Select to turn on more options icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showPersonalizeVisualButton": {
+            "type": "boolean",
+            "title": "Personalize visual",
+            "description": "Allow report readers to personalize this visual to suit their needs."
+          },
+          "showPinButton": {
+            "type": "boolean",
+            "title": "Pin icon",
+            "description": "Select to turn on pin icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showSeeDataLayoutToggleButton": {
+            "type": "boolean",
+            "title": "See data layout icon",
+            "description": "Select to turn on See Data layout icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showSetAlertButton": {
+            "type": "boolean",
+            "title": "Set alert button",
+            "description": "Turn on the set alert icon to allow people to create an alert on a measure in the visual. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showSmartNarrativeButton": {
+            "type": "boolean",
+            "title": "Smart narrative",
+            "description": "Select to turn on smart narrative icon."
+          },
+          "showTooltipButton": {
+            "type": "boolean",
+            "title": "Visual header tooltip icon",
+            "description": "Select to show the visual header tooltip icon"
+          },
+          "showVisualErrorButton": {
+            "type": "boolean",
+            "title": "Visual error icon",
+            "description": "Select to turn on visual error icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showVisualInformationButton": {
+            "type": "boolean",
+            "title": "Visual information icon",
+            "description": "Select to turn on visual information icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "showVisualWarningButton": {
+            "type": "boolean",
+            "title": "Visual warning icon",
+            "description": "Select to turn on visual warning icon. Changes to the visual header icon's visibility will only be applied in reading view."
+          },
+          "transparency": {
+            "type": "number",
+            "title": "Transparency",
+            "description": "Set transparency for visual header background"
+          }
+        }
+      },
+      "title": "Visual header",
+      "description": "Select to turn on the visual header. Changes to the visual header's visibility will only be applied in reading view."
+    },
+    "visualHeaderTooltip": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "background": {
+            "$ref": "#/definitions/fill",
+            "title": "Background color",
+            "description": "Background color for the tooltip"
+          },
+          "bold": {
+            "type": "boolean",
+            "title": "Bold"
+          },
+          "fontFamily": {
+            "type": "string",
+            "title": "Font family",
+            "description": "Font family for the tooltip"
+          },
+          "fontSize": {
+            "$ref": "#/definitions/fontSize",
+            "title": "Text size",
+            "description": "Font size for the tooltip"
+          },
+          "italic": {
+            "type": "boolean",
+            "title": "Italic"
+          },
+          "section": {
+            "type": "string",
+            "title": "Page",
+            "description": "Choose the page you want to use for your tooltip"
+          },
+          "text": {
+            "type": "string",
+            "title": "Tooltip text",
+            "description": "Write the custom tooltip that will show up when a report page tooltip hasn't been chosen or isn't supported"
+          },
+          "themedBackground": {
+            "$ref": "#/definitions/fill",
+            "title": "Background color",
+            "description": "Background color for the tooltip"
+          },
+          "themedTitleFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Color",
+            "description": "Font color for the tooltip"
+          },
+          "titleFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Color",
+            "description": "Font color for the tooltip"
+          },
+          "transparency": {
+            "type": "number",
+            "title": "Transparency",
+            "description": "Set transparency for the tooltip background"
+          },
+          "type": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Default",
+                "title": "Text"
+              },
+              {
+                "const": "Canvas",
+                "title": "Report page"
+              }
+            ],
+            "title": "Type"
+          },
+          "underline": {
+            "type": "boolean",
+            "title": "Underline"
+          }
+        }
+      },
+      "title": "Visual header tooltip"
+    },
+    "visualLink": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "bookmark": {
+            "type": "string",
+            "title": "Bookmark",
+            "description": "Choose which bookmark will open when this element is selected."
+          },
+          "dataFunction": {
+            "$ref": "#/definitions/itemLocation",
+            "title": "Data function"
+          },
+          "disabledTooltip": {
+            "type": "string",
+            "title": "Disabled tooltip"
+          },
+          "drillthroughSection": {
+            "type": "string",
+            "title": "Destination",
+            "description": "Select a single destination or use conditional formatting for custom destination logic, such as multi-destination support."
+          },
+          "enabledTooltip": {
+            "type": "string",
+            "title": "Enabled tooltip"
+          },
+          "navigationSection": {
+            "type": "string",
+            "title": "Destination",
+            "description": "Select a single destination or use conditional formatting for custom destination logic, such as multi-destination support."
+          },
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          },
+          "showDefaultTooltip": {
+            "type": "boolean",
+            "title": "Show tooltips"
+          },
+          "suppressDefaultTooltip": {
+            "type": "boolean",
+            "title": "No tooltips"
+          },
+          "tooltip": {
+            "type": "string",
+            "title": "Tooltip",
+            "description": "Write the custom tooltip that will show when users hover over this element."
+          },
+          "tooltipPlaceholderText": {
+            "type": "string",
+            "title": "Placeholder for tooltip"
+          },
+          "type": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Back",
+                "title": "Back"
+              },
+              {
+                "const": "Bookmark",
+                "title": "Bookmark"
+              },
+              {
+                "const": "Drillthrough",
+                "title": "Drill through"
+              },
+              {
+                "const": "PageNavigation",
+                "title": "Page navigation"
+              },
+              {
+                "const": "Qna",
+                "title": "Q&A"
+              },
+              {
+                "const": "WebUrl",
+                "title": "Web URL"
+              },
+              {
+                "const": "ApplyAllSlicers",
+                "title": "Apply all slicers"
+              },
+              {
+                "const": "ClearAllSlicers",
+                "title": "Clear all slicers"
+              },
+              {
+                "const": "DataFunction",
+                "title": "Data function"
+              }
+            ],
+            "title": "Type",
+            "description": "Choose what action will occur when this element is selected."
+          },
+          "webUrl": {
+            "type": "string",
+            "title": "Web URL"
+          }
+        }
+      },
+      "title": "Action"
+    },
+    "visualTooltip": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "actionFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Drill text and icon color",
+            "description": "Color for drill icon and text"
+          },
+          "background": {
+            "$ref": "#/definitions/fill",
+            "title": "Background color",
+            "description": "Background color for the tooltip"
+          },
+          "bold": {
+            "type": "boolean",
+            "title": "Bold"
+          },
+          "fontFamily": {
+            "type": "string",
+            "title": "Font family",
+            "description": "Font family for the tooltip"
+          },
+          "fontSize": {
+            "$ref": "#/definitions/fontSize",
+            "title": "Text size",
+            "description": "Font size for the tooltip"
+          },
+          "italic": {
+            "type": "boolean",
+            "title": "Italic"
+          },
+          "section": {
+            "type": "string",
+            "title": "Page",
+            "description": "Choose the page you want to use for your tooltip"
+          },
+          "show": {
+            "type": "boolean",
+            "title": "Show"
+          },
+          "themedBackground": {
+            "$ref": "#/definitions/fill",
+            "title": "Background color",
+            "description": "Background color for the tooltip"
+          },
+          "themedTitleFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Label text color",
+            "description": "Text color for the tooltip label"
+          },
+          "themedValueFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Value text color",
+            "description": "Text color for the tooltip value"
+          },
+          "titleFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Label text color",
+            "description": "Text color for the tooltip label"
+          },
+          "transparency": {
+            "type": "number",
+            "title": "Transparency",
+            "description": "Set transparency for the tooltip background"
+          },
+          "type": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Default",
+                "title": "Default"
+              },
+              {
+                "const": "Canvas",
+                "title": "Report page"
+              }
+            ],
+            "title": "Type",
+            "description": "Allows report pages to be used as tooltips for this visual"
+          },
+          "underline": {
+            "type": "boolean",
+            "title": "Underline"
+          },
+          "valueFontColor": {
+            "$ref": "#/definitions/fill",
+            "title": "Value text color",
+            "description": "Text color for the tooltip value"
+          }
+        }
+      },
+      "title": "Tooltip"
+    }
+  }
+}

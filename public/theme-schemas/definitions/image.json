@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "url"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "scaling": {
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "Normal",
+          "title": "Normal"
+        },
+        {
+          "const": "Fit",
+          "title": "Fit"
+        },
+        {
+          "const": "Fill",
+          "title": "Fill"
+        }
+      ]
+    }
+  }
+}

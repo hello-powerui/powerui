@@ -1,0 +1,322 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/commonCards"
+    },
+    {
+      "properties": {
+        "*": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "savedUtterance": {
+                "type": "string"
+              },
+              "acceptedColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Accepted underline color",
+                "description": "We'll underline the words we understand in this color."
+              },
+              "background": {
+                "$ref": "#/definitions/fill",
+                "title": "Background color",
+                "description": "Adjust the background color for the question field."
+              },
+              "commitButtonBackgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Submit button background color",
+                "description": "Select a color for the background of the submit button."
+              },
+              "errorColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Error underline color",
+                "description": "We'll underline the words we don't understand in this color."
+              },
+              "hoverColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Hover color",
+                "description": "Adjust the color used to highlight different options in the question field dropdown menu."
+              },
+              "questionBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "questionFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Question font color",
+                "description": "Adjust the font color for the text within the question field."
+              },
+              "questionFontFamily": {
+                "type": "string",
+                "title": "Question font family",
+                "description": "Adjust the font family for the text within the question field."
+              },
+              "questionFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Question font size",
+                "description": "Adjust the font size for the text within the question field."
+              },
+              "questionItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "questionUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "restatementFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Restatement font color",
+                "description": "Adjust the font color for the text below the question field that restates what you've entered. This text only appears if you enter something we don't understand."
+              },
+              "restatementFontFamily": {
+                "type": "string",
+                "title": "Restatement font family",
+                "description": "Adjust the font family for the text below the question field that restates what you've entered. This text only appears if you enter something we don't understand."
+              },
+              "restatementFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Restatement font size",
+                "description": "Adjust the font size for the text below the question field that restates what you've entered. This text only appears if you enter something we don't understand."
+              },
+              "warningColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Warning underline color",
+                "description": "We'll underline the words we're not sure about in this color."
+              },
+              "cardBackground": {
+                "$ref": "#/definitions/fill",
+                "title": "Card background color",
+                "description": "Adjust the background color of the suggestion cards."
+              },
+              "cardBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "cardFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Card font color",
+                "description": "Adjust the font color for the text within the suggestion cards."
+              },
+              "cardFontFamily": {
+                "type": "string",
+                "title": "Card font family",
+                "description": "Adjust the font family for the text within the suggestion cards."
+              },
+              "cardFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Card font size",
+                "description": "Adjust the font size for the text within the suggestion cards."
+              },
+              "cardItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "cardUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "headerBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "headerFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Header font color",
+                "description": "Adjust the font color for the suggestions header."
+              },
+              "headerFontFamily": {
+                "type": "string",
+                "title": "Header font family",
+                "description": "Adjust the font family for the suggestions header."
+              },
+              "headerFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Header font size",
+                "description": "Adjust the font size for the suggestions header."
+              },
+              "headerItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "headerUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              }
+            }
+          }
+        },
+        "hiddenProperties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "savedUtterance": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "inputBox": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "acceptedColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Accepted underline color",
+                "description": "We'll underline the words we understand in this color."
+              },
+              "background": {
+                "$ref": "#/definitions/fill",
+                "title": "Background color",
+                "description": "Adjust the background color for the question field."
+              },
+              "commitButtonBackgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Submit button background color",
+                "description": "Select a color for the background of the submit button."
+              },
+              "errorColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Error underline color",
+                "description": "We'll underline the words we don't understand in this color."
+              },
+              "hoverColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Hover color",
+                "description": "Adjust the color used to highlight different options in the question field dropdown menu."
+              },
+              "questionBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "questionFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Question font color",
+                "description": "Adjust the font color for the text within the question field."
+              },
+              "questionFontFamily": {
+                "type": "string",
+                "title": "Question font family",
+                "description": "Adjust the font family for the text within the question field."
+              },
+              "questionFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Question font size",
+                "description": "Adjust the font size for the text within the question field."
+              },
+              "questionItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "questionUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "restatementFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Restatement font color",
+                "description": "Adjust the font color for the text below the question field that restates what you've entered. This text only appears if you enter something we don't understand."
+              },
+              "restatementFontFamily": {
+                "type": "string",
+                "title": "Restatement font family",
+                "description": "Adjust the font family for the text below the question field that restates what you've entered. This text only appears if you enter something we don't understand."
+              },
+              "restatementFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Restatement font size",
+                "description": "Adjust the font size for the text below the question field that restates what you've entered. This text only appears if you enter something we don't understand."
+              },
+              "warningColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Warning underline color",
+                "description": "We'll underline the words we're not sure about in this color."
+              }
+            }
+          },
+          "title": "Question field"
+        },
+        "suggestions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "cardBackground": {
+                "$ref": "#/definitions/fill",
+                "title": "Card background color",
+                "description": "Adjust the background color of the suggestion cards."
+              },
+              "cardBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "cardFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Card font color",
+                "description": "Adjust the font color for the text within the suggestion cards."
+              },
+              "cardFontFamily": {
+                "type": "string",
+                "title": "Card font family",
+                "description": "Adjust the font family for the text within the suggestion cards."
+              },
+              "cardFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Card font size",
+                "description": "Adjust the font size for the text within the suggestion cards."
+              },
+              "cardItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "cardUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "headerBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "headerFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Header font color",
+                "description": "Adjust the font color for the suggestions header."
+              },
+              "headerFontFamily": {
+                "type": "string",
+                "title": "Header font family",
+                "description": "Adjust the font family for the suggestions header."
+              },
+              "headerFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Header font size",
+                "description": "Adjust the font size for the suggestions header."
+              },
+              "headerItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "headerUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              }
+            }
+          },
+          "title": "Suggestions"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+export { ModernColorTab as ColorTab } from './ModernColorTab';

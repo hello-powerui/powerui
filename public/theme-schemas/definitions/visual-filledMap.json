@@ -1,0 +1,614 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/commonCards"
+    },
+    {
+      "properties": {
+        "*": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "defaultColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color"
+              },
+              "fill": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color"
+              },
+              "fillRule": {
+                "$ref": "#/definitions/fillRule",
+                "title": "Values",
+                "description": "The numeric amounts to plot"
+              },
+              "showAllDataPoints": {
+                "type": "boolean",
+                "title": "Show all"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Select color for data labels"
+              },
+              "labelDisplayUnits": {
+                "$ref": "#/definitions/labelDisplayUnits",
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "labelPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "labelColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Top",
+                    "title": "Top left"
+                  },
+                  {
+                    "const": "TopCenter",
+                    "title": "Top center"
+                  },
+                  {
+                    "const": "TopRight",
+                    "title": "Top right"
+                  },
+                  {
+                    "const": "Left",
+                    "title": "Top left stacked"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Top right stacked"
+                  },
+                  {
+                    "const": "LeftCenter",
+                    "title": "Center left"
+                  },
+                  {
+                    "const": "RightCenter",
+                    "title": "Center right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom left"
+                  },
+                  {
+                    "const": "BottomCenter",
+                    "title": "Bottom center"
+                  },
+                  {
+                    "const": "BottomRight",
+                    "title": "Bottom right"
+                  }
+                ],
+                "title": "Position",
+                "description": "Select the location for the legend"
+              },
+              "showTitle": {
+                "type": "boolean",
+                "title": "Title",
+                "description": "Display a title for legend symbols"
+              },
+              "titleText": {
+                "type": "string",
+                "title": "Legend Name",
+                "description": "Title text"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "autoZoom": {
+                "type": "boolean",
+                "title": "Auto zoom"
+              },
+              "centerLatitude": {
+                "type": "number"
+              },
+              "centerLongitude": {
+                "type": "number"
+              },
+              "geocodingCulture": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "",
+                    "title": "Auto"
+                  },
+                  {
+                    "const": "de-de",
+                    "title": "de-de"
+                  },
+                  {
+                    "const": "en-GB",
+                    "title": "en-GB"
+                  },
+                  {
+                    "const": "en-US",
+                    "title": "en-US"
+                  },
+                  {
+                    "const": "es-ES",
+                    "title": "es-ES"
+                  },
+                  {
+                    "const": "fr-FR",
+                    "title": "fr-FR"
+                  },
+                  {
+                    "const": "it-it",
+                    "title": "it-it"
+                  },
+                  {
+                    "const": "ja",
+                    "title": "ja"
+                  },
+                  {
+                    "const": "ko",
+                    "title": "ko"
+                  },
+                  {
+                    "const": "nl-BE",
+                    "title": "nl-BE"
+                  },
+                  {
+                    "const": "pt-BR",
+                    "title": "pt-BR"
+                  },
+                  {
+                    "const": "ru",
+                    "title": "ru"
+                  },
+                  {
+                    "const": "zh-Hans",
+                    "title": "zh-Hans"
+                  },
+                  {
+                    "const": "zh-Hant",
+                    "title": "zh-Hant"
+                  }
+                ],
+                "title": "Geocoding culture"
+              },
+              "maxZoom": {
+                "type": "number",
+                "title": "Max zoom level"
+              },
+              "minZoom": {
+                "type": "number",
+                "title": "Min zoom level"
+              },
+              "showLassoButton": {
+                "type": "boolean",
+                "title": "Lasso button"
+              },
+              "showZoomButtons": {
+                "type": "boolean",
+                "title": "Zoom buttons"
+              },
+              "zoomLevel": {
+                "type": "number"
+              },
+              "mapTheme": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "aerial",
+                    "title": "Aerial"
+                  },
+                  {
+                    "const": "canvasDark",
+                    "title": "Dark"
+                  },
+                  {
+                    "const": "canvasLight",
+                    "title": "Light"
+                  },
+                  {
+                    "const": "grayscale",
+                    "title": "Grayscale"
+                  },
+                  {
+                    "const": "road",
+                    "title": "Road"
+                  }
+                ],
+                "title": "Theme"
+              },
+              "showLabels": {
+                "type": "boolean",
+                "title": "Show labels"
+              },
+              "strokeColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "strokeWidth": {
+                "type": "number",
+                "title": "Width"
+              }
+            }
+          }
+        },
+        "categoryLabels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              }
+            }
+          },
+          "title": "Category labels"
+        },
+        "dataPoint": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "defaultColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color"
+              },
+              "fill": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color"
+              },
+              "fillRule": {
+                "$ref": "#/definitions/fillRule",
+                "title": "Values",
+                "description": "The numeric amounts to plot"
+              },
+              "showAllDataPoints": {
+                "type": "boolean",
+                "title": "Show all"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency"
+              }
+            }
+          },
+          "title": "Data colors",
+          "description": "Display data color options"
+        },
+        "general": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formatString": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "General"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Select color for data labels"
+              },
+              "labelDisplayUnits": {
+                "$ref": "#/definitions/labelDisplayUnits",
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "labelPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              }
+            }
+          },
+          "title": "Data labels"
+        },
+        "legend": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "labelColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Top",
+                    "title": "Top left"
+                  },
+                  {
+                    "const": "TopCenter",
+                    "title": "Top center"
+                  },
+                  {
+                    "const": "TopRight",
+                    "title": "Top right"
+                  },
+                  {
+                    "const": "Left",
+                    "title": "Top left stacked"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Top right stacked"
+                  },
+                  {
+                    "const": "LeftCenter",
+                    "title": "Center left"
+                  },
+                  {
+                    "const": "RightCenter",
+                    "title": "Center right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom left"
+                  },
+                  {
+                    "const": "BottomCenter",
+                    "title": "Bottom center"
+                  },
+                  {
+                    "const": "BottomRight",
+                    "title": "Bottom right"
+                  }
+                ],
+                "title": "Position",
+                "description": "Select the location for the legend"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "showTitle": {
+                "type": "boolean",
+                "title": "Title",
+                "description": "Display a title for legend symbols"
+              },
+              "titleText": {
+                "type": "string",
+                "title": "Legend Name",
+                "description": "Title text"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Legend",
+          "description": "Display legend options"
+        },
+        "mapControls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "autoZoom": {
+                "type": "boolean",
+                "title": "Auto zoom"
+              },
+              "centerLatitude": {
+                "type": "number"
+              },
+              "centerLongitude": {
+                "type": "number"
+              },
+              "geocodingCulture": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "",
+                    "title": "Auto"
+                  },
+                  {
+                    "const": "de-de",
+                    "title": "de-de"
+                  },
+                  {
+                    "const": "en-GB",
+                    "title": "en-GB"
+                  },
+                  {
+                    "const": "en-US",
+                    "title": "en-US"
+                  },
+                  {
+                    "const": "es-ES",
+                    "title": "es-ES"
+                  },
+                  {
+                    "const": "fr-FR",
+                    "title": "fr-FR"
+                  },
+                  {
+                    "const": "it-it",
+                    "title": "it-it"
+                  },
+                  {
+                    "const": "ja",
+                    "title": "ja"
+                  },
+                  {
+                    "const": "ko",
+                    "title": "ko"
+                  },
+                  {
+                    "const": "nl-BE",
+                    "title": "nl-BE"
+                  },
+                  {
+                    "const": "pt-BR",
+                    "title": "pt-BR"
+                  },
+                  {
+                    "const": "ru",
+                    "title": "ru"
+                  },
+                  {
+                    "const": "zh-Hans",
+                    "title": "zh-Hans"
+                  },
+                  {
+                    "const": "zh-Hant",
+                    "title": "zh-Hant"
+                  }
+                ],
+                "title": "Geocoding culture"
+              },
+              "maxZoom": {
+                "type": "number",
+                "title": "Max zoom level"
+              },
+              "minZoom": {
+                "type": "number",
+                "title": "Min zoom level"
+              },
+              "showLassoButton": {
+                "type": "boolean",
+                "title": "Lasso button"
+              },
+              "showZoomButtons": {
+                "type": "boolean",
+                "title": "Zoom buttons"
+              },
+              "zoomLevel": {
+                "type": "number"
+              }
+            }
+          },
+          "title": "Map controls",
+          "description": "Map-specific formatting controls"
+        },
+        "mapStyles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "mapTheme": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "aerial",
+                    "title": "Aerial"
+                  },
+                  {
+                    "const": "canvasDark",
+                    "title": "Dark"
+                  },
+                  {
+                    "const": "canvasLight",
+                    "title": "Light"
+                  },
+                  {
+                    "const": "grayscale",
+                    "title": "Grayscale"
+                  },
+                  {
+                    "const": "road",
+                    "title": "Road"
+                  }
+                ],
+                "title": "Theme"
+              },
+              "showLabels": {
+                "type": "boolean",
+                "title": "Show labels"
+              }
+            }
+          },
+          "title": "Map styles",
+          "description": "Controls how the map looks"
+        },
+        "stroke": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "strokeColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "strokeWidth": {
+                "type": "number",
+                "title": "Width"
+              }
+            }
+          },
+          "title": "Shape outline"
+        }
+      }
+    }
+  ]
+}

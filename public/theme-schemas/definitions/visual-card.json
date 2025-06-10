@@ -1,0 +1,184 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/commonCards"
+    },
+    {
+      "properties": {
+        "*": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Select color for data labels"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "preserveWhitespace": {
+                "type": "boolean",
+                "title": "Source spacing",
+                "description": "Display any extra spaces in the data label"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "labelDisplayUnits": {
+                "$ref": "#/definitions/labelDisplayUnits",
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "labelPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              }
+            }
+          }
+        },
+        "categoryLabels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Select color for data labels"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "preserveWhitespace": {
+                "type": "boolean",
+                "title": "Source spacing",
+                "description": "Display any extra spaces in the category label"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Category label"
+        },
+        "general": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formatString": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "General"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Select color for data labels"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "labelDisplayUnits": {
+                "$ref": "#/definitions/labelDisplayUnits",
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "labelPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "preserveWhitespace": {
+                "type": "boolean",
+                "title": "Source spacing",
+                "description": "Display any extra spaces in the data label"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Data label"
+        },
+        "wordWrap": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              }
+            }
+          },
+          "title": "Word wrap"
+        }
+      }
+    }
+  ]
+}

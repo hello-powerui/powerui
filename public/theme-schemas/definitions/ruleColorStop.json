@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "color",
+    "value"
+  ],
+  "properties": {
+    "color": {
+      "$ref": "#/definitions/color"
+    },
+    "value": {
+      "type": "number"
+    }
+  }
+}

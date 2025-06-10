@@ -1,0 +1,11 @@
+{
+    "text-xs": 9,
+    "text-sm": 10.5,
+    "text-md": 12,
+    "text-lg": 13.5,
+    "display-sm": 18,
+    "display-md": 21,
+    "display-lg": 27,
+    "display-xl": 40.5,
+    "display-2xl": 54
+}

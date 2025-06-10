@@ -1,0 +1,1 @@
+export { ModernStyleTab as StyleTab } from './ModernStyleTab';

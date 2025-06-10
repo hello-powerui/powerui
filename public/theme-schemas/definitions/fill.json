@@ -1,0 +1,81 @@
+{
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "solid"
+      ],
+      "properties": {
+        "solid": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "color"
+          ],
+          "properties": {
+            "color": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/color"
+                },
+                {
+                  "$ref": "#/definitions/themeDataColor"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gradient"
+      ],
+      "properties": {
+        "gradient": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "startColor",
+            "endColor"
+          ],
+          "properties": {
+            "startColor": {
+              "$ref": "#/definitions/color"
+            },
+            "endColor": {
+              "$ref": "#/definitions/color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pattern"
+      ],
+      "properties": {
+        "pattern": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "patternKind"
+          ],
+          "properties": {
+            "patternKind": {
+              "type": "string"
+            },
+            "color": {
+              "$ref": "#/definitions/color"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

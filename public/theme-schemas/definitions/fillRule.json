@@ -1,0 +1,64 @@
+{
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "linearGradient2"
+      ],
+      "properties": {
+        "linearGradient2": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max",
+            "min"
+          ],
+          "properties": {
+            "max": {
+              "$ref": "#/definitions/ruleColorStop"
+            },
+            "min": {
+              "$ref": "#/definitions/ruleColorStop"
+            },
+            "nullColoringStrategy": {
+              "$ref": "#/definitions/nullColorStop"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "linearGradient3"
+      ],
+      "properties": {
+        "linearGradient3": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max",
+            "mid",
+            "min"
+          ],
+          "properties": {
+            "max": {
+              "$ref": "#/definitions/ruleColorStop"
+            },
+            "mid": {
+              "$ref": "#/definitions/ruleColorStop"
+            },
+            "min": {
+              "$ref": "#/definitions/ruleColorStop"
+            },
+            "nullColoringStrategy": {
+              "$ref": "#/definitions/nullColorStop"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

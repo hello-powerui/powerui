@@ -1,0 +1,284 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/commonCards"
+    },
+    {
+      "properties": {
+        "*": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "allowKeyDrivers": {
+                "type": "boolean",
+                "title": "Enable key influencers",
+                "description": "Enable key influencers analysis option"
+              },
+              "allowKeyDriversCounting": {
+                "type": "boolean",
+                "title": "Enable counts",
+                "description": "Show estimated data points for key influencers"
+              },
+              "allowProfiles": {
+                "type": "boolean",
+                "title": "Enable segments",
+                "description": "Enable segment analysis option"
+              },
+              "countType": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "absolute",
+                    "title": "Absolute"
+                  },
+                  {
+                    "const": "relative",
+                    "title": "Relative"
+                  }
+                ],
+                "title": "Count type",
+                "description": "Choose whether the displayed estimated counts will be relative to the maximum key influencer or absolute."
+              },
+              "numericTargetSelectedKind": {
+                "type": "number"
+              },
+              "selectedAnalysis": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "keyInfluencers",
+                    "title": "keyInfluencers"
+                  },
+                  {
+                    "const": "topProfiles",
+                    "title": "topProfiles"
+                  }
+                ]
+              },
+              "selectedNumericAnalysis": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Continuous",
+                    "title": "Continuous"
+                  },
+                  {
+                    "const": "Categorical",
+                    "title": "Categorical"
+                  }
+                ],
+                "title": "Analysis type",
+                "description": "Choose whether to treat the field you are analyzing as categorical or continuous"
+              },
+              "selectedSort": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "impact",
+                    "title": "Impact"
+                  },
+                  {
+                    "const": "count",
+                    "title": "Count"
+                  }
+                ]
+              },
+              "targetValue": {
+                "type": "string"
+              },
+              "defaultColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color",
+                "description": "Default color"
+              },
+              "referenceLineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Reference line color",
+                "description": "Set reference line color"
+              },
+              "canvasColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Background color",
+                "description": "Background color of the analysis visual"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color",
+                "description": "Font color"
+              },
+              "primaryColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Primary color",
+                "description": "Primary accent color of the analysis visual"
+              },
+              "primaryFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Primary text color",
+                "description": "Primary text accent color of the analysis visual"
+              },
+              "secondaryColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Secondary color",
+                "description": "Secondary accent color of the analysis visual"
+              },
+              "secondaryFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Secondary text color",
+                "description": "Secondary text accent color of the analysis visual"
+              }
+            }
+          }
+        },
+        "keyDrivers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "allowKeyDrivers": {
+                "type": "boolean",
+                "title": "Enable key influencers",
+                "description": "Enable key influencers analysis option"
+              },
+              "allowKeyDriversCounting": {
+                "type": "boolean",
+                "title": "Enable counts",
+                "description": "Show estimated data points for key influencers"
+              },
+              "allowProfiles": {
+                "type": "boolean",
+                "title": "Enable segments",
+                "description": "Enable segment analysis option"
+              },
+              "countType": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "absolute",
+                    "title": "Absolute"
+                  },
+                  {
+                    "const": "relative",
+                    "title": "Relative"
+                  }
+                ],
+                "title": "Count type",
+                "description": "Choose whether the displayed estimated counts will be relative to the maximum key influencer or absolute."
+              },
+              "numericTargetSelectedKind": {
+                "type": "number"
+              },
+              "selectedAnalysis": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "keyInfluencers",
+                    "title": "keyInfluencers"
+                  },
+                  {
+                    "const": "topProfiles",
+                    "title": "topProfiles"
+                  }
+                ]
+              },
+              "selectedNumericAnalysis": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Continuous",
+                    "title": "Continuous"
+                  },
+                  {
+                    "const": "Categorical",
+                    "title": "Categorical"
+                  }
+                ],
+                "title": "Analysis type",
+                "description": "Choose whether to treat the field you are analyzing as categorical or continuous"
+              },
+              "selectedSort": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "impact",
+                    "title": "Impact"
+                  },
+                  {
+                    "const": "count",
+                    "title": "Count"
+                  }
+                ]
+              },
+              "targetValue": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "Analysis",
+          "description": "Toggle which analyses are included in the visual"
+        },
+        "keyDriversDrillVisual": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "defaultColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color",
+                "description": "Default color"
+              },
+              "referenceLineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Reference line color",
+                "description": "Set reference line color"
+              }
+            }
+          },
+          "title": "Drill visual colors",
+          "description": "Display drill visual color options"
+        },
+        "keyInfluencersVisual": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "canvasColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Background color",
+                "description": "Background color of the analysis visual"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color",
+                "description": "Font color"
+              },
+              "primaryColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Primary color",
+                "description": "Primary accent color of the analysis visual"
+              },
+              "primaryFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Primary text color",
+                "description": "Primary text accent color of the analysis visual"
+              },
+              "secondaryColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Secondary color",
+                "description": "Secondary accent color of the analysis visual"
+              },
+              "secondaryFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Secondary text color",
+                "description": "Secondary text accent color of the analysis visual"
+              }
+            }
+          },
+          "title": "Analysis visual colors",
+          "description": "Display analysis visual color options"
+        }
+      }
+    }
+  ]
+}

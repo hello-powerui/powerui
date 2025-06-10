@@ -1,0 +1,657 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/commonCards"
+    },
+    {
+      "properties": {
+        "*": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "aiEnabled": {
+                "type": "boolean",
+                "title": "Enable AI splits",
+                "description": "Show AI options when choosing a column to drill down into"
+              },
+              "aiMode": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "absolute",
+                    "title": "Absolute"
+                  },
+                  {
+                    "const": "relative",
+                    "title": "Relative"
+                  }
+                ],
+                "title": "Analysis type",
+                "description": "Choose whether AI splits find absolute high/low values or the ones that stand out the most"
+              },
+              "categoryLabelBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "categoryLabelFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "categoryLabelFontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "categoryLabelFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "categoryLabelItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "categoryLabelUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "axisEnd": {
+                "type": [
+                  "number",
+                  "string"
+                ],
+                "title": "End",
+                "description": "Enter an ending value (optional)"
+              },
+              "axisStart": {
+                "type": [
+                  "number",
+                  "string"
+                ],
+                "title": "Start",
+                "description": "Enter a starting value (optional)"
+              },
+              "dataBarBackgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Bar background",
+                "description": "Color of the unoccupied area of the bar"
+              },
+              "dataBarColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Data bar color",
+                "description": "Format data bars with color based on a value."
+              },
+              "dataBarScalingType": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "topNode",
+                    "title": "Top node"
+                  },
+                  {
+                    "const": "parentNode",
+                    "title": "Parent node"
+                  },
+                  {
+                    "const": "levelMaximum",
+                    "title": "Level maximum"
+                  }
+                ],
+                "title": "Scale to",
+                "description": "Choose how to scale the contents of the data bar"
+              },
+              "dataBarWidthPercent": {
+                "type": "integer",
+                "title": "Size",
+                "description": "Size"
+              },
+              "negativeBarColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Negative bar",
+                "description": "Color of data bars with negative values"
+              },
+              "positiveBarColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Positive bar",
+                "description": "Color of data bars with positive values"
+              },
+              "dataLabelBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "dataLabelDisplayUnits": {
+                "$ref": "#/definitions/labelDisplayUnits",
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "dataLabelFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "dataLabelFontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "dataLabelFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "dataLabelItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "dataLabelPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "dataLabelUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "isAINode": {
+                "type": "boolean"
+              },
+              "levelHeaderBackgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "The background color for the group"
+              },
+              "levelSubtitleBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "levelSubtitleFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Color"
+              },
+              "levelSubtitleFontFamily": {
+                "type": "string",
+                "title": "Subtitle font family",
+                "description": "Subtitle font family"
+              },
+              "levelSubtitleFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Subtitle font size",
+                "description": "Subtitle font size"
+              },
+              "levelSubtitleItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "levelSubtitleUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "levelTitleBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "levelTitleFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Color"
+              },
+              "levelTitleFontFamily": {
+                "type": "string",
+                "title": "Title font family",
+                "description": "Title font family"
+              },
+              "levelTitleFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Title font size",
+                "description": "Title font size"
+              },
+              "levelTitleItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "levelTitleUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "showSubtitles": {
+                "type": "boolean",
+                "title": "Show subtitles",
+                "description": "Show subtitles"
+              },
+              "accentColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Selected line",
+                "description": "Primary accent color of the analysis visual"
+              },
+              "barsPerLevel": {
+                "type": "integer",
+                "title": "Max bars shown",
+                "description": "Maximum number of data bars shown per level before scrolling"
+              },
+              "connectorDefaultColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Unselected line",
+                "description": "Color for the deselected lines"
+              },
+              "connectorType": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "curve",
+                    "title": "Default"
+                  },
+                  {
+                    "const": "round",
+                    "title": "Round"
+                  }
+                ],
+                "title": "Style",
+                "description": "Shape of the lines connecting the data bars"
+              },
+              "defaultClickAction": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "select",
+                    "title": "Filter / highlight"
+                  },
+                  {
+                    "const": "toggle",
+                    "title": "Collapse"
+                  }
+                ],
+                "title": "Default action",
+                "description": "Choose whether clicking on an intermediate node in the selected path results in filtering or collapsing the tree"
+              },
+              "density": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "dense",
+                    "title": "Dense"
+                  },
+                  {
+                    "const": "default",
+                    "title": "Default"
+                  },
+                  {
+                    "const": "sparse",
+                    "title": "Sparse"
+                  }
+                ],
+                "title": "Density",
+                "description": "Choose how tightly to cluster the data bars"
+              },
+              "effectiveBarsPerLevel": {
+                "type": "integer"
+              },
+              "responsiveLayout": {
+                "type": "boolean",
+                "title": "Responsive",
+                "description": "The visual will adapt to size changes"
+              }
+            }
+          }
+        },
+        "analysis": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "aiEnabled": {
+                "type": "boolean",
+                "title": "Enable AI splits",
+                "description": "Show AI options when choosing a column to drill down into"
+              },
+              "aiMode": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "absolute",
+                    "title": "Absolute"
+                  },
+                  {
+                    "const": "relative",
+                    "title": "Relative"
+                  }
+                ],
+                "title": "Analysis type",
+                "description": "Choose whether AI splits find absolute high/low values or the ones that stand out the most"
+              }
+            }
+          },
+          "title": "Analysis",
+          "description": "Analysis"
+        },
+        "categoryLabels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "categoryLabelBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "categoryLabelFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "categoryLabelFontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "categoryLabelFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "categoryLabelItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "categoryLabelUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Category labels",
+          "description": "Settings for the category labels that appear under each section of the tree"
+        },
+        "dataBars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "axisEnd": {
+                "type": [
+                  "number",
+                  "string"
+                ],
+                "title": "End",
+                "description": "Enter an ending value (optional)"
+              },
+              "axisStart": {
+                "type": [
+                  "number",
+                  "string"
+                ],
+                "title": "Start",
+                "description": "Enter a starting value (optional)"
+              },
+              "dataBarBackgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Bar background",
+                "description": "Color of the unoccupied area of the bar"
+              },
+              "dataBarColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Data bar color",
+                "description": "Format data bars with color based on a value."
+              },
+              "dataBarScalingType": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "topNode",
+                    "title": "Top node"
+                  },
+                  {
+                    "const": "parentNode",
+                    "title": "Parent node"
+                  },
+                  {
+                    "const": "levelMaximum",
+                    "title": "Level maximum"
+                  }
+                ],
+                "title": "Scale to",
+                "description": "Choose how to scale the contents of the data bar"
+              },
+              "dataBarWidthPercent": {
+                "type": "integer",
+                "title": "Size",
+                "description": "Size"
+              },
+              "negativeBarColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Negative bar",
+                "description": "Color of data bars with negative values"
+              },
+              "positiveBarColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Positive bar",
+                "description": "Color of data bars with positive values"
+              }
+            }
+          },
+          "title": "Bars",
+          "description": "Data bars"
+        },
+        "dataLabels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dataLabelBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "dataLabelDisplayUnits": {
+                "$ref": "#/definitions/labelDisplayUnits",
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "dataLabelFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "dataLabelFontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "dataLabelFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "dataLabelItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "dataLabelPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "dataLabelUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Values",
+          "description": "Settings for the specific value that appears below each category label"
+        },
+        "general": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formatString": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "General"
+        },
+        "insights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "isAINode": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "levelHeader": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "levelHeaderBackgroundColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "The background color for the group"
+              },
+              "levelSubtitleBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "levelSubtitleFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Color"
+              },
+              "levelSubtitleFontFamily": {
+                "type": "string",
+                "title": "Subtitle font family",
+                "description": "Subtitle font family"
+              },
+              "levelSubtitleFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Subtitle font size",
+                "description": "Subtitle font size"
+              },
+              "levelSubtitleItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "levelSubtitleUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "levelTitleBold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "levelTitleFontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Color"
+              },
+              "levelTitleFontFamily": {
+                "type": "string",
+                "title": "Title font family",
+                "description": "Title font family"
+              },
+              "levelTitleFontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Title font size",
+                "description": "Title font size"
+              },
+              "levelTitleItalic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "levelTitleUnderline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "showSubtitles": {
+                "type": "boolean",
+                "title": "Show subtitles",
+                "description": "Show subtitles"
+              }
+            }
+          },
+          "title": "Headers",
+          "description": "Settings for the area at the top of the tree, including the title of each section"
+        },
+        "tree": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "accentColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Selected line",
+                "description": "Primary accent color of the analysis visual"
+              },
+              "barsPerLevel": {
+                "type": "integer",
+                "title": "Max bars shown",
+                "description": "Maximum number of data bars shown per level before scrolling"
+              },
+              "connectorDefaultColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Unselected line",
+                "description": "Color for the deselected lines"
+              },
+              "connectorType": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "curve",
+                    "title": "Default"
+                  },
+                  {
+                    "const": "round",
+                    "title": "Round"
+                  }
+                ],
+                "title": "Style",
+                "description": "Shape of the lines connecting the data bars"
+              },
+              "defaultClickAction": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "select",
+                    "title": "Filter / highlight"
+                  },
+                  {
+                    "const": "toggle",
+                    "title": "Collapse"
+                  }
+                ],
+                "title": "Default action",
+                "description": "Choose whether clicking on an intermediate node in the selected path results in filtering or collapsing the tree"
+              },
+              "density": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "dense",
+                    "title": "Dense"
+                  },
+                  {
+                    "const": "default",
+                    "title": "Default"
+                  },
+                  {
+                    "const": "sparse",
+                    "title": "Sparse"
+                  }
+                ],
+                "title": "Density",
+                "description": "Choose how tightly to cluster the data bars"
+              },
+              "effectiveBarsPerLevel": {
+                "type": "integer"
+              },
+              "responsiveLayout": {
+                "type": "boolean",
+                "title": "Responsive",
+                "description": "The visual will adapt to size changes"
+              }
+            }
+          },
+          "title": "Tree",
+          "description": "Tree"
+        }
+      }
+    }
+  ]
+}

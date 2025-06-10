@@ -1,0 +1,411 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/commonCards"
+    },
+    {
+      "properties": {
+        "*": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Select color for data labels"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "fill": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color"
+              },
+              "fillRule": {
+                "$ref": "#/definitions/fillRule",
+                "title": "Color saturation"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "labelDisplayUnits": {
+                "$ref": "#/definitions/labelDisplayUnits",
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "labelPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "innerPadding": {
+                "type": "number",
+                "title": "Space between all nodes",
+                "description": "Separate neighboring nodes across all levels"
+              },
+              "outerPadding": {
+                "type": "number",
+                "title": "Space between groups",
+                "description": "Add additional space for each node group"
+              },
+              "tilingMethod": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "stableSquarified",
+                    "title": "Squarified"
+                  },
+                  {
+                    "const": "binary",
+                    "title": "Binary"
+                  },
+                  {
+                    "const": "alternating",
+                    "title": "Alternating (Columns, Rows)"
+                  }
+                ],
+                "title": "Tiling Method",
+                "description": "Select the algorithm used to generate dimensions and positions of each rectangle."
+              },
+              "labelColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Top",
+                    "title": "Top left"
+                  },
+                  {
+                    "const": "TopCenter",
+                    "title": "Top center"
+                  },
+                  {
+                    "const": "TopRight",
+                    "title": "Top right"
+                  },
+                  {
+                    "const": "Left",
+                    "title": "Top left stacked"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Top right stacked"
+                  },
+                  {
+                    "const": "LeftCenter",
+                    "title": "Center left"
+                  },
+                  {
+                    "const": "RightCenter",
+                    "title": "Center right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom left"
+                  },
+                  {
+                    "const": "BottomCenter",
+                    "title": "Bottom center"
+                  },
+                  {
+                    "const": "BottomRight",
+                    "title": "Bottom right"
+                  }
+                ],
+                "title": "Position",
+                "description": "Select the location for the legend"
+              },
+              "showTitle": {
+                "type": "boolean",
+                "title": "Title",
+                "description": "Display a title for legend symbols"
+              },
+              "titleText": {
+                "type": "string",
+                "title": "Legend Name",
+                "description": "Title text"
+              }
+            }
+          }
+        },
+        "categoryLabels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Select color for category labels"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Category labels",
+          "description": "Display category labels"
+        },
+        "dataPoint": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fill": {
+                "$ref": "#/definitions/fill",
+                "title": "Default color"
+              },
+              "fillRule": {
+                "$ref": "#/definitions/fillRule",
+                "title": "Color saturation"
+              }
+            }
+          },
+          "title": "Data colors",
+          "description": "Display data color options"
+        },
+        "general": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formatString": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "General"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color",
+                "description": "Select color for data labels"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "labelDisplayUnits": {
+                "$ref": "#/definitions/labelDisplayUnits",
+                "title": "Display units",
+                "description": "Select the units (millions, billions, etc.)"
+              },
+              "labelPrecision": {
+                "type": "integer",
+                "title": "Value decimal places",
+                "description": "Select the number of decimal places to display for the values"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Data labels",
+          "description": "Display data label options"
+        },
+        "layout": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "innerPadding": {
+                "type": "number",
+                "title": "Space between all nodes",
+                "description": "Separate neighboring nodes across all levels"
+              },
+              "outerPadding": {
+                "type": "number",
+                "title": "Space between groups",
+                "description": "Add additional space for each node group"
+              },
+              "tilingMethod": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "stableSquarified",
+                    "title": "Squarified"
+                  },
+                  {
+                    "const": "binary",
+                    "title": "Binary"
+                  },
+                  {
+                    "const": "alternating",
+                    "title": "Alternating (Columns, Rows)"
+                  }
+                ],
+                "title": "Tiling Method",
+                "description": "Select the algorithm used to generate dimensions and positions of each rectangle."
+              }
+            }
+          },
+          "title": "Layout"
+        },
+        "legend": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "labelColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Top",
+                    "title": "Top left"
+                  },
+                  {
+                    "const": "TopCenter",
+                    "title": "Top center"
+                  },
+                  {
+                    "const": "TopRight",
+                    "title": "Top right"
+                  },
+                  {
+                    "const": "Left",
+                    "title": "Top left stacked"
+                  },
+                  {
+                    "const": "Right",
+                    "title": "Top right stacked"
+                  },
+                  {
+                    "const": "LeftCenter",
+                    "title": "Center left"
+                  },
+                  {
+                    "const": "RightCenter",
+                    "title": "Center right"
+                  },
+                  {
+                    "const": "Bottom",
+                    "title": "Bottom left"
+                  },
+                  {
+                    "const": "BottomCenter",
+                    "title": "Bottom center"
+                  },
+                  {
+                    "const": "BottomRight",
+                    "title": "Bottom right"
+                  }
+                ],
+                "title": "Position",
+                "description": "Select the location for the legend"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "showTitle": {
+                "type": "boolean",
+                "title": "Title",
+                "description": "Display a title for legend symbols"
+              },
+              "titleText": {
+                "type": "string",
+                "title": "Legend Name",
+                "description": "Title text"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Legend",
+          "description": "Display legend options"
+        }
+      }
+    }
+  ]
+}

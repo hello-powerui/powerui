@@ -1,0 +1,451 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/commonCards"
+    },
+    {
+      "properties": {
+        "*": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "backColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "backShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "backTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "borderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "borderShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "borderTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "borderWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "iconColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "iconSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Icon size"
+              },
+              "iconTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "paddingBottom": {
+                "type": "integer",
+                "title": "Bottom margin"
+              },
+              "paddingLeft": {
+                "type": "integer",
+                "title": "Left margin"
+              },
+              "paddingRight": {
+                "type": "integer",
+                "title": "Right margin"
+              },
+              "paddingTop": {
+                "type": "integer",
+                "title": "Top margin"
+              },
+              "spacing": {
+                "type": "integer",
+                "title": "Spacing"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "dismissColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "dismissSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Icon size"
+              },
+              "dismissSpacing": {
+                "type": "integer",
+                "title": "Spacing"
+              },
+              "dismissTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "fontTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "placeholder": {
+                "type": "string",
+                "title": "Placeholder"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "accentBarColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "accentBarPosition": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "--accent-bar-top",
+                    "title": "Top"
+                  },
+                  {
+                    "const": "--accent-bar-right",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "--accent-bar-bottom",
+                    "title": "Bottom"
+                  },
+                  {
+                    "const": "--accent-bar-left",
+                    "title": "Left"
+                  }
+                ],
+                "title": "Position"
+              },
+              "accentBarShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "accentBarTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "accentBarWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "multiselect": {
+                "type": "boolean",
+                "title": "Accept multiple values"
+              }
+            }
+          }
+        },
+        "applyButton": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "backColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "backShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "backTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "borderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "borderShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "borderTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "borderWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "iconColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "iconSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Icon size"
+              },
+              "iconTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "paddingBottom": {
+                "type": "integer",
+                "title": "Bottom margin"
+              },
+              "paddingLeft": {
+                "type": "integer",
+                "title": "Left margin"
+              },
+              "paddingRight": {
+                "type": "integer",
+                "title": "Right margin"
+              },
+              "paddingTop": {
+                "type": "integer",
+                "title": "Top margin"
+              },
+              "spacing": {
+                "type": "integer",
+                "title": "Spacing"
+              }
+            }
+          }
+        },
+        "general": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "formatString": {
+                "type": "string"
+              }
+            }
+          },
+          "title": "General"
+        },
+        "inputText": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "backColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "backTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "borderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "borderShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "borderTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "borderWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "dismissColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "dismissSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Icon size"
+              },
+              "dismissSpacing": {
+                "type": "integer",
+                "title": "Spacing"
+              },
+              "dismissTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "fontSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "fontTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "paddingBottom": {
+                "type": "integer",
+                "title": "Bottom margin"
+              },
+              "paddingLeft": {
+                "type": "integer",
+                "title": "Left margin"
+              },
+              "paddingRight": {
+                "type": "integer",
+                "title": "Right margin"
+              },
+              "paddingTop": {
+                "type": "integer",
+                "title": "Top margin"
+              },
+              "placeholder": {
+                "type": "string",
+                "title": "Placeholder"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          }
+        },
+        "inputTextBox": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "accentBarColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "accentBarPosition": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "--accent-bar-top",
+                    "title": "Top"
+                  },
+                  {
+                    "const": "--accent-bar-right",
+                    "title": "Right"
+                  },
+                  {
+                    "const": "--accent-bar-bottom",
+                    "title": "Bottom"
+                  },
+                  {
+                    "const": "--accent-bar-left",
+                    "title": "Left"
+                  }
+                ],
+                "title": "Position"
+              },
+              "accentBarShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "accentBarTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "accentBarWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "backColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "backShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "backTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "borderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "borderShow": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "borderTransparency": {
+                "type": "number",
+                "title": "Transparency"
+              },
+              "borderWidth": {
+                "type": "number",
+                "title": "Width"
+              },
+              "paddingBottom": {
+                "type": "integer",
+                "title": "Bottom margin"
+              },
+              "paddingLeft": {
+                "type": "integer",
+                "title": "Left margin"
+              },
+              "paddingRight": {
+                "type": "integer",
+                "title": "Right margin"
+              },
+              "paddingTop": {
+                "type": "integer",
+                "title": "Top margin"
+              }
+            }
+          }
+        },
+        "slicerSettings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "multiselect": {
+                "type": "boolean",
+                "title": "Accept multiple values"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

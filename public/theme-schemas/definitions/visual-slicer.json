@@ -1,0 +1,910 @@
+{
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/commonCards"
+    },
+    {
+      "properties": {
+        "*": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "endDate": {
+                "type": "string"
+              },
+              "isInvertedSelectionMode": {
+                "type": "boolean"
+              },
+              "mode": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "VerticalList",
+                    "title": "Vertical list"
+                  },
+                  {
+                    "const": "HorizontalList",
+                    "title": "Tile"
+                  },
+                  {
+                    "const": "Between",
+                    "title": "Between"
+                  },
+                  {
+                    "const": "Before",
+                    "title": "Before"
+                  },
+                  {
+                    "const": "After",
+                    "title": "After"
+                  },
+                  {
+                    "const": "Basic",
+                    "title": "List"
+                  },
+                  {
+                    "const": "Dropdown",
+                    "title": "Dropdown"
+                  },
+                  {
+                    "const": "Relative",
+                    "title": "Relative Date"
+                  },
+                  {
+                    "const": "Single",
+                    "title": "Single Value"
+                  },
+                  {
+                    "const": "RelativeTime",
+                    "title": "Relative Time"
+                  }
+                ],
+                "title": "Style"
+              },
+              "numericEnd": {
+                "type": "number"
+              },
+              "numericStart": {
+                "type": "number"
+              },
+              "relativeDuration": {
+                "type": "number"
+              },
+              "relativePeriod": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "None",
+                    "title": "Select"
+                  },
+                  {
+                    "const": "Days",
+                    "title": "Days"
+                  },
+                  {
+                    "const": "Weeks",
+                    "title": "Weeks"
+                  },
+                  {
+                    "const": "Calendar Weeks",
+                    "title": "Weeks (Calendar)"
+                  },
+                  {
+                    "const": "Months",
+                    "title": "Months"
+                  },
+                  {
+                    "const": "Calendar Months",
+                    "title": "Months (Calendar)"
+                  },
+                  {
+                    "const": "Years",
+                    "title": "Years"
+                  },
+                  {
+                    "const": "Calendar Years",
+                    "title": "Years (Calendar)"
+                  }
+                ]
+              },
+              "relativeRange": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Last",
+                    "title": "Last"
+                  },
+                  {
+                    "const": "Next",
+                    "title": "Next"
+                  },
+                  {
+                    "const": "This",
+                    "title": "This"
+                  }
+                ]
+              },
+              "relativeTimePeriod": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "None",
+                    "title": "Select"
+                  },
+                  {
+                    "const": "Minutes",
+                    "title": "Minutes"
+                  },
+                  {
+                    "const": "Hours",
+                    "title": "Hours"
+                  }
+                ]
+              },
+              "startDate": {
+                "type": "string"
+              },
+              "background": {
+                "$ref": "#/definitions/fill",
+                "title": "Background"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "hideDatePickerButton": {
+                "type": "boolean"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "textSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              },
+              "anchorDate": {
+                "type": "string",
+                "title": "Anchor date",
+                "description": "Select a date to reference when filtering visuals by a relative range of time. If an anchor date isn't specified, we'll use the current date."
+              },
+              "includeToday": {
+                "type": "boolean",
+                "title": "Include today"
+              },
+              "count": {
+                "type": "integer"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "orientation": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Vertical"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Horizontal"
+                  }
+                ],
+                "title": "Orientation"
+              },
+              "outlineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Outline color",
+                "description": "Color of the outline"
+              },
+              "outlineWeight": {
+                "type": "number",
+                "title": "Outline weight",
+                "description": "Thickness of the outline in pixels"
+              },
+              "responsive": {
+                "type": "boolean",
+                "title": "Responsive",
+                "description": "The visual will adapt to size changes"
+              },
+              "selfFilterEnabled": {
+                "type": "boolean"
+              },
+              "outlineStyle": {
+                "type": "integer",
+                "title": "Outline"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "showRestatement": {
+                "type": "boolean",
+                "title": "Show summary"
+              },
+              "text": {
+                "type": "string",
+                "title": "Title text",
+                "description": "The name of the visual"
+              },
+              "accessibilityContrastProperties": {
+                "type": "boolean"
+              },
+              "expandCollapseToggleType": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Chevron"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Plus/minus"
+                  },
+                  {
+                    "const": 2,
+                    "title": "Caret"
+                  }
+                ],
+                "title": "Expand/collapse icon"
+              },
+              "padding": {
+                "type": "number",
+                "title": "Padding"
+              },
+              "steppedLayoutIndentation": {
+                "type": "number",
+                "title": "Stepped layout indentation"
+              },
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "custom",
+                    "title": "Custom"
+                  },
+                  {
+                    "const": "left",
+                    "title": "Left of text"
+                  },
+                  {
+                    "const": "right",
+                    "title": "Right of text"
+                  },
+                  {
+                    "const": "above",
+                    "title": "Above text"
+                  },
+                  {
+                    "const": "below",
+                    "title": "Below text"
+                  }
+                ],
+                "title": "Position"
+              },
+              "showTooltip": {
+                "type": "boolean",
+                "title": "Show tooltip"
+              },
+              "size": {
+                "type": "number",
+                "title": "Size"
+              },
+              "tooltipLabel": {
+                "type": "string",
+                "title": "Label text"
+              },
+              "tooltipText": {
+                "type": "string",
+                "title": "Tooltip text"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              },
+              "borderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Outline color",
+                "description": "Color of the outline"
+              },
+              "selectAllCheckboxEnabled": {
+                "type": "boolean",
+                "title": "Show \"Select all\" option",
+                "description": "Show \"Select all\" as an option in the slicer. This selects all the values in the slicer so you can unselect them one by one to create an \"is not\" type filter."
+              },
+              "singleSelect": {
+                "type": "boolean",
+                "title": "Multi-select with CTRL",
+                "description": "Allow multiple selections in check boxes only when CTRL or Command + click is used"
+              },
+              "strictSingleSelect": {
+                "type": "boolean",
+                "title": "Single select",
+                "description": "Show slicer items with radio buttons"
+              },
+              "handleBorderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Border"
+              },
+              "handleFillColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Fill"
+              },
+              "secondaryLineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              }
+            }
+          }
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "endDate": {
+                "type": "string"
+              },
+              "isInvertedSelectionMode": {
+                "type": "boolean"
+              },
+              "mode": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "VerticalList",
+                    "title": "Vertical list"
+                  },
+                  {
+                    "const": "HorizontalList",
+                    "title": "Tile"
+                  },
+                  {
+                    "const": "Between",
+                    "title": "Between"
+                  },
+                  {
+                    "const": "Before",
+                    "title": "Before"
+                  },
+                  {
+                    "const": "After",
+                    "title": "After"
+                  },
+                  {
+                    "const": "Basic",
+                    "title": "List"
+                  },
+                  {
+                    "const": "Dropdown",
+                    "title": "Dropdown"
+                  },
+                  {
+                    "const": "Relative",
+                    "title": "Relative Date"
+                  },
+                  {
+                    "const": "Single",
+                    "title": "Single Value"
+                  },
+                  {
+                    "const": "RelativeTime",
+                    "title": "Relative Time"
+                  }
+                ],
+                "title": "Style"
+              },
+              "numericEnd": {
+                "type": "number"
+              },
+              "numericStart": {
+                "type": "number"
+              },
+              "relativeDuration": {
+                "type": "number"
+              },
+              "relativePeriod": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "None",
+                    "title": "Select"
+                  },
+                  {
+                    "const": "Days",
+                    "title": "Days"
+                  },
+                  {
+                    "const": "Weeks",
+                    "title": "Weeks"
+                  },
+                  {
+                    "const": "Calendar Weeks",
+                    "title": "Weeks (Calendar)"
+                  },
+                  {
+                    "const": "Months",
+                    "title": "Months"
+                  },
+                  {
+                    "const": "Calendar Months",
+                    "title": "Months (Calendar)"
+                  },
+                  {
+                    "const": "Years",
+                    "title": "Years"
+                  },
+                  {
+                    "const": "Calendar Years",
+                    "title": "Years (Calendar)"
+                  }
+                ]
+              },
+              "relativeRange": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "Last",
+                    "title": "Last"
+                  },
+                  {
+                    "const": "Next",
+                    "title": "Next"
+                  },
+                  {
+                    "const": "This",
+                    "title": "This"
+                  }
+                ]
+              },
+              "relativeTimePeriod": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "None",
+                    "title": "Select"
+                  },
+                  {
+                    "const": "Minutes",
+                    "title": "Minutes"
+                  },
+                  {
+                    "const": "Hours",
+                    "title": "Hours"
+                  }
+                ]
+              },
+              "startDate": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "date": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "background": {
+                "$ref": "#/definitions/fill",
+                "title": "Background color"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "hideDatePickerButton": {
+                "type": "boolean"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "textSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Date inputs"
+        },
+        "dateRange": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "anchorDate": {
+                "type": "string",
+                "title": "Anchor date",
+                "description": "Select a date to reference when filtering visuals by a relative range of time. If an anchor date isn't specified, we'll use the current date."
+              },
+              "includeToday": {
+                "type": "boolean",
+                "title": "Include today"
+              }
+            }
+          },
+          "title": "Date Range"
+        },
+        "general": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "integer"
+              },
+              "formatString": {
+                "type": "string"
+              },
+              "orientation": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Vertical"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Horizontal"
+                  }
+                ],
+                "title": "Orientation"
+              },
+              "outlineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Outline color",
+                "description": "Color of the outline"
+              },
+              "outlineWeight": {
+                "type": "number",
+                "title": "Outline weight",
+                "description": "Thickness of the outline in pixels"
+              },
+              "responsive": {
+                "type": "boolean",
+                "title": "Responsive",
+                "description": "The visual will adapt to size changes"
+              },
+              "selfFilterEnabled": {
+                "type": "boolean"
+              }
+            }
+          },
+          "title": "General"
+        },
+        "header": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "background": {
+                "$ref": "#/definitions/fill",
+                "title": "Background color"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "outlineStyle": {
+                "type": "integer",
+                "title": "Outline"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "showRestatement": {
+                "type": "boolean",
+                "title": "Show summary"
+              },
+              "text": {
+                "type": "string",
+                "title": "Title text",
+                "description": "The name of the visual"
+              },
+              "textSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Slicer header"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "accessibilityContrastProperties": {
+                "type": "boolean"
+              },
+              "background": {
+                "$ref": "#/definitions/fill",
+                "title": "Background color"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "expandCollapseToggleType": {
+                "type": "integer",
+                "oneOf": [
+                  {
+                    "const": 0,
+                    "title": "Chevron"
+                  },
+                  {
+                    "const": 1,
+                    "title": "Plus/minus"
+                  },
+                  {
+                    "const": 2,
+                    "title": "Caret"
+                  }
+                ],
+                "title": "Expand/collapse icon"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "outlineStyle": {
+                "type": "integer",
+                "title": "Outline"
+              },
+              "padding": {
+                "type": "number",
+                "title": "Padding"
+              },
+              "steppedLayoutIndentation": {
+                "type": "number",
+                "title": "Stepped layout indentation"
+              },
+              "textSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Items"
+        },
+        "numericInputStyle": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "background": {
+                "$ref": "#/definitions/fill",
+                "title": "Background color"
+              },
+              "bold": {
+                "type": "boolean",
+                "title": "Bold"
+              },
+              "fontColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Font color"
+              },
+              "fontFamily": {
+                "type": "string",
+                "title": "Font family"
+              },
+              "italic": {
+                "type": "boolean",
+                "title": "Italic"
+              },
+              "textSize": {
+                "$ref": "#/definitions/fontSize",
+                "title": "Text size"
+              },
+              "underline": {
+                "type": "boolean",
+                "title": "Underline"
+              }
+            }
+          },
+          "title": "Numeric inputs"
+        },
+        "pendingChangesIcon": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "position": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "custom",
+                    "title": "Custom"
+                  },
+                  {
+                    "const": "left",
+                    "title": "Left of text"
+                  },
+                  {
+                    "const": "right",
+                    "title": "Right of text"
+                  },
+                  {
+                    "const": "above",
+                    "title": "Above text"
+                  },
+                  {
+                    "const": "below",
+                    "title": "Below text"
+                  }
+                ],
+                "title": "Position"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              },
+              "showTooltip": {
+                "type": "boolean",
+                "title": "Show tooltip"
+              },
+              "size": {
+                "type": "number",
+                "title": "Size"
+              },
+              "tooltipLabel": {
+                "type": "string",
+                "title": "Label text"
+              },
+              "tooltipText": {
+                "type": "string",
+                "title": "Tooltip text"
+              },
+              "transparency": {
+                "type": "number",
+                "title": "Transparency",
+                "description": "Background color transparency"
+              }
+            }
+          },
+          "title": "Pending icon"
+        },
+        "searchBox": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "background": {
+                "$ref": "#/definitions/fill",
+                "title": "Background"
+              },
+              "borderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Outline color",
+                "description": "Color of the outline"
+              },
+              "outlineStyle": {
+                "type": "integer",
+                "title": "Outline"
+              }
+            }
+          },
+          "title": "Search box"
+        },
+        "selection": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "selectAllCheckboxEnabled": {
+                "type": "boolean",
+                "title": "Show \"Select all\" option",
+                "description": "Show \"Select all\" as an option in the slicer. This selects all the values in the slicer so you can unselect them one by one to create an \"is not\" type filter."
+              },
+              "singleSelect": {
+                "type": "boolean",
+                "title": "Multi-select with CTRL",
+                "description": "Allow multiple selections in check boxes only when CTRL or Command + click is used"
+              },
+              "strictSingleSelect": {
+                "type": "boolean",
+                "title": "Single select",
+                "description": "Show slicer items with radio buttons"
+              }
+            }
+          },
+          "title": "Selection controls"
+        },
+        "slider": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "color": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "handleBorderColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Border"
+              },
+              "handleFillColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Fill"
+              },
+              "secondaryLineColor": {
+                "$ref": "#/definitions/fill",
+                "title": "Color"
+              },
+              "show": {
+                "type": "boolean",
+                "title": "Show"
+              }
+            }
+          },
+          "title": "Slider"
+        }
+      }
+    }
+  ]
+}

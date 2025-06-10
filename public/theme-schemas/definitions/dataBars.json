@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reverseDirection",
+    "hideText"
+  ],
+  "properties": {
+    "minValue": {
+      "type": "number"
+    },
+    "maxValue": {
+      "type": "number"
+    },
+    "positiveColor": {
+      "$ref": "#/definitions/fill"
+    },
+    "negativeColor": {
+      "$ref": "#/definitions/fill"
+    },
+    "axisColor": {
+      "$ref": "#/definitions/fill"
+    },
+    "reverseDirection": {
+      "type": "boolean"
+    },
+    "hideText": {
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,2038 @@
+{
+  "$schema": {
+    "type": "string"
+  },
+  "name": {
+    "title": "Report theme name",
+    "type": "string"
+  },
+  "visualStyles": {
+    "type": "object",
+    "properties": {
+      "report": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "type": "object",
+            "allOf": [
+              {
+                "properties": {
+                  "*": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "expanded": {
+                          "type": "boolean"
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        },
+                        "verticalAlignment": {
+                          "type": "string",
+                          "oneOf": [
+                            {
+                              "const": "Top",
+                              "title": "Top"
+                            },
+                            {
+                              "const": "Middle",
+                              "title": "Middle"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "outspacePane": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "expanded": {
+                          "type": "boolean"
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "title": "Filter pane"
+                  },
+                  "section": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "verticalAlignment": {
+                          "type": "string",
+                          "oneOf": [
+                            {
+                              "const": "Top",
+                              "title": "Top"
+                            },
+                            {
+                              "const": "Middle",
+                              "title": "Middle"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "title": "Page alignment"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "page": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "type": "object",
+            "allOf": [
+              {
+                "properties": {
+                  "*": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "color": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Color"
+                        },
+                        "image": {
+                          "$ref": "#/definitions/image"
+                        },
+                        "transparency": {
+                          "type": "number",
+                          "title": "Transparency",
+                          "description": "Controls how see-through your filter pane's background color is"
+                        },
+                        "verticalAlignment": {
+                          "type": "string",
+                          "oneOf": [
+                            {
+                              "const": "Top",
+                              "title": "Top"
+                            },
+                            {
+                              "const": "Middle",
+                              "title": "Middle"
+                            }
+                          ],
+                          "title": "Vertical alignment"
+                        },
+                        "backgroundColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Background color",
+                          "description": "Sets the color for the background of the filter pane in the published report"
+                        },
+                        "border": {
+                          "type": "boolean",
+                          "title": "Border",
+                          "description": "Vertical line separating the report from the filter pane"
+                        },
+                        "borderColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Border color",
+                          "description": "The color of the vertical line separating the report from the filter pane"
+                        },
+                        "fontFamily": {
+                          "type": "string",
+                          "title": "Font family",
+                          "description": "Sets the font family for the title and headers in the filter pane"
+                        },
+                        "foregroundColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Font and icon color",
+                          "description": "Sets the color for most text, buttons, and icons in the filter pane"
+                        },
+                        "inputBoxColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Input box color",
+                          "description": "Sets the background color for input fields of the filter pane "
+                        },
+                        "textSize": {
+                          "type": "integer",
+                          "title": "Text size",
+                          "description": "Sets the font size for text in the filter cards"
+                        },
+                        "checkboxAndApplyColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Checkbox and Apply color",
+                          "description": "Select a color to be used for the Apply button and some checkboxes in the filter pane"
+                        },
+                        "headerSize": {
+                          "type": "integer",
+                          "title": "Header text size",
+                          "description": "Sets the text size for the headers in the filter pane"
+                        },
+                        "searchTextSize": {
+                          "type": "integer",
+                          "title": "Search text size",
+                          "description": "Sets the text size for the search box of the filter pane"
+                        },
+                        "titleSize": {
+                          "type": "integer",
+                          "title": "Title text size",
+                          "description": "Sets the text size for the title of the filter pane"
+                        },
+                        "width": {
+                          "type": "integer",
+                          "title": "Width"
+                        },
+                        "pageInformationAltName": {
+                          "type": "string",
+                          "title": "Add alternate names separated by commas"
+                        },
+                        "pageInformationName": {
+                          "type": "string",
+                          "title": "Name"
+                        },
+                        "pageInformationQnaPodEnabled": {
+                          "type": "boolean",
+                          "title": "Q&A"
+                        },
+                        "pageInformationType": {
+                          "type": "boolean",
+                          "title": "Allow use as tooltip"
+                        },
+                        "duration": {
+                          "type": "string",
+                          "title": "Refresh this page every"
+                        },
+                        "refreshType": {
+                          "type": "string",
+                          "oneOf": [
+                            {
+                              "const": "APR",
+                              "title": "Auto page refresh"
+                            },
+                            {
+                              "const": "CDM",
+                              "title": "Change detection"
+                            }
+                          ],
+                          "title": "Refresh type"
+                        },
+                        "show": {
+                          "type": "boolean",
+                          "title": "Show"
+                        },
+                        "pageSizeHeight": {
+                          "type": "number",
+                          "title": "Height"
+                        },
+                        "pageSizeTypes": {
+                          "type": "string",
+                          "oneOf": [
+                            {
+                              "const": "Widescreen",
+                              "title": "16:9"
+                            },
+                            {
+                              "const": "Standard",
+                              "title": "4:3"
+                            },
+                            {
+                              "const": "Letter",
+                              "title": "Letter"
+                            },
+                            {
+                              "const": "Tooltip",
+                              "title": "Tooltip"
+                            },
+                            {
+                              "const": "Custom",
+                              "title": "Custom"
+                            }
+                          ],
+                          "title": "Type"
+                        },
+                        "pageSizeWidth": {
+                          "type": "number",
+                          "title": "Width"
+                        },
+                        "perspectiveRef": {
+                          "type": "string",
+                          "title": "Report-reader perspective"
+                        }
+                      }
+                    }
+                  },
+                  "background": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "color": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Color"
+                        },
+                        "image": {
+                          "$ref": "#/definitions/image"
+                        },
+                        "transparency": {
+                          "type": "number",
+                          "title": "Transparency"
+                        }
+                      }
+                    },
+                    "title": "Page background"
+                  },
+                  "displayArea": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "verticalAlignment": {
+                          "type": "string",
+                          "oneOf": [
+                            {
+                              "const": "Top",
+                              "title": "Top"
+                            },
+                            {
+                              "const": "Middle",
+                              "title": "Middle"
+                            }
+                          ],
+                          "title": "Vertical alignment"
+                        }
+                      }
+                    },
+                    "title": "Page alignment"
+                  },
+                  "filterCard": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "$id": {
+                          "type": "string",
+                          "anyOf": [
+                            {
+                              "enum": [
+                                "Available",
+                                "Applied"
+                              ]
+                            },
+                            {
+                              "pattern": "^[A-Za-z0-9]+$"
+                            }
+                          ]
+                        },
+                        "backgroundColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Background color",
+                          "description": "Sets the color for the background of the filter cards on the filter pane in the published report"
+                        },
+                        "border": {
+                          "type": "boolean",
+                          "title": "Border",
+                          "description": "Adds a one-pixel line around your filter cards"
+                        },
+                        "borderColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Border color",
+                          "description": "Sets the color of the border around your filter cards"
+                        },
+                        "fontFamily": {
+                          "type": "string",
+                          "title": "Font family",
+                          "description": "Sets the font family for the filter cards"
+                        },
+                        "foregroundColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Font and icon color",
+                          "description": "Sets the color for most text, buttons, and icons in the filter cards"
+                        },
+                        "inputBoxColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Input box color",
+                          "description": "Sets the background color for input fields, search boxes, sliders, text boxes, and drop-down lists\n    "
+                        },
+                        "textSize": {
+                          "type": "integer",
+                          "title": "Text size",
+                          "description": "Sets the font size for text in the filter cards"
+                        },
+                        "transparency": {
+                          "type": "integer",
+                          "title": "Transparency",
+                          "description": "Controls how see-through your filter cards' background color is"
+                        }
+                      }
+                    },
+                    "title": "Filter cards"
+                  },
+                  "outspace": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "color": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Color"
+                        },
+                        "image": {
+                          "$ref": "#/definitions/image"
+                        },
+                        "transparency": {
+                          "type": "number",
+                          "title": "Transparency"
+                        }
+                      }
+                    },
+                    "title": "Wallpaper"
+                  },
+                  "outspacePane": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "backgroundColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Background color",
+                          "description": "Sets the color for the background of the filter pane in the published report"
+                        },
+                        "border": {
+                          "type": "boolean",
+                          "title": "Border",
+                          "description": "Vertical line separating the report from the filter pane"
+                        },
+                        "borderColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Border color",
+                          "description": "The color of the vertical line separating the report from the filter pane"
+                        },
+                        "checkboxAndApplyColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Checkbox and Apply color",
+                          "description": "Select a color to be used for the Apply button and some checkboxes in the filter pane"
+                        },
+                        "fontFamily": {
+                          "type": "string",
+                          "title": "Font family",
+                          "description": "Sets the font family for the title and headers in the filter pane"
+                        },
+                        "foregroundColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Font and icon color",
+                          "description": "Sets the color for most text, buttons, and icons in the filter pane"
+                        },
+                        "headerSize": {
+                          "type": "integer",
+                          "title": "Header text size",
+                          "description": "Sets the text size for the headers in the filter pane"
+                        },
+                        "inputBoxColor": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Input box color",
+                          "description": "Sets the background color for input fields of the filter pane "
+                        },
+                        "searchTextSize": {
+                          "type": "integer",
+                          "title": "Search text size",
+                          "description": "Sets the text size for the search box of the filter pane"
+                        },
+                        "titleSize": {
+                          "type": "integer",
+                          "title": "Title text size",
+                          "description": "Sets the text size for the title of the filter pane"
+                        },
+                        "transparency": {
+                          "type": "number",
+                          "title": "Transparency",
+                          "description": "Controls how see-through your filter pane's background color is"
+                        },
+                        "width": {
+                          "type": "integer",
+                          "title": "Width"
+                        }
+                      }
+                    },
+                    "title": "Filter pane"
+                  },
+                  "pageInformation": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "pageInformationAltName": {
+                          "type": "string",
+                          "title": "Add alternate names separated by commas"
+                        },
+                        "pageInformationName": {
+                          "type": "string",
+                          "title": "Name"
+                        },
+                        "pageInformationQnaPodEnabled": {
+                          "type": "boolean",
+                          "title": "Q&A"
+                        },
+                        "pageInformationType": {
+                          "type": "boolean",
+                          "title": "Allow use as tooltip"
+                        }
+                      }
+                    },
+                    "title": "Page information"
+                  },
+                  "pageRefresh": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "duration": {
+                          "type": "string",
+                          "title": "Refresh this page every"
+                        },
+                        "refreshType": {
+                          "type": "string",
+                          "oneOf": [
+                            {
+                              "const": "APR",
+                              "title": "Auto page refresh"
+                            },
+                            {
+                              "const": "CDM",
+                              "title": "Change detection"
+                            }
+                          ],
+                          "title": "Refresh type"
+                        },
+                        "show": {
+                          "type": "boolean",
+                          "title": "Show"
+                        }
+                      }
+                    },
+                    "title": "Page refresh"
+                  },
+                  "pageSize": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "pageSizeHeight": {
+                          "type": "number",
+                          "title": "Height"
+                        },
+                        "pageSizeTypes": {
+                          "type": "string",
+                          "oneOf": [
+                            {
+                              "const": "Widescreen",
+                              "title": "16:9"
+                            },
+                            {
+                              "const": "Standard",
+                              "title": "4:3"
+                            },
+                            {
+                              "const": "Letter",
+                              "title": "Letter"
+                            },
+                            {
+                              "const": "Tooltip",
+                              "title": "Tooltip"
+                            },
+                            {
+                              "const": "Custom",
+                              "title": "Custom"
+                            }
+                          ],
+                          "title": "Type"
+                        },
+                        "pageSizeWidth": {
+                          "type": "number",
+                          "title": "Width"
+                        }
+                      }
+                    },
+                    "title": "Canvas settings"
+                  },
+                  "personalizeVisual": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "perspectiveRef": {
+                          "type": "string",
+                          "title": "Report-reader perspective"
+                        },
+                        "show": {
+                          "type": "boolean",
+                          "title": "Show"
+                        }
+                      }
+                    },
+                    "title": "Personalize visual"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "filter": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "type": "object",
+            "allOf": [
+              {
+                "properties": {
+                  "*": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "isInvertedSelectionMode": {
+                          "type": "boolean"
+                        },
+                        "requireSingleSelect": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "general": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "isInvertedSelectionMode": {
+                          "type": "boolean"
+                        },
+                        "requireSingleSelect": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "group": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "type": "object",
+            "allOf": [
+              {
+                "properties": {
+                  "*": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "color": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Color",
+                          "description": "The background color for the group"
+                        },
+                        "show": {
+                          "type": "boolean",
+                          "title": "Show"
+                        },
+                        "transparency": {
+                          "type": "number",
+                          "title": "Transparency",
+                          "description": "Background color transparency"
+                        },
+                        "altText": {
+                          "type": "string",
+                          "title": "Alt text"
+                        },
+                        "height": {
+                          "type": "number",
+                          "title": "Height"
+                        },
+                        "width": {
+                          "type": "number",
+                          "title": "Width"
+                        },
+                        "x": {
+                          "type": "number",
+                          "title": "X Position"
+                        },
+                        "y": {
+                          "type": "number",
+                          "title": "Y Position"
+                        }
+                      }
+                    }
+                  },
+                  "background": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "color": {
+                          "$ref": "#/definitions/fill",
+                          "title": "Color",
+                          "description": "The background color for the group"
+                        },
+                        "show": {
+                          "type": "boolean",
+                          "title": "Show"
+                        },
+                        "transparency": {
+                          "type": "number",
+                          "title": "Transparency",
+                          "description": "Background color transparency"
+                        }
+                      }
+                    },
+                    "title": "Background"
+                  },
+                  "general": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "altText": {
+                          "type": "string",
+                          "title": "Alt text"
+                        },
+                        "height": {
+                          "type": "number",
+                          "title": "Height"
+                        },
+                        "width": {
+                          "type": "number",
+                          "title": "Width"
+                        },
+                        "x": {
+                          "type": "number",
+                          "title": "X Position"
+                        },
+                        "y": {
+                          "type": "number",
+                          "title": "Y Position"
+                        }
+                      }
+                    },
+                    "title": "General"
+                  },
+                  "lockAspect": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "show": {
+                          "type": "boolean",
+                          "title": "Show"
+                        }
+                      }
+                    },
+                    "title": "Lock aspect"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "actionButton": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-actionButton",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-actionButton",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "bookmarkNavigator": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-bookmarkNavigator",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-bookmarkNavigator",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "image": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-image",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-image",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "textbox": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-textbox",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-textbox",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "pageNavigator": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-pageNavigator",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-pageNavigator",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "shape": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-shape",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-shape",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "barChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-barChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-barChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "columnChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-columnChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-columnChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "clusteredBarChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-clusteredBarChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-clusteredBarChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "clusteredColumnChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-clusteredColumnChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-clusteredColumnChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "hundredPercentStackedBarChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-hundredPercentStackedBarChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-hundredPercentStackedBarChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "hundredPercentStackedColumnChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-hundredPercentStackedColumnChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-hundredPercentStackedColumnChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "lineChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-lineChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-lineChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "areaChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-areaChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-areaChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "stackedAreaChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-stackedAreaChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-stackedAreaChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "hundredPercentStackedAreaChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-hundredPercentStackedAreaChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-hundredPercentStackedAreaChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "lineStackedColumnComboChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-lineStackedColumnComboChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-lineStackedColumnComboChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "lineClusteredColumnComboChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-lineClusteredColumnComboChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-lineClusteredColumnComboChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "ribbonChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-ribbonChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-ribbonChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "waterfallChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-waterfallChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-waterfallChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "funnel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-funnel",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-funnel",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "scatterChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-scatterChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-scatterChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "pieChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-pieChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-pieChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "donutChart": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-donutChart",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-donutChart",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "treemap": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-treemap",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-treemap",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "map": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-map",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-map",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "filledMap": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-filledMap",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-filledMap",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "shapeMap": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-shapeMap",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-shapeMap",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "azureMap": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-azureMap",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-azureMap",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "gauge": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-gauge",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-gauge",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "card": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-card",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-card",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "multiRowCard": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-multiRowCard",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-multiRowCard",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "kpi": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-kpi",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-kpi",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "slicer": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-slicer",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-slicer",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "tableEx": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-tableEx",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-tableEx",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "pivotTable": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-pivotTable",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-pivotTable",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "scriptVisual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-scriptVisual",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-scriptVisual",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "pythonVisual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-pythonVisual",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-pythonVisual",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "keyDriversVisual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-keyDriversVisual",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-keyDriversVisual",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "decompositionTreeVisual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-decompositionTreeVisual",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-decompositionTreeVisual",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "qnaVisual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-qnaVisual",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-qnaVisual",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "aiNarratives": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-aiNarratives",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-aiNarratives",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "scorecard": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-scorecard",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-scorecard",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "rdlVisual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-rdlVisual",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-rdlVisual",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "cardVisual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-cardVisual",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-cardVisual",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "advancedSlicerVisual": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-advancedSlicerVisual",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-advancedSlicerVisual",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "textSlicer": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-textSlicer",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-textSlicer",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      },
+      "listSlicer": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "*": {
+            "$ref": "#/definitions/visual-listSlicer",
+            "description": "Default style for visual"
+          }
+        },
+        "patternProperties": {
+          "^(?!\\*$).+$": {
+            "$ref": "#/definitions/visual-listSlicer",
+            "description": "Custom style preset for visual",
+            "not": {
+              "type": "object",
+              "required": [
+                "stylePreset"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "additionalProperties": {
+      "type": "object",
+      "properties": {
+        "*": {
+          "type": "object",
+          "patternProperties": {
+            "^.+$": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "patternProperties": {
+                  "^.+$": {
+                    "anyOf": [
+                      {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      },
+                      {
+                        "$ref": "#/definitions/dataBars"
+                      },
+                      {
+                        "$ref": "#/definitions/fill"
+                      },
+                      {
+                        "$ref": "#/definitions/fillRule"
+                      },
+                      {
+                        "$ref": "#/definitions/icon"
+                      },
+                      {
+                        "$ref": "#/definitions/image"
+                      },
+                      {
+                        "$ref": "#/definitions/paragraphs"
+                      },
+                      {
+                        "$ref": "#/definitions/itemLocation"
+                      },
+                      {
+                        "$ref": "#/definitions/annotationTemplate"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "dataColors": {
+    "type": "array",
+    "items": {
+      "$ref": "#/definitions/color"
+    }
+  },
+  "icons": {
+    "anyOf": [
+      {
+        "type": "object",
+        "patternProperties": {
+          ".*": {
+            "$ref": "#/definitions/themeIcon"
+          }
+        }
+      },
+      {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/themeIcon"
+        }
+      }
+    ]
+  },
+  "textClasses": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "title": {
+        "$ref": "#/definitions/textClass"
+      },
+      "label": {
+        "$ref": "#/definitions/textClass"
+      },
+      "callout": {
+        "$ref": "#/definitions/textClass"
+      },
+      "header": {
+        "$ref": "#/definitions/textClass"
+      },
+      "largeTitle": {
+        "$ref": "#/definitions/textClass"
+      },
+      "dataTitle": {
+        "$ref": "#/definitions/textClass"
+      },
+      "boldLabel": {
+        "$ref": "#/definitions/textClass"
+      },
+      "largeLabel": {
+        "$ref": "#/definitions/textClass"
+      },
+      "largeLightLabel": {
+        "$ref": "#/definitions/textClass"
+      },
+      "lightLabel": {
+        "$ref": "#/definitions/textClass"
+      },
+      "semiboldLabel": {
+        "$ref": "#/definitions/textClass"
+      },
+      "smallLabel": {
+        "$ref": "#/definitions/textClass"
+      },
+      "smallLightLabel": {
+        "$ref": "#/definitions/textClass"
+      },
+      "smallDataLabel": {
+        "$ref": "#/definitions/textClass"
+      }
+    }
+  },
+  "foreground": {
+    "$ref": "#/definitions/color"
+  },
+  "firstLevelElements": {
+    "$ref": "#/definitions/color"
+  },
+  "secondLevelElements": {
+    "$ref": "#/definitions/color"
+  },
+  "thirdLevelElements": {
+    "$ref": "#/definitions/color"
+  },
+  "fourthLevelElements": {
+    "$ref": "#/definitions/color"
+  },
+  "background": {
+    "$ref": "#/definitions/color"
+  },
+  "secondaryBackground": {
+    "$ref": "#/definitions/color"
+  },
+  "good": {
+    "$ref": "#/definitions/color"
+  },
+  "neutral": {
+    "$ref": "#/definitions/color"
+  },
+  "bad": {
+    "$ref": "#/definitions/color"
+  },
+  "maximum": {
+    "$ref": "#/definitions/color"
+  },
+  "center": {
+    "$ref": "#/definitions/color"
+  },
+  "minimum": {
+    "$ref": "#/definitions/color"
+  },
+  "null": {
+    "$ref": "#/definitions/color"
+  },
+  "accent": {
+    "$ref": "#/definitions/color"
+  },
+  "tableAccent": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundLight": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundDark": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundNeutralLight": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundNeutralDark": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundNeutralSecondary": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundNeutralSecondaryAlt": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundNeutralSecondaryAlt2": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundNeutralTertiary": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundNeutralTertiaryAlt": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundSelected": {
+    "$ref": "#/definitions/color"
+  },
+  "foregroundButton": {
+    "$ref": "#/definitions/color"
+  },
+  "backgroundLight": {
+    "$ref": "#/definitions/color"
+  },
+  "backgroundNeutral": {
+    "$ref": "#/definitions/color"
+  },
+  "backgroundDark": {
+    "$ref": "#/definitions/color"
+  },
+  "hyperlink": {
+    "$ref": "#/definitions/color"
+  },
+  "visitedHyperlink": {
+    "$ref": "#/definitions/color"
+  },
+  "shapeStroke": {
+    "$ref": "#/definitions/color"
+  },
+  "disabledText": {
+    "$ref": "#/definitions/color"
+  },
+  "mapPushpin": {
+    "$ref": "#/definitions/color"
+  }
+}

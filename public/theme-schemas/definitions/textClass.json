@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "fontFace": {
+      "type": "string"
+    },
+    "fontSize": {
+      "$ref": "#/definitions/fontSize"
+    },
+    "fontWeight": {
+      "type": "string"
+    },
+    "color": {
+      "$ref": "#/definitions/color"
+    }
+  }
+}

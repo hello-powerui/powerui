@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "strategy"
+  ],
+  "properties": {
+    "strategy": {
+      "type": "string"
+    },
+    "color": {
+      "$ref": "#/definitions/color"
+    }
+  }
+}
