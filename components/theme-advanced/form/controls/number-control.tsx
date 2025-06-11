@@ -15,6 +15,9 @@ interface NumberControlProps {
   path: string[];
   // For percentage values
   isPercentage?: boolean;
+  // For inheritance
+  inheritanceIndicator?: React.ReactNode;
+  onReset?: () => void;
 }
 
 export function NumberControl({
@@ -28,6 +31,8 @@ export function NumberControl({
   step = 1,
   path,
   isPercentage = false,
+  inheritanceIndicator,
+  onReset,
 }: NumberControlProps) {
   const handleChange = (newValue: string) => {
     const parsed = parseFloat(newValue);
@@ -45,13 +50,27 @@ export function NumberControl({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <Label htmlFor={path.join('-')} className="text-sm font-medium">
-          {label}
-        </Label>
-        {required && (
-          <span className="text-xs text-red-500">*</span>
-        )}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Label htmlFor={path.join('-')} className="text-sm font-medium">
+            {label}
+          </Label>
+          {required && (
+            <span className="text-xs text-red-500">*</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {inheritanceIndicator}
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="text-xs text-blue-600 hover:text-blue-800"
+            >
+              Reset
+            </button>
+          )}
+        </div>
       </div>
 
       {description && (

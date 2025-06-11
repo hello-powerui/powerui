@@ -58,12 +58,19 @@ export class SchemaLoader {
         }
       });
 
+      // Convert definitions map to object for schema
+      const definitionsObject: Record<string, SchemaProperty> = {};
+      this.definitions.forEach((value, key) => {
+        definitionsObject[key] = value;
+      });
+
       this.schema = {
         type: 'object',
         properties: this.properties,
         required: ['name'],
         additionalProperties: false,
-        description: 'Power BI Theme Schema'
+        description: 'Power BI Theme Schema',
+        definitions: definitionsObject
       };
 
       this.loaded = true;
@@ -168,5 +175,76 @@ export class SchemaLoader {
     ];
     
     return schemas.some(schema => this.supportsStates(schema));
+  }
+
+  getVisualTypes(): string[] {
+    const definitions = this.schema?.definitions || {};
+    return Object.keys(definitions)
+      .filter(key => key.startsWith('visual-'))
+      .map(key => key.replace('visual-', ''))
+      .sort();
+  }
+
+  // Get global property value from theme
+  getGlobalPropertyValue(theme: any, propertyPath: string[]): any {
+    try {
+      // Global values are stored at visualStyles.*.*.*
+      const globalArray = theme?.visualStyles?.['*']?.['*']?.['*'];
+      if (!Array.isArray(globalArray) || globalArray.length === 0) {
+        return undefined;
+      }
+      
+      // Get the first object in the array (combined properties)
+      const globalProps = globalArray[0];
+      
+      // Navigate to the specific property
+      let value = globalProps;
+      for (const key of propertyPath) {
+        if (value && typeof value === 'object' && key in value) {
+          value = value[key];
+        } else {
+          return undefined;
+        }
+      }
+      
+      return value;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
+  // Check if a property value is inherited from global
+  isInheritedFromGlobal(theme: any, visualType: string, variant: string, propertyPath: string[], currentValue: any): boolean {
+    const globalValue = this.getGlobalPropertyValue(theme, propertyPath);
+    if (globalValue === undefined) return false;
+    
+    return JSON.stringify(currentValue) === JSON.stringify(globalValue);
+  }
+  
+  // Check if a visual has any state-driven properties
+  visualHasStateDrivenProperties(visualType: string): boolean {
+    try {
+      const visualDef = this.definitions.get(`visual-${visualType}`);
+      if (!visualDef || !visualDef.allOf || visualDef.allOf.length < 2) {
+        return false;
+      }
+      
+      // Check visual-specific properties (allOf[1])
+      const visualProps = visualDef.allOf[1].properties || {};
+      
+      // Check each property for state support
+      for (const [propName, propSchema] of Object.entries(visualProps)) {
+        if (propSchema.type === 'array' && 
+            propSchema.items?.type === 'object' && 
+            propSchema.items.properties?.$id) {
+          return true;
+        }
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error checking state-driven properties:', error);
+      return false;
+    }
   }
 }

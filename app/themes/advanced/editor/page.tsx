@@ -34,6 +34,12 @@ const VisualIcon = () => (
   </svg>
 );
 
+const GlobalIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+
 export default function AdvancedThemeEditorPage() {
   const router = useRouter();
   const [schemaLoader] = useState(() => SchemaLoader.getInstance());
@@ -51,11 +57,13 @@ export default function AdvancedThemeEditorPage() {
     selectedVisual,
     selectedStyle,
     selectedVariant,
+    selectedState,
     setSelectedSection,
     setSelectedProperty,
     setSelectedVisual,
     setSelectedStyle,
     setSelectedVariant,
+    setSelectedState,
     updateThemeProperty,
     updateVisualStyle,
     setThemeMetadata,
@@ -137,6 +145,7 @@ export default function AdvancedThemeEditorPage() {
 
   const topLevelProperties = schemaLoader.getTopLevelProperties();
   const visualTypes = schemaLoader.getVisualTypes();
+  const hasStateDrivenProperties = selectedVisual && schemaLoader.visualHasStateDrivenProperties(selectedVisual);
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
@@ -201,8 +210,19 @@ export default function AdvancedThemeEditorPage() {
           {/* Section Tabs */}
           <div className="flex border-b">
             <button
+              onClick={() => setSelectedSection('global')}
+              className={`flex-1 px-3 py-3 text-sm font-medium flex items-center justify-center gap-2 ${
+                selectedSection === 'global'
+                  ? 'bg-primary text-white'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <GlobalIcon />
+              Global
+            </button>
+            <button
               onClick={() => setSelectedSection('properties')}
-              className={`flex-1 px-4 py-3 text-sm font-medium flex items-center justify-center gap-2 ${
+              className={`flex-1 px-3 py-3 text-sm font-medium flex items-center justify-center gap-2 ${
                 selectedSection === 'properties'
                   ? 'bg-primary text-white'
                   : 'text-gray-600 hover:bg-gray-50'
@@ -213,7 +233,7 @@ export default function AdvancedThemeEditorPage() {
             </button>
             <button
               onClick={() => setSelectedSection('visuals')}
-              className={`flex-1 px-4 py-3 text-sm font-medium flex items-center justify-center gap-2 ${
+              className={`flex-1 px-3 py-3 text-sm font-medium flex items-center justify-center gap-2 ${
                 selectedSection === 'visuals'
                   ? 'bg-primary text-white'
                   : 'text-gray-600 hover:bg-gray-50'
@@ -226,7 +246,32 @@ export default function AdvancedThemeEditorPage() {
 
           {/* Content based on selected section */}
           <div className="p-4">
-            {selectedSection === 'properties' ? (
+            {selectedSection === 'global' ? (
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Global Visual Settings</h3>
+                <p className="text-xs text-gray-500 mb-4">
+                  These settings apply to all visuals by default and can be overridden per visual type.
+                </p>
+                <button
+                  onClick={() => {
+                    setSelectedVisual('*');
+                    setSelectedVariant('*');
+                    setSelectedProperty('allVisuals');
+                  }}
+                  className={`w-full text-left px-3 py-2 text-sm rounded border ${
+                    selectedProperty === 'allVisuals'
+                      ? 'bg-primary/10 border-primary text-primary'
+                      : 'hover:bg-gray-50 border-transparent hover:border-gray-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <GlobalIcon />
+                    <span>All Visuals Settings</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Spacing, padding, borders for all visuals</p>
+                </button>
+              </div>
+            ) : selectedSection === 'properties' ? (
               <div className="space-y-2">
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Theme Properties</h3>
                 {topLevelProperties.map((prop) => (
@@ -253,6 +298,7 @@ export default function AdvancedThemeEditorPage() {
                       setSelectedVisual(visual);
                       setSelectedStyle('*');
                       setSelectedVariant('*'); // Reset to default variant
+                      setSelectedState('default'); // Reset to default state
                     }}
                     className={`w-full text-left px-3 py-2 text-sm rounded border ${
                       selectedVisual === visual
@@ -341,6 +387,34 @@ export default function AdvancedThemeEditorPage() {
                       </div>
                     </div>
                     
+                    {/* Visual State Selector - only show for visuals with state-driven properties */}
+                    {hasStateDrivenProperties && (
+                      <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-sm font-medium text-gray-700">Visual State</h3>
+                          <p className="text-xs text-gray-600">Edit properties for different interaction states</p>
+                        </div>
+                        <div className="flex gap-2">
+                          {['default', 'hover', 'selected', 'disabled'].map(state => (
+                            <button
+                              key={state}
+                              onClick={() => setSelectedState(state)}
+                              className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+                                selectedState === state
+                                  ? 'bg-primary text-white border-primary'
+                                  : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                              }`}
+                            >
+                              {state.charAt(0).toUpperCase() + state.slice(1)}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Properties with state support will use the selected state. Properties without state support apply to all states.
+                        </p>
+                      </div>
+                    )}
+                    
                     <SchemaForm
                       schema={
                         schemaLoader.getPropertySchema(['visualStyles', selectedVisual]) ||
@@ -367,15 +441,96 @@ export default function AdvancedThemeEditorPage() {
                       schemaLoader={schemaLoader}
                     />
                   </>
+                ) : selectedSection === 'global' && selectedProperty === 'allVisuals' ? (
+                  <>
+                    <div className="mb-6">
+                      <h2 className="text-lg font-semibold">Global Visual Settings</h2>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Configure default settings that apply to all visuals. Individual visuals can override these settings.
+                      </p>
+                    </div>
+                    
+                    {/* Global Settings Form */}
+                    <div className="space-y-6">
+                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <div className="text-blue-600 mt-0.5">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm text-blue-800 font-medium">How Global Settings Work</p>
+                            <p className="text-xs text-blue-700 mt-1">
+                              These settings apply to all visuals using the pattern <code className="bg-blue-100 px-1 rounded">visualStyles.*.*.*</code>. 
+                              They can be overridden at the visual type or variant level.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Use the actual commonCards.*.items schema for proper properties */}
+                      <SchemaForm
+                        schema={(() => {
+                          // Get the commonCards definition
+                          const commonCardsSchema = schemaLoader.resolveRef('#/definitions/commonCards');
+                          if (commonCardsSchema?.properties?.['*']) {
+                            // Return the * property schema which contains all global properties
+                            return commonCardsSchema.properties['*'];
+                          }
+                          // Fallback schema
+                          return {
+                            type: 'array',
+                            items: {
+                              type: 'object',
+                              properties: {
+                                // Spacing properties
+                                customizeSpacing: { type: 'boolean', title: 'Customize Spacing' },
+                                spaceBelowTitle: { type: 'number', title: 'Space Below Title', minimum: 0, maximum: 50 },
+                                spaceBelowSubTitle: { type: 'number', title: 'Space Below Subtitle', minimum: 0, maximum: 50 },
+                                spaceBelowTitleArea: { type: 'number', title: 'Space Below Title Area', minimum: 0, maximum: 50 },
+                                // Padding properties
+                                top: { type: 'number', title: 'Padding Top', minimum: 0, maximum: 100 },
+                                bottom: { type: 'number', title: 'Padding Bottom', minimum: 0, maximum: 100 },
+                                left: { type: 'number', title: 'Padding Left', minimum: 0, maximum: 100 },
+                                right: { type: 'number', title: 'Padding Right', minimum: 0, maximum: 100 },
+                              }
+                            }
+                          };
+                        })()}
+                        value={currentTheme.visualStyles?.['*']?.['*']?.['*'] || [{}]}
+                        onChange={(value) => {
+                          const newTheme = {
+                            ...currentTheme,
+                            visualStyles: {
+                              ...currentTheme.visualStyles,
+                              '*': {
+                                ...currentTheme.visualStyles?.['*'],
+                                '*': {
+                                  ...currentTheme.visualStyles?.['*']?.['*'],
+                                  '*': value
+                                }
+                              }
+                            }
+                          };
+                          useThemeAdvancedStore.getState().setTheme(newTheme);
+                        }}
+                        schemaLoader={schemaLoader}
+                        path={['visualStyles', '*', '*', '*']}
+                      />
+                    </div>
+                  </>
                 ) : (
                   <div className="text-center py-12 text-gray-500">
                     <p className="mb-2">
-                      {selectedSection === 'properties' 
+                      {selectedSection === 'global'
+                        ? 'Select a global setting from the sidebar to edit'
+                        : selectedSection === 'properties' 
                         ? 'Select a property from the sidebar to edit'
                         : 'Select a visual from the sidebar to edit its styles'}
                     </p>
                     <p className="text-sm">
-                      Use the sidebar to navigate through theme properties and visual styles
+                      Use the sidebar to navigate through theme settings
                     </p>
                   </div>
                 )}

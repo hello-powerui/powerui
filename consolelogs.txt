@@ -1,0 +1,248 @@
+✓ Compiled /api/palettes/neutral in 149ms (949 modules)
+ ✓ Compiled /api/generate-theme in 0ms (952 modules)
+ ✓ Compiled in 0ms (957 modules)
+ ✓ Compiled in 0ms (957 modules)
+[Palette API] GET request received
+[Palette API] Auth result: {
+  tokenType: 'session_token',
+  actor: undefined,
+  sessionClaims: {
+    azp: 'http://localhost:3000',
+    exp: 1749650993,
+    fva: [ 199, -1 ],
+    iat: 1749650933,
+    iss: 'https://tolerant-terrier-35.clerk.accounts.dev',
+    nbf: 1749650923,
+    sid: 'sess_2yMKLTCiAdl1Bn5i3phsMRSFuPB',
+    sub: 'user_2yEshVCKtbWbsJtQnGvqGxej9KS',
+    v: 2
+  },
+  sessionId: 'sess_2yMKLTCiAdl1Bn5i3phsMRSFuPB',
+  sessionStatus: null,
+  userId: 'user_2yEshVCKtbWbsJtQnGvqGxej9KS',
+  orgId: undefined,
+  orgRole: undefined,
+  orgSlug: undefined,
+  orgPermissions: undefined,
+  factorVerificationAge: [ 199, -1 ],
+  getToken: [AsyncFunction (anonymous)],
+  has: [Function (anonymous)],
+  debug: [Function (anonymous)],
+  redirectToSignIn: [Function: redirectToSignIn],
+  redirectToSignUp: [Function: redirectToSignUp]
+}
+[Palette API] User ID: user_2yEshVCKtbWbsJtQnGvqGxej9KS
+[Palette API] Ensuring user exists...
+prisma:query SELECT "public"."User"."id", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[Palette API] DB User ID: user_2yEshVCKtbWbsJtQnGvqGxej9KS
+[Palette API] Fetching palettes...
+prisma:query SELECT 1
+prisma:query SELECT "public"."ColorPalette"."id", "public"."ColorPalette"."userId", "public"."ColorPalette"."name", "public"."ColorPalette"."description", "public"."ColorPalette"."colors", "public"."ColorPalette"."isBuiltIn", "public"."ColorPalette"."createdAt", "public"."ColorPalette"."updatedAt" FROM "public"."ColorPalette" WHERE "public"."ColorPalette"."userId" = $1 ORDER BY "public"."ColorPalette"."createdAt" DESC OFFSET $2
+prisma:query SELECT "public"."ColorPalette"."id", "public"."ColorPalette"."userId", "public"."ColorPalette"."name", "public"."ColorPalette"."description", "public"."ColorPalette"."colors", "public"."ColorPalette"."isBuiltIn", "public"."ColorPalette"."createdAt", "public"."ColorPalette"."updatedAt" FROM "public"."ColorPalette" WHERE "public"."ColorPalette"."isBuiltIn" = $1 ORDER BY "public"."ColorPalette"."name" ASC OFFSET $2
+[Palette API] User palettes: 2
+[Palette API] Built-in palettes: 1
+ GET /api/palettes/color 200 in 618ms
+ ✓ Compiled in 0ms (957 modules)
+prisma:query SELECT "public"."User"."id", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."NeutralPalette"."id", "public"."NeutralPalette"."userId", "public"."NeutralPalette"."name", "public"."NeutralPalette"."shades", "public"."NeutralPalette"."isBuiltIn", "public"."NeutralPalette"."createdAt", "public"."NeutralPalette"."updatedAt" FROM "public"."NeutralPalette" WHERE "public"."NeutralPalette"."userId" = $1 ORDER BY "public"."NeutralPalette"."createdAt" DESC OFFSET $2
+ GET /api/palettes/neutral 200 in 751ms
+ ✓ Compiled in 0ms (957 modules)
+Base theme before token resolution: {
+  background: '@text-secondary',
+  backgroundLight: '@bg-active',
+  foreground: '@text-secondary',
+  bad: '@fg-error-primary',
+  good: '@fg-success-primary',
+  neutral: '@fg-warning-primary'
+}
+Applying container (default) style
+Applying border (default) style
+Applying padding (default) style
+Theme after token resolution: {
+  background: undefined,
+  backgroundLight: undefined,
+  foreground: undefined,
+  bad: undefined,
+  good: undefined,
+  neutral: undefined
+}
+Resolving background: @text-secondary -> undefined
+Failed to resolve color property background: @text-secondary {
+  tokenName: 'text-secondary',
+  resolved: undefined,
+  availableTokens: [
+    'text-primary',
+    'text-primary_on-brand',
+    'text-secondary',
+    'text-secondary_hover',
+    'text-secondary_on-brand',
+    'text-tertiary',
+    'text-tertiary_hover',
+    'text-tertiary_on-brand',
+    'text-quaternary',
+    'text-quaternary_on-brand'
+  ]
+}
+Resolving backgroundLight: @bg-active -> undefined
+Failed to resolve color property backgroundLight: @bg-active {
+  tokenName: 'bg-active',
+  resolved: undefined,
+  availableTokens: [
+    'text-primary',
+    'text-primary_on-brand',
+    'text-secondary',
+    'text-secondary_hover',
+    'text-secondary_on-brand',
+    'text-tertiary',
+    'text-tertiary_hover',
+    'text-tertiary_on-brand',
+    'text-quaternary',
+    'text-quaternary_on-brand'
+  ]
+}
+Resolving backgroundNeutral: @bg-secondary -> undefined
+Failed to resolve color property backgroundNeutral: @bg-secondary {
+  tokenName: 'bg-secondary',
+  resolved: undefined,
+  availableTokens: [
+    'text-primary',
+    'text-primary_on-brand',
+    'text-secondary',
+    'text-secondary_hover',
+    'text-secondary_on-brand',
+    'text-tertiary',
+    'text-tertiary_hover',
+    'text-tertiary_on-brand',
+    'text-quaternary',
+    'text-quaternary_on-brand'
+  ]
+}
+Resolving foreground: @text-secondary -> undefined
+Failed to resolve color property foreground: @text-secondary {
+  tokenName: 'text-secondary',
+  resolved: undefined,
+  availableTokens: [
+    'text-primary',
+    'text-primary_on-brand',
+    'text-secondary',
+    'text-secondary_hover',
+    'text-secondary_on-brand',
+    'text-tertiary',
+    'text-tertiary_hover',
+    'text-tertiary_on-brand',
+    'text-quaternary',
+    'text-quaternary_on-brand'
+  ]
+}
+Resolving foregroundNeutralSecondary: @text-secondary -> undefined
+Failed to resolve color property foregroundNeutralSecondary: @text-secondary {
+  tokenName: 'text-secondary',
+  resolved: undefined,
+  availableTokens: [
+    'text-primary',
+    'text-primary_on-brand',
+    'text-secondary',
+    'text-secondary_hover',
+    'text-secondary_on-brand',
+    'text-tertiary',
+    'text-tertiary_hover',
+    'text-tertiary_on-brand',
+    'text-quaternary',
+    'text-quaternary_on-brand'
+  ]
+}
+Resolving foregroundNeutralTertiary: @text-tertiary -> undefined
+Failed to resolve color property foregroundNeutralTertiary: @text-tertiary {
+  tokenName: 'text-tertiary',
+  resolved: undefined,
+  availableTokens: [
+    'text-primary',
+    'text-primary_on-brand',
+    'text-secondary',
+    'text-secondary_hover',
+    'text-secondary_on-brand',
+    'text-tertiary',
+    'text-tertiary_hover',
+    'text-tertiary_on-brand',
+    'text-quaternary',
+    'text-quaternary_on-brand'
+  ]
+}
+Resolving bad: @fg-error-primary -> undefined
+Failed to resolve color property bad: @fg-error-primary {
+  tokenName: 'fg-error-primary',
+  resolved: undefined,
+  availableTokens: [
+    'text-primary',
+    'text-primary_on-brand',
+    'text-secondary',
+    'text-secondary_hover',
+    'text-secondary_on-brand',
+    'text-tertiary',
+    'text-tertiary_hover',
+    'text-tertiary_on-brand',
+    'text-quaternary',
+    'text-quaternary_on-brand'
+  ]
+}
+Resolving good: @fg-success-primary -> undefined
+Failed to resolve color property good: @fg-success-primary {
+  tokenName: 'fg-success-primary',
+  resolved: undefined,
+  availableTokens: [
+    'text-primary',
+    'text-primary_on-brand',
+    'text-secondary',
+    'text-secondary_hover',
+    'text-secondary_on-brand',
+    'text-tertiary',
+    'text-tertiary_hover',
+    'text-tertiary_on-brand',
+    'text-quaternary',
+    'text-quaternary_on-brand'
+  ]
+}
+Resolving neutral: @fg-warning-primary -> undefined
+Failed to resolve color property neutral: @fg-warning-primary {
+  tokenName: 'fg-warning-primary',
+  resolved: undefined,
+  availableTokens: [
+    'text-primary',
+    'text-primary_on-brand',
+    'text-secondary',
+    'text-secondary_hover',
+    'text-secondary_on-brand',
+    'text-tertiary',
+    'text-tertiary_hover',
+    'text-tertiary_on-brand',
+    'text-quaternary',
+    'text-quaternary_on-brand'
+  ]
+}
+Resolving center: @text-primary -> undefined
+Failed to resolve color property center: @text-primary {
+  tokenName: 'text-primary',
+  resolved: undefined,
+  availableTokens: [
+    'text-primary',
+    'text-primary_on-brand',
+    'text-secondary',
+    'text-secondary_hover',
+    'text-secondary_on-brand',
+    'text-tertiary',
+    'text-tertiary_hover',
+    'text-tertiary_on-brand',
+    'text-quaternary',
+    'text-quaternary_on-brand'
+  ]
+}
+Generated theme colors: {
+  background: '#FFFFFF',
+  backgroundLight: '#FFFFFF',
+  foreground: '#000000',
+  bad: '#000000',
+  good: '#000000',
+  neutral: '#000000'
+}
+ POST /api/generate-theme 200 in 692ms
+ GET /themes/builder 200 in 516ms

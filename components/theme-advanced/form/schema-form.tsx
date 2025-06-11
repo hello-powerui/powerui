@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { SchemaProperty } from '@/lib/theme-advanced/types/schema';
 import { SchemaLoader } from '@/lib/theme-advanced/services/schema-loader';
 import { PropertyInput } from './property-input';
@@ -8,6 +8,8 @@ import { AdvancedColorPicker } from './advanced-color-picker';
 import { CollapsibleSection } from '../ui/collapsible-section';
 import { Card } from '@/components/ui/card';
 import { FillControl, NumberControl, BooleanControl } from './controls';
+import { PropertyWithInheritance } from './property-with-inheritance';
+import { useThemeAdvancedStore } from '@/lib/stores/theme-advanced-store';
 
 interface SchemaFormProps {
   schema: SchemaProperty;
@@ -124,20 +126,33 @@ const isVisualPropertySection = (schema: SchemaProperty): boolean => {
          !schema.items.properties.$id; // Exclude state-based arrays
 };
 
-// Render visual properties following schema structure (allOf[1].properties only)
-const renderVisualProperties = (
-  schema: SchemaProperty,
-  value: any,
-  onChange: (value: any) => void,
-  schemaLoader: SchemaLoader,
-  path: string[],
-  level: number
-) => {
-  // For visual definitions, we want to process allOf[1].properties
-  // Skip commonCards (allOf[0]) and focus on visual-specific properties
+// Visual Properties Component - converted from function to component to properly use hooks
+const VisualPropertiesRenderer: React.FC<{
+  schema: SchemaProperty;
+  value: any;
+  onChange: (value: any) => void;
+  schemaLoader: SchemaLoader;
+  path: string[];
+  level: number;
+}> = ({ schema, value, onChange, schemaLoader, path, level }) => {
+  const [activeTab, setActiveTab] = useState<'specific' | 'general'>('specific');
+  // For visual definitions, we want to process both commonCards and visual-specific properties
+  let commonProperties: Record<string, SchemaProperty> = {};
   let visualProperties: Record<string, SchemaProperty> = {};
   
   if (schema.allOf && schema.allOf.length > 1) {
+    // Get common properties from allOf[0] (commonCards)
+    const commonSchema = schema.allOf[0];
+    if (commonSchema.$ref === '#/definitions/commonCards') {
+      // Resolve the commonCards reference
+      const resolvedCommon = schemaLoader.resolveRef(commonSchema.$ref);
+      if (resolvedCommon?.properties) {
+        commonProperties = resolvedCommon.properties;
+      }
+    } else if (commonSchema.properties) {
+      commonProperties = commonSchema.properties;
+    }
+    
     // Get visual-specific properties from allOf[1]
     const visualSchema = schema.allOf[1];
     if (visualSchema.properties) {
@@ -148,7 +163,23 @@ const renderVisualProperties = (
     visualProperties = schema.properties;
   }
   
-  const sections: { name: string; schema: SchemaProperty; title: string }[] = [];
+  const sections: { name: string; schema: SchemaProperty; title: string; isCommon?: boolean }[] = [];
+  
+  // Collect common property sections (from commonCards)
+  Object.entries(commonProperties).forEach(([propName, propSchema]) => {
+    // Skip the '*' property - we'll handle it separately
+    if (propName === '*') return;
+    
+    // Each property should be an array with items containing the actual form fields
+    if (propSchema.type === 'array' && propSchema.items?.type === 'object') {
+      sections.push({
+        name: propName,
+        schema: propSchema,
+        title: propSchema.title || formatGroupTitle(propName),
+        isCommon: true
+      });
+    }
+  });
   
   // Collect visual-specific property sections
   Object.entries(visualProperties).forEach(([propName, propSchema]) => {
@@ -160,7 +191,8 @@ const renderVisualProperties = (
       sections.push({
         name: propName,
         schema: propSchema,
-        title: propSchema.title || formatGroupTitle(propName)
+        title: propSchema.title || formatGroupTitle(propName),
+        isCommon: false
       });
     }
   });
@@ -168,6 +200,10 @@ const renderVisualProperties = (
   // Sort sections by importance for the visual type
   const importantSections = ['dataPoint', 'legend', 'categoryAxis', 'valueAxis', 'labels', 'plotArea'];
   const sortedSections = sections.sort((a, b) => {
+    // Common properties go last
+    if (a.isCommon && !b.isCommon) return 1;
+    if (!a.isCommon && b.isCommon) return -1;
+    
     const aIndex = importantSections.indexOf(a.name);
     const bIndex = importantSections.indexOf(b.name);
     
@@ -177,13 +213,187 @@ const renderVisualProperties = (
     return a.title.localeCompare(b.title);
   });
   
+  // Split sections by type
+  const specificSections = sortedSections.filter(s => !s.isCommon);
+  const generalSections = sortedSections.filter(s => s.isCommon);
+  
   return (
-    <div className="space-y-1">
-      {sortedSections.map(({ name, schema: sectionSchema, title }) => {
-        const isDefaultOpen = importantSections.slice(0, 3).includes(name);
-        // Get the value for this section - it should be an array with one object
-        const sectionValue = Array.isArray(value[name]) ? value[name] : [{}];
-        const itemValue = sectionValue.length > 0 ? sectionValue[0] : {};
+    <div className="space-y-4">
+      {/* Tab navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+          <button
+            onClick={() => setActiveTab('specific')}
+            className={`
+              whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm
+              ${activeTab === 'specific'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }
+            `}
+          >
+            Visual Properties
+            {specificSections.length > 0 && (
+              <span className="ml-2 text-xs text-gray-500">({specificSections.length})</span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('general')}
+            className={`
+              whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm
+              ${activeTab === 'general'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }
+            `}
+          >
+            General Properties
+            {generalSections.length > 0 && (
+              <span className="ml-2 text-xs text-gray-500">({generalSections.length})</span>
+            )}
+          </button>
+        </nav>
+      </div>
+      
+      {/* Tab content */}
+      <div className="mt-4">
+        {activeTab === 'specific' ? (
+          <div className="space-y-1">
+            {specificSections.length > 0 ? (
+              specificSections.map(({ name, schema: sectionSchema, title }) => {
+            const isDefaultOpen = false; // Changed: all sections start collapsed
+            // Get the value for this section - it should be an array with one object
+            const sectionValue = Array.isArray(value[name]) ? value[name] : [{}];
+            const itemValue = sectionValue.length > 0 ? sectionValue[0] : {};
+            
+            const handleSectionReset = () => {
+              // Reset the entire section to inherit from global/defaults
+              onChange({ ...value, [name]: undefined });
+            };
+            
+            return (
+              <CollapsibleSection
+                key={name}
+                id={`${path.join('-')}-${name}`}
+                title={title}
+                defaultOpen={isDefaultOpen}
+                headerAction={
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSectionReset();
+                    }}
+                    className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50"
+                  >
+                    Reset Section
+                  </button>
+                }
+              >
+                <div className="space-y-4">
+                  {/* Show state indicator if this section has state support */}
+                  {sectionSchema.items?.properties?.$id && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        State: {useThemeAdvancedStore.getState().selectedState || 'default'}
+                      </span>
+                      <span className="text-xs text-gray-500">This section uses the visual state selector</span>
+                    </div>
+                  )}
+                  
+                  {/* Check if this section has state support */}
+                  {sectionSchema.items?.properties?.$id ? (
+                    // This is a state-driven property - pass the entire schema
+                    <SchemaForm
+                      schema={sectionSchema}
+                      value={value[name]}
+                      onChange={(newValue) => {
+                        onChange({ ...value, [name]: newValue });
+                      }}
+                      schemaLoader={schemaLoader}
+                      path={[...path, name]}
+                      level={level + 1}
+                      hideTitle={true}
+                    />
+                  ) : (
+                    // Regular properties - render them individually
+                    sectionSchema.items?.properties && (
+                      <div className="space-y-4">
+                        {(() => {
+                          const hasShow = sectionSchema.items.properties.show !== undefined;
+                          const showValue = hasShow ? itemValue?.show ?? true : true;
+                          
+                          console.log(`Section "${name}" properties:`, Object.keys(sectionSchema.items.properties));
+                          const sorted = sortPropertiesWithShowFirst(sectionSchema.items.properties);
+                          console.log(`Sorted "${name}" properties:`, sorted.map(([name]) => name));
+                          return sorted
+                            .filter(([propName, propSchema]) => {
+                              // Filter out properties with complex/mixed types that are confusing
+                              if ((propName === 'end' || propName === 'start') && Array.isArray(propSchema.type)) {
+                                return false;
+                              }
+                              // Always show the 'show' property
+                              if (propName === 'show') return true;
+                              // Conditionally show other properties based on 'show' value
+                              if (hasShow && !showValue) return false;
+                              return true;
+                            })
+                            .map(([propName, propSchema]) => {
+                              // Add contextual title for known references
+                              let contextualTitle = propSchema.title || formatPropertyName(propName);
+                              if (propSchema.$ref) {
+                                const refName = propSchema.$ref.split('/').pop();
+                                if (refName === 'image' && !propSchema.title) {
+                                  contextualTitle = 'Image Settings';
+                                }
+                              }
+                              
+                              return (
+                                <SchemaForm
+                                  key={propName}
+                                  schema={{ ...propSchema, title: contextualTitle }}
+                                  value={itemValue[propName]}
+                                  onChange={(newValue) => {
+                                    const newItemValue = { ...itemValue, [propName]: newValue };
+                                    onChange({ ...value, [name]: [newItemValue] });
+                                  }}
+                                  schemaLoader={schemaLoader}
+                                  path={[...path, name, '0', propName]}
+                                  level={level + 2}
+                                  hideTitle={false}
+                                />
+                              );
+                            });
+                        })()}
+                      </div>
+                    )
+                  )}
+                </div>
+              </CollapsibleSection>
+            );
+          })
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-8">
+                No visual-specific properties available for this visual type.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {generalSections.length > 0 ? (
+              generalSections.map(({ name, schema: sectionSchema, title }) => {
+            const isDefaultOpen = false; // Changed: all sections start collapsed
+            // Get the value for this section - it should be an array with one object
+            const sectionValue = Array.isArray(value[name]) ? value[name] : [{}];
+            const itemValue = sectionValue.length > 0 ? sectionValue[0] : {};
+        
+        const handleSectionReset = () => {
+          // Reset the entire section to inherit from global/defaults
+          onChange({ ...value, [name]: undefined });
+        };
         
         return (
           <CollapsibleSection
@@ -191,48 +401,126 @@ const renderVisualProperties = (
             id={`${path.join('-')}-${name}`}
             title={title}
             defaultOpen={isDefaultOpen}
+            headerAction={
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSectionReset();
+                }}
+                className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50"
+              >
+                Reset Section
+              </button>
+            }
           >
             <div className="space-y-4">
-              {/* Render the properties from the items.properties */}
-              {sectionSchema.items?.properties && (
-                <div className="space-y-4">
-                  {Object.entries(sectionSchema.items.properties)
-                    .filter(([propName, propSchema]) => {
-                      // Filter out properties with complex/mixed types that are confusing
-                      // "end" property has type ["number", "string"] which is not well supported
-                      if (propName === 'end' && Array.isArray(propSchema.type)) {
-                        return false;
-                      }
-                      // Also filter out "start" for consistency
-                      if (propName === 'start' && Array.isArray(propSchema.type)) {
-                        return false;
-                      }
-                      return true;
-                    })
-                    .map(([propName, propSchema]) => (
-                      <SchemaForm
-                        key={propName}
-                        schema={{ ...propSchema, title: propSchema.title || formatPropertyName(propName) }}
-                        value={itemValue[propName]}
-                        onChange={(newValue) => {
-                          const newItemValue = { ...itemValue, [propName]: newValue };
-                          onChange({ ...value, [name]: [newItemValue] });
-                        }}
-                        schemaLoader={schemaLoader}
-                        path={[...path, name, '0', propName]}
-                        level={level + 2}
-                        hideTitle={false}
-                      />
-                    ))
-                  }
+              {/* Show state indicator if this section has state support */}
+              {sectionSchema.items?.properties?.$id && (
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    State: {useThemeAdvancedStore.getState().selectedState || 'default'}
+                  </span>
+                  <span className="text-xs text-gray-500">This section uses the visual state selector</span>
                 </div>
+              )}
+              
+              {/* Check if this section has state support */}
+              {sectionSchema.items?.properties?.$id ? (
+                // This is a state-driven property - pass the entire schema
+                <SchemaForm
+                  schema={sectionSchema}
+                  value={value[name]}
+                  onChange={(newValue) => {
+                    onChange({ ...value, [name]: newValue });
+                  }}
+                  schemaLoader={schemaLoader}
+                  path={[...path, name]}
+                  level={level + 1}
+                  hideTitle={true}
+                />
+              ) : (
+                // Regular properties - render them individually
+                sectionSchema.items?.properties && (
+                  <div className="space-y-4">
+                    {(() => {
+                      const hasShow = sectionSchema.items.properties.show !== undefined;
+                      const showValue = hasShow ? itemValue?.show ?? true : true;
+                      
+                      return sortPropertiesWithShowFirst(sectionSchema.items.properties)
+                        .filter(([propName, propSchema]) => {
+                          // Filter out properties with complex/mixed types that are confusing
+                          if ((propName === 'end' || propName === 'start') && Array.isArray(propSchema.type)) {
+                            return false;
+                          }
+                          // Always show the 'show' property
+                          if (propName === 'show') return true;
+                          // Conditionally show other properties based on 'show' value
+                          if (hasShow && !showValue) return false;
+                          return true;
+                        })
+                        .map(([propName, propSchema]) => {
+                          // Add contextual title for known references
+                          let contextualTitle = propSchema.title || formatPropertyName(propName);
+                          if (propSchema.$ref) {
+                            const refName = propSchema.$ref.split('/').pop();
+                            if (refName === 'image' && !propSchema.title) {
+                              contextualTitle = 'Image Settings';
+                            }
+                          }
+                          
+                          return (
+                            <SchemaForm
+                              key={propName}
+                              schema={{ ...propSchema, title: contextualTitle }}
+                              value={itemValue[propName]}
+                              onChange={(newValue) => {
+                                const newItemValue = { ...itemValue, [propName]: newValue };
+                                onChange({ ...value, [name]: [newItemValue] });
+                              }}
+                              schemaLoader={schemaLoader}
+                              path={[...path, name, '0', propName]}
+                              level={level + 2}
+                              hideTitle={false}
+                            />
+                          );
+                        });
+                    })()}
+                  </div>
+                )
               )}
             </div>
           </CollapsibleSection>
-        );
-      })}
+            );
+          })
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-8">
+                No general properties available for this visual type.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
+};
+
+// Helper to check if a property should be conditionally shown
+const hasShowProperty = (properties: Record<string, SchemaProperty> | undefined): boolean => {
+  return properties?.show !== undefined;
+};
+
+// Helper to sort properties with 'show' first
+const sortPropertiesWithShowFirst = (properties: Record<string, SchemaProperty>): Array<[string, SchemaProperty]> => {
+  const entries = Object.entries(properties);
+  return entries.sort(([nameA], [nameB]) => {
+    if (nameA === 'show') return -1;
+    if (nameB === 'show') return 1;
+    return 0;
+  });
 };
 
 // Render property fields (from array items)
@@ -244,22 +532,63 @@ const renderPropertyFields = (
   path: string[],
   level: number
 ) => {
+  const hasShow = hasShowProperty(schema.properties);
+  const showValue = hasShow ? value?.show ?? true : true;
+  const sortedProperties = sortPropertiesWithShowFirst(schema.properties || {});
+
   return (
     <div className="space-y-4">
-      {Object.entries(schema.properties || {}).map(([fieldName, fieldSchema]) => (
-        <SchemaForm
-          key={fieldName}
-          schema={{ ...fieldSchema, title: fieldSchema.title || formatPropertyName(fieldName) }}
-          value={value[fieldName]}
-          onChange={(newValue) => {
-            onChange({ ...value, [fieldName]: newValue });
-          }}
-          schemaLoader={schemaLoader}
-          path={[...path, fieldName]}
-          level={level + 1}
-          hideTitle={false}
-        />
-      ))}
+      {sortedProperties.map(([fieldName, fieldSchema]) => {
+        // Always show the 'show' property
+        if (fieldName === 'show') {
+          return (
+            <SchemaForm
+              key={fieldName}
+              schema={{ ...fieldSchema, title: fieldSchema.title || 'Show' }}
+              value={value[fieldName]}
+              onChange={(newValue) => {
+                onChange({ ...value, [fieldName]: newValue });
+              }}
+              schemaLoader={schemaLoader}
+              path={[...path, fieldName]}
+              level={level + 1}
+              hideTitle={false}
+            />
+          );
+        }
+
+        // Conditionally show other properties based on 'show' value
+        if (hasShow && !showValue) {
+          return null;
+        }
+
+        // Check if this is a referenced object that needs context
+        let contextualTitle = fieldSchema.title || formatPropertyName(fieldName);
+        if (fieldSchema.$ref) {
+          // Add context for known references
+          const refName = fieldSchema.$ref.split('/').pop();
+          if (refName === 'image' && !fieldSchema.title) {
+            contextualTitle = 'Image Settings';
+          } else if (refName === 'fill' && fieldName === 'fillColor') {
+            contextualTitle = 'Fill Color';
+          }
+        }
+
+        return (
+          <SchemaForm
+            key={fieldName}
+            schema={{ ...fieldSchema, title: contextualTitle }}
+            value={value[fieldName]}
+            onChange={(newValue) => {
+              onChange({ ...value, [fieldName]: newValue });
+            }}
+            schemaLoader={schemaLoader}
+            path={[...path, fieldName]}
+            level={level + 1}
+            hideTitle={false}
+          />
+        );
+      })}
     </div>
   );
 };
@@ -273,22 +602,60 @@ const renderDefaultObject = (
   path: string[],
   level: number
 ) => {
+  const hasShow = hasShowProperty(schema.properties);
+  const showValue = hasShow ? value?.show ?? true : true;
+  const sortedProperties = sortPropertiesWithShowFirst(schema.properties || {});
+
   return (
     <div className="space-y-4">
-      {Object.entries(schema.properties || {}).map(([propName, propSchema]) => (
-        <SchemaForm
-          key={propName}
-          schema={{ ...propSchema, title: propSchema.title || formatPropertyName(propName) }}
-          value={value[propName]}
-          onChange={(newValue) => {
-            onChange({ ...value, [propName]: newValue });
-          }}
-          schemaLoader={schemaLoader}
-          path={[...path, propName]}
-          level={level + 1}
-          hideTitle={false}
-        />
-      ))}
+      {sortedProperties.map(([propName, propSchema]) => {
+        // Always show the 'show' property
+        if (propName === 'show') {
+          return (
+            <SchemaForm
+              key={propName}
+              schema={{ ...propSchema, title: propSchema.title || 'Show' }}
+              value={value[propName]}
+              onChange={(newValue) => {
+                onChange({ ...value, [propName]: newValue });
+              }}
+              schemaLoader={schemaLoader}
+              path={[...path, propName]}
+              level={level + 1}
+              hideTitle={false}
+            />
+          );
+        }
+
+        // Conditionally show other properties based on 'show' value
+        if (hasShow && !showValue) {
+          return null;
+        }
+
+        // Check if this is a referenced object that needs context
+        let contextualTitle = propSchema.title || formatPropertyName(propName);
+        if (propSchema.$ref) {
+          const refName = propSchema.$ref.split('/').pop();
+          if (refName === 'image' && !propSchema.title) {
+            contextualTitle = 'Image Settings';
+          }
+        }
+
+        return (
+          <SchemaForm
+            key={propName}
+            schema={{ ...propSchema, title: contextualTitle }}
+            value={value[propName]}
+            onChange={(newValue) => {
+              onChange({ ...value, [propName]: newValue });
+            }}
+            schemaLoader={schemaLoader}
+            path={[...path, propName]}
+            level={level + 1}
+            hideTitle={false}
+          />
+        );
+      })}
     </div>
   );
 };
@@ -307,6 +674,13 @@ export function SchemaForm({
     onChange(newValue);
   }, [onChange]);
 
+  // Get context from store to determine if we should show inheritance
+  const { selectedVisual, selectedVariant, selectedState } = useThemeAdvancedStore();
+  
+  // Check if we're in a visual context (editing visual properties)
+  const isVisualContext = path.length > 0 && (path[0] === 'visualStyles' || path.includes('*'));
+  const shouldShowInheritance = isVisualContext && selectedVisual && selectedVisual !== '*';
+
 
   // Handle visual style wrapper (e.g., { properties: { "*": { "$ref": "#/definitions/visual-lineChart" } } })
   if (schema.type === 'object' && schema.properties?.['*'] && Object.keys(schema.properties).length === 1) {
@@ -317,20 +691,22 @@ export function SchemaForm({
         // Check if this is a visual definition with allOf
         if (resolvedSchema.allOf && resolvedSchema.allOf.length > 1) {
           // Render visual properties directly
-          return renderVisualProperties(
-            resolvedSchema, 
-            value['*'] || value || {}, 
-            (newValue) => {
-              // When updating, wrap in the * property if needed
-              if (path.length >= 2 && path[0] === 'visualStyles') {
-                handleChange({ '*': newValue });
-              } else {
-                handleChange(newValue);
-              }
-            }, 
-            schemaLoader, 
-            [...path, '*'], 
-            level
+          return (
+            <VisualPropertiesRenderer
+              schema={resolvedSchema}
+              value={value['*'] || value || {}}
+              onChange={(newValue) => {
+                // When updating, wrap in the * property if needed
+                if (path.length >= 2 && path[0] === 'visualStyles') {
+                  handleChange({ '*': newValue });
+                } else {
+                  handleChange(newValue);
+                }
+              }}
+              schemaLoader={schemaLoader}
+              path={[...path, '*']}
+              level={level}
+            />
           );
         } else {
           // Not a visual definition, render normally
@@ -380,12 +756,36 @@ export function SchemaForm({
       return <div className="text-red-500 text-sm">Unable to resolve reference: {schema.$ref}</div>;
     }
     
+    // Check if this is an image reference that needs special handling
+    const refName = schema.$ref.split('/').pop();
+    const isImageRef = refName === 'image';
+    
     // Merge title and description from the reference
     const mergedSchema = {
       ...resolvedSchema,
-      title: schema.title || resolvedSchema.title,
+      title: schema.title || (isImageRef && !schema.title ? 'Image Settings' : resolvedSchema.title),
       description: schema.description || resolvedSchema.description,
     };
+    
+    // If this is an image object, wrap it in a card for better visual grouping
+    if (isImageRef && resolvedSchema.properties?.name && resolvedSchema.properties?.url) {
+      return (
+        <Card className="p-4 border-l-4 border-l-blue-500">
+          <div className="space-y-4">
+            <h5 className="text-sm font-medium text-gray-700 mb-3">Image Settings</h5>
+            <SchemaForm
+              schema={mergedSchema}
+              value={value}
+              onChange={handleChange}
+              schemaLoader={schemaLoader}
+              path={path}
+              level={level}
+              hideTitle={true}
+            />
+          </div>
+        </Card>
+      );
+    }
     
     return (
       <SchemaForm
@@ -584,20 +984,133 @@ export function SchemaForm({
   // Handle property section arrays (Power BI schema pattern)
   if (schema.type === 'array' && schema.items?.type === 'object' && schema.items.properties) {
     const arrayValue = Array.isArray(value) ? value : [{}];
-    const itemValue = arrayValue.length > 0 ? arrayValue[0] : {};
     
-    // Property sections in Power BI are single-item arrays containing configuration objects
-    return (
-      <SchemaForm
-        schema={schema.items}
-        value={itemValue}
-        onChange={(newItemValue) => handleChange([newItemValue])}
-        schemaLoader={schemaLoader}
-        path={path}
-        level={level}
-        hideTitle={hideTitle}
-      />
-    );
+    // Check if this is a state-driven property (has $id field)
+    const hasStateSupport = schema.items.properties.$id !== undefined;
+    
+    if (hasStateSupport) {
+      // Handle state-driven properties using global state from store
+      const globalSelectedState = useThemeAdvancedStore.getState().selectedState || 'default';
+      
+      // Normalize array to ensure all items have $id
+      const normalizedArray = arrayValue.map(item => {
+        if (!item.$id) {
+          return { ...item, $id: 'default' };
+        }
+        return item;
+      });
+      
+      // Get or create the item for the selected state
+      let stateItem = normalizedArray.find(item => item.$id === globalSelectedState);
+      if (!stateItem) {
+        stateItem = { $id: globalSelectedState };
+      }
+      
+      const handleStateItemChange = (updates: any) => {
+        // Ensure we always have $id field for all items
+        const normalizedArray = arrayValue.map(item => {
+          // Add $id: 'default' to items without $id
+          if (!item.$id) {
+            return { ...item, $id: 'default' };
+          }
+          return item;
+        });
+        
+        // Update or add the item for the current state
+        const existingIndex = normalizedArray.findIndex(item => item.$id === globalSelectedState);
+        
+        if (existingIndex >= 0) {
+          // Update existing item
+          normalizedArray[existingIndex] = { 
+            ...normalizedArray[existingIndex], 
+            ...updates, 
+            $id: globalSelectedState 
+          };
+        } else {
+          // Add new item for this state
+          normalizedArray.push({ ...updates, $id: globalSelectedState });
+        }
+        
+        handleChange(normalizedArray);
+      };
+      
+      return (
+        <div className="space-y-4">
+          {!hideTitle && schema.title && (
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-medium text-gray-700">{schema.title}</h4>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                State: {globalSelectedState}
+              </span>
+            </div>
+          )}
+          {schema.description && (
+            <p className="text-xs text-gray-500">{schema.description}</p>
+          )}
+          
+          <div className="space-y-4">
+            {(() => {
+              const hasShow = schema.items.properties.show !== undefined;
+              const showValue = hasShow ? stateItem?.show ?? true : true;
+              
+              console.log(`State-driven section properties:`, Object.keys(schema.items.properties));
+              const sorted = sortPropertiesWithShowFirst(schema.items.properties);
+              console.log(`Sorted state-driven properties:`, sorted.map(([name]) => name));
+              
+              return sorted
+                .filter(([propName]) => propName !== '$id')
+                .filter(([propName]) => {
+                  // Always show the 'show' property
+                  if (propName === 'show') return true;
+                  // Conditionally show other properties based on 'show' value
+                  if (hasShow && !showValue) return false;
+                  return true;
+                })
+                .map(([propName, propSchema]) => {
+                  // Add contextual title for known references
+                  let contextualTitle = propSchema.title || formatPropertyName(propName);
+                  if (propSchema.$ref) {
+                    const refName = propSchema.$ref.split('/').pop();
+                    if (refName === 'image' && !propSchema.title) {
+                      contextualTitle = 'Image Settings';
+                    }
+                  }
+                  
+                  return (
+                    <SchemaForm
+                      key={`${globalSelectedState}-${propName}`}
+                      schema={{ ...propSchema, title: contextualTitle }}
+                      value={stateItem[propName]}
+                      onChange={(newValue) => {
+                        handleStateItemChange({ [propName]: newValue });
+                      }}
+                      schemaLoader={schemaLoader}
+                      path={[...path, globalSelectedState, propName]}
+                      level={level + 1}
+                      hideTitle={false}
+                    />
+                  );
+                });
+            })()}
+          </div>
+        </div>
+      );
+    } else {
+      // Non-state-driven property sections (single-item arrays)
+      const itemValue = arrayValue.length > 0 ? arrayValue[0] : {};
+      
+      return (
+        <SchemaForm
+          schema={schema.items}
+          value={itemValue}
+          onChange={(newItemValue) => handleChange([newItemValue])}
+          schemaLoader={schemaLoader}
+          path={path}
+          level={level}
+          hideTitle={hideTitle}
+        />
+      );
+    }
   }
 
   // Handle true multi-item arrays (not property sections)
@@ -675,7 +1188,16 @@ export function SchemaForm({
         // Check if the resolved schema has allOf with visual properties
         if (resolvedVisualSchema.allOf && resolvedVisualSchema.allOf.length > 1) {
           // This is a visual definition - render the visual properties
-          return renderVisualProperties(resolvedVisualSchema, starValue, (newValue) => handleChange({ ...objectValue, '*': newValue }), schemaLoader, [...path, '*'], level + 1);
+          return (
+            <VisualPropertiesRenderer
+              schema={resolvedVisualSchema}
+              value={starValue}
+              onChange={(newValue) => handleChange({ ...objectValue, '*': newValue })}
+              schemaLoader={schemaLoader}
+              path={[...path, '*']}
+              level={level + 1}
+            />
+          );
         } else {
           return (
             <SchemaForm
@@ -705,15 +1227,44 @@ export function SchemaForm({
     
     if (hasVisualAllOf) {
       // Render visual properties using schema-defined sections
-      return renderVisualProperties(schema, objectValue, handleChange, schemaLoader, path, level);
+      return (
+        <VisualPropertiesRenderer
+          schema={schema}
+          value={objectValue}
+          onChange={handleChange}
+          schemaLoader={schemaLoader}
+          path={path}
+          level={level}
+        />
+      );
     }
     
     // Check if this is a property section (array items with properties)
     const isPropertySection = path.length >= 2 && level >= 2;
     
+    // Check if this object needs special visual grouping (like image properties)
+    const needsVisualGrouping = schema.properties && (
+      (schema.properties.name && schema.properties.url) || // Image object
+      (schema.required?.includes('name') && schema.required?.includes('url'))
+    );
+    
     if (isPropertySection) {
       // Render individual property fields inline
       return renderPropertyFields(schema, objectValue, handleChange, schemaLoader, path, level);
+    }
+    
+    // If this needs visual grouping, wrap in a card
+    if (needsVisualGrouping && !hideTitle) {
+      return (
+        <Card className="p-4 border-l-4 border-l-blue-500">
+          <div className="space-y-4">
+            {schema.title && (
+              <h5 className="text-sm font-medium text-gray-700 mb-3">{schema.title}</h5>
+            )}
+            {renderDefaultObject(schema, objectValue, handleChange, schemaLoader, path, level)}
+          </div>
+        </Card>
+      );
     }
     
     // Default object rendering for other cases
@@ -790,6 +1341,29 @@ export function SchemaForm({
     const isPercentage = schema.title?.toLowerCase().includes('transparency') ||
                         schema.minimum === 0 && schema.maximum === 1;
     
+    // Use inheritance wrapper in visual context
+    if (shouldShowInheritance && path.length > 0) {
+      // Extract the property path relative to the visual section
+      // Path might be like: ['*', 'categoryAxis', '0', 'fontSize']
+      // We want just ['fontSize'] for the property lookup
+      const propertyPath = path.filter((segment, index) => {
+        // Skip array indices and wildcard segments
+        return segment !== '*' && segment !== '0' && !(/^\d+$/.test(segment));
+      });
+      
+      return (
+        <PropertyWithInheritance
+          propertyName={path[path.length - 1]}
+          propertyPath={propertyPath}
+          value={value}
+          onChange={handleChange}
+          schema={schema}
+          visualType={selectedVisual}
+          variant={selectedVariant}
+        />
+      );
+    }
+    
     return (
       <NumberControl
         label={schema.title || ''}
@@ -806,6 +1380,29 @@ export function SchemaForm({
   }
 
   if (schema.type === 'boolean') {
+    // Use inheritance wrapper in visual context
+    if (shouldShowInheritance && path.length > 0) {
+      // Extract the property path relative to the visual section
+      // Path might be like: ['*', 'categoryAxis', '0', 'fontSize']
+      // We want just ['fontSize'] for the property lookup
+      const propertyPath = path.filter((segment, index) => {
+        // Skip array indices and wildcard segments
+        return segment !== '*' && segment !== '0' && !(/^\d+$/.test(segment));
+      });
+      
+      return (
+        <PropertyWithInheritance
+          propertyName={path[path.length - 1]}
+          propertyPath={propertyPath}
+          value={value}
+          onChange={handleChange}
+          schema={schema}
+          visualType={selectedVisual}
+          variant={selectedVariant}
+        />
+      );
+    }
+    
     return (
       <BooleanControl
         label={schema.title || ''}

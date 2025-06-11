@@ -105,12 +105,22 @@ export function replaceTokens(obj: any, tokenResolver: (token: string) => any): 
     } else {
       const result: any = {};
       for (const [key, value] of Object.entries(obj)) {
-        result[key] = replaceTokens(value, tokenResolver);
+        const replaced = replaceTokens(value, tokenResolver);
+        // Only add the property if it's not undefined
+        if (replaced !== undefined) {
+          result[key] = replaced;
+        }
       }
       return result;
     }
   } else if (typeof obj === 'string' && obj.startsWith('@')) {
-    return tokenResolver(obj.slice(1));
+    const resolved = tokenResolver(obj.slice(1));
+    // If the resolver returns undefined or another token, return undefined
+    // This will cause the property to be omitted from the result
+    if (resolved === undefined || (typeof resolved === 'string' && resolved.startsWith('@'))) {
+      return undefined;
+    }
+    return resolved;
   }
   return obj;
 }

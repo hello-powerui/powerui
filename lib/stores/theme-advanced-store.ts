@@ -17,7 +17,8 @@ interface ThemeAdvancedState {
   selectedStyle: string;
   selectedVariant: string;
   selectedProperty: string;
-  selectedSection: 'properties' | 'visuals' | 'globalSettings';
+  selectedSection: 'properties' | 'visuals' | 'global';
+  selectedState: string; // For state-driven properties (default, hover, selected, etc.)
   expandedPanels: string[];
   isDirty: boolean;
   isSaving: boolean;
@@ -37,7 +38,8 @@ interface ThemeAdvancedState {
   setSelectedStyle: (style: string) => void;
   setSelectedVariant: (variant: string) => void;
   setSelectedProperty: (property: string) => void;
-  setSelectedSection: (section: 'properties' | 'visuals' | 'globalSettings') => void;
+  setSelectedSection: (section: 'properties' | 'visuals' | 'global') => void;
+  setSelectedState: (state: string) => void;
   togglePanel: (panelId: string) => void;
   
   // Variant management
@@ -92,6 +94,7 @@ export const useThemeAdvancedStore = create<ThemeAdvancedState>()(
       selectedVariant: '*',
       selectedProperty: '',
       selectedSection: 'properties',
+      selectedState: 'default',
       expandedPanels: [],
       isDirty: false,
       isSaving: false,
@@ -162,6 +165,7 @@ export const useThemeAdvancedStore = create<ThemeAdvancedState>()(
       setSelectedVariant: (variant) => set({ selectedVariant: variant }),
       setSelectedProperty: (property) => set({ selectedProperty: property }),
       setSelectedSection: (section) => set({ selectedSection: section }),
+      setSelectedState: (state) => set({ selectedState: state }),
       
       togglePanel: (panelId) => {
         set((state) => ({
@@ -319,6 +323,8 @@ export const useThemeAdvancedStore = create<ThemeAdvancedState>()(
           selectedVariant: '*',
           selectedProperty: '',
           selectedSection: 'properties',
+          selectedState: 'default',
+          selectedState: 'default',
           expandedPanels: [],
           isDirty: false,
           validationErrors: [],

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useThemeBuilderStore } from '@/lib/stores/theme-builder-store';
 import { ModernThemeBuilderCollapsible } from '@/components/theme-builder/ModernThemeBuilderCollapsible';
 import { PreviewDashboard } from '@/components/theme-builder/PreviewDashboard';
+import { PowerBIPreview } from '@/components/theme-builder/PowerBIPreview';
 import { ThemeActions } from '@/components/theme-builder/ThemeActions';
 import './theme-preview.css';
 import '@/components/theme-builder/preview-powerbi.css';
@@ -30,6 +31,7 @@ export default function ThemeBuilderPage() {
   const [generatedTheme, setGeneratedTheme] = useState<any>(null);
   const [themeId, setThemeId] = useState<string | null>(null);
   const [themeDescription, setThemeDescription] = useState<string>('');
+  const [previewMode, setPreviewMode] = useState<'mock' | 'embedded'>('mock');
 
   // Load theme data from URL params
   useEffect(() => {
@@ -142,12 +144,43 @@ export default function ThemeBuilderPage() {
                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Updating...</span>
                     )}
                   </div>
+                  
+                  {/* Preview Mode Toggle */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">Preview Mode:</span>
+                    <div className="flex rounded-md shadow-sm">
+                      <button
+                        onClick={() => setPreviewMode('mock')}
+                        className={`px-3 py-1 text-xs font-medium rounded-l-md border ${
+                          previewMode === 'mock'
+                            ? 'bg-gray-900 text-white border-gray-900'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        Mock
+                      </button>
+                      <button
+                        onClick={() => setPreviewMode('embedded')}
+                        className={`px-3 py-1 text-xs font-medium rounded-r-md border-t border-r border-b ${
+                          previewMode === 'embedded'
+                            ? 'bg-gray-900 text-white border-gray-900'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        Power BI
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Preview Container */}
               <div>
-                <PreviewDashboard />
+                {previewMode === 'mock' ? (
+                  <PreviewDashboard />
+                ) : (
+                  <PowerBIPreview generatedTheme={generatedTheme} />
+                )}
               </div>
             </div>
           </div>

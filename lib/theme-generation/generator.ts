@@ -91,7 +91,8 @@ export class ThemeGenerator {
       return null;
     }
 
-    const [palette, shade] = tokenMappings[token].split('-');
+    const paletteRef = tokenMappings[token];
+    const [palette, shade] = paletteRef.split('-');
     const paletteMapping = this.createPaletteMapping(neutralPalette);
     
     if (palette in paletteMapping) {
@@ -207,12 +208,16 @@ export class ThemeGenerator {
         return `@${token}`;
       }
 
-      console.warn(`Unresolved token: ${token}`);
+      // Only warn for truly unresolved tokens, not those we expect to resolve later
+      if (!token.startsWith('text-') && !token.startsWith('fg-')) {
+        console.warn(`Unresolved token: ${token}`);
+      }
       return `@${token}`;
     };
 
     // Start with base theme
     const theme = JSON.parse(JSON.stringify(this.configs.theme));
+    
 
     // Apply container style
     if (data.bgStyle) {
@@ -237,6 +242,56 @@ export class ThemeGenerator {
 
     // Resolve all tokens
     const finalTheme = replaceTokens(theme, resolveToken);
+    
+
+    // Ensure critical color properties are resolved
+    const criticalColors = [
+      'background', 'backgroundLight', 'backgroundNeutral',
+      'foreground', 'foregroundNeutralSecondary', 'foregroundNeutralTertiary',
+      'bad', 'good', 'neutral', 'center'
+    ];
+    
+    // Re-add critical colors from base theme and resolve them
+    for (const colorProp of criticalColors) {
+      if (colorProp in this.configs.theme) {
+        const baseValue = this.configs.theme[colorProp];
+        if (typeof baseValue === 'string' && baseValue.startsWith('@')) {
+          const tokenName = baseValue.slice(1);
+          
+          // Try to resolve the token directly from tokenMappings first
+          let resolved: any = null;
+          
+          // Check if it's in tokenMappings
+          if (tokenMappings && tokenName in tokenMappings) {
+            const paletteRef = tokenMappings[tokenName];
+            const [palette, shade] = paletteRef.split('-');
+            const paletteMapping = this.createPaletteMapping(neutralPalette);
+            
+            if (palette in paletteMapping && shade in paletteMapping[palette]) {
+              resolved = paletteMapping[palette][shade];
+            }
+          }
+          
+          // If not resolved, try the general resolver
+          if (!resolved) {
+            resolved = resolveToken(tokenName);
+          }
+          
+          if (resolved && typeof resolved === 'string' && !resolved.startsWith('@')) {
+            finalTheme[colorProp] = resolved;
+          } else {
+            // Set mode-appropriate fallback colors
+            if (mode === 'dark') {
+              finalTheme[colorProp] = colorProp.includes('background') ? '#1E1E1E' : '#FFFFFF';
+            } else {
+              finalTheme[colorProp] = colorProp.includes('background') ? '#FFFFFF' : '#000000';
+            }
+          }
+        } else {
+          finalTheme[colorProp] = baseValue;
+        }
+      }
+    }
 
     // Add icons if available
     if (this.configs.icons && mode in this.configs.icons) {

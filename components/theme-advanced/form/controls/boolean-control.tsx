@@ -9,6 +9,8 @@ interface BooleanControlProps {
   description?: string;
   required?: boolean;
   path: string[];
+  inheritanceIndicator?: React.ReactNode;
+  onReset?: () => void;
 }
 
 export function BooleanControl({
@@ -18,6 +20,8 @@ export function BooleanControl({
   description,
   required,
   path,
+  inheritanceIndicator,
+  onReset,
 }: BooleanControlProps) {
   return (
     <div className="space-y-2">
@@ -29,9 +33,20 @@ export function BooleanControl({
           {required && (
             <span className="text-xs text-red-500">*</span>
           )}
+          {inheritanceIndicator}
         </div>
         
-        <button
+        <div className="flex items-center gap-2">
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="text-xs text-blue-600 hover:text-blue-800 mr-2"
+            >
+              Reset
+            </button>
+          )}
+          <button
           id={path.join('-')}
           type="button"
           role="switch"
@@ -48,7 +63,8 @@ export function BooleanControl({
               ${value ? 'translate-x-6' : 'translate-x-1'}
             `}
           />
-        </button>
+          </button>
+        </div>
       </div>
 
       {description && (
