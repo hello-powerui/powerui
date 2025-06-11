@@ -123,7 +123,7 @@ export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbe
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-[600px] bg-red-50">
+      <div className="flex items-center justify-center h-full bg-red-50">
         <div className="text-center max-w-md">
           <div className="text-red-600 mb-4">
             <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,7 +138,7 @@ export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbe
   }
 
   return (
-    <div className="relative h-[600px] bg-gray-50">
+    <div className="relative h-full bg-gray-50">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
           <div className="text-center">
@@ -147,7 +147,7 @@ export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbe
           </div>
         </div>
       )}
-      <div ref={containerRef} className="w-full h-full" />
+      <div ref={containerRef} className="w-full h-full" style={{ minHeight: '100%' }} />
     </div>
   );
 }

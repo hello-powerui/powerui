@@ -12,6 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useThemeBuilderStore } from '@/lib/stores/theme-builder-store';
 import { usePaletteStore } from '@/lib/stores/palette-store';
 import { useThemeAdvancedStore } from '@/lib/stores/theme-advanced-store';
@@ -31,16 +37,57 @@ import {
   Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { VisualStylesPanel } from '@/components/theme-studio/VisualStylesPanel';
+import { SchemaLoader } from '@/lib/theme-advanced/services/schema-loader';
+import { SchemaForm } from '@/components/theme-advanced/form/schema-form';
+import { ImportThemeModal } from '@/components/theme-advanced/ui/import-theme-modal';
+
+// Icons
+const BackIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+  </svg>
+);
+
+const PropertyIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+  </svg>
+);
+
+const VisualIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+  </svg>
+);
+
+const GlobalIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
 
 export default function UnifiedThemeStudio() {
   const router = useRouter();
-  const [selectedVisual, setSelectedVisual] = useState<string>('*');
+  const [selectedVisual, setSelectedVisual] = useState<string>('');
   const [showPaletteManager, setShowPaletteManager] = useState(false);
   const [showNeutralPaletteManager, setShowNeutralPaletteManager] = useState(false);
   const [showNeutralPreview, setShowNeutralPreview] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [visualSettings, setVisualSettings] = useState<Record<string, any>>({});
   const [generatedTheme, setGeneratedTheme] = useState<any>(null);
+  const [themeName, setThemeName] = useState('My Power BI Theme');
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Advanced editor states
+  const [selectedSection, setSelectedSection] = useState<'global' | 'properties' | 'visuals'>('visuals');
+  const [selectedProperty, setSelectedProperty] = useState<string>('');
+  const [schemaLoader] = useState(() => SchemaLoader.getInstance());
+  const hasStateDrivenProperties = selectedVisual && schemaLoader.visualHasStateDrivenProperties(selectedVisual);
+  const [schemaLoaded, setSchemaLoaded] = useState(false);
+  const [visualTypes, setVisualTypes] = useState<string[]>([]);
+  const [topLevelProperties, setTopLevelProperties] = useState<string[]>([]);
+  const [showVariantDialog, setShowVariantDialog] = useState(false);
+  const [newVariantName, setNewVariantName] = useState('');
   
   // Sidebar states
   const [showFoundation, setShowFoundation] = useState(true);
@@ -59,15 +106,34 @@ export default function UnifiedThemeStudio() {
     generateAndSaveTheme
   } = useThemeBuilderStore();
   
-  const { palettes, neutralPalettes } = usePaletteStore();
+  // const { palettes, neutralPalettes } = usePaletteStore();
   const { 
-    theme: advancedTheme, 
+    currentTheme: advancedTheme, 
     setTheme: setAdvancedTheme,
     selectedState,
     setSelectedState,
     selectedVariant,
-    setSelectedVariant
+    setSelectedVariant,
+    updateThemeProperty,
+    getVisualVariants,
+    createVariant,
+    deleteVariant
   } = useThemeAdvancedStore();
+  
+  // Load schema on mount
+  useEffect(() => {
+    const loadSchema = async () => {
+      try {
+        await schemaLoader.loadSchema();
+        setVisualTypes(schemaLoader.getVisualTypes());
+        setTopLevelProperties(schemaLoader.getTopLevelProperties());
+        setSchemaLoaded(true);
+      } catch (error) {
+        console.error('Failed to load schema:', error);
+      }
+    };
+    loadSchema();
+  }, [schemaLoader]);
 
   // Generate theme whenever foundation or visual settings change
   useEffect(() => {
@@ -86,50 +152,30 @@ export default function UnifiedThemeStudio() {
     generateTheme(themeInput).then(setGeneratedTheme);
   }, [theme, visualSettings]);
 
-  // Visual types available in Power BI
-  const visualTypes = [
-    { value: '*', label: 'All Visuals' },
-    { value: 'barChart', label: 'Bar Chart' },
-    { value: 'columnChart', label: 'Column Chart' },
-    { value: 'lineChart', label: 'Line Chart' },
-    { value: 'pieChart', label: 'Pie Chart' },
-    { value: 'donutChart', label: 'Donut Chart' },
-    { value: 'areaChart', label: 'Area Chart' },
-    { value: 'scatterChart', label: 'Scatter Chart' },
-    { value: 'waterfallChart', label: 'Waterfall Chart' },
-    { value: 'treemap', label: 'Treemap' },
-    { value: 'map', label: 'Map' },
-    { value: 'filledMap', label: 'Filled Map' },
-    { value: 'card', label: 'Card' },
-    { value: 'multiRowCard', label: 'Multi-Row Card' },
-    { value: 'kpi', label: 'KPI' },
-    { value: 'gauge', label: 'Gauge' },
-    { value: 'slicer', label: 'Slicer' },
-    { value: 'tableEx', label: 'Table' },
-    { value: 'pivotTable', label: 'Pivot Table' },
-    { value: 'matrix', label: 'Matrix' },
-  ];
-
   const handleSave = async () => {
+    setIsSaving(true);
     try {
       // Save the theme with visual customizations
       const themeData = {
         ...theme,
+        name: themeName,
         visualStyles: visualSettings
       };
       
       // TODO: Implement save functionality that includes visual settings
-      await generateAndSaveTheme('Unified Theme');
+      await generateAndSaveTheme(themeName);
       toast.success('Theme saved successfully');
     } catch (error) {
       toast.error('Failed to save theme');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleExport = async () => {
     try {
       const themeInput = {
-        name: theme.name,
+        name: themeName,
         mode: theme.mode,
         dataColors: theme.palette.colors,
         neutralPalette: theme.neutralPalette.shades,
@@ -147,7 +193,7 @@ export default function UnifiedThemeStudio() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'power-bi-theme.json';
+      a.download = `${themeName.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success('Theme exported successfully');
@@ -157,9 +203,69 @@ export default function UnifiedThemeStudio() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
-      {/* Foundation Sidebar */}
-      <div className={cn(
+    <div className="flex flex-col h-screen">
+      {/* Header - similar to theme builder */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-full px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Left side: Back button and theme name */}
+            <div className="flex items-center">
+              <button
+                onClick={() => router.push('/themes')}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                aria-label="Back to themes"
+              >
+                <BackIcon />
+              </button>
+              <div className="ml-3 pl-3 border-l border-gray-200">
+                <input
+                  type="text"
+                  value={themeName}
+                  onChange={(e) => setThemeName(e.target.value)}
+                  className="text-lg font-medium bg-transparent border-none outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-2 py-1 rounded"
+                  placeholder="Untitled Theme"
+                />
+              </div>
+            </div>
+            
+            {/* Right side: Actions */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowImportModal(true)}
+                className="px-3 py-1.5 text-gray-600 bg-white border border-gray-200 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-1.5 text-sm font-medium"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                Import
+              </button>
+              <button
+                onClick={handleExport}
+                className="px-3 py-1.5 text-gray-600 bg-white border border-gray-200 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-1.5 text-sm font-medium"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-3 py-1.5 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors flex items-center gap-1.5 text-sm font-medium disabled:opacity-50"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                {isSaving ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Foundation Sidebar */}
+        <div className={cn(
         "border-r bg-muted/10 transition-all duration-300",
         showFoundation ? "w-96" : "w-12"
       )}>
@@ -182,27 +288,40 @@ export default function UnifiedThemeStudio() {
               </div>
               
               {/* Data Colors */}
-              <div className="space-y-2">
-                <Label>Data Colors</Label>
-                <Card 
-                  className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => setShowPaletteManager(true)}
-                >
-                  <div className="flex gap-2">
-                    {theme.palette.colors.slice(0, 8).map((color, i) => (
-                      <div
-                        key={i}
-                        className="w-6 h-6 rounded"
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-                    {theme.palette.colors.length > 8 && (
-                      <span className="text-sm text-muted-foreground">
-                        +{theme.palette.colors.length - 8}
-                      </span>
-                    )}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>Data Colors</Label>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setShowPaletteManager(true)}
+                      className="h-auto py-1 px-2 text-xs font-medium"
+                    >
+                      <Settings className="h-3 w-3 mr-1" />
+                      Manage
+                    </Button>
                   </div>
-                </Card>
+                </div>
+                
+                {/* Display current palette colors */}
+                <div className="space-y-2">
+                  <div className="p-3 bg-muted/20 rounded-lg">
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {theme.palette.colors.map((color: string, i: number) => (
+                        <div
+                          key={i}
+                          className="w-8 h-8 rounded border border-gray-200"
+                          style={{ backgroundColor: color }}
+                          title={color}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {theme.palette.name || 'Custom Palette'} ({theme.palette.colors.length} colors)
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Theme Mode */}
@@ -223,36 +342,49 @@ export default function UnifiedThemeStudio() {
               </div>
 
               {/* Neutral Palette */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label>Neutral Palette</Label>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setShowNeutralPreview(!showNeutralPreview)}
-                    className="h-6 px-2 text-xs"
-                  >
-                    <Info className="w-3 h-3 mr-1" />
-                    {showNeutralPreview ? 'Hide' : 'Show'} Mapping
-                  </Button>
-                </div>
-                <Card 
-                  className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => setShowNeutralPaletteManager(true)}
-                >
-                  <div className="flex gap-1">
-                    {Object.values(theme.neutralPalette.shades).map((shade, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 h-6 first:rounded-l last:rounded-r"
-                        style={{ backgroundColor: shade }}
-                      />
-                    ))}
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setShowNeutralPreview(!showNeutralPreview)}
+                      className="h-auto py-1 px-2 text-xs font-medium"
+                    >
+                      <Info className="h-3 w-3 mr-1" />
+                      {showNeutralPreview ? 'Hide' : 'Show'} Mapping
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setShowNeutralPaletteManager(true)}
+                      className="h-auto py-1 px-2 text-xs font-medium"
+                    >
+                      <Settings className="h-3 w-3 mr-1" />
+                      Manage
+                    </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {theme.neutralPalette.name}
-                  </p>
-                </Card>
+                </div>
+                
+                {/* Display current neutral palette */}
+                <div className="space-y-2">
+                  <div className="p-3 bg-muted/20 rounded-lg">
+                    <div className="flex gap-1 mb-2">
+                      {Object.values(theme.neutralPalette.shades).map((shade: any, i: number) => (
+                        <div
+                          key={i}
+                          className="flex-1 h-8 first:rounded-l last:rounded-r border-r last:border-r-0 border-gray-200"
+                          style={{ backgroundColor: shade }}
+                          title={shade}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {theme.neutralPalette.name}
+                    </p>
+                  </div>
+                </div>
                 
                 {/* Neutral Palette Mapping Preview */}
                 {showNeutralPreview && (
@@ -389,14 +521,9 @@ export default function UnifiedThemeStudio() {
 
               {/* Actions */}
               <div className="border-t pt-6 space-y-2">
-                <Button onClick={handleSave} className="w-full">
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Theme
-                </Button>
-                <Button onClick={handleExport} variant="outline" className="w-full">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export JSON
-                </Button>
+                <div className="text-sm text-muted-foreground text-center">
+                  Use the buttons in the header to save or export your theme.
+                </div>
               </div>
             </div>
           </div>
@@ -421,54 +548,361 @@ export default function UnifiedThemeStudio() {
       {/* Visual Styles Sidebar */}
       <div className={cn(
         "border-r bg-muted/10 transition-all duration-300",
-        showVisualStyles ? "w-96" : "w-12"
+        showVisualStyles ? "w-[400px]" : "w-12"
       )}>
         {showVisualStyles ? (
-          <div className="h-full overflow-y-auto">
-            <div className="p-6 space-y-6">
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Layers className="w-5 h-5" />
-                  <h2 className="text-xl font-semibold">Visual Styles</h2>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowVisualStyles(false)}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-              </div>
-
-              {/* Visual Selector */}
-              <div className="space-y-2">
-                <Label>Select Visual</Label>
-                <Select value={selectedVisual} onValueChange={setSelectedVisual}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {visualTypes.map((visual) => (
-                      <SelectItem key={visual.value} value={visual.value}>
-                        {visual.label}
-                      </SelectItem>
+          <div className="h-full flex flex-col bg-white">
+            {/* Header */}
+            <div className="p-4 border-b flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Theme Editor</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowVisualStyles(false)}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {/* Section Tabs */}
+            <div className="flex border-b">
+              <button
+                onClick={() => setSelectedSection('global')}
+                className={cn(
+                  "flex-1 px-3 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors",
+                  selectedSection === 'global'
+                    ? 'bg-primary text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                )}
+              >
+                <GlobalIcon />
+                Global
+              </button>
+              <button
+                onClick={() => setSelectedSection('properties')}
+                className={cn(
+                  "flex-1 px-3 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors",
+                  selectedSection === 'properties'
+                    ? 'bg-primary text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                )}
+              >
+                <PropertyIcon />
+                Properties
+              </button>
+              <button
+                onClick={() => setSelectedSection('visuals')}
+                className={cn(
+                  "flex-1 px-3 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors",
+                  selectedSection === 'visuals'
+                    ? 'bg-primary text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                )}
+              >
+                <VisualIcon />
+                Visuals
+              </button>
+            </div>
+            
+            {/* Content based on selected section */}
+            <div className="flex-1 overflow-y-auto">
+              {/* Navigation Section */}
+              <div className="p-4 border-b">
+                {selectedSection === 'global' ? (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">Global Visual Settings</h3>
+                    <p className="text-xs text-gray-500 mb-4">
+                      These settings apply to all visuals by default and can be overridden per visual type.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setSelectedVisual('*');
+                        setSelectedProperty('allVisuals');
+                      }}
+                      className={cn(
+                        "w-full text-left px-3 py-2 text-sm rounded border transition-colors",
+                        selectedVisual === '*' && selectedProperty === 'allVisuals'
+                          ? 'bg-primary/10 border-primary text-primary'
+                          : 'hover:bg-gray-50 border-transparent hover:border-gray-200'
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        <GlobalIcon />
+                        <span>All Visuals Settings</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Spacing, padding, borders for all visuals</p>
+                    </button>
+                  </div>
+                ) : selectedSection === 'properties' ? (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">Theme Properties</h3>
+                    {topLevelProperties.map((prop) => (
+                      <button
+                        key={prop}
+                        onClick={() => setSelectedProperty(prop)}
+                        className={cn(
+                          "w-full text-left px-3 py-2 text-sm rounded border transition-colors",
+                          selectedProperty === prop
+                            ? 'bg-primary/10 border-primary text-primary'
+                            : 'hover:bg-gray-50 border-transparent hover:border-gray-200'
+                        )}
+                      >
+                        {prop.charAt(0).toUpperCase() + prop.slice(1).replace(/([A-Z])/g, ' $1')}
+                      </button>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">Visual Styles</h3>
+                    {/* Visual Type Dropdown */}
+                    <Select
+                      value={selectedVisual || ''}
+                      onValueChange={(value) => {
+                        setSelectedVisual(value);
+                        setSelectedVariant('*');
+                        setSelectedState('default');
+                      }}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a visual type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {visualTypes.map((visual) => (
+                          <SelectItem key={visual} value={visual}>
+                            {visual.charAt(0).toUpperCase() + visual.slice(1).replace(/([A-Z])/g, ' $1')}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
 
-              {/* Visual Styles Panel */}
-              <VisualStylesPanel
-                selectedVisual={selectedVisual}
-                visualLabel={visualTypes.find(v => v.value === selectedVisual)?.label || selectedVisual}
-                onThemeChange={(newTheme) => {
-                  // Update visual settings from advanced theme
-                  if (newTheme.visualStyles) {
-                    setVisualSettings(newTheme.visualStyles);
-                  }
-                }}
-              />
+              {/* Form Section */}
+              <div className="p-4">
+                {selectedSection === 'properties' && selectedProperty ? (
+                  <>
+                    <h2 className="text-lg font-semibold mb-4">
+                      {selectedProperty.charAt(0).toUpperCase() + selectedProperty.slice(1).replace(/([A-Z])/g, ' $1')}
+                    </h2>
+                    {schemaLoaded && (
+                      <SchemaForm
+                        schema={schemaLoader.getPropertySchema([selectedProperty]) || { type: 'null' }}
+                        value={advancedTheme[selectedProperty]}
+                        onChange={(value) => {
+                          updateThemeProperty([selectedProperty], value);
+                        }}
+                        schemaLoader={schemaLoader}
+                        hideTitle
+                      />
+                    )}
+                  </>
+                ) : selectedSection === 'visuals' && selectedVisual ? (
+                  <>
+                    <div className="mb-4">
+                      <h2 className="text-lg font-semibold">
+                        {selectedVisual.charAt(0).toUpperCase() + selectedVisual.slice(1).replace(/([A-Z])/g, ' $1')}
+                      </h2>
+                    </div>
+                    
+                    {/* Visual Style Variants */}
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-sm font-medium text-gray-700">Visual Style Variants</h3>
+                      </div>
+                      <p className="text-xs text-gray-600 mb-3">
+                        Create multiple style variations for this visual type. Users can select different styles 
+                        to apply varied looks to their visuals.
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setShowVariantDialog(true)}
+                          className="px-3 py-1.5 text-xs bg-primary text-white rounded hover:bg-primary/90"
+                        >
+                          + New Style Variant
+                        </button>
+                        <div className="flex-1 flex gap-2">
+                          <select
+                            value={selectedVariant}
+                            onChange={(e) => setSelectedVariant(e.target.value)}
+                            className="flex-1 px-3 py-1.5 text-xs bg-white border border-gray-300 rounded"
+                          >
+                            {getVisualVariants(selectedVisual).map(variant => (
+                              <option key={variant} value={variant}>
+                                {variant === '*' ? 'Default Style' : variant}
+                              </option>
+                            ))}
+                          </select>
+                          {selectedVariant !== '*' && (
+                            <button
+                              onClick={() => {
+                                if (confirm(`Delete variant "${selectedVariant}"?`)) {
+                                  deleteVariant(selectedVisual, selectedVariant);
+                                  setSelectedVariant('*');
+                                }
+                              }}
+                              className="px-3 py-1.5 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Visual State Selector - only show for visuals with state-driven properties */}
+                    {hasStateDrivenProperties && (
+                      <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-sm font-medium text-gray-700">Visual State</h3>
+                        </div>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Edit properties for different interaction states
+                        </p>
+                        <div className="flex gap-2">
+                          {['default', 'hover', 'selected', 'disabled'].map(state => (
+                            <button
+                              key={state}
+                              onClick={() => setSelectedState(state)}
+                              className={cn(
+                                "px-3 py-1.5 text-sm rounded-md border transition-colors",
+                                selectedState === state
+                                  ? 'bg-primary text-white border-primary'
+                                  : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                              )}
+                            >
+                              {state.charAt(0).toUpperCase() + state.slice(1)}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Properties with state support will use the selected state. Properties without state support apply to all states.
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* SchemaForm renders its own tabs with collapsible sections */}
+                    <SchemaForm
+                      schema={
+                        schemaLoader.getPropertySchema(['visualStyles', selectedVisual]) ||
+                        { type: 'object' }
+                      }
+                      value={{ '*': advancedTheme.visualStyles?.[selectedVisual]?.[selectedVariant] || {} }}
+                      onChange={(value) => {
+                        // Extract the value from the * wrapper
+                        const variantValue = value['*'] || value;
+                        
+                        // Update the specific variant
+                        const newTheme = {
+                          ...advancedTheme,
+                          visualStyles: {
+                            ...advancedTheme.visualStyles,
+                            [selectedVisual]: {
+                              ...advancedTheme.visualStyles?.[selectedVisual],
+                              [selectedVariant]: variantValue
+                            }
+                          }
+                        };
+                        setAdvancedTheme(newTheme);
+                        // Update visual settings for theme generation
+                        if (newTheme.visualStyles) {
+                          setVisualSettings(newTheme.visualStyles);
+                        }
+                      }}
+                      schemaLoader={schemaLoader}
+                    />
+                  </>
+                ) : selectedSection === 'global' && selectedProperty === 'allVisuals' ? (
+                  <>
+                    <div className="mb-6">
+                      <h2 className="text-lg font-semibold">Global Visual Settings</h2>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Configure default settings that apply to all visuals. Individual visuals can override these settings.
+                      </p>
+                    </div>
+                    
+                    {/* Global Settings Form */}
+                    <div className="space-y-6">
+                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <div className="text-blue-600 mt-0.5">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm text-blue-800 font-medium">How Global Settings Work</p>
+                            <p className="text-xs text-blue-700 mt-1">
+                              These settings apply to all visuals using the pattern <code className="bg-blue-100 px-1 rounded">visualStyles.*.*.*</code>. 
+                              They can be overridden at the visual type or variant level.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Use the actual commonCards.*.items schema for proper properties */}
+                      <SchemaForm
+                        schema={(() => {
+                          // Get the commonCards definition
+                          const commonCardsSchema = schemaLoader.resolveRef('#/definitions/commonCards');
+                          if (commonCardsSchema?.properties?.['*']) {
+                            // Return the * property schema which contains all global properties
+                            return commonCardsSchema.properties['*'];
+                          }
+                          // Fallback schema
+                          return {
+                            type: 'array',
+                            items: {
+                              type: 'object',
+                              properties: {
+                                // Spacing properties
+                                customizeSpacing: { type: 'boolean', title: 'Customize Spacing' },
+                                spaceBelowTitle: { type: 'number', title: 'Space Below Title', minimum: 0, maximum: 50 },
+                                spaceBelowSubTitle: { type: 'number', title: 'Space Below Subtitle', minimum: 0, maximum: 50 },
+                                spaceBelowTitleArea: { type: 'number', title: 'Space Below Title Area', minimum: 0, maximum: 50 },
+                                // Padding properties
+                                top: { type: 'number', title: 'Padding Top', minimum: 0, maximum: 100 },
+                                bottom: { type: 'number', title: 'Padding Bottom', minimum: 0, maximum: 100 },
+                                left: { type: 'number', title: 'Padding Left', minimum: 0, maximum: 100 },
+                                right: { type: 'number', title: 'Padding Right', minimum: 0, maximum: 100 },
+                              }
+                            }
+                          };
+                        })()}
+                        value={advancedTheme.visualStyles?.['*']?.['*']?.['*'] || [{}]}
+                        onChange={(value) => {
+                          const newTheme = {
+                            ...advancedTheme,
+                            visualStyles: {
+                              ...advancedTheme.visualStyles,
+                              '*': {
+                                ...advancedTheme.visualStyles?.['*'],
+                                '*': {
+                                  ...advancedTheme.visualStyles?.['*']?.['*'],
+                                  '*': value
+                                }
+                              }
+                            }
+                          };
+                          setAdvancedTheme(newTheme);
+                        }}
+                        schemaLoader={schemaLoader}
+                        path={['visualStyles', '*', '*', '*']}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-12 text-gray-500">
+                    <p className="mb-2">
+                      {selectedSection === 'global'
+                        ? 'Select a global setting from above to edit'
+                        : selectedSection === 'properties' 
+                        ? 'Select a property from above to edit'
+                        : 'Select a visual from the dropdown above to edit its styles'}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ) : (
@@ -489,38 +923,116 @@ export default function UnifiedThemeStudio() {
         )}
       </div>
 
+
       {/* Preview Panel */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden h-full">
         <PowerBIPreview 
           generatedTheme={generatedTheme}
           selectedVisualType={selectedVisual} 
         />
       </div>
+    </div>
 
-      {/* Modals */}
-      {showPaletteManager && (
-        <PaletteManager
-          isOpen={showPaletteManager}
-          onClose={() => setShowPaletteManager(false)}
+    {/* Modals */}
+    <Dialog open={showPaletteManager} onOpenChange={setShowPaletteManager}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Manage Color Palettes</DialogTitle>
+        </DialogHeader>
+        <PaletteManager 
           selectedPaletteId={theme.palette.id}
           onSelect={(palette) => {
             setPalette(palette);
             setShowPaletteManager(false);
           }}
         />
-      )}
+      </DialogContent>
+    </Dialog>
 
-      {showNeutralPaletteManager && (
-        <NeutralPaletteManager
-          isOpen={showNeutralPaletteManager}
-          onClose={() => setShowNeutralPaletteManager(false)}
-          selectedPaletteId={theme.neutralPalette.id}
-          onSelect={(palette) => {
-            setNeutralPalette(palette);
-            setShowNeutralPaletteManager(false);
-          }}
-        />
-      )}
+    <NeutralPaletteManager 
+      isOpen={showNeutralPaletteManager}
+      onOpenChange={setShowNeutralPaletteManager}
+      onSelectPalette={(palette) => {
+        // Handle palette selection
+        if (typeof palette === 'string') {
+          // Built-in palette ID
+          setNeutralPalette({ 
+            id: palette, 
+            name: palette.charAt(0).toUpperCase() + palette.slice(1), 
+            shades: {} // Will be loaded from theme data
+          });
+        } else {
+          // Custom palette with shades
+          setNeutralPalette({
+            id: 'custom',
+            name: 'Custom',
+            shades: palette
+          });
+        }
+      }}
+    />
+
+    {/* Import Modal */}
+    <ImportThemeModal
+      isOpen={showImportModal}
+      onClose={() => setShowImportModal(false)}
+    />
+    
+    {/* Create Variant Dialog */}
+    {showVariantDialog && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <h3 className="text-lg font-semibold mb-4">Create New Style Variant</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Enter a name for the new style variant. This will create a new set of styling options 
+            for {selectedVisual} visuals.
+          </p>
+          <input
+            type="text"
+            value={newVariantName}
+            onChange={(e) => setNewVariantName(e.target.value)}
+            placeholder="e.g. minimal, detailed, corporate"
+            className="w-full px-3 py-2 border rounded-md mb-4"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                if (newVariantName && newVariantName !== '*') {
+                  createVariant(selectedVisual, newVariantName);
+                  setSelectedVariant(newVariantName);
+                  setNewVariantName('');
+                  setShowVariantDialog(false);
+                }
+              }
+            }}
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => {
+                setNewVariantName('');
+                setShowVariantDialog(false);
+              }}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                if (newVariantName && newVariantName !== '*') {
+                  createVariant(selectedVisual, newVariantName);
+                  setSelectedVariant(newVariantName);
+                  setNewVariantName('');
+                  setShowVariantDialog(false);
+                }
+              }}
+              disabled={!newVariantName || newVariantName === '*'}
+              className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary/90 disabled:opacity-50"
+            >
+              Create Variant
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 }

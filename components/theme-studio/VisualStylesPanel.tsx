@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { SchemaForm } from '@/components/theme-advanced/form/schema-form';
 import { CollapsibleSection } from '@/components/theme-advanced/ui/collapsible-section';
-import { loadVisualSchema } from '@/lib/theme-advanced/services/schema-loader';
+import { loadVisualSchema, SchemaLoader } from '@/lib/theme-advanced/services/schema-loader';
 import { useThemeAdvancedStore } from '@/lib/stores/theme-advanced-store';
 import { Plus, Trash2, Copy, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -46,6 +46,19 @@ export function VisualStylesPanel({
   const [variants, setVariants] = useState<string[]>(['*']);
   const [supportedStates, setSupportedStates] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [schemaLoader] = useState(() => SchemaLoader.getInstance());
+
+  // Initialize schema loader on mount
+  useEffect(() => {
+    const initSchemaLoader = async () => {
+      try {
+        await schemaLoader.loadSchema();
+      } catch (error) {
+        console.error('Failed to initialize schema loader:', error);
+      }
+    };
+    initSchemaLoader();
+  }, [schemaLoader]);
 
   // Load visual schema when visual changes
   useEffect(() => {
@@ -71,6 +84,8 @@ export function VisualStylesPanel({
         if (theme?.visualStyles?.[selectedVisual]) {
           const variantKeys = Object.keys(theme.visualStyles[selectedVisual]);
           setVariants(variantKeys.length > 0 ? variantKeys : ['*']);
+        } else {
+          setVariants(['*']);
         }
       } catch (error) {
         console.error('Failed to load visual schema:', error);
@@ -115,7 +130,7 @@ export function VisualStylesPanel({
 
   // Add new variant
   const handleAddVariant = () => {
-    const variantName = prompt('Enter variant name:');
+    const variantName = prompt('Enter variant name (e.g., minimal, detailed, corporate):');
     if (variantName && !variants.includes(variantName)) {
       setVariants([...variants, variantName]);
       setSelectedVariant(variantName);
@@ -215,10 +230,11 @@ export function VisualStylesPanel({
                     }
                   }
                 }}
-                data={theme?.visualStyles?.['*']?.['*'] || {}}
+                value={theme?.visualStyles?.['*']?.['*'] || {}}
                 onChange={handlePropertyChange}
                 path={[]}
                 level={0}
+                schemaLoader={schemaLoader}
               />
             </CollapsibleSection>
           </div>
@@ -230,80 +246,90 @@ export function VisualStylesPanel({
   // Visual-specific settings
   return (
     <div className="space-y-4">
-      {/* Variant Management */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label>Style Variant</Label>
-          <Button 
-            size="sm" 
-            variant="ghost"
-            onClick={handleAddVariant}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
+      {/* Visual Style Variants */}
+      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium text-gray-700">Visual Style Variants</h3>
         </div>
-        <div className="space-y-1">
-          {variants.map(variant => (
-            <div 
-              key={variant}
-              className={cn(
-                "flex items-center justify-between p-2 rounded cursor-pointer hover:bg-muted/50",
-                selectedVariant === variant && "bg-muted"
-              )}
-              onClick={() => setSelectedVariant(variant)}
+        <p className="text-xs text-gray-600 mb-3">
+          Create multiple style variations for this visual type. Users can select different styles 
+          to apply varied looks to their visuals.
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={handleAddVariant}
+            className="px-3 py-1.5 text-xs bg-primary text-white rounded hover:bg-primary/90"
+          >
+            + New Style Variant
+          </button>
+          <div className="flex-1 flex gap-2">
+            <Select
+              value={selectedVariant || '*'}
+              onValueChange={setSelectedVariant}
             >
-              <span className="text-sm">
-                {variant === '*' ? 'Default' : variant}
-              </span>
-              {variant !== '*' && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteVariant(variant);
-                  }}
-                >
-                  <Trash2 className="w-3 h-3" />
-                </Button>
-              )}
-            </div>
-          ))}
+              <SelectTrigger className="h-auto py-1.5 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {variants.map(variant => (
+                  <SelectItem key={variant} value={variant}>
+                    {variant === '*' ? 'Default Style' : variant}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {selectedVariant !== '*' && (
+              <button
+                onClick={() => handleDeleteVariant(selectedVariant)}
+                className="px-3 py-1.5 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+              >
+                Delete
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* State Selector (if applicable) */}
+      {/* Visual State Selector - only show for visuals with state-driven properties */}
       {supportedStates.length > 0 && (
-        <div className="space-y-2">
-          <Label>Visual State</Label>
-          <Select 
-            value={selectedState || 'default'} 
-            onValueChange={setSelectedState}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {supportedStates.map(state => (
-                <SelectItem key={state} value={state}>
-                  {state.charAt(0).toUpperCase() + state.slice(1)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-gray-700">Visual State</h3>
+            <p className="text-xs text-gray-600">Edit properties for different interaction states</p>
+          </div>
+          <div className="flex gap-2">
+            {['default', 'hover', 'selected', 'disabled'].map(state => (
+              <button
+                key={state}
+                onClick={() => setSelectedState(state)}
+                className={cn(
+                  "px-3 py-1.5 text-sm rounded-md border transition-colors",
+                  selectedState === state
+                    ? 'bg-primary text-white border-primary'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                )}
+                disabled={!supportedStates.includes(state)}
+              >
+                {state.charAt(0).toUpperCase() + state.slice(1)}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            Properties with state support will use the selected state. Properties without state support apply to all states.
+          </p>
         </div>
       )}
 
       {/* Properties */}
       {loading ? (
-        <Card className="p-4">
-          <p className="text-sm text-muted-foreground">Loading visual properties...</p>
-        </Card>
+        <div className="p-4 bg-white rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-500">Loading visual properties...</p>
+        </div>
       ) : visualSchema ? (
-        <Card className="p-4">
+        <div className="bg-white rounded-lg border border-gray-200">
           <SchemaForm
             schema={visualSchema}
-            data={
+            value={
               selectedState && selectedState !== 'default' && supportedStates.includes(selectedState)
                 ? theme?.visualStyles?.[selectedVisual]?.[selectedVariant || '*']?.[selectedState] || {}
                 : theme?.visualStyles?.[selectedVisual]?.[selectedVariant || '*'] || {}
@@ -311,23 +337,25 @@ export function VisualStylesPanel({
             onChange={handlePropertyChange}
             path={[]}
             level={0}
+            schemaLoader={schemaLoader}
           />
-        </Card>
+        </div>
       ) : (
-        <Card className="p-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="p-4 bg-white rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-500">
             No schema available for {visualLabel}
           </p>
-        </Card>
+        </div>
       )}
 
       {/* Actions */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 pt-2">
         <Button
           variant="outline"
           size="sm"
           onClick={undoChanges}
           disabled={!canUndo}
+          className="text-xs"
         >
           Undo
         </Button>
@@ -336,6 +364,7 @@ export function VisualStylesPanel({
           size="sm"
           onClick={redoChanges}
           disabled={!canRedo}
+          className="text-xs"
         >
           Redo
         </Button>

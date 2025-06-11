@@ -177,13 +177,6 @@ export class SchemaLoader {
     return schemas.some(schema => this.supportsStates(schema));
   }
 
-  getVisualTypes(): string[] {
-    const definitions = this.schema?.definitions || {};
-    return Object.keys(definitions)
-      .filter(key => key.startsWith('visual-'))
-      .map(key => key.replace('visual-', ''))
-      .sort();
-  }
 
   // Get global property value from theme
   getGlobalPropertyValue(theme: any, propertyPath: string[]): any {
@@ -247,4 +240,58 @@ export class SchemaLoader {
       return false;
     }
   }
+
+  // Get general properties schema for a visual (non-styling properties)
+  getGeneralPropertiesSchema(visualType: string): SchemaProperty | undefined {
+    try {
+      const visualDef = this.definitions.get(`visual-${visualType}`);
+      if (!visualDef || !visualDef.allOf || visualDef.allOf.length < 2) {
+        return undefined;
+      }
+      
+      // General properties are typically in allOf[1].properties
+      const visualProps = visualDef.allOf[1].properties || {};
+      
+      // Filter out styling-related properties
+      const generalProps: Record<string, any> = {};
+      const stylingKeywords = ['color', 'fill', 'border', 'background', 'font', 'text', 'padding', 'margin', 'spacing'];
+      
+      for (const [key, value] of Object.entries(visualProps)) {
+        const isStylingSProperty = stylingKeywords.some(keyword => 
+          key.toLowerCase().includes(keyword)
+        );
+        
+        if (!isStylingSProperty) {
+          generalProps[key] = value;
+        }
+      }
+      
+      return {
+        type: 'object',
+        properties: generalProps
+      };
+    } catch (error) {
+      console.error('Error getting general properties schema:', error);
+      return undefined;
+    }
+  }
+}
+
+// Export a function to load visual schema
+export async function loadVisualSchema(visualType: string): Promise<any> {
+  const loader = SchemaLoader.getInstance();
+  
+  // Ensure schema is loaded
+  if (!loader.schema) {
+    await loader.loadSchema();
+  }
+  
+  // Get the visual definition
+  const visualDef = loader.getDefinition(`visual-${visualType}`);
+  if (!visualDef) {
+    console.warn(`No schema definition found for visual: ${visualType}`);
+    return null;
+  }
+  
+  return visualDef;
 }

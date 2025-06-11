@@ -26,7 +26,12 @@ import { useThemeStore } from '@/lib/stores/theme-store';
 import { ColorPalette } from '@prisma/client';
 // import { useToast } from '@/components/ui/use-toast';
 
-export function PaletteManager() {
+interface PaletteManagerProps {
+  onSelect?: (palette: ColorPalette) => void;
+  selectedPaletteId?: string;
+}
+
+export function PaletteManager({ onSelect, selectedPaletteId }: PaletteManagerProps = {}) {
   const { colorPalettes, loadPalettes, createColorPalette, updateColorPalette, deleteColorPalette } = usePaletteStore();
   const { themes } = useThemeStore();
   // const { toast } = useToast();
@@ -135,7 +140,11 @@ export function PaletteManager() {
           <h3 className="text-lg font-medium">Your Palettes</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {userPalettes.map((palette) => (
-              <Card key={palette.id} className="p-4 space-y-3">
+              <Card 
+                key={palette.id} 
+                className={`p-4 space-y-3 transition-all ${onSelect ? 'cursor-pointer hover:border-primary' : ''} ${selectedPaletteId === palette.id ? 'border-primary ring-2 ring-primary/20' : ''}`}
+                onClick={() => onSelect?.(palette)}
+              >
                 <div className="flex justify-between items-start">
                   <div>
                     <h4 className="font-medium">{palette.name}</h4>
@@ -212,7 +221,11 @@ export function PaletteManager() {
           <h3 className="text-lg font-medium">Built-in Palettes</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {builtInPalettes.map((palette) => (
-              <Card key={palette.id} className="p-4 space-y-3">
+              <Card 
+                key={palette.id} 
+                className={`p-4 space-y-3 transition-all ${onSelect ? 'cursor-pointer hover:border-primary' : ''} ${selectedPaletteId === palette.id ? 'border-primary ring-2 ring-primary/20' : ''}`}
+                onClick={() => onSelect?.(palette)}
+              >
                 <div>
                   <h4 className="font-medium">{palette.name}</h4>
                   {palette.description && (

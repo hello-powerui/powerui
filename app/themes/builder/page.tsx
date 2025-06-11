@@ -35,12 +35,12 @@ export default function ThemeBuilderPage() {
 
   // Load theme data from URL params
   useEffect(() => {
-    const id = searchParams.get('id');
-    const data = searchParams.get('data');
-    const description = searchParams.get('description');
-    
-    if (id && data) {
-      try {
+    try {
+      const id = searchParams.get('id');
+      const data = searchParams.get('data');
+      const description = searchParams.get('description');
+      
+      if (id && data) {
         const themeData = JSON.parse(decodeURIComponent(data));
         loadTheme(themeData);
         setThemeId(id);
@@ -48,9 +48,9 @@ export default function ThemeBuilderPage() {
         
         // Clear URL params after loading
         router.replace('/themes/builder', { scroll: false });
-      } catch (error) {
-        console.error('Failed to load theme data:', error);
       }
+    } catch (error) {
+      console.error('Failed to load theme data:', error);
     }
   }, [searchParams, loadTheme, router]);
 
