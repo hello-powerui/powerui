@@ -11,6 +11,7 @@ import {
   getThemeValue, 
   replaceTokens 
 } from './utils';
+import { mapNeutralPaletteToTheme } from './neutral-mapper';
 
 export class ThemeGenerator {
   private configs: ThemeConfigs;
@@ -296,6 +297,25 @@ export class ThemeGenerator {
     // Add icons if available
     if (this.configs.icons && mode in this.configs.icons) {
       finalTheme.icons = this.configs.icons[mode];
+    }
+
+    // Apply neutral palette mapping for hierarchy colors
+    const neutralPaletteData = typeof neutralPalette === 'string' 
+      ? this.configs.palettes[neutralPalette] 
+      : neutralPalette;
+    
+    if (neutralPaletteData) {
+      const neutralMapping = mapNeutralPaletteToTheme(
+        { 
+          id: typeof neutralPalette === 'string' ? neutralPalette : 'custom',
+          name: typeof neutralPalette === 'string' ? neutralPalette : 'Custom',
+          shades: neutralPaletteData
+        }, 
+        mode
+      );
+      
+      // Apply the mapped colors to the theme
+      Object.assign(finalTheme, neutralMapping);
     }
 
     return finalTheme;

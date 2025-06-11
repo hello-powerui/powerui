@@ -1,105 +1,156 @@
 import { create } from 'zustand';
-import { ThemeGenerationInput } from '@/lib/theme-generation/types';
+import { ColorPalette, NeutralPalette } from './palette-store';
+
+interface ThemeBuilderTheme {
+  name: string;
+  mode: 'light' | 'dark';
+  palette: ColorPalette;
+  neutralPalette: NeutralPalette;
+  fontFamily: string;
+  borderRadius: number;
+  spacing: 'compact' | 'normal' | 'relaxed';
+  bgStyle?: string;
+  borderStyle?: string;
+  paddingStyle?: string;
+}
 
 interface ThemeBuilderState {
   // Current theme configuration
-  theme: ThemeGenerationInput;
+  theme: ThemeBuilderTheme;
   
   // UI state
   activeTab: 'color' | 'typography' | 'style';
   isSaving: boolean;
   isGenerating: boolean;
-  previewMode: 'desktop' | 'tablet' | 'mobile';
   
   // Actions
-  setTheme: (theme: Partial<ThemeGenerationInput>) => void;
-  updateThemeProperty: <K extends keyof ThemeGenerationInput>(
-    key: K,
-    value: ThemeGenerationInput[K]
-  ) => void;
+  setTheme: (theme: Partial<ThemeBuilderTheme>) => void;
+  setPalette: (palette: ColorPalette) => void;
+  setNeutralPalette: (palette: NeutralPalette) => void;
+  setThemeMode: (mode: 'light' | 'dark') => void;
+  setFontFamily: (fontFamily: string) => void;
+  setBorderRadius: (radius: number) => void;
+  setSpacing: (spacing: 'compact' | 'normal' | 'relaxed') => void;
   setActiveTab: (tab: 'color' | 'typography' | 'style') => void;
   setIsSaving: (saving: boolean) => void;
   setIsGenerating: (generating: boolean) => void;
-  setPreviewMode: (mode: 'desktop' | 'tablet' | 'mobile') => void;
   resetTheme: () => void;
-  loadTheme: (themeData: Partial<ThemeGenerationInput>) => void;
+  generateAndSaveTheme: (name: string) => Promise<void>;
 }
 
-const defaultTheme: ThemeGenerationInput = {
+const defaultTheme: ThemeBuilderTheme = {
   name: 'Untitled Theme',
   mode: 'light',
-  neutralPalette: 'azure',
-  fontFamily: 'segoe-ui',
+  palette: {
+    id: 'default',
+    name: 'Default',
+    colors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56', '#3498DB', '#A66999']
+  },
+  neutralPalette: {
+    id: 'azure',
+    name: 'Azure',
+    shades: {
+      '25': '#FBFDFF',
+      '50': '#F5FAFF',
+      '100': '#E6F3FF',
+      '200': '#C2E4FF',
+      '300': '#8CC7FF',
+      '400': '#4DA6FF',
+      '500': '#1A82E2',
+      '600': '#0059CC',
+      '700': '#003A8C',
+      '800': '#00265E',
+      '900': '#001A40',
+      '950': '#001333'
+    }
+  },
+  fontFamily: 'Segoe UI',
   borderRadius: 4,
-  dataColors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56', '#3498DB', '#A66999'],
+  spacing: 'normal',
   bgStyle: 'default',
   borderStyle: 'default',
-  paddingStyle: 'default',
-  showBorders: true,
-  
-  // Typography defaults
-  fontSize: 14,
-  fontWeight: 'normal',
-  fontStyle: 'normal',
-  textDecoration: 'none',
-  lineHeight: 1.5,
-  
-  // Color defaults (using neutral palette)
-  background: { solid: { color: '#FFFFFF' } },
-  foreground: { solid: { color: '#000000' } },
-  border: { solid: { color: '#E4E7E9' } },
-  
-  // Spacing defaults
-  padding: {
-    top: 16,
-    right: 16,
-    bottom: 16,
-    left: 16
-  },
-  spacing: 8,
-  
-  // Shadow defaults
-  shadow: {
-    color: '#000000',
-    blur: 4,
-    distance: 2,
-    angle: 45,
-    transparency: 0.1
-  },
-  
-  // Visual-specific overrides (empty by default)
-  visualStyles: {}
+  paddingStyle: 'default'
 };
 
-export const useThemeBuilderStore = create<ThemeBuilderState>((set) => ({
+export const useThemeBuilderStore = create<ThemeBuilderState>((set, get) => ({
   theme: defaultTheme,
   activeTab: 'color',
   isSaving: false,
   isGenerating: false,
-  previewMode: 'desktop',
   
   setTheme: (theme) =>
     set((state) => ({
       theme: { ...state.theme, ...theme },
     })),
     
-  updateThemeProperty: (key, value) =>
+  setPalette: (palette) =>
     set((state) => ({
-      theme: { ...state.theme, [key]: value },
+      theme: { ...state.theme, palette },
+    })),
+    
+  setNeutralPalette: (neutralPalette) =>
+    set((state) => ({
+      theme: { ...state.theme, neutralPalette },
+    })),
+    
+  setThemeMode: (mode) =>
+    set((state) => ({
+      theme: { ...state.theme, mode },
+    })),
+    
+  setFontFamily: (fontFamily) =>
+    set((state) => ({
+      theme: { ...state.theme, fontFamily },
+    })),
+    
+  setBorderRadius: (borderRadius) =>
+    set((state) => ({
+      theme: { ...state.theme, borderRadius },
+    })),
+    
+  setSpacing: (spacing) =>
+    set((state) => ({
+      theme: { ...state.theme, spacing },
     })),
     
   setActiveTab: (tab) => set({ activeTab: tab }),
   setIsSaving: (saving) => set({ isSaving: saving }),
   setIsGenerating: (generating) => set({ isGenerating: generating }),
-  setPreviewMode: (mode) => set({ previewMode: mode }),
   
   resetTheme: () => set({ theme: defaultTheme }),
   
-  loadTheme: (themeData) => 
-    set({ 
-      theme: { 
-        ...defaultTheme, 
-        ...themeData 
-      } 
-    }),
+  generateAndSaveTheme: async (name: string) => {
+    const { theme } = get();
+    set({ isSaving: true });
+    
+    try {
+      // Transform theme to match API expectations
+      const themeInput = {
+        name: name || theme.name,
+        mode: theme.mode,
+        dataColors: theme.palette.colors,
+        neutralPalette: theme.neutralPalette.shades,
+        fontFamily: theme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
+        borderRadius: theme.borderRadius,
+        bgStyle: theme.bgStyle || 'default',
+        borderStyle: theme.borderStyle || 'default',
+        paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default'
+      };
+      
+      // Save theme via API
+      const response = await fetch('/api/themes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(themeInput)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save theme');
+      }
+      
+      return await response.json();
+    } finally {
+      set({ isSaving: false });
+    }
+  }
 }));

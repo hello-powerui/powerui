@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react';
 
 interface PowerBIPreviewProps {
-  generatedTheme: any;
+  generatedTheme?: any;
+  selectedVisualType?: string;
 }
 
-export function PowerBIPreview({ generatedTheme }: PowerBIPreviewProps) {
+export function PowerBIPreview({ generatedTheme, selectedVisualType = '*' }: PowerBIPreviewProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
