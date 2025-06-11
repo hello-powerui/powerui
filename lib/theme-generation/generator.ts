@@ -318,6 +318,23 @@ export class ThemeGenerator {
       Object.assign(finalTheme, neutralMapping);
     }
 
+    // Apply visual style overrides if provided
+    if (data.visualStyles && Object.keys(data.visualStyles).length > 0) {
+      if (!finalTheme.visualStyles) {
+        finalTheme.visualStyles = {};
+      }
+      
+      // Apply each visual's custom settings
+      for (const [visualType, settings] of Object.entries(data.visualStyles)) {
+        if (settings && Object.keys(settings).length > 0) {
+          if (!finalTheme.visualStyles[visualType]) {
+            finalTheme.visualStyles[visualType] = {};
+          }
+          finalTheme.visualStyles[visualType]['*'] = settings;
+        }
+      }
+    }
+
     return finalTheme;
   }
 }

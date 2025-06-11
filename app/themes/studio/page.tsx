@@ -21,6 +21,7 @@ import { NeutralPaletteManager } from '@/components/palette/NeutralPaletteManage
 import { generateTheme, getNeutralPalettePreview } from '@/lib/theme-generation';
 import { toast } from 'sonner';
 import { Save, Download, Info } from 'lucide-react';
+import { VisualCustomizer } from '@/components/theme-studio/VisualCustomizer';
 
 export default function UnifiedThemeStudio() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export default function UnifiedThemeStudio() {
   const [showPaletteManager, setShowPaletteManager] = useState(false);
   const [showNeutralPaletteManager, setShowNeutralPaletteManager] = useState(false);
   const [showNeutralPreview, setShowNeutralPreview] = useState(false);
+  const [visualSettings, setVisualSettings] = useState<Record<string, any>>({});
   
   const { 
     theme, 
@@ -44,7 +46,7 @@ export default function UnifiedThemeStudio() {
   const { theme: advancedTheme, setTheme: setAdvancedTheme } = useThemeAdvancedStore();
   const [generatedTheme, setGeneratedTheme] = useState<any>(null);
 
-  // Generate theme whenever foundation changes
+  // Generate theme whenever foundation or visual settings change
   useEffect(() => {
     const themeInput = {
       name: theme.name,
@@ -55,10 +57,11 @@ export default function UnifiedThemeStudio() {
       borderRadius: theme.borderRadius,
       bgStyle: theme.bgStyle || 'default',
       borderStyle: theme.borderStyle || 'default',
-      paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default'
+      paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default',
+      visualStyles: visualSettings
     };
     generateTheme(themeInput).then(setGeneratedTheme);
-  }, [theme]);
+  }, [theme, visualSettings]);
 
   // Visual types available in Power BI
   const visualTypes = [
@@ -86,6 +89,13 @@ export default function UnifiedThemeStudio() {
 
   const handleSave = async () => {
     try {
+      // Save the theme with visual customizations
+      const themeData = {
+        ...theme,
+        visualStyles: visualSettings
+      };
+      
+      // TODO: Implement save functionality that includes visual settings
       await generateAndSaveTheme('Unified Theme');
       toast.success('Theme saved successfully');
     } catch (error) {
@@ -104,7 +114,8 @@ export default function UnifiedThemeStudio() {
         borderRadius: theme.borderRadius,
         bgStyle: theme.bgStyle || 'default',
         borderStyle: theme.borderStyle || 'default',
-        paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default'
+        paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default',
+        visualStyles: visualSettings
       };
       const exportedTheme = await generateTheme(themeInput);
       const blob = new Blob([JSON.stringify(exportedTheme, null, 2)], {
@@ -317,15 +328,18 @@ export default function UnifiedThemeStudio() {
             </div>
 
             {selectedVisual !== '*' && (
-              <Card className="p-4 space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Customization for {visualTypes.find(v => v.value === selectedVisual)?.label} 
-                  coming soon...
-                </p>
-                <Button variant="outline" size="sm">
-                  Open Advanced Editor
-                </Button>
-              </Card>
+              <VisualCustomizer
+                visualType={selectedVisual}
+                visualLabel={visualTypes.find(v => v.value === selectedVisual)?.label || selectedVisual}
+                currentSettings={visualSettings[selectedVisual]}
+                generatedTheme={generatedTheme}
+                onSettingsChange={(settings) => {
+                  setVisualSettings(prev => ({
+                    ...prev,
+                    [selectedVisual]: settings
+                  }));
+                }}
+              />
             )}
           </div>
 

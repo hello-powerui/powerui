@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Providers } from './providers'
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { Toaster } from 'sonner'
 import './globals.css'
 import './fonts.css'
 
@@ -45,6 +46,7 @@ export default function RootLayout({
             </div>
           </header>
           <main>{children}</main>
+          <Toaster position="bottom-right" />
         </Providers>
       </body>
     </html>
