@@ -50,7 +50,12 @@ export function updateThemePath(theme: any, path: string, value: any): void {
           current[name] = [];
         }
         while (current[name].length <= index) {
-          current[name].push({});
+          // For Power BI theme arrays, index 0 should have metadata
+          if (current[name].length === 0 && (name === 'background' || name === 'border' || name === 'padding')) {
+            current[name].push({ show: true });
+          } else {
+            current[name].push({});
+          }
         }
         current = current[name][index];
       } else {
@@ -68,7 +73,12 @@ export function updateThemePath(theme: any, path: string, value: any): void {
         current[last.name] = [];
       }
       while (current[last.name].length <= last.index) {
-        current[last.name].push({});
+        // For Power BI theme arrays, index 0 should have metadata
+        if (current[last.name].length === 0 && (last.name === 'background' || last.name === 'border' || last.name === 'padding')) {
+          current[last.name].push({ show: true });
+        } else {
+          current[last.name].push({});
+        }
       }
       current[last.name][last.index] = value;
     } else {

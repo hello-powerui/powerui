@@ -9,8 +9,8 @@ interface ThemeBuilderTheme {
   fontFamily: string;
   borderRadius: number;
   spacing: 'compact' | 'normal' | 'relaxed';
-  bgStyle?: string;
-  borderStyle?: string;
+  bgStyle: string;
+  borderStyle: string;
   paddingStyle?: string;
 }
 
@@ -31,6 +31,8 @@ interface ThemeBuilderState {
   setFontFamily: (fontFamily: string) => void;
   setBorderRadius: (radius: number) => void;
   setSpacing: (spacing: 'compact' | 'normal' | 'relaxed') => void;
+  setBgStyle: (style: string) => void;
+  setBorderStyle: (style: string) => void;
   setActiveTab: (tab: 'color' | 'typography' | 'style') => void;
   setIsSaving: (saving: boolean) => void;
   setIsGenerating: (generating: boolean) => void;
@@ -111,6 +113,16 @@ export const useThemeBuilderStore = create<ThemeBuilderState>((set, get) => ({
   setSpacing: (spacing) =>
     set((state) => ({
       theme: { ...state.theme, spacing },
+    })),
+    
+  setBgStyle: (bgStyle) =>
+    set((state) => ({
+      theme: { ...state.theme, bgStyle },
+    })),
+    
+  setBorderStyle: (borderStyle) =>
+    set((state) => ({
+      theme: { ...state.theme, borderStyle },
     })),
     
   setActiveTab: (tab) => set({ activeTab: tab }),

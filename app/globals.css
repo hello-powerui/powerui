@@ -30,3 +30,10 @@
     @apply bg-white text-gray-900;
   }
 }
+
+@layer utilities {
+  .writing-mode-vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+}
