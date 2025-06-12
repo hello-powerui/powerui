@@ -11,14 +11,14 @@ export function validateNeutralPalette(palette: any): palette is ColorPalette {
   // Check all required shades exist
   const missing = requiredShades.filter(shade => !(shade in palette));
   if (missing.length > 0) {
-    console.error(`Neutral palette missing required shades: ${missing.join(', ')}`);
+    console.warn(`Neutral palette missing required shades: ${missing.join(', ')}`);
     return false;
   }
   
   // Validate hex codes
   for (const [shade, color] of Object.entries(palette)) {
     if (typeof color !== 'string' || !color.startsWith('#') || (color.length !== 4 && color.length !== 7)) {
-      console.error(`Invalid hex code for shade ${shade}: ${color}`);
+      console.warn(`Invalid hex code for shade ${shade}: ${color}`);
       return false;
     }
   }

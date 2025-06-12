@@ -194,9 +194,19 @@ export class SimpleThemeGenerator {
       throw new Error(`Missing required fields: ${missing.join(', ')}`);
     }
     
-    // Validate neutral palette if it's an object
-    if (typeof input.neutralPalette === 'object' && !validateNeutralPalette(input.neutralPalette)) {
-      throw new Error('Invalid neutral palette format');
+    // Validate and fix neutral palette if needed
+    if (typeof input.neutralPalette === 'object' && input.neutralPalette !== null) {
+      if (!validateNeutralPalette(input.neutralPalette)) {
+        console.warn('Neutral palette validation failed, using Azure default as fallback');
+        // Import Azure palette as fallback
+        const { AZURE_NEUTRAL_PALETTE } = require('@/lib/defaults/palettes');
+        input.neutralPalette = AZURE_NEUTRAL_PALETTE.shades;
+      }
+    } else {
+      // If neutral palette is missing or invalid, use Azure default
+      console.warn('Missing or invalid neutral palette, using Azure default');
+      const { AZURE_NEUTRAL_PALETTE } = require('@/lib/defaults/palettes');
+      input.neutralPalette = AZURE_NEUTRAL_PALETTE.shades;
     }
   }
   

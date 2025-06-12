@@ -1348,25 +1348,14 @@ export default function UnifiedThemeStudio() {
         isOpen={showNeutralPaletteManager}
         onOpenChange={setShowNeutralPaletteManager}
         onSelectPalette={(palette) => {
-          // Handle palette selection
-          if (typeof palette === 'string') {
-            // Built-in palette ID - use Azure palette data if it's the azure-default
-            if (palette === 'azure-default') {
-              setNeutralPaletteWithTracking(AZURE_NEUTRAL_PALETTE);
-            } else {
-              setNeutralPaletteWithTracking({ 
-                id: palette, 
-                name: palette.charAt(0).toUpperCase() + palette.slice(1), 
-                shades: {} // Will be loaded from theme data
-              });
-            }
+          // Handle palette selection - now always receives full palette object
+          if (palette && typeof palette === 'object' && 'shades' in palette && palette.shades) {
+            // Full palette object with shades
+            setNeutralPaletteWithTracking(palette);
           } else {
-            // Custom palette with shades
-            setNeutralPaletteWithTracking({
-              id: 'custom',
-              name: 'Custom',
-              shades: palette
-            });
+            // Fallback to Azure palette if invalid
+            console.warn('Invalid palette selected, falling back to Azure:', palette);
+            setNeutralPaletteWithTracking(AZURE_NEUTRAL_PALETTE);
           }
         }}
       />

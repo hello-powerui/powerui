@@ -69,13 +69,8 @@ export function NeutralPaletteManager({ isOpen, onOpenChange, onSelectPalette }:
 
   const handleSelectPalette = (palette: any) => {
     if (onSelectPalette) {
-      if (palette.isBuiltIn) {
-        // For built-in palettes, pass the ID
-        onSelectPalette(palette.id);
-      } else {
-        // For custom palettes, pass the shades object
-        onSelectPalette(palette.shades);
-      }
+      // Always pass the full palette object to ensure proper handling
+      onSelectPalette(palette);
       onOpenChange(false);
     }
   };
