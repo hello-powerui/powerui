@@ -23,10 +23,10 @@ export default function Home() {
               Get Started
             </Link>
             <Link 
-              href="/demo"
+              href="/themes/studio"
               className="px-8 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-lg"
             >
-              View Demo
+              Theme Studio
             </Link>
           </div>
         </div>

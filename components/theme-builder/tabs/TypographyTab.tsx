@@ -1,1 +1,0 @@
-export { ModernTypographyTab as TypographyTab } from './ModernTypographyTab';

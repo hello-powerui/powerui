@@ -155,17 +155,7 @@ export class StyleGenerator {
   static getNeutralPaletteVariables(neutralPalette: string | Record<string, string>): Record<string, string> {
     const variables: Record<string, string> = {};
     
-    if (typeof neutralPalette === 'string') {
-      // Load palette colors from palettes data
-      const palettes = require('@/public/theme-data/palettes.json');
-      const palette = palettes[neutralPalette];
-      
-      if (palette) {
-        Object.entries(palette).forEach(([shade, color]) => {
-          variables[`--neutral-${shade}`] = color as string;
-        });
-      }
-    } else if (typeof neutralPalette === 'object') {
+    if (typeof neutralPalette === 'object') {
       // Custom neutral palette
       Object.entries(neutralPalette).forEach(([shade, color]) => {
         variables[`--neutral-${shade}`] = color;

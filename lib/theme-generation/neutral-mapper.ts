@@ -1,4 +1,4 @@
-import { NeutralPalette } from '@/lib/stores/palette-store';
+import { NeutralPalette } from '@/lib/generated/prisma';
 
 interface ThemeColorMapping {
   light: {

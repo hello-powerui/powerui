@@ -82,22 +82,8 @@ export function NeutralPaletteManager({ isOpen, onOpenChange, onSelectPalette }:
 
   const shadeOrder = ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
 
-  // Load built-in palettes from palettes.json
-  const palettesData = require('@/public/theme-data/palettes.json');
-  
-  const builtInPaletteList = [
-    { id: 'azure', name: 'Azure', isBuiltIn: true, shades: palettesData.azure },
-    { id: 'neutral', name: 'Neutral', isBuiltIn: true, shades: palettesData.neutral },
-    { id: 'ice', name: 'Ice', isBuiltIn: true, shades: palettesData.ice },
-    { id: 'eclipse', name: 'Eclipse', isBuiltIn: true, shades: palettesData.eclipse },
-    { id: 'lava', name: 'Lava', isBuiltIn: true, shades: palettesData.lava },
-    { id: 'stone', name: 'Stone', isBuiltIn: true, shades: palettesData.stone },
-    { id: 'jungle', name: 'Jungle', isBuiltIn: true, shades: palettesData.jungle },
-  ];
-
-  // Separate user and built-in palettes
-  const userPalettes = neutralPalettes.filter(p => !p.isBuiltIn);
-  const builtInPalettes = builtInPaletteList;
+  // No more built-in palettes - all palettes are user-created
+  const userPalettes = neutralPalettes;
 
   return (
     <>
@@ -177,33 +163,6 @@ export function NeutralPaletteManager({ isOpen, onOpenChange, onSelectPalette }:
                 </div>
               )}
 
-              {/* Built-in Palettes */}
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600 mb-4">Built-in Palettes</h3>
-                <div className="grid gap-4">
-                  {builtInPalettes.map((palette) => (
-                    <div
-                      key={palette.id}
-                      className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-white hover:shadow-lg hover:border-gray-300 transition-all duration-200 cursor-pointer"
-                      onClick={() => handleSelectPalette(palette)}
-                    >
-                      <div className="mb-3">
-                        <h4 className="font-medium text-gray-900">{palette.name}</h4>
-                      </div>
-                      <div className="grid grid-cols-12 gap-0.5">
-                        {shadeOrder.map((shade) => (
-                          <div
-                            key={shade}
-                            className="h-8 first:rounded-l last:rounded-r shadow-sm"
-                            style={{ backgroundColor: palette.shades[shade] }}
-                            title={`Shade ${shade}: ${palette.shades[shade]}`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </Dialog.Content>
         </Dialog.Portal>

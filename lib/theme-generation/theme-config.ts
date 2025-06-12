@@ -1,4 +1,4 @@
-import { NeutralPalette } from '@/lib/stores/palette-store';
+import { NeutralPalette } from '@/lib/generated/prisma';
 
 // Type definitions for theme configuration
 export interface ColorPalettes {
@@ -13,22 +13,10 @@ export interface ColorMappings {
   dark: Record<string, ColorResolver>;
 }
 
-export interface VisualStyleTemplate {
-  [key: string]: (colors: Record<string, string>) => any;
-}
-
-export interface StylePreset {
-  name: string;
-  description: string;
-  borderRadius: number;
-  borderStyle: 'default' | 'subtle' | 'none';
-  padding: number;
-  colorOverrides?: Partial<Record<string, ColorResolver>>;
-}
-
 // Main theme configuration
 export const themeConfig = {
-  // Color mappings for different UI elements
+  // Color mappings for different UI elements - these can be used as a reference
+  // but users will provide their own colors
   colorMappings: {
     light: {
       // Backgrounds
@@ -125,76 +113,7 @@ export const themeConfig = {
       'fourthLevelElements': (p) => p.neutral['700'],
       'tableAccent': (p) => p.neutral['700'],
     }
-  } as ColorMappings,
-  
-  // Font configurations
-  fonts: {
-    'segoe-ui': {
-      regular: 'Segoe UI',
-      semibold: 'Segoe UI Semibold',
-      bold: 'Segoe UI Bold'
-    },
-    'arial': {
-      regular: 'Arial',
-      semibold: 'Arial',
-      bold: 'Arial Bold'
-    },
-    'helvetica-neue': {
-      regular: 'Helvetica Neue',
-      semibold: 'Helvetica Neue Medium',
-      bold: 'Helvetica Neue Bold'
-    },
-    'inter': {
-      regular: 'Inter',
-      semibold: 'Inter Medium',
-      bold: 'Inter Bold'
-    }
-  },
-  
-  // Font sizes
-  fontSizes: {
-    'text-xs': 9,
-    'text-sm': 10,
-    'text-md': 12,
-    'text-lg': 14,
-    'text-xl': 16,
-    'display-sm': 18,
-    'display-md': 24,
-    'display-lg': 32
-  },
-  
-  // Style presets
-  stylePresets: {
-    default: {
-      name: 'Default',
-      description: 'Clean, modern theme',
-      borderRadius: 4,
-      borderStyle: 'default',
-      padding: 16
-    },
-    minimal: {
-      name: 'Minimal',
-      description: 'Subtle borders and spacing',
-      borderRadius: 2,
-      borderStyle: 'subtle',
-      padding: 12,
-      colorOverrides: {
-        'border-primary': (p) => p.neutral['200'],
-        'border-secondary': (p) => p.neutral['100']
-      }
-    },
-    bold: {
-      name: 'Bold',
-      description: 'High contrast with strong borders',
-      borderRadius: 0,
-      borderStyle: 'default',
-      padding: 20,
-      colorOverrides: {
-        'border-primary': (p) => p.neutral['900'],
-        'background-secondary': (p) => p.neutral['100']
-      }
-    }
-  } as Record<string, StylePreset>
+  } as ColorMappings
 };
 
 // Helper function to resolve all colors for a given mode and palettes
@@ -208,7 +127,7 @@ export function resolveColors(
   
   for (const [key, resolver] of Object.entries(mappings)) {
     try {
-      resolved[key] = resolver(palettes);
+      resolved[key] = resolver!(palettes);
     } catch (error) {
       console.warn(`Failed to resolve color for ${key}:`, error);
       resolved[key] = mode === 'light' ? '#000000' : '#FFFFFF';

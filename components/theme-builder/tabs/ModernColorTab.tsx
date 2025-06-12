@@ -68,25 +68,8 @@ export function ModernColorTab() {
     }
   }, [colorPalettes, theme.dataColors]);
 
-  // Load built-in palettes from palettes.json
-  const palettesData = require('@/public/theme-data/palettes.json');
-  
-  // Combine built-in palette names with loaded neutral palettes
-  const builtInNeutralPalettes = [
-    { id: 'azure', name: 'Azure', isBuiltIn: true, shades: palettesData.azure },
-    { id: 'neutral', name: 'Neutral', isBuiltIn: true, shades: palettesData.neutral },
-    { id: 'ice', name: 'Ice', isBuiltIn: true, shades: palettesData.ice },
-    { id: 'eclipse', name: 'Eclipse', isBuiltIn: true, shades: palettesData.eclipse },
-    { id: 'lava', name: 'Lava', isBuiltIn: true, shades: palettesData.lava },
-    { id: 'stone', name: 'Stone', isBuiltIn: true, shades: palettesData.stone },
-    { id: 'jungle', name: 'Jungle', isBuiltIn: true, shades: palettesData.jungle },
-  ];
-  
-  // Merge built-in palettes with user palettes from the store
-  const allNeutralPalettes = [
-    ...builtInNeutralPalettes,
-    ...neutralPalettes.filter(p => !p.isBuiltIn)
-  ];
+  // No more built-in palettes - all palettes are user-created
+  const allNeutralPalettes = neutralPalettes;
 
   const handlePaletteSelect = (paletteId: string) => {
     const palette = colorPalettes.find(p => p.id === paletteId);

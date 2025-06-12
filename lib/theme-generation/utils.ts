@@ -136,6 +136,25 @@ export function replaceTokens(
         }
       }
       
+      // Check if this is a color property with nested solid.color structure
+      if (obj.color?.solid?.color) {
+        const colorValue = obj.color.solid.color;
+        
+        // Handle token references
+        if (typeof colorValue === 'string' && colorValue.startsWith('@')) {
+          const resolved = tokenResolver(colorValue.slice(1));
+          return { ...obj, color: { solid: { color: resolved } } };
+        }
+        
+        // Handle theme data color references
+        if (colorValue?.expr?.ThemeDataColor && dataColors) {
+          const resolved = resolveThemeDataColor(colorValue, dataColors);
+          if (resolved) {
+            return { ...obj, color: { solid: { color: resolved } } };
+          }
+        }
+      }
+      
       // Check if this is a ThemeDataColor expression at the current level
       if (obj.expr?.ThemeDataColor && dataColors) {
         const resolved = resolveThemeDataColor(obj, dataColors);
