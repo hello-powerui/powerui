@@ -4,9 +4,10 @@ import { updateNeutralPalette, deleteNeutralPalette } from '@/lib/db/services/pa
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const user = await requireUser();
     const data = await req.json();
     
@@ -17,7 +18,7 @@ export async function PUT(
       );
     }
     
-    const palette = await updateNeutralPalette(params.id, user.id, {
+    const palette = await updateNeutralPalette(id, user.id, {
       name: data.name,
       shades: data.shades
     });
@@ -34,11 +35,12 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const user = await requireUser();
-    await deleteNeutralPalette(params.id, user.id);
+    await deleteNeutralPalette(id, user.id);
     
     return NextResponse.json({ success: true });
   } catch (error) {

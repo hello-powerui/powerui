@@ -1,8 +1,10 @@
 import { create } from 'zustand';
 import { ColorPalette, NeutralPalette } from './palette-store';
+import { StructuralColors, TextClasses } from '@/lib/theme-generation/types';
 
 interface ThemeBuilderTheme {
   name: string;
+  description?: string;
   mode: 'light' | 'dark';
   palette: ColorPalette;
   neutralPalette: NeutralPalette;
@@ -12,6 +14,9 @@ interface ThemeBuilderTheme {
   bgStyle: string;
   borderStyle: string;
   paddingStyle?: string;
+  structuralColors?: StructuralColors;
+  textClasses?: TextClasses;
+  structuralColorsMode?: 'auto' | 'custom';
 }
 
 interface ThemeBuilderState {
@@ -33,11 +38,16 @@ interface ThemeBuilderState {
   setSpacing: (spacing: 'compact' | 'normal' | 'relaxed') => void;
   setBgStyle: (style: string) => void;
   setBorderStyle: (style: string) => void;
+  setStructuralColors: (colors: StructuralColors) => void;
+  setStructuralColorsMode: (mode: 'auto' | 'custom') => void;
+  setTextClasses: (textClasses: TextClasses) => void;
+  setTextClass: (className: keyof TextClasses, value: any) => void;
+  updateTextClasses: (textClasses: Record<string, any>) => void;
   setActiveTab: (tab: 'color' | 'typography' | 'style') => void;
   setIsSaving: (saving: boolean) => void;
   setIsGenerating: (generating: boolean) => void;
   resetTheme: () => void;
-  generateAndSaveTheme: (name: string) => Promise<void>;
+  generateAndSaveTheme: (name: string, visualStyles?: Record<string, any>) => Promise<void>;
 }
 
 const defaultTheme: ThemeBuilderTheme = {
@@ -71,7 +81,10 @@ const defaultTheme: ThemeBuilderTheme = {
   spacing: 'normal',
   bgStyle: 'default',
   borderStyle: 'default',
-  paddingStyle: 'default'
+  paddingStyle: 'default',
+  structuralColorsMode: 'auto',
+  structuralColors: {},
+  textClasses: {}
 };
 
 export const useThemeBuilderStore = create<ThemeBuilderState>((set, get) => ({
@@ -125,13 +138,44 @@ export const useThemeBuilderStore = create<ThemeBuilderState>((set, get) => ({
       theme: { ...state.theme, borderStyle },
     })),
     
+  setStructuralColors: (structuralColors) =>
+    set((state) => ({
+      theme: { ...state.theme, structuralColors },
+    })),
+    
+  setStructuralColorsMode: (mode) =>
+    set((state) => ({
+      theme: { ...state.theme, structuralColorsMode: mode },
+    })),
+    
+  setTextClasses: (textClasses) =>
+    set((state) => ({
+      theme: { ...state.theme, textClasses },
+    })),
+    
+  setTextClass: (className, value) =>
+    set((state) => ({
+      theme: {
+        ...state.theme,
+        textClasses: {
+          ...state.theme.textClasses,
+          [className]: value
+        }
+      },
+    })),
+    
+  updateTextClasses: (textClasses) =>
+    set((state) => ({
+      theme: { ...state.theme, textClasses }
+    })),
+    
   setActiveTab: (tab) => set({ activeTab: tab }),
   setIsSaving: (saving) => set({ isSaving: saving }),
   setIsGenerating: (generating) => set({ isGenerating: generating }),
   
   resetTheme: () => set({ theme: defaultTheme }),
   
-  generateAndSaveTheme: async (name: string) => {
+  generateAndSaveTheme: async (name: string, visualStyles?: Record<string, any>) => {
     const { theme } = get();
     set({ isSaving: true });
     
@@ -146,7 +190,10 @@ export const useThemeBuilderStore = create<ThemeBuilderState>((set, get) => ({
         borderRadius: theme.borderRadius,
         bgStyle: theme.bgStyle || 'default',
         borderStyle: theme.borderStyle || 'default',
-        paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default'
+        paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default',
+        structuralColors: theme.structuralColorsMode === 'custom' ? theme.structuralColors : undefined,
+        textClasses: theme.textClasses && Object.keys(theme.textClasses).length > 0 ? theme.textClasses : undefined,
+        visualStyles: visualStyles && Object.keys(visualStyles).length > 0 ? visualStyles : undefined
       };
       
       // Save theme via API

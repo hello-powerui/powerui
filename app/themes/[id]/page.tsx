@@ -11,11 +11,11 @@ export default function ThemeDetailPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const { user, isLoading } = useUser();
+  const { user, isLoaded } = useUser();
 
   useEffect(() => {
     const loadTheme = async () => {
-      if (isLoading) return;
+      if (!isLoaded) return;
       
       if (!user) {
         router.push('/');
@@ -64,7 +64,7 @@ export default function ThemeDetailPage({
         });
 
         // Navigate to builder with theme data
-        router.push(`/themes/builder?${queryParams.toString()}`);
+        router.push(`/themes/studio?${queryParams.toString()}`);
       } catch (error) {
         console.error('Error loading theme:', error);
         router.push('/themes');
@@ -72,7 +72,7 @@ export default function ThemeDetailPage({
     };
 
     loadTheme();
-  }, [id, user, isLoading, router]);
+  }, [id, user, isLoaded, router]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">

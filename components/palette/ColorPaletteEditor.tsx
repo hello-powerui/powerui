@@ -21,7 +21,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { parseCoolorsUrl, isValidHexColor, generateCoolorsUrl } from '@/lib/utils/coolors-parser';
-import { ColorPalette } from '@prisma/client';
+import { ColorPalette } from '@/lib/generated/prisma';
 
 interface ColorPaletteEditorProps {
   palette?: ColorPalette;

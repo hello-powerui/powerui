@@ -66,7 +66,7 @@ export default function ThemesPage() {
             </div>
             <div className="flex gap-3">
               <button 
-                onClick={() => router.push('/themes/builder')}
+                onClick={() => router.push('/themes/studio')}
                 className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-colors shadow-sm"
               >
                 + Create New Theme
@@ -142,21 +142,19 @@ export default function ThemesPage() {
                 <button 
                   className="px-3 py-1 text-sm bg-primary text-white hover:opacity-90 rounded"
                   onClick={async () => {
+                    const themeInput = theme.themeData || {
+                      name: theme.name,
+                      mode: theme.colorMode || 'light',
+                      dataColors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C'],
+                      neutralPalette: ['#FFFFFF', '#F5F5F5', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#757575', '#616161', '#424242', '#212121', '#000000'],
+                      fontFamily: theme.fontFamily || 'segoe-ui',
+                      borderRadius: parseInt(theme.borders || '4'),
+                    };
+                    
                     const response = await fetch('/api/generate-theme', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(theme.themeData || {
-                        name: theme.name,
-                        mode: theme.colorMode,
-                        dataColors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C'],
-                        neutralPalette: theme.neutralPalette,
-                        fontFamily: theme.fontFamily,
-                        borderRadius: parseInt(theme.borders),
-                        bgStyle: theme.bgStyle,
-                        borderStyle: theme.borderStyle,
-                        paddingStyle: theme.paddingStyle,
-                        showBorders: theme.showBorders,
-                      }),
+                      body: JSON.stringify(themeInput),
                     });
                     if (response.ok) {
                       const generatedTheme = await response.json();

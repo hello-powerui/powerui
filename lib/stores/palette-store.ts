@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { ColorPalette, NeutralPalette } from '@prisma/client'
+import { ColorPalette, NeutralPalette } from '@/lib/generated/prisma'
 
 interface PaletteStore {
   colorPalettes: ColorPalette[]

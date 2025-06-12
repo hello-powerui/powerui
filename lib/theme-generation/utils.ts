@@ -108,28 +108,55 @@ export function getThemeValue(theme: any, path: string): any {
   }
 }
 
-export function replaceTokens(obj: any, tokenResolver: (token: string) => any): any {
+export function replaceTokens(
+  obj: any, 
+  tokenResolver: (token: string) => any,
+  dataColors?: string[]
+): any {
   if (typeof obj === 'object' && obj !== null) {
     if (Array.isArray(obj)) {
-      return obj.map(item => replaceTokens(item, tokenResolver));
+      return obj.map(item => replaceTokens(item, tokenResolver, dataColors));
     } else {
+      // Check if this is a color object with solid.color structure
+      if (obj.solid?.color) {
+        const colorValue = obj.solid.color;
+        
+        // Handle token references
+        if (typeof colorValue === 'string' && colorValue.startsWith('@')) {
+          const resolved = tokenResolver(colorValue.slice(1));
+          return { solid: { color: resolved } };
+        }
+        
+        // Handle theme data color references
+        if (colorValue?.expr?.ThemeDataColor && dataColors) {
+          const resolved = resolveThemeDataColor(colorValue, dataColors);
+          if (resolved) {
+            return { solid: { color: resolved } };
+          }
+        }
+      }
+      
+      // Check if this is a ThemeDataColor expression at the current level
+      if (obj.expr?.ThemeDataColor && dataColors) {
+        const resolved = resolveThemeDataColor(obj, dataColors);
+        if (resolved) {
+          return resolved;
+        }
+      }
+      
       const result: any = {};
       for (const [key, value] of Object.entries(obj)) {
-        const replaced = replaceTokens(value, tokenResolver);
-        // Only add the property if it's not undefined
-        if (replaced !== undefined) {
-          result[key] = replaced;
-        }
+        const replaced = replaceTokens(value, tokenResolver, dataColors);
+        // Always add the property, even if null/undefined
+        // This preserves the structure of the theme
+        result[key] = replaced;
       }
       return result;
     }
   } else if (typeof obj === 'string' && obj.startsWith('@')) {
     const resolved = tokenResolver(obj.slice(1));
-    // If the resolver returns undefined or another token, return undefined
-    // This will cause the property to be omitted from the result
-    if (resolved === undefined || (typeof resolved === 'string' && resolved.startsWith('@'))) {
-      return undefined;
-    }
+    // Always return the resolved value, even if null
+    // The token resolver should always return a valid color or null
     return resolved;
   }
   return obj;
@@ -208,4 +235,41 @@ export function hslToHex(h: number, s: number, l: number): string {
   
   // Convert to hex
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+export function adjustColorBrightness(hex: string, percent: number): string {
+  // Convert hex to HSL
+  const hsl = hexToHSL(hex);
+  
+  // Adjust lightness based on percentage
+  // Negative percent darkens, positive lightens
+  let newL = hsl.l + (hsl.l * percent);
+  newL = Math.max(0, Math.min(100, newL)); // Clamp between 0 and 100
+  
+  // Convert back to hex
+  return hslToHex(hsl.h, hsl.s, newL);
+}
+
+export function resolveThemeDataColor(
+  expression: any,
+  dataColors: string[]
+): string | null {
+  // Handle ThemeDataColor expressions
+  if (expression?.expr?.ThemeDataColor) {
+    const { ColorId, Percent } = expression.expr.ThemeDataColor;
+    
+    // ColorId is 0-indexed in the dataColors array
+    if (ColorId >= 0 && ColorId < dataColors.length) {
+      const baseColor = dataColors[ColorId];
+      
+      // If there's a percentage adjustment, apply it
+      if (Percent !== undefined && Percent !== 0) {
+        return adjustColorBrightness(baseColor, Percent);
+      }
+      
+      return baseColor;
+    }
+  }
+  
+  return null;
 }

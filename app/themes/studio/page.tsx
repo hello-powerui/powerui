@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { ColorPicker } from '@/components/ui/color-picker';
 import { 
   Select,
   SelectContent,
@@ -21,9 +22,10 @@ import {
 import { useThemeBuilderStore } from '@/lib/stores/theme-builder-store';
 import { usePaletteStore } from '@/lib/stores/palette-store';
 import { useThemeAdvancedStore } from '@/lib/stores/theme-advanced-store';
-import { PowerBIPreview } from '@/components/theme-builder/PowerBIPreview';
+import { PowerBIPreview } from '@/components/theme-studio/PowerBIPreview';
 import { PaletteManager } from '@/components/palette/PaletteManager';
 import { NeutralPaletteManager } from '@/components/palette/NeutralPaletteManager';
+import { TextClassesEditor } from '@/components/theme-studio/TextClassesEditor';
 import { generateTheme, getNeutralPalettePreview } from '@/lib/theme-generation';
 import { toast } from 'sonner';
 import { 
@@ -40,6 +42,13 @@ import { cn } from '@/lib/utils';
 import { SchemaLoader } from '@/lib/theme-advanced/services/schema-loader';
 import { SchemaForm } from '@/components/theme-advanced/form/schema-form';
 import { ImportThemeModal } from '@/components/theme-advanced/ui/import-theme-modal';
+import { CollapsibleSection } from '@/components/theme-advanced/ui/collapsible-section';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 // Icons
 const BackIcon = () => (
@@ -73,6 +82,7 @@ export default function UnifiedThemeStudio() {
   const [showNeutralPaletteManager, setShowNeutralPaletteManager] = useState(false);
   const [showNeutralPreview, setShowNeutralPreview] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showTextClassesEditor, setShowTextClassesEditor] = useState(false);
   const [visualSettings, setVisualSettings] = useState<Record<string, any>>({});
   const [generatedTheme, setGeneratedTheme] = useState<any>(null);
   const [themeName, setThemeName] = useState('My Power BI Theme');
@@ -85,6 +95,7 @@ export default function UnifiedThemeStudio() {
   const hasStateDrivenProperties = selectedVisual && schemaLoader.visualHasStateDrivenProperties(selectedVisual);
   const [schemaLoaded, setSchemaLoaded] = useState(false);
   const [visualTypes, setVisualTypes] = useState<string[]>([]);
+  const [canvasTypes, setCanvasTypes] = useState<string[]>([]);
   const [topLevelProperties, setTopLevelProperties] = useState<string[]>([]);
   const [showVariantDialog, setShowVariantDialog] = useState(false);
   const [newVariantName, setNewVariantName] = useState('');
@@ -103,8 +114,15 @@ export default function UnifiedThemeStudio() {
     setSpacing,
     setBgStyle,
     setBorderStyle,
+    setStructuralColors,
+    setStructuralColorsMode,
     generateAndSaveTheme
   } = useThemeBuilderStore();
+  
+  // Sync theme mode to advanced store
+  useEffect(() => {
+    setAdvancedTheme({ ...advancedTheme, mode: theme.mode });
+  }, [theme.mode]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // const { palettes, neutralPalettes } = usePaletteStore();
   const { 
@@ -125,7 +143,12 @@ export default function UnifiedThemeStudio() {
     const loadSchema = async () => {
       try {
         await schemaLoader.loadSchema();
-        setVisualTypes(schemaLoader.getVisualTypes());
+        const types = schemaLoader.getVisualTypes();
+        const canvas = schemaLoader.getCanvasTypes();
+        console.log('Loaded visual types:', types);
+        console.log('Loaded canvas types:', canvas);
+        setVisualTypes(types);
+        setCanvasTypes(canvas);
         setTopLevelProperties(schemaLoader.getTopLevelProperties());
         setSchemaLoaded(true);
       } catch (error) {
@@ -137,6 +160,15 @@ export default function UnifiedThemeStudio() {
 
   // Generate theme whenever foundation or visual settings change
   useEffect(() => {
+    // Merge visual settings with canvas properties from advancedTheme
+    const mergedVisualStyles = {
+      ...visualSettings,
+      // Include canvas properties if they exist
+      ...(advancedTheme?.visualStyles?.report && { report: advancedTheme.visualStyles.report }),
+      ...(advancedTheme?.visualStyles?.page && { page: advancedTheme.visualStyles.page }),
+      ...(advancedTheme?.visualStyles?.filter && { filter: advancedTheme.visualStyles.filter })
+    };
+    
     const themeInput = {
       name: theme.name,
       mode: theme.mode,
@@ -147,10 +179,12 @@ export default function UnifiedThemeStudio() {
       bgStyle: theme.bgStyle || 'default',
       borderStyle: theme.borderStyle || 'default',
       paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default',
-      visualStyles: visualSettings
+      visualStyles: mergedVisualStyles,
+      structuralColors: theme.structuralColorsMode === 'custom' ? theme.structuralColors : undefined,
+      textClasses: theme.textClasses && Object.keys(theme.textClasses).length > 0 ? theme.textClasses : undefined
     };
     generateTheme(themeInput).then(setGeneratedTheme);
-  }, [theme, visualSettings]);
+  }, [theme, visualSettings, advancedTheme]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -162,8 +196,7 @@ export default function UnifiedThemeStudio() {
         visualStyles: visualSettings
       };
       
-      // TODO: Implement save functionality that includes visual settings
-      await generateAndSaveTheme(themeName);
+      await generateAndSaveTheme(themeName, visualSettings);
       toast.success('Theme saved successfully');
     } catch (error) {
       toast.error('Failed to save theme');
@@ -184,7 +217,9 @@ export default function UnifiedThemeStudio() {
         bgStyle: theme.bgStyle || 'default',
         borderStyle: theme.borderStyle || 'default',
         paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default',
-        visualStyles: visualSettings
+        visualStyles: visualSettings,
+        structuralColors: theme.structuralColorsMode === 'custom' ? theme.structuralColors : undefined,
+        textClasses: theme.textClasses && Object.keys(theme.textClasses).length > 0 ? theme.textClasses : undefined
       };
       const exportedTheme = await generateTheme(themeInput);
       const blob = new Blob([JSON.stringify(exportedTheme, null, 2)], {
@@ -203,6 +238,7 @@ export default function UnifiedThemeStudio() {
   };
 
   return (
+    <TooltipProvider>
     <div className="flex flex-col h-screen">
       {/* Header - similar to theme builder */}
       <header className="bg-white border-b border-gray-200">
@@ -264,7 +300,7 @@ export default function UnifiedThemeStudio() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Foundation Sidebar */}
+        {/* Foundation Sidebar - Combined Foundation & Properties */}
         <div className={cn(
         "border-r bg-muted/10 transition-all duration-300",
         showFoundation ? "w-96" : "w-12"
@@ -276,7 +312,7 @@ export default function UnifiedThemeStudio() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Palette className="w-5 h-5" />
-                  <h2 className="text-xl font-semibold">Foundation</h2>
+                  <h2 className="text-xl font-semibold">Theme Foundation</h2>
                 </div>
                 <Button
                   variant="ghost"
@@ -285,6 +321,17 @@ export default function UnifiedThemeStudio() {
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
+              </div>
+              
+              {/* Theme Description */}
+              <div className="space-y-2">
+                <Label>Description</Label>
+                <textarea
+                  value={theme.description || ''}
+                  onChange={(e) => useThemeBuilderStore.getState().setTheme({ description: e.target.value })}
+                  placeholder="Describe your theme..."
+                  className="w-full px-3 py-2 text-sm border rounded-md resize-none h-20"
+                />
               </div>
               
               {/* Data Colors */}
@@ -411,9 +458,189 @@ export default function UnifiedThemeStudio() {
                 )}
               </div>
 
-              {/* Typography */}
-              <div className="space-y-2">
-                <Label>Typography</Label>
+              {/* Structural Colors Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>Structural Colors</Label>
+                  <Select
+                    value={theme.structuralColorsMode || 'auto'}
+                    onValueChange={(value: 'auto' | 'custom') => setStructuralColorsMode(value)}
+                  >
+                    <SelectTrigger className="w-24">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">Auto</SelectItem>
+                      <SelectItem value="custom">Custom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {theme.structuralColorsMode === 'auto' ? (
+                  <div className="p-3 bg-muted/20 rounded-lg space-y-2">
+                    <p className="text-xs text-muted-foreground">
+                      Structural colors are automatically derived from your neutral palette.
+                    </p>
+                    {/* Preview of auto-mapped colors */}
+                    <div className="space-y-1">
+                      {getNeutralPalettePreview(theme.neutralPalette, theme.mode)
+                        .filter(m => ['firstLevelElements', 'secondLevelElements', 'thirdLevelElements', 'fourthLevelElements'].includes(m.property))
+                        .map((mapping) => (
+                        <div key={mapping.property} className="flex items-center gap-2">
+                          <div 
+                            className="w-4 h-4 rounded border"
+                            style={{ backgroundColor: mapping.value }}
+                          />
+                          <span className="text-xs font-mono">{mapping.property}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Define custom structural colors for UI elements.
+                    </p>
+                    {[
+                      { key: 'firstLevelElements', label: 'First Level Elements', default: '#252526' },
+                      { key: 'secondLevelElements', label: 'Second Level Elements', default: '#2D2D30' },
+                      { key: 'thirdLevelElements', label: 'Third Level Elements', default: '#3E3E42' },
+                      { key: 'fourthLevelElements', label: 'Fourth Level Elements', default: '#4D4D4D' },
+                      { key: 'background', label: 'Background', default: '#1E1E1E' },
+                      { key: 'secondaryBackground', label: 'Secondary Background', default: '#181818' },
+                      { key: 'tableAccent', label: 'Table Accent', default: '#0E639C' }
+                    ].map(({ key, label, default: defaultColor }) => (
+                      <div key={key} className="flex items-center justify-between">
+                        <Label className="text-xs">{label}</Label>
+                        <ColorPicker
+                          value={theme.structuralColors?.[key as keyof typeof theme.structuralColors] || defaultColor}
+                          onChange={(color) => {
+                            const updatedColors = {
+                              ...theme.structuralColors,
+                              [key]: color
+                            };
+                            setStructuralColors(updatedColors);
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Canvas & Layout Section */}
+              <div className="space-y-4 border-t pt-4">
+                <h3 className="text-sm font-medium flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                  </svg>
+                  Canvas & Layout
+                </h3>
+                
+                {/* Debug info */}
+                {schemaLoaded && canvasTypes.length === 0 && (
+                  <p className="text-xs text-muted-foreground">No canvas properties available in schema</p>
+                )}
+                
+                {/* Report Canvas */}
+                {schemaLoaded && canvasTypes.includes('report') && (
+                  <CollapsibleSection
+                    title="Report Canvas"
+                    tooltip="Controls the overall report appearance and behavior"
+                    defaultOpen={false}
+                  >
+                    <SchemaForm
+                      schema={schemaLoader.getVisualSchema('report')?.properties?.['*'] || {}}
+                      value={advancedTheme?.visualStyles?.report?.['*'] || {}}
+                      onChange={(value) => {
+                        const newTheme = {
+                          ...advancedTheme,
+                          visualStyles: {
+                            ...advancedTheme.visualStyles,
+                            report: {
+                              '*': value
+                            }
+                          }
+                        };
+                        setAdvancedTheme(newTheme);
+                      }}
+                      schemaLoader={schemaLoader}
+                      path={['visualStyles', 'report', '*']}
+                    />
+                  </CollapsibleSection>
+                )}
+                
+                {/* Page Settings */}
+                {schemaLoaded && canvasTypes.includes('page') && (
+                  <CollapsibleSection
+                    title="Page Settings"
+                    tooltip="Configure page backgrounds, size, and layout options"
+                    defaultOpen={false}
+                  >
+                    <SchemaForm
+                      schema={schemaLoader.getVisualSchema('page')?.properties?.['*'] || {}}
+                      value={advancedTheme?.visualStyles?.page?.['*'] || {}}
+                      onChange={(value) => {
+                        const newTheme = {
+                          ...advancedTheme,
+                          visualStyles: {
+                            ...advancedTheme.visualStyles,
+                            page: {
+                              '*': value
+                            }
+                          }
+                        };
+                        setAdvancedTheme(newTheme);
+                      }}
+                      schemaLoader={schemaLoader}
+                      path={['visualStyles', 'page', '*']}
+                    />
+                  </CollapsibleSection>
+                )}
+                
+                {/* Filter Pane */}
+                {schemaLoaded && canvasTypes.includes('filter') && (
+                  <CollapsibleSection
+                    title="Filter Pane"
+                    tooltip="Customize the appearance of filter panes and cards"
+                    defaultOpen={false}
+                  >
+                    <SchemaForm
+                      schema={schemaLoader.getVisualSchema('filter')?.properties?.['*'] || {}}
+                      value={advancedTheme?.visualStyles?.filter?.['*'] || {}}
+                      onChange={(value) => {
+                        const newTheme = {
+                          ...advancedTheme,
+                          visualStyles: {
+                            ...advancedTheme.visualStyles,
+                            filter: {
+                              '*': value
+                            }
+                          }
+                        };
+                        setAdvancedTheme(newTheme);
+                      }}
+                      schemaLoader={schemaLoader}
+                      path={['visualStyles', 'filter', '*']}
+                    />
+                  </CollapsibleSection>
+                )}
+              </div>
+
+              {/* Typography & Text Classes */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>Typography</Label>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowTextClassesEditor(true)}
+                    className="h-auto py-1 px-2 text-xs font-medium"
+                  >
+                    <Settings className="h-3 w-3 mr-1" />
+                    Text Classes
+                  </Button>
+                </div>
                 <Select value={theme.fontFamily} onValueChange={setFontFamily}>
                   <SelectTrigger>
                     <SelectValue />
@@ -433,9 +660,9 @@ export default function UnifiedThemeStudio() {
                 </Select>
               </div>
 
-              {/* Base Properties */}
+              {/* Visual Style Properties */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium">Base Properties</h3>
+                <h3 className="text-sm font-medium">Visual Style</h3>
                 
                 {/* Border Radius */}
                 <div className="space-y-2">
@@ -579,18 +806,6 @@ export default function UnifiedThemeStudio() {
                 Global
               </button>
               <button
-                onClick={() => setSelectedSection('properties')}
-                className={cn(
-                  "flex-1 px-3 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors",
-                  selectedSection === 'properties'
-                    ? 'bg-primary text-white'
-                    : 'text-gray-600 hover:bg-gray-50'
-                )}
-              >
-                <PropertyIcon />
-                Properties
-              </button>
-              <button
                 onClick={() => setSelectedSection('visuals')}
                 className={cn(
                   "flex-1 px-3 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors",
@@ -633,24 +848,6 @@ export default function UnifiedThemeStudio() {
                       <p className="text-xs text-gray-500 mt-1">Spacing, padding, borders for all visuals</p>
                     </button>
                   </div>
-                ) : selectedSection === 'properties' ? (
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-700 mb-3">Theme Properties</h3>
-                    {topLevelProperties.map((prop) => (
-                      <button
-                        key={prop}
-                        onClick={() => setSelectedProperty(prop)}
-                        className={cn(
-                          "w-full text-left px-3 py-2 text-sm rounded border transition-colors",
-                          selectedProperty === prop
-                            ? 'bg-primary/10 border-primary text-primary'
-                            : 'hover:bg-gray-50 border-transparent hover:border-gray-200'
-                        )}
-                      >
-                        {prop.charAt(0).toUpperCase() + prop.slice(1).replace(/([A-Z])/g, ' $1')}
-                      </button>
-                    ))}
-                  </div>
                 ) : (
                   <div className="space-y-2">
                     <h3 className="text-sm font-medium text-gray-700 mb-3">Visual Styles</h3>
@@ -680,24 +877,7 @@ export default function UnifiedThemeStudio() {
 
               {/* Form Section */}
               <div className="p-4">
-                {selectedSection === 'properties' && selectedProperty ? (
-                  <>
-                    <h2 className="text-lg font-semibold mb-4">
-                      {selectedProperty.charAt(0).toUpperCase() + selectedProperty.slice(1).replace(/([A-Z])/g, ' $1')}
-                    </h2>
-                    {schemaLoaded && (
-                      <SchemaForm
-                        schema={schemaLoader.getPropertySchema([selectedProperty]) || { type: 'null' }}
-                        value={advancedTheme[selectedProperty]}
-                        onChange={(value) => {
-                          updateThemeProperty([selectedProperty], value);
-                        }}
-                        schemaLoader={schemaLoader}
-                        hideTitle
-                      />
-                    )}
-                  </>
-                ) : selectedSection === 'visuals' && selectedVisual ? (
+                {selectedSection === 'visuals' && selectedVisual ? (
                   <>
                     <div className="mb-4">
                       <h2 className="text-lg font-semibold">
@@ -896,8 +1076,6 @@ export default function UnifiedThemeStudio() {
                     <p className="mb-2">
                       {selectedSection === 'global'
                         ? 'Select a global setting from above to edit'
-                        : selectedSection === 'properties' 
-                        ? 'Select a property from above to edit'
                         : 'Select a visual from the dropdown above to edit its styles'}
                     </p>
                   </div>
@@ -1033,6 +1211,13 @@ export default function UnifiedThemeStudio() {
         </div>
       </div>
     )}
+    
+    {/* Text Classes Editor Modal */}
+    <TextClassesEditor 
+      open={showTextClassesEditor}
+      onOpenChange={setShowTextClassesEditor}
+    />
     </div>
+    </TooltipProvider>
   );
 }

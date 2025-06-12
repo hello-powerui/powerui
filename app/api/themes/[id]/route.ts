@@ -4,11 +4,12 @@ import { ThemeService } from '@/lib/db/services/theme-service';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireUser();
-    const theme = await ThemeService.getThemeById(params.id, user.id);
+    const { id } = await params;
+    const theme = await ThemeService.getThemeById(id, user.id);
     
     if (!theme) {
       return NextResponse.json(
@@ -29,14 +30,15 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireUser();
     const data = await req.json();
+    const { id } = await params;
     
     // Check if theme exists and belongs to user
-    const existingTheme = await ThemeService.getThemeById(params.id, user.id);
+    const existingTheme = await ThemeService.getThemeById(id, user.id);
     if (!existingTheme) {
       return NextResponse.json(
         { error: 'Theme not found' },
@@ -77,7 +79,7 @@ export async function PUT(
     };
     
     const updatedTheme = await ThemeService.updateTheme(
-      params.id,
+      id,
       user.id,
       updateData
     );
@@ -94,13 +96,14 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireUser();
+    const { id } = await params;
     
     // Check if theme exists and belongs to user
-    const existingTheme = await ThemeService.getThemeById(params.id, user.id);
+    const existingTheme = await ThemeService.getThemeById(id, user.id);
     if (!existingTheme) {
       return NextResponse.json(
         { error: 'Theme not found' },
@@ -108,7 +111,7 @@ export async function DELETE(
       );
     }
     
-    await ThemeService.deleteTheme(params.id, user.id);
+    await ThemeService.deleteTheme(id, user.id);
     
     return NextResponse.json({ success: true });
   } catch (error) {

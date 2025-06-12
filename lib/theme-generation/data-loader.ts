@@ -44,10 +44,7 @@ export async function loadThemeConfigs(): Promise<ThemeConfigs> {
 
 // For client-side usage
 export async function loadThemeConfigsClient(): Promise<ThemeConfigs> {
-  if (cachedConfigs) {
-    return cachedConfigs;
-  }
-
+  // Don't use cache for test page to ensure fresh data
   const configFiles = {
     theme: 'base-theme.json',
     elements: 'elements.json',
@@ -80,8 +77,7 @@ export async function loadThemeConfigsClient(): Promise<ThemeConfigs> {
     }
   }
 
-  cachedConfigs = configs as ThemeConfigs;
-  return cachedConfigs;
+  return configs as ThemeConfigs;
 }
 
 // Clear cache when needed

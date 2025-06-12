@@ -122,6 +122,7 @@ export class ThemeGenerator {
           specialHandlers[token](theme, path);
         } else {
           // Default: use token as value, convert to int if it's numeric
+          // Token strings will be resolved later in the second pass
           const value = /^\d+$/.test(token) ? parseInt(token) : token;
           updateThemePath(theme, path, value);
         }
@@ -153,6 +154,67 @@ export class ThemeGenerator {
     return styles[styleName];
   }
 
+  private getFallbackColor(token: string, mode: 'light' | 'dark'): string {
+    // Provide reasonable fallback colors when tokens can't be resolved
+    const lightDefaults: Record<string, string> = {
+      'bg-primary': '#FFFFFF',
+      'bg-secondary': '#F5F5F5',
+      'bg-tertiary': '#E5E5E5',
+      'bg-brand-primary': '#E6F3FF',
+      'text-primary': '#1A1A1A',
+      'text-secondary': '#4D4D4D',
+      'text-tertiary': '#666666',
+      'border-primary': '#CCCCCC',
+      'border-secondary': '#E5E5E5',
+      'fg-primary': '#1A1A1A',
+      'fg-secondary': '#4D4D4D',
+      'fg-brand-primary': '#0066CC',
+      'fg-error-primary': '#DC2626',
+      'fg-warning-primary': '#F59E0B',
+      'fg-success-primary': '#10B981'
+    };
+
+    const darkDefaults: Record<string, string> = {
+      'bg-primary': '#0D0D0D',
+      'bg-secondary': '#1A1A1A',
+      'bg-tertiary': '#2D2D2D',
+      'bg-brand-primary': '#003366',
+      'text-primary': '#F5F5F5',
+      'text-secondary': '#CCCCCC',
+      'text-tertiary': '#999999',
+      'border-primary': '#4D4D4D',
+      'border-secondary': '#333333',
+      'fg-primary': '#FFFFFF',
+      'fg-secondary': '#CCCCCC',
+      'fg-brand-primary': '#3399FF',
+      'fg-error-primary': '#EF4444',
+      'fg-warning-primary': '#FCD34D',
+      'fg-success-primary': '#34D399'
+    };
+
+    const defaults = mode === 'light' ? lightDefaults : darkDefaults;
+    
+    // Check for exact match
+    if (token in defaults) {
+      return defaults[token];
+    }
+    
+    // Check for pattern match (e.g., bg-brand-solid, text-brand-secondary)
+    for (const [key, value] of Object.entries(defaults)) {
+      if (token.startsWith(key.split('-').slice(0, -1).join('-'))) {
+        return value;
+      }
+    }
+    
+    // Ultimate fallbacks
+    if (token.startsWith('bg-')) return mode === 'light' ? '#F5F5F5' : '#1A1A1A';
+    if (token.startsWith('text-')) return mode === 'light' ? '#1A1A1A' : '#F5F5F5';
+    if (token.startsWith('border-')) return mode === 'light' ? '#CCCCCC' : '#4D4D4D';
+    if (token.startsWith('fg-')) return mode === 'light' ? '#1A1A1A' : '#FFFFFF';
+    
+    return mode === 'light' ? '#000000' : '#FFFFFF';
+  }
+
   generate(data: ThemeGenerationInput): any {
     // Validate required fields
     const requiredFields: (keyof ThemeGenerationInput)[] = [
@@ -174,6 +236,21 @@ export class ThemeGenerator {
     const tokenMappings = this.configs.elements[mode];
 
     const resolveToken = (token: string): any => {
+      // Handle mode-specific tokens like @dark:bg-primary or @light:text-primary
+      if (token.includes(':')) {
+        const [specifiedMode, baseToken] = token.split(':');
+        if (['dark', 'light'].includes(specifiedMode)) {
+          // Use the specified mode's mappings instead of current mode
+          const specificModeMappings = this.configs.elements[specifiedMode as 'light' | 'dark'];
+          const result = this.resolveColorToken(baseToken, specificModeMappings, neutralPalette);
+          if (result !== null) {
+            return result;
+          }
+          // If not found in mappings, use fallback for the specified mode
+          return this.getFallbackColor(baseToken, specifiedMode as 'light' | 'dark');
+        }
+      }
+      
       // Try mode-specific tokens first
       let result = this.resolveModeToken(token, neutralPalette);
       if (result !== null) {
@@ -204,27 +281,35 @@ export class ThemeGenerator {
         return result;
       }
 
-      // Return unresolved tokens for second pass
-      if (token.startsWith('bg-') || token === 'border-primary') {
-        return `@${token}`;
+      // Check if this is a color token that should be in tokenMappings
+      const colorTokenPrefixes = ['bg-', 'text-', 'fg-', 'border-'];
+      const isColorToken = colorTokenPrefixes.some(prefix => token.startsWith(prefix));
+      
+      if (isColorToken) {
+        // Return a fallback color based on the token type and mode
+        return this.getFallbackColor(token, mode);
       }
 
-      // Only warn for truly unresolved tokens, not those we expect to resolve later
-      if (!token.startsWith('text-') && !token.startsWith('fg-')) {
-        console.warn(`Unresolved token: ${token}`);
-      }
-      return `@${token}`;
+      // For any other unresolved token, return a visible fallback
+      console.warn(`Unresolved token: ${token}`);
+      return mode === 'light' ? '#FF00FF' : '#00FFFF'; // Magenta/Cyan to make it obvious
     };
 
     // Start with base theme
-    const theme = JSON.parse(JSON.stringify(this.configs.theme));
+    const baseTheme = JSON.parse(JSON.stringify(this.configs.theme));
     
-
+    // IMPORTANT: Remove any pre-existing visualStyles.*.* to avoid conflicts
+    // The style system will recreate these with the correct tokens
+    if (baseTheme.visualStyles?.['*']?.['*']) {
+      delete baseTheme.visualStyles['*']['*'];
+    }
+    
+    // Apply styles BEFORE any token resolution to ensure tokens are in place
     // Apply container style
     if (data.bgStyle) {
       const containerStyle = this.configs.styles.containerStyles[data.bgStyle];
       if (containerStyle) {
-        this.applyStyleConfig(theme, containerStyle, `container (${data.bgStyle})`);
+        this.applyStyleConfig(baseTheme, containerStyle, `container (${data.bgStyle})`);
       }
     }
 
@@ -234,15 +319,15 @@ export class ThemeGenerator {
     const specialHandlers = {
       'inherit-bg': (theme: any, path: string) => this.handleBorderInheritBg(theme, path)
     };
-    this.applyStyleConfig(theme, borderConfig, `border (${borderStyle})`, specialHandlers);
+    this.applyStyleConfig(baseTheme, borderConfig, `border (${borderStyle})`, specialHandlers);
 
     // Apply padding styles
     const paddingStyle = data.paddingStyle || 'default';
     const paddingConfig = this.validateAndGetStyle(paddingStyle, 'paddingStyles');
-    this.applyStyleConfig(theme, paddingConfig, `padding (${paddingStyle})`);
-
-    // Resolve all tokens
-    const finalTheme = replaceTokens(theme, resolveToken);
+    this.applyStyleConfig(baseTheme, paddingConfig, `padding (${paddingStyle})`);
+    
+    // NOW resolve all tokens in one pass
+    const finalTheme = replaceTokens(baseTheme, resolveToken, data.dataColors);
     
 
     // Ensure critical color properties are resolved
@@ -317,6 +402,47 @@ export class ThemeGenerator {
       // Apply the mapped colors to the theme
       Object.assign(finalTheme, neutralMapping);
     }
+    
+    // Apply structural colors if provided (overrides neutral mapping)
+    if (data.structuralColors) {
+      const structuralColors = data.structuralColors;
+      if (structuralColors.firstLevelElements) finalTheme.firstLevelElements = structuralColors.firstLevelElements;
+      if (structuralColors.secondLevelElements) finalTheme.secondLevelElements = structuralColors.secondLevelElements;
+      if (structuralColors.thirdLevelElements) finalTheme.thirdLevelElements = structuralColors.thirdLevelElements;
+      if (structuralColors.fourthLevelElements) finalTheme.fourthLevelElements = structuralColors.fourthLevelElements;
+      if (structuralColors.background) finalTheme.background = structuralColors.background;
+      if (structuralColors.secondaryBackground) finalTheme.secondaryBackground = structuralColors.secondaryBackground;
+      if (structuralColors.tableAccent) finalTheme.tableAccent = structuralColors.tableAccent;
+    }
+    
+    // Apply text classes if provided
+    if (data.textClasses) {
+      finalTheme.textClasses = {};
+      
+      // Helper to create text class object
+      const createTextClass = (textClass: any) => {
+        const result: any = {};
+        if (textClass.fontColor) result.color = textClass.fontColor;
+        if (textClass.fontFace) result.fontFace = textClass.fontFace;
+        if (textClass.fontSize) result.fontSize = textClass.fontSize;
+        if (textClass.bold) result.bold = true;
+        return result;
+      };
+      
+      // Apply each text class if defined
+      if (data.textClasses.callout) finalTheme.textClasses.callout = createTextClass(data.textClasses.callout);
+      if (data.textClasses.header) finalTheme.textClasses.header = createTextClass(data.textClasses.header);
+      if (data.textClasses.title) finalTheme.textClasses.title = createTextClass(data.textClasses.title);
+      if (data.textClasses.largeTitle) finalTheme.textClasses.largeTitle = createTextClass(data.textClasses.largeTitle);
+      if (data.textClasses.label) finalTheme.textClasses.label = createTextClass(data.textClasses.label);
+      if (data.textClasses.semiboldLabel) finalTheme.textClasses.semiboldLabel = createTextClass(data.textClasses.semiboldLabel);
+      if (data.textClasses.largeLabel) finalTheme.textClasses.largeLabel = createTextClass(data.textClasses.largeLabel);
+      if (data.textClasses.smallLabel) finalTheme.textClasses.smallLabel = createTextClass(data.textClasses.smallLabel);
+      if (data.textClasses.lightLabel) finalTheme.textClasses.lightLabel = createTextClass(data.textClasses.lightLabel);
+      if (data.textClasses.boldLabel) finalTheme.textClasses.boldLabel = createTextClass(data.textClasses.boldLabel);
+      if (data.textClasses.largeLightLabel) finalTheme.textClasses.largeLightLabel = createTextClass(data.textClasses.largeLightLabel);
+      if (data.textClasses.smallLightLabel) finalTheme.textClasses.smallLightLabel = createTextClass(data.textClasses.smallLightLabel);
+    }
 
     // Apply visual style overrides if provided
     if (data.visualStyles && Object.keys(data.visualStyles).length > 0) {
@@ -330,7 +456,28 @@ export class ThemeGenerator {
           if (!finalTheme.visualStyles[visualType]) {
             finalTheme.visualStyles[visualType] = {};
           }
-          finalTheme.visualStyles[visualType]['*'] = settings;
+          
+          // Check if settings already has the variant structure
+          if (typeof settings === 'object' && !Array.isArray(settings)) {
+            // If settings has keys like '*', 'minimal', etc., it's already in variant format
+            const hasVariantStructure = Object.keys(settings).some(key => key === '*' || !key.startsWith('@'));
+            
+            if (hasVariantStructure) {
+              // Settings already has variant structure, apply token resolution to each variant
+              for (const [variant, variantSettings] of Object.entries(settings)) {
+                const resolvedSettings = replaceTokens(variantSettings, resolveToken, data.dataColors);
+                finalTheme.visualStyles[visualType][variant] = resolvedSettings;
+              }
+            } else {
+              // Legacy format - wrap in default variant
+              const resolvedSettings = replaceTokens(settings, resolveToken, data.dataColors);
+              finalTheme.visualStyles[visualType]['*'] = resolvedSettings;
+            }
+          } else {
+            // Legacy format - wrap in default variant
+            const resolvedSettings = replaceTokens(settings, resolveToken, data.dataColors);
+            finalTheme.visualStyles[visualType]['*'] = resolvedSettings;
+          }
         }
       }
     }

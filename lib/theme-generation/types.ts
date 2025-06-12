@@ -1,3 +1,35 @@
+export interface StructuralColors {
+  firstLevelElements?: string;
+  secondLevelElements?: string;
+  thirdLevelElements?: string;
+  fourthLevelElements?: string;
+  background?: string;
+  secondaryBackground?: string;
+  tableAccent?: string;
+}
+
+export interface TextClass {
+  fontFace?: string;
+  fontSize?: number;
+  fontColor?: string;
+  bold?: boolean;
+}
+
+export interface TextClasses {
+  callout?: TextClass;
+  header?: TextClass;
+  title?: TextClass;
+  largeTitle?: TextClass;
+  label?: TextClass;
+  semiboldLabel?: TextClass;
+  largeLabel?: TextClass;
+  smallLabel?: TextClass;
+  lightLabel?: TextClass;
+  boldLabel?: TextClass;
+  largeLightLabel?: TextClass;
+  smallLightLabel?: TextClass;
+}
+
 export interface ThemeGenerationInput {
   mode: 'light' | 'dark';
   neutralPalette: string | Record<string, string>;
@@ -31,6 +63,12 @@ export interface ThemeGenerationInput {
   
   // Visual-specific overrides
   visualStyles?: VisualStyleOverrides;
+  
+  // Structural colors
+  structuralColors?: StructuralColors;
+  
+  // Text classes
+  textClasses?: TextClasses;
 }
 
 export interface FillDefinition {

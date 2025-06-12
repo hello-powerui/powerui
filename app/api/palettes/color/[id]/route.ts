@@ -58,9 +58,9 @@ export async function DELETE(
     const themes = await ThemeService.getUserThemes(dbUserId);
     const referencingThemes = themes.filter(theme => theme.dataPalette === id);
     
-    const success = await PaletteService.deleteColorPalette(id, dbUserId);
-    
-    if (!success) {
+    try {
+      await PaletteService.deleteColorPalette(id, dbUserId);
+    } catch (error) {
       return NextResponse.json(
         { error: 'Palette not found or unauthorized' },
         { status: 404 }
@@ -69,7 +69,7 @@ export async function DELETE(
     
     // Reset themes that were using this palette
     if (referencingThemes.length > 0) {
-      const defaultPalette = await PaletteService.getBuiltInPalettes();
+      const defaultPalette = await PaletteService.getBuiltInColorPalettes();
       const defaultPaletteId = defaultPalette[0]?.id;
       
       if (defaultPaletteId) {

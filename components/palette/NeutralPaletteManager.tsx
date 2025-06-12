@@ -166,8 +166,8 @@ export function NeutralPaletteManager({ isOpen, onOpenChange, onSelectPalette }:
                             <div
                               key={shade}
                               className="h-8 first:rounded-l last:rounded-r shadow-sm"
-                              style={{ backgroundColor: palette.shades[shade] }}
-                              title={`Shade ${shade}: ${palette.shades[shade]}`}
+                              style={{ backgroundColor: (palette.shades as any)?.[shade] || '#ccc' }}
+                              title={`Shade ${shade}: ${(palette.shades as any)?.[shade] || 'N/A'}`}
                             />
                           ))}
                         </div>

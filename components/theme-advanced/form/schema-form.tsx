@@ -1219,11 +1219,11 @@ export function SchemaForm({
     // Check if this is a visual definition (has allOf with visual-specific properties)
     const hasVisualAllOf = schema.allOf && 
                           Array.isArray(schema.allOf) && 
-                          schema.allOf.length > 1 && 
-                          schema.allOf[1] &&
-                          'properties' in schema.allOf[1] &&
-                          schema.allOf[1].properties &&
-                          !schema.allOf[1].properties['*']; // Exclude the wrapper level
+                          (schema.allOf as any[]).length > 1 && 
+                          (schema.allOf as any)[1] &&
+                          'properties' in (schema.allOf as any)[1] &&
+                          (schema.allOf as any)[1].properties &&
+                          !(schema.allOf as any)[1].properties['*']; // Exclude the wrapper level
     
     if (hasVisualAllOf) {
       // Render visual properties using schema-defined sections
@@ -1426,7 +1426,7 @@ export function SchemaForm({
         onChange={(newValue) => {
           // Try to parse as number first
           const numValue = parseFloat(newValue);
-          if (!isNaN(numValue) && schema.type.includes('number')) {
+          if (!isNaN(numValue) && schema.type?.includes('number')) {
             handleChange(numValue);
           } else {
             handleChange(newValue);

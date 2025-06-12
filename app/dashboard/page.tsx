@@ -118,7 +118,7 @@ export default function DashboardPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium text-gray-900">My Themes</h2>
-            <Link href="/themes/builder" className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors">
+            <Link href="/themes/studio" className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors">
               <PlusIcon />
               <span>New Theme</span>
             </Link>
@@ -142,7 +142,7 @@ export default function DashboardPage() {
               // No themes yet
               <div className="col-span-full bg-white p-8 rounded-lg border border-gray-200 text-center">
                 <p className="text-sm text-gray-600 mb-2">No themes created yet</p>
-                <Link href="/themes/builder" className="text-sm text-gray-900 hover:underline">
+                <Link href="/themes/studio" className="text-sm text-gray-900 hover:underline">
                   Create your first theme →
                 </Link>
               </div>

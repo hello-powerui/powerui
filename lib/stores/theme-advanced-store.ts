@@ -68,6 +68,7 @@ interface ThemeAdvancedState {
 
 const defaultTheme: PowerBITheme = {
   name: 'Untitled Advanced Theme',
+  mode: 'light',
   dataColors: [
     '#2568E8',
     '#8338EC',

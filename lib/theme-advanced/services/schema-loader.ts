@@ -28,6 +28,9 @@ export class SchemaLoader {
         throw new Error(`Failed to load properties.json: ${propertiesResponse.statusText}`);
       }
       const propertiesData = await propertiesResponse.json();
+      console.log('Loaded properties data:', propertiesData);
+      console.log('Has visualStyles?', !!propertiesData.visualStyles);
+      console.log('visualStyles.properties keys:', propertiesData.visualStyles?.properties ? Object.keys(propertiesData.visualStyles.properties) : 'none');
       this.properties = propertiesData;
 
       // Load definitions summary
@@ -122,6 +125,31 @@ export class SchemaLoader {
     );
   }
 
+  getAllVisualTypes(): string[] {
+    if (!this.properties.visualStyles?.properties) return [];
+    return Object.keys(this.properties.visualStyles.properties);
+  }
+
+  getCanvasTypes(): string[] {
+    console.log('Getting canvas types...');
+    console.log('properties:', this.properties);
+    console.log('visualStyles:', this.properties.visualStyles);
+    console.log('visualStyles.properties:', this.properties.visualStyles?.properties);
+    
+    if (!this.properties.visualStyles?.properties) {
+      console.log('No visualStyles.properties found');
+      return [];
+    }
+    
+    const allTypes = Object.keys(this.properties.visualStyles.properties);
+    console.log('All visual types:', allTypes);
+    
+    const canvasTypes = ['report', 'page', 'filter'].filter(type => allTypes.includes(type));
+    console.log('Canvas types found:', canvasTypes);
+    
+    return canvasTypes;
+  }
+
   getTopLevelProperties(): string[] {
     return Object.keys(this.properties).filter(
       key => key !== 'visualStyles' && key !== '$schema'
@@ -142,6 +170,12 @@ export class SchemaLoader {
     }
     
     return current as SchemaProperty;
+  }
+
+  getVisualSchema(visualType: string): SchemaProperty | undefined {
+    // Get schema for any visual type, including report/page/filter
+    if (!this.properties.visualStyles?.properties) return undefined;
+    return this.properties.visualStyles.properties[visualType];
   }
 
   // Clear cache (useful for development)
