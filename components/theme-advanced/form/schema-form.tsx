@@ -10,6 +10,8 @@ import { Card } from '@/components/ui/card';
 import { FillControl, NumberControl, BooleanControl } from './controls';
 import { PropertyWithInheritance } from './property-with-inheritance';
 import { useThemeAdvancedStore } from '@/lib/stores/theme-advanced-store';
+import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
+import { PropertyWrapper } from './property-wrapper';
 
 interface SchemaFormProps {
   schema: SchemaProperty;
@@ -136,6 +138,9 @@ const VisualPropertiesRenderer: React.FC<{
   level: number;
 }> = ({ schema, value, onChange, schemaLoader, path, level }) => {
   const [activeTab, setActiveTab] = useState<'specific' | 'general'>('specific');
+  const hasChangesInSection = useThemeChanges(state => state.hasChangesInSection);
+  const getChangedPropertiesCount = useThemeChanges(state => state.getChangedPropertiesCount);
+  const trackChangeRef = useThemeChanges(state => state.trackChange);
   // For visual definitions, we want to process both commonCards and visual-specific properties
   let commonProperties: Record<string, SchemaProperty> = {};
   let visualProperties: Record<string, SchemaProperty> = {};
@@ -220,36 +225,36 @@ const VisualPropertiesRenderer: React.FC<{
   return (
     <div className="space-y-4">
       {/* Tab navigation */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+      <div className="bg-gray-100 p-1 rounded-md">
+        <nav className="flex space-x-1" aria-label="Tabs">
           <button
             onClick={() => setActiveTab('specific')}
             className={`
-              whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm
+              flex-1 whitespace-nowrap py-2 px-3 rounded-md font-medium text-sm transition-all
               ${activeTab === 'specific'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-gray-900 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
               }
             `}
           >
             Visual Properties
             {specificSections.length > 0 && (
-              <span className="ml-2 text-xs text-gray-500">({specificSections.length})</span>
+              <span className={`ml-2 text-xs ${activeTab === 'specific' ? 'text-gray-300' : 'text-gray-500'}`}>({specificSections.length})</span>
             )}
           </button>
           <button
             onClick={() => setActiveTab('general')}
             className={`
-              whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm
+              flex-1 whitespace-nowrap py-2 px-3 rounded-md font-medium text-sm transition-all
               ${activeTab === 'general'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-gray-900 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
               }
             `}
           >
             General Properties
             {generalSections.length > 0 && (
-              <span className="ml-2 text-xs text-gray-500">({generalSections.length})</span>
+              <span className={`ml-2 text-xs ${activeTab === 'general' ? 'text-gray-300' : 'text-gray-500'}`}>({generalSections.length})</span>
             )}
           </button>
         </nav>
@@ -271,12 +276,18 @@ const VisualPropertiesRenderer: React.FC<{
               onChange({ ...value, [name]: undefined });
             };
             
+            const sectionPath = [...path, name];
+            const hasChanges = hasChangesInSection(sectionPath);
+            const changedCount = getChangedPropertiesCount(sectionPath);
+            
             return (
               <CollapsibleSection
                 key={name}
                 id={`${path.join('-')}-${name}`}
                 title={title}
                 defaultOpen={isDefaultOpen}
+                hasChanges={hasChanges}
+                changedCount={changedCount}
                 headerAction={
                   <button
                     type="button"
@@ -284,7 +295,7 @@ const VisualPropertiesRenderer: React.FC<{
                       e.stopPropagation();
                       handleSectionReset();
                     }}
-                    className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50"
+                    className="text-xs text-gray-600 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-100"
                   >
                     Reset Section
                   </button>
@@ -294,7 +305,7 @@ const VisualPropertiesRenderer: React.FC<{
                   {/* Show state indicator if this section has state support */}
                   {sectionSchema.items?.properties?.$id && (
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1">
+                      <span className="text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded flex items-center gap-1">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
@@ -326,9 +337,7 @@ const VisualPropertiesRenderer: React.FC<{
                           const hasShow = sectionSchema.items.properties.show !== undefined;
                           const showValue = hasShow ? itemValue?.show ?? true : true;
                           
-                          console.log(`Section "${name}" properties:`, Object.keys(sectionSchema.items.properties));
                           const sorted = sortPropertiesWithShowFirst(sectionSchema.items.properties);
-                          console.log(`Sorted "${name}" properties:`, sorted.map(([name]) => name));
                           return sorted
                             .filter(([propName, propSchema]) => {
                               // Filter out properties with complex/mixed types that are confusing
@@ -359,6 +368,8 @@ const VisualPropertiesRenderer: React.FC<{
                                   onChange={(newValue) => {
                                     const newItemValue = { ...itemValue, [propName]: newValue };
                                     onChange({ ...value, [name]: [newItemValue] });
+                                    // Also track this specific change
+                                    trackChangeRef([...path, name, '0', propName]);
                                   }}
                                   schemaLoader={schemaLoader}
                                   path={[...path, name, '0', propName]}
@@ -395,12 +406,18 @@ const VisualPropertiesRenderer: React.FC<{
           onChange({ ...value, [name]: undefined });
         };
         
+        const sectionPath = [...path, name];
+        const hasChanges = hasChangesInSection(sectionPath);
+        const changedCount = getChangedPropertiesCount(sectionPath);
+        
         return (
           <CollapsibleSection
             key={name}
             id={`${path.join('-')}-${name}`}
             title={title}
             defaultOpen={isDefaultOpen}
+            hasChanges={hasChanges}
+            changedCount={changedCount}
             headerAction={
               <button
                 type="button"
@@ -480,6 +497,8 @@ const VisualPropertiesRenderer: React.FC<{
                               onChange={(newValue) => {
                                 const newItemValue = { ...itemValue, [propName]: newValue };
                                 onChange({ ...value, [name]: [newItemValue] });
+                                // Also track this specific change
+                                trackChangeRef([...path, name, '0', propName]);
                               }}
                               schemaLoader={schemaLoader}
                               path={[...path, name, '0', propName]}
@@ -669,10 +688,16 @@ export function SchemaForm({
   level = 0,
   hideTitle = false,
 }: SchemaFormProps) {
+  const trackChangeRef = useThemeChanges(state => state.trackChange);
+  
   // Handle value updates
   const handleChange = useCallback((newValue: any) => {
     onChange(newValue);
-  }, [onChange]);
+    // Track the change
+    if (path.length > 0) {
+      trackChangeRef(path);
+    }
+  }, [onChange, path, trackChangeRef]);
 
   // Get context from store to determine if we should show inheritance
   const { selectedVisual, selectedVariant, selectedState } = useThemeAdvancedStore();
@@ -1053,9 +1078,7 @@ export function SchemaForm({
               const hasShow = schema.items.properties.show !== undefined;
               const showValue = hasShow ? stateItem?.show ?? true : true;
               
-              console.log(`State-driven section properties:`, Object.keys(schema.items.properties));
               const sorted = sortPropertiesWithShowFirst(schema.items.properties);
-              console.log(`Sorted state-driven properties:`, sorted.map(([name]) => name));
               
               return sorted
                 .filter(([propName]) => propName !== '$id')
@@ -1325,14 +1348,16 @@ export function SchemaForm({
     
     // Regular string
     return (
-      <PropertyInput
-        type="text"
-        label={schema.title || ''}
-        value={value || ''}
-        onChange={handleChange}
-        description={schema.description}
-        path={path}
-      />
+      <PropertyWrapper label={schema.title || ''} path={path}>
+        <PropertyInput
+          type="text"
+          label=""
+          value={value || ''}
+          onChange={handleChange}
+          description={schema.description}
+          path={path}
+        />
+      </PropertyWrapper>
     );
   }
 
@@ -1365,17 +1390,19 @@ export function SchemaForm({
     }
     
     return (
-      <NumberControl
-        label={schema.title || ''}
-        value={value || 0}
-        onChange={handleChange}
-        min={schema.minimum}
-        max={schema.maximum}
-        step={schema.type === 'integer' ? 1 : 0.01}
-        description={schema.description}
-        path={path}
-        isPercentage={isPercentage}
-      />
+      <PropertyWrapper label="" path={path}>
+        <NumberControl
+          label={schema.title || ''}
+          value={value || 0}
+          onChange={handleChange}
+          min={schema.minimum}
+          max={schema.maximum}
+          step={schema.type === 'integer' ? 1 : 0.01}
+          description={schema.description}
+          path={path}
+          isPercentage={isPercentage}
+        />
+      </PropertyWrapper>
     );
   }
 
@@ -1404,13 +1431,15 @@ export function SchemaForm({
     }
     
     return (
-      <BooleanControl
-        label={schema.title || ''}
-        value={value || false}
-        onChange={handleChange}
-        description={schema.description}
-        path={path}
-      />
+      <PropertyWrapper label="" path={path}>
+        <BooleanControl
+          label={schema.title || ''}
+          value={value || false}
+          onChange={handleChange}
+          description={schema.description}
+          path={path}
+        />
+      </PropertyWrapper>
     );
   }
 

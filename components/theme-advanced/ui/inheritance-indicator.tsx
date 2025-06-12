@@ -36,15 +36,15 @@ function getSourceLabel(source: PropertySource): string {
 function getSourceColor(source: PropertySource): string {
   switch (source) {
     case 'global':
-      return 'text-blue-600 bg-blue-50 hover:bg-blue-100';
+      return 'text-gray-700 bg-gray-100 hover:bg-gray-200';
     case 'visual':
-      return 'text-purple-600 bg-purple-50 hover:bg-purple-100';
+      return 'text-purple-700 bg-purple-100 hover:bg-purple-200';
     case 'variant':
-      return 'text-green-600 bg-green-50 hover:bg-green-100';
+      return 'text-green-700 bg-green-100 hover:bg-green-200';
     case 'state':
-      return 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100';
+      return 'text-indigo-700 bg-indigo-100 hover:bg-indigo-200';
     case 'custom':
-      return 'text-orange-600 bg-orange-50 hover:bg-orange-100';
+      return 'text-orange-700 bg-orange-100 hover:bg-orange-200';
     case 'default':
     default:
       return 'text-gray-600 bg-gray-50 hover:bg-gray-100';
@@ -114,7 +114,7 @@ export function InheritanceIndicator({ source, overriddenValue, actions }: Inher
                     key={index}
                     type="button"
                     onClick={action.onClick}
-                    className="block w-full text-left px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"
+                    className="block w-full text-left px-2 py-1 text-xs text-gray-700 hover:bg-gray-100 rounded"
                   >
                     {action.label}
                   </button>

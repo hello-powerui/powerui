@@ -65,7 +65,7 @@ export function NumberControl({
             <button
               type="button"
               onClick={onReset}
-              className="text-xs text-blue-600 hover:text-blue-800"
+              className="text-xs text-gray-600 hover:text-gray-900"
             >
               Reset
             </button>

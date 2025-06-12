@@ -11,8 +11,22 @@ interface DataTableProps {
 
 export function DataTable({ title }: DataTableProps) {
   const { theme } = useThemeBuilderStore();
-  const styles = useTableStyles(theme);
-  const baseStyles = StyleGenerator.generateStyleObject(theme, 'tableEx');
+  
+  // Convert ThemeBuilderTheme to ThemeGenerationInput
+  const themeInput = {
+    mode: theme.mode,
+    neutralPalette: theme.neutralPalette.shades,
+    fontFamily: theme.fontFamily,
+    borderRadius: theme.borderRadius,
+    dataColors: theme.palette.colors,
+    name: theme.name,
+    bgStyle: theme.bgStyle,
+    borderStyle: theme.borderStyle,
+    paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default'
+  };
+  
+  const styles = useTableStyles(themeInput);
+  const baseStyles = StyleGenerator.generateStyleObject(themeInput, 'tableEx');
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
   
   const data = [
@@ -55,7 +69,7 @@ export function DataTable({ title }: DataTableProps) {
                 <td style={{ 
                   ...styles.cell, 
                   textAlign: 'right',
-                  color: theme.dataColors[0],
+                  color: theme.palette.colors[0],
                   fontWeight: 'bold'
                 }}>
                   {row.revenue}
@@ -76,8 +90,8 @@ export function DataTable({ title }: DataTableProps) {
                   ...styles.cell, 
                   textAlign: 'right',
                   color: row.growth.startsWith('+') 
-                    ? theme.dataColors[5] || '#2ACF56' 
-                    : theme.dataColors[2] || '#FF006E',
+                    ? theme.palette.colors[5] || '#2ACF56' 
+                    : theme.palette.colors[2] || '#FF006E',
                   fontWeight: 'bold'
                 }}>
                   {row.growth}

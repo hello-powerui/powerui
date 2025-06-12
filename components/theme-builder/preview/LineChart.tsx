@@ -10,9 +10,23 @@ interface LineChartProps {
 
 export function LineChart({ title }: LineChartProps) {
   const { theme } = useThemeBuilderStore();
-  const styles = useChartStyles(theme);
-  const colors = useChartColors(theme);
-  const baseStyles = StyleGenerator.generateStyleObject(theme, 'lineChart');
+  
+  // Convert ThemeBuilderTheme to ThemeGenerationInput
+  const themeInput = {
+    mode: theme.mode,
+    neutralPalette: theme.neutralPalette.shades,
+    fontFamily: theme.fontFamily,
+    borderRadius: theme.borderRadius,
+    dataColors: theme.palette.colors,
+    name: theme.name,
+    bgStyle: theme.bgStyle,
+    borderStyle: theme.borderStyle,
+    paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default'
+  };
+  
+  const styles = useChartStyles(themeInput);
+  const colors = useChartColors(themeInput);
+  const baseStyles = StyleGenerator.generateStyleObject(themeInput, 'lineChart');
   
   const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const series = [

@@ -9,9 +9,22 @@ import { DataTableWithProgress } from './preview/DataTableWithProgress';
 
 export function PreviewDashboard() {
   const { theme } = useThemeBuilderStore();
+  
+  // Convert ThemeBuilderTheme to ThemeGenerationInput
+  const themeInput = {
+    mode: theme.mode,
+    neutralPalette: theme.neutralPalette.shades,
+    fontFamily: theme.fontFamily,
+    borderRadius: theme.borderRadius,
+    dataColors: theme.palette.colors,
+    name: theme.name,
+    bgStyle: theme.bgStyle,
+    borderStyle: theme.borderStyle,
+    paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default'
+  };
 
   return (
-    <ThemePreviewWrapper theme={theme} className="preview-dashboard">
+    <ThemePreviewWrapper theme={themeInput} className="preview-dashboard">
       <div className="preview-canvas" style={{ backgroundColor: 'var(--canvas-bg)' }}>
         {/* Header */}
         <div className="flex-block-31">

@@ -23,10 +23,25 @@ const BackIcon = () => (
   </svg>
 );
 
+// Icon for delete
+const TrashIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+  </svg>
+);
+
+// Icon for more options
+const MoreIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+  </svg>
+);
+
 export default function ThemesPage() {
   const router = useRouter();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchThemes();
@@ -43,6 +58,30 @@ export default function ThemesPage() {
       console.error('Failed to fetch themes:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (themeId: string, themeName: string) => {
+    if (!confirm(`Are you sure you want to delete "${themeName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingId(themeId);
+    try {
+      const response = await fetch(`/api/themes/${themeId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        setThemes(themes.filter(t => t.id !== themeId));
+      } else {
+        alert('Failed to delete theme');
+      }
+    } catch (error) {
+      console.error('Failed to delete theme:', error);
+      alert('Failed to delete theme');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -64,23 +103,12 @@ export default function ThemesPage() {
                 <h1 className="text-xl font-semibold text-gray-900">My Themes</h1>
               </div>
             </div>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => router.push('/themes/studio')}
-                className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-colors shadow-sm"
-              >
-                + Create New Theme
-              </button>
-              <button 
-                onClick={() => router.push('/themes/studio')}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all shadow-sm flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-                Theme Studio
-              </button>
-            </div>
+            <button 
+              onClick={() => router.push('/themes/studio')}
+              className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-md transition-colors text-sm font-medium"
+            >
+              Create New Theme
+            </button>
           </div>
         </div>
       </header>
@@ -88,91 +116,141 @@ export default function ThemesPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading themes...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-lg border border-gray-200 p-4 animate-pulse">
+                <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2 mb-3"></div>
+                <div className="flex -space-x-1 mb-3">
+                  {[...Array(4)].map((_, j) => (
+                    <div key={j} className="w-5 h-5 bg-gray-200 rounded-full"></div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <div className="h-8 bg-gray-200 rounded flex-1"></div>
+                  <div className="h-8 bg-gray-200 rounded w-10"></div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : themes.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <p>You haven't created any themes yet.</p>
-            <p className="mt-2">Click "Create New Theme" to get started!</p>
+          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+            <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+            </svg>
+            <h3 className="text-sm font-medium text-gray-900 mb-1">No themes yet</h3>
+            <p className="text-sm text-gray-500 mb-4">Get started by creating your first theme</p>
+            <button 
+              onClick={() => router.push('/themes/studio')}
+              className="inline-flex items-center px-3 py-1.5 text-sm bg-gray-900 hover:bg-gray-800 text-white rounded-md transition-colors"
+            >
+              Create New Theme
+            </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {themes.map((theme) => (
-            <div key={theme.id} className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-200">
-              <h3 className="text-lg font-semibold mb-2 text-gray-900">{theme.name}</h3>
-              {theme.description && (
-                <p className="text-gray-600 text-sm mb-3">{theme.description}</p>
-              )}
-              <p className="text-gray-500 text-xs mb-4">
-                Created on: {new Date(theme.createdAt).toLocaleDateString()}
-              </p>
+            <div key={theme.id} className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all group relative overflow-hidden">
+              {/* Delete button - absolute positioned */}
+              <button
+                onClick={() => handleDelete(theme.id, theme.name)}
+                disabled={deletingId === theme.id}
+                className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all opacity-0 group-hover:opacity-100 z-10"
+                title="Delete theme"
+              >
+                {deletingId === theme.id ? (
+                  <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <TrashIcon />
+                )}
+              </button>
               
-              {/* Color preview */}
-              {theme.themeData?.dataColors && (
-                <div className="flex gap-1 mb-4">
-                  {theme.themeData.dataColors.slice(0, 5).map((color: string, i: number) => (
-                    <div
-                      key={i}
-                      className="w-8 h-8 rounded"
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                  {theme.themeData.dataColors.length > 5 && (
-                    <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-600">
-                      +{theme.themeData.dataColors.length - 5}
-                    </div>
-                  )}
+              <div className="p-4">
+                {/* Title and metadata */}
+                <div className="mb-3">
+                  <h3 className="font-medium text-gray-900 mb-1 pr-8">{theme.name}</h3>
+                  <p className="text-xs text-gray-500">
+                    {new Date(theme.createdAt).toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric', 
+                      year: 'numeric' 
+                    })}
+                  </p>
                 </div>
-              )}
-              
-              {/* Theme metadata */}
-              <div className="text-xs text-gray-600 mb-4 space-y-1">
-                <div>Mode: {theme.colorMode}</div>
-                <div>Font: {theme.fontFamily.replace('-', ' ')}</div>
-              </div>
-              
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => router.push(`/themes/${theme.id}`)}
-                  className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
-                >
-                  Edit
-                </button>
-                <button 
-                  className="px-3 py-1 text-sm bg-primary text-white hover:opacity-90 rounded"
-                  onClick={async () => {
-                    const themeInput = theme.themeData || {
-                      name: theme.name,
-                      mode: theme.colorMode || 'light',
-                      dataColors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C'],
-                      neutralPalette: ['#FFFFFF', '#F5F5F5', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#757575', '#616161', '#424242', '#212121', '#000000'],
-                      fontFamily: theme.fontFamily || 'segoe-ui',
-                      borderRadius: parseInt(theme.borders || '4'),
-                    };
-                    
-                    const response = await fetch('/api/generate-theme', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(themeInput),
-                    });
-                    if (response.ok) {
-                      const generatedTheme = await response.json();
-                      // Download the theme
-                      const blob = new Blob([JSON.stringify(generatedTheme, null, 2)], {
-                        type: 'application/json',
+                
+                {/* Color preview - more compact */}
+                {theme.themeData?.dataColors && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex -space-x-1">
+                      {theme.themeData.dataColors.slice(0, 4).map((color: string, i: number) => (
+                        <div
+                          key={i}
+                          className="w-5 h-5 rounded-full border-2 border-white"
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </div>
+                    {theme.themeData.dataColors.length > 4 && (
+                      <span className="text-xs text-gray-500">+{theme.themeData.dataColors.length - 4}</span>
+                    )}
+                  </div>
+                )}
+                
+                {/* Compact metadata pills */}
+                <div className="flex gap-2 mb-3 flex-wrap">
+                  <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
+                    {theme.colorMode}
+                  </span>
+                  <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
+                    {theme.fontFamily.replace('-', ' ')}
+                  </span>
+                </div>
+                
+                {/* Actions - more compact */}
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => router.push(`/themes/${theme.id}`)}
+                    className="flex-1 px-3 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    className="px-3 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                    onClick={async () => {
+                      const themeInput = theme.themeData || {
+                        name: theme.name,
+                        mode: theme.colorMode || 'light',
+                        dataColors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C'],
+                        neutralPalette: ['#FFFFFF', '#F5F5F5', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#757575', '#616161', '#424242', '#212121', '#000000'],
+                        fontFamily: theme.fontFamily || 'segoe-ui',
+                        borderRadius: parseInt(theme.borders || '4'),
+                      };
+                      
+                      const response = await fetch('/api/generate-theme', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(themeInput),
                       });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
-                      a.click();
-                      URL.revokeObjectURL(url);
-                    }
-                  }}
-                >
-                  Download
-                </button>
+                      if (response.ok) {
+                        const generatedTheme = await response.json();
+                        // Download the theme
+                        const blob = new Blob([JSON.stringify(generatedTheme, null, 2)], {
+                          type: 'application/json',
+                        });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      }
+                    }}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           ))}

@@ -10,9 +10,23 @@ interface ColumnChartProps {
 
 export function ColumnChart({ title }: ColumnChartProps) {
   const { theme } = useThemeBuilderStore();
-  const styles = useChartStyles(theme);
-  const colors = useChartColors(theme);
-  const baseStyles = StyleGenerator.generateStyleObject(theme, 'columnChart');
+  
+  // Convert ThemeBuilderTheme to ThemeGenerationInput
+  const themeInput = {
+    mode: theme.mode,
+    neutralPalette: theme.neutralPalette.shades,
+    fontFamily: theme.fontFamily,
+    borderRadius: theme.borderRadius,
+    dataColors: theme.palette.colors,
+    name: theme.name,
+    bgStyle: theme.bgStyle,
+    borderStyle: theme.borderStyle,
+    paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default'
+  };
+  
+  const styles = useChartStyles(themeInput);
+  const colors = useChartColors(themeInput);
+  const baseStyles = StyleGenerator.generateStyleObject(themeInput, 'columnChart');
   
   const data = [
     { category: 'Electronics', values: [20, 15, 10, 25, 30] },

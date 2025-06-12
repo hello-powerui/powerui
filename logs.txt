@@ -1,0 +1,102 @@
+Loaded properties data: {$schema: {…}, name: {…}, visualStyles: {…}, dataColors: {…}, icons: {…}, …}
+schema-loader.ts:32 Has visualStyles? true
+schema-loader.ts:33 visualStyles.properties keys: (52) ['report', 'page', 'filter', 'group', 'actionButton', 'bookmarkNavigator', 'image', 'textbox', 'pageNavigator', 'shape', 'barChart', 'columnChart', 'clusteredBarChart', 'clusteredColumnChart', 'hundredPercentStackedBarChart', 'hundredPercentStackedColumnChart', 'lineChart', 'areaChart', 'stackedAreaChart', 'hundredPercentStackedAreaChart', 'lineStackedColumnComboChart', 'lineClusteredColumnComboChart', 'ribbonChart', 'waterfallChart', 'funnel', 'scatterChart', 'pieChart', 'donutChart', 'treemap', 'map', 'filledMap', 'shapeMap', 'azureMap', 'gauge', 'card', 'multiRowCard', 'kpi', 'slicer', 'tableEx', 'pivotTable', 'scriptVisual', 'pythonVisual', 'keyDriversVisual', 'decompositionTreeVisual', 'qnaVisual', 'aiNarratives', 'scorecard', 'rdlVisual', 'cardVisual', 'advancedSlicerVisual', 'textSlicer', 'listSlicer']
+schema-loader.ts:134 Getting canvas types...
+schema-loader.ts:135 properties: {$schema: {…}, name: {…}, visualStyles: {…}, dataColors: {…}, icons: {…}, …}
+schema-loader.ts:136 visualStyles: {type: 'object', properties: {…}, additionalProperties: {…}}
+schema-loader.ts:137 visualStyles.properties: {report: {…}, page: {…}, filter: {…}, group: {…}, actionButton: {…}, …}
+schema-loader.ts:145 All visual types: (52) ['report', 'page', 'filter', 'group', 'actionButton', 'bookmarkNavigator', 'image', 'textbox', 'pageNavigator', 'shape', 'barChart', 'columnChart', 'clusteredBarChart', 'clusteredColumnChart', 'hundredPercentStackedBarChart', 'hundredPercentStackedColumnChart', 'lineChart', 'areaChart', 'stackedAreaChart', 'hundredPercentStackedAreaChart', 'lineStackedColumnComboChart', 'lineClusteredColumnComboChart', 'ribbonChart', 'waterfallChart', 'funnel', 'scatterChart', 'pieChart', 'donutChart', 'treemap', 'map', 'filledMap', 'shapeMap', 'azureMap', 'gauge', 'card', 'multiRowCard', 'kpi', 'slicer', 'tableEx', 'pivotTable', 'scriptVisual', 'pythonVisual', 'keyDriversVisual', 'decompositionTreeVisual', 'qnaVisual', 'aiNarratives', 'scorecard', 'rdlVisual', 'cardVisual', 'advancedSlicerVisual', 'textSlicer', 'listSlicer']
+schema-loader.ts:148 Canvas types found: (3) ['report', 'page', 'filter']
+SimplePowerBIEmbed.tsx:137 Report loaded
+SimplePowerBIEmbed.tsx:141 Report rendered
+SimplePowerBIEmbed.tsx:137 Report loaded
+SimplePowerBIEmbed.tsx:141 Report rendered
+SimplePowerBIEmbed.tsx:94 Applying theme update...
+SimplePowerBIEmbed.tsx:107 Theme being applied (without reportPage): {
+  "$schema": "https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/refs/heads/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-2.139.json",
+  "name": "Untitled Theme",
+  "dataColors": [
+    "#2568E8",
+    "#8338EC",
+    "#FF006E",
+    "#F95608",
+    "#FFBE0C",
+    "#2ACF56",
+    "#3498DB",
+    "#A66999"
+  ],
+  "background": "#FFFFFF",
+  "backgroundLight": "#F5FAFF",
+  "backgroundNeutral": "#E6F3FF",
+  "foreground": "#001A40",
+  "foregroundNeutralSecondary": "#003A8C",
+  "foregroundNeutralTertiary": "#0059CC",
+  "tableAccent": "#C2E4FF",
+  "good": "#10B981",
+  "neutral": "#F59E0B",
+  "bad": "#DC2626",
+  "maximum": "#DC2626",
+  "center": "#001A40",
+  "minimum": "#10B981",
+  "null": "#999999",
+  "firstLevelElements": "#00265E",
+  "secondLevelElements": "#0059CC",
+  "thirdLevelElements": "#4DA6FF",
+  "fourthLevelElements": "#8CC7FF",
+  "textClasses": {},
+  "visualStyles": {
+    "actionButton": {
+      "*": {
+        "fill": [
+          {
+            "$id": "default",
+            "show": true
+          }
+        ]
+      }
+    }
+  }
+}
+SimplePowerBIEmbed.tsx:111 Theme applied successfully
+SimplePowerBIEmbed.tsx:141 Report rendered
+SimplePowerBIEmbed.tsx:94 Applying theme update...
+SimplePowerBIEmbed.tsx:107 Theme being applied (without reportPage): {
+  "$schema": "https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/refs/heads/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-2.139.json",
+  "name": "Untitled Theme",
+  "dataColors": [
+    "#2568E8",
+    "#8338EC",
+    "#FF006E",
+    "#F95608",
+    "#FFBE0C",
+    "#2ACF56",
+    "#3498DB",
+    "#A66999"
+  ],
+  "background": "#FFFFFF",
+  "backgroundLight": "#F5FAFF",
+  "backgroundNeutral": "#E6F3FF",
+  "foreground": "#001A40",
+  "foregroundNeutralSecondary": "#003A8C",
+  "foregroundNeutralTertiary": "#0059CC",
+  "tableAccent": "#C2E4FF",
+  "good": "#10B981",
+  "neutral": "#F59E0B",
+  "bad": "#DC2626",
+  "maximum": "#DC2626",
+  "center": "#001A40",
+  "minimum": "#10B981",
+  "null": "#999999",
+  "firstLevelElements": "#00265E",
+  "secondLevelElements": "#0059CC",
+  "thirdLevelElements": "#4DA6FF",
+  "fourthLevelElements": "#8CC7FF",
+  "textClasses": {},
+  "visualStyles": {
+    "actionButton": {
+      "*": {}
+    }
+  }
+}
+SimplePowerBIEmbed.tsx:111 Theme applied successfully
+SimplePowerBIEmbed.tsx:141 Report rendered

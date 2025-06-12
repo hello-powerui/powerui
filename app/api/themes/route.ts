@@ -48,6 +48,10 @@ export async function POST(req: NextRequest) {
         paddingStyle: data.paddingStyle,
         showBorders: data.showBorders,
         spacing: data.spacing,
+        structuralColors: data.structuralColors,
+        structuralColorsMode: data.structuralColorsMode,
+        textClasses: data.textClasses,
+        visualStyles: data.visualStyles,
         description: data.description,
       }
     };

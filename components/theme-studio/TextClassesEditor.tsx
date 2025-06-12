@@ -21,6 +21,7 @@ interface TextClass {
 interface TextClassesEditorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onUpdateTextClasses?: (textClasses: Record<string, TextClass>) => void;
 }
 
 const TEXT_CLASS_NAMES = [
@@ -53,7 +54,7 @@ const DEFAULT_TEXT_CLASSES: Record<string, TextClass> = {
   reference: { fontSize: 11 }
 };
 
-export function TextClassesEditor({ open, onOpenChange }: TextClassesEditorProps) {
+export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: TextClassesEditorProps) {
   const { theme, updateTextClasses } = useThemeBuilderStore();
   const [localTextClasses, setLocalTextClasses] = useState<Record<string, TextClass>>({});
   
@@ -120,7 +121,11 @@ export function TextClassesEditor({ open, onOpenChange }: TextClassesEditorProps
   };
 
   const handleSave = () => {
-    updateTextClasses(localTextClasses);
+    if (onUpdateTextClasses) {
+      onUpdateTextClasses(localTextClasses);
+    } else {
+      updateTextClasses(localTextClasses);
+    }
     onOpenChange(false);
   };
 

@@ -190,10 +190,19 @@ export const useThemeBuilderStore = create<ThemeBuilderState>((set, get) => ({
         borderRadius: theme.borderRadius,
         bgStyle: theme.bgStyle || 'default',
         borderStyle: theme.borderStyle || 'default',
+        spacing: theme.spacing,
         paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default',
         structuralColors: theme.structuralColorsMode === 'custom' ? theme.structuralColors : undefined,
+        structuralColorsMode: theme.structuralColorsMode,
         textClasses: theme.textClasses && Object.keys(theme.textClasses).length > 0 ? theme.textClasses : undefined,
-        visualStyles: visualStyles && Object.keys(visualStyles).length > 0 ? visualStyles : undefined
+        visualStyles: visualStyles && Object.keys(visualStyles).length > 0 ? visualStyles : undefined,
+        // Include full theme data for reloading
+        themeData: {
+          ...theme,
+          palette: theme.palette.colors,
+          neutralPalette: theme.neutralPalette.shades,
+          visualStyles: visualStyles
+        }
       };
       
       // Save theme via API

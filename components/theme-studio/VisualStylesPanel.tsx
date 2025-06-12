@@ -17,6 +17,7 @@ import { loadVisualSchema, SchemaLoader } from '@/lib/theme-advanced/services/sc
 import { useThemeAdvancedStore } from '@/lib/stores/theme-advanced-store';
 import { Plus, Trash2, Copy, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 
 interface VisualStylesPanelProps {
   selectedVisual: string;
@@ -47,6 +48,7 @@ export function VisualStylesPanel({
   const [supportedStates, setSupportedStates] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [schemaLoader] = useState(() => SchemaLoader.getInstance());
+  const { setOriginalTheme } = useThemeChanges();
 
   // Initialize schema loader on mount
   useEffect(() => {

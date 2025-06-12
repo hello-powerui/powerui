@@ -111,7 +111,7 @@ export function PropertyInput(props: PropertyInputProps) {
             id={inputId}
             checked={props.value}
             onChange={(e) => props.onChange(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
           />
           <Label htmlFor={inputId} className="text-sm text-gray-600 cursor-pointer">
             {props.value ? 'Enabled' : 'Disabled'}
@@ -124,7 +124,7 @@ export function PropertyInput(props: PropertyInputProps) {
           id={inputId}
           value={props.value}
           onChange={(e) => props.onChange(e.target.value)}
-          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
         >
           {props.options.map((option) => (
             <option key={option.value} value={option.value}>

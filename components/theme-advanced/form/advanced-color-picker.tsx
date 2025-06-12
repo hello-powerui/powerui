@@ -178,7 +178,7 @@ export function AdvancedColorPicker({
                   onClick={() => handleThemeColorChange(themeColor.id, getThemeColorShade())}
                   className={`relative p-3 rounded-md border-2 transition-all ${
                     getThemeColorId() === themeColor.id
-                      ? 'border-primary'
+                      ? 'border-gray-900'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                   title={themeColor.name}

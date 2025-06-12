@@ -11,25 +11,31 @@ const ChevronDownIcon = ({ className }: { className?: string }) => (
 );
 
 interface CollapsibleSectionProps {
-  id: string;
+  id?: string;
   title: string;
+  tooltip?: string;
   icon?: React.ReactNode;
   defaultOpen?: boolean;
   children: React.ReactNode;
   badge?: string | number;
   className?: string;
   headerAction?: React.ReactNode;
+  hasChanges?: boolean;
+  changedCount?: number;
 }
 
 export function CollapsibleSection({ 
   id,
   title, 
+  tooltip,
   icon, 
   defaultOpen = false, 
   children,
   badge,
   className = "",
-  headerAction
+  headerAction,
+  hasChanges = false,
+  changedCount
 }: CollapsibleSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -37,14 +43,21 @@ export function CollapsibleSection({
     <Collapsible.Root 
       open={isOpen} 
       onOpenChange={setIsOpen} 
-      className={`border-b border-gray-200 last:border-b-0 ${className}`}
+      className={`bg-white rounded-md border border-gray-200 mb-3 ${className}`}
     >
-      <div className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 transition-colors group">
+      <div className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 rounded-t-md transition-colors group">
         <Collapsible.Trigger className="flex items-center gap-3 flex-1 text-left">
           {icon && (
-            <div className="w-5 h-5 text-gray-400">{icon}</div>
+            <div className="w-5 h-5 text-gray-500">{icon}</div>
           )}
-          <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+            {hasChanges && (
+              <div className="relative">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" title={`${changedCount || ''} ${changedCount === 1 ? 'change' : 'changes'}`} />
+              </div>
+            )}
+          </div>
           {badge !== undefined && (
             <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
               {badge}
@@ -59,7 +72,7 @@ export function CollapsibleSection({
           )}
           <Collapsible.Trigger>
             <ChevronDownIcon 
-              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+              className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
                 isOpen ? 'transform rotate-180' : ''
               }`} 
             />
@@ -67,8 +80,8 @@ export function CollapsibleSection({
         </div>
       </div>
       
-      <Collapsible.Content className="px-4 pb-4">
-        <div className="pt-2">
+      <Collapsible.Content className="border-t border-gray-100">
+        <div className="p-4">
           {children}
         </div>
       </Collapsible.Content>

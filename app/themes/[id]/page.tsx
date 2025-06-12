@@ -60,6 +60,7 @@ export default function ThemeDetailPage({
         const queryParams = new URLSearchParams({
           id: theme.id,
           data: encodeURIComponent(JSON.stringify(themeData)),
+          name: encodeURIComponent(theme.name || 'My Theme'),
           description: encodeURIComponent(theme.description || ''),
         });
 

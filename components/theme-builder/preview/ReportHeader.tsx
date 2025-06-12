@@ -11,7 +11,21 @@ interface ReportHeaderProps {
 
 export function ReportHeader({ title, subtitle, lastUpdated }: ReportHeaderProps) {
   const { theme } = useThemeBuilderStore();
-  const baseStyles = StyleGenerator.generateStyleObject(theme);
+  
+  // Convert ThemeBuilderTheme to ThemeGenerationInput
+  const themeInput = {
+    mode: theme.mode,
+    neutralPalette: theme.neutralPalette.shades,
+    fontFamily: theme.fontFamily,
+    borderRadius: theme.borderRadius,
+    dataColors: theme.palette.colors,
+    name: theme.name,
+    bgStyle: theme.bgStyle,
+    borderStyle: theme.borderStyle,
+    paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default'
+  };
+  
+  const baseStyles = StyleGenerator.generateStyleObject(themeInput);
   
   const headerStyles: React.CSSProperties = {
     ...baseStyles,
@@ -33,7 +47,7 @@ export function ReportHeader({ title, subtitle, lastUpdated }: ReportHeaderProps
   
   const subtitleStyles: React.CSSProperties = {
     fontSize: '1em',
-    fontWeight: theme.fontWeight || 'normal',
+    fontWeight: 'normal',
     color: 'var(--text-secondary)',
     marginTop: '0.25em',
   };

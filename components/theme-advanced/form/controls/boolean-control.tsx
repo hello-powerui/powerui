@@ -41,7 +41,7 @@ export function BooleanControl({
             <button
               type="button"
               onClick={onReset}
-              className="text-xs text-blue-600 hover:text-blue-800 mr-2"
+              className="text-xs text-gray-600 hover:text-gray-900 mr-2"
             >
               Reset
             </button>
@@ -54,12 +54,12 @@ export function BooleanControl({
           onClick={() => onChange(!value)}
           className={`
             relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-            ${value ? 'bg-primary' : 'bg-gray-200'}
+            ${value ? 'bg-gray-900' : 'bg-gray-200'}
           `}
         >
           <span
             className={`
-              inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+              inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm
               ${value ? 'translate-x-6' : 'translate-x-1'}
             `}
           />
