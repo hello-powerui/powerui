@@ -4,6 +4,7 @@ import { useThemeBuilderStore } from '@/lib/stores/theme-builder-store';
 import { useTableStyles } from '@/lib/theme-builder/hooks';
 import { StyleGenerator } from '@/lib/theme-builder/style-generator';
 import { useState } from 'react';
+import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 
 interface DataTableProps {
   title?: string;
@@ -15,10 +16,10 @@ export function DataTable({ title }: DataTableProps) {
   // Convert ThemeBuilderTheme to ThemeGenerationInput
   const themeInput = {
     mode: theme.mode,
-    neutralPalette: theme.neutralPalette.shades,
+    neutralPalette: (theme.neutralPalette?.shades && typeof theme.neutralPalette.shades === 'object' && !Array.isArray(theme.neutralPalette.shades)) ? theme.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
     fontFamily: theme.fontFamily,
     borderRadius: theme.borderRadius,
-    dataColors: theme.palette.colors,
+    dataColors: (Array.isArray(theme.palette.colors)) ? theme.palette.colors as string[] : [],
     name: theme.name,
     bgStyle: theme.bgStyle,
     borderStyle: theme.borderStyle,
@@ -69,7 +70,7 @@ export function DataTable({ title }: DataTableProps) {
                 <td style={{ 
                   ...styles.cell, 
                   textAlign: 'right',
-                  color: theme.palette.colors[0],
+                  color: (Array.isArray(theme.palette.colors) && theme.palette.colors.length > 0) ? theme.palette.colors[0] as string : '#000',
                   fontWeight: 'bold'
                 }}>
                   {row.revenue}
@@ -90,8 +91,8 @@ export function DataTable({ title }: DataTableProps) {
                   ...styles.cell, 
                   textAlign: 'right',
                   color: row.growth.startsWith('+') 
-                    ? theme.palette.colors[5] || '#2ACF56' 
-                    : theme.palette.colors[2] || '#FF006E',
+                    ? (Array.isArray(theme.palette.colors) && theme.palette.colors.length > 5) ? theme.palette.colors[5] as string : '#2ACF56'
+                    : (Array.isArray(theme.palette.colors) && theme.palette.colors.length > 2) ? theme.palette.colors[2] as string : '#FF006E',
                   fontWeight: 'bold'
                 }}>
                   {row.growth}

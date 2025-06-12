@@ -1,19 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser, requireUser } from '@/lib/utils/get-current-user';
-import { getUserNeutralPalettes, createNeutralPalette } from '@/lib/db/services/palette-service';
+import { getUserNeutralPalettes, getBuiltInNeutralPalettes, createNeutralPalette } from '@/lib/db/services/palette-service';
 
 export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     
-    // Return empty array for unauthenticated users instead of throwing error
+    // Always return built-in palettes, even for unauthenticated users
+    const builtInPalettes = await getBuiltInNeutralPalettes();
+    
     if (!user) {
-      return NextResponse.json([]);
+      return NextResponse.json(builtInPalettes);
     }
     
-    const palettes = await getUserNeutralPalettes(user.id);
+    const userPalettes = await getUserNeutralPalettes(user.id);
     
-    return NextResponse.json(palettes);
+    // Combine built-in and user palettes
+    const allPalettes = [...builtInPalettes, ...userPalettes];
+    
+    return NextResponse.json(allPalettes);
   } catch (error) {
     console.error('Error fetching neutral palettes:', error);
     return NextResponse.json(

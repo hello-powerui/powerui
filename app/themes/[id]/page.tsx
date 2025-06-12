@@ -3,6 +3,7 @@
 import { useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/lib/hooks/use-user';
+import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
 
 export default function ThemeDetailPage({
   params,
@@ -39,11 +40,13 @@ export default function ThemeDetailPage({
         // If theme has themeData, use that for loading in builder
         const themeData = theme.themeData || {
           name: theme.name,
-          // Fix for custom palettes - use default colors if dataPalette is 'custom'
+          // Fix for custom palettes - use stored colors if dataPalette is 'custom'
           dataColors: theme.dataPalette === 'custom' 
-            ? ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56'] 
+            ? (theme.themeData?.dataColors || DEFAULT_COLOR_PALETTE.colors)
             : theme.dataPalette,
-          neutralPalette: theme.neutralPalette,
+          neutralPalette: theme.neutralPalette === 'custom' 
+            ? (theme.themeData?.neutralPalette || AZURE_NEUTRAL_PALETTE)
+            : theme.neutralPalette,
           mode: theme.colorMode,
           fontFamily: theme.fontFamily,
           fontSize: 14, // Default if not stored

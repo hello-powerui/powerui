@@ -315,10 +315,8 @@ export class SchemaLoader {
 export async function loadVisualSchema(visualType: string): Promise<any> {
   const loader = SchemaLoader.getInstance();
   
-  // Ensure schema is loaded
-  if (!loader.schema) {
-    await loader.loadSchema();
-  }
+  // Ensure schema is loaded (this will return cached schema if already loaded)
+  await loader.loadSchema();
   
   // Get the visual definition
   const visualDef = loader.getDefinition(`visual-${visualType}`);

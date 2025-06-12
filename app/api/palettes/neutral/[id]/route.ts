@@ -40,9 +40,14 @@ export async function DELETE(
   try {
     const { id } = await params;
     const user = await requireUser();
-    await deleteNeutralPalette(id, user.id);
+    const result = await deleteNeutralPalette(id, user.id);
     
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true, 
+      message: result.updatedThemes > 0 
+        ? `Palette deleted successfully. ${result.updatedThemes} theme(s) updated to use Azure default.`
+        : 'Palette deleted successfully.'
+    });
   } catch (error) {
     console.error('Error deleting neutral palette:', error);
     return NextResponse.json(

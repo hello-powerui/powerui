@@ -107,7 +107,9 @@ export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbe
           console.log('Theme being applied (without reportPage):', JSON.stringify(themeToApply, null, 2));
           
           // Apply the theme
-          await reportRef.current.applyTheme({ themeJson: themeToApply });
+          if (reportRef.current) {
+            await reportRef.current.applyTheme({ themeJson: themeToApply });
+          }
           console.log('Theme applied successfully');
         } catch (err: any) {
           console.error('Error applying theme:', err);

@@ -66,7 +66,11 @@ export class SimpleThemeGenerator {
         { 
           id: 'custom',
           name: 'Custom',
-          shades: input.neutralPalette
+          shades: input.neutralPalette,
+          userId: 'temp',
+          isBuiltIn: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
         }, 
         input.mode
       );

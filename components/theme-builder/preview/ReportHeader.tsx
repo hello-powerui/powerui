@@ -2,6 +2,7 @@
 
 import { useThemeBuilderStore } from '@/lib/stores/theme-builder-store';
 import { StyleGenerator } from '@/lib/theme-builder/style-generator';
+import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 
 interface ReportHeaderProps {
   title: string;
@@ -15,10 +16,10 @@ export function ReportHeader({ title, subtitle, lastUpdated }: ReportHeaderProps
   // Convert ThemeBuilderTheme to ThemeGenerationInput
   const themeInput = {
     mode: theme.mode,
-    neutralPalette: theme.neutralPalette.shades,
+    neutralPalette: (theme.neutralPalette?.shades && typeof theme.neutralPalette.shades === 'object' && !Array.isArray(theme.neutralPalette.shades)) ? theme.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
     fontFamily: theme.fontFamily,
     borderRadius: theme.borderRadius,
-    dataColors: theme.palette.colors,
+    dataColors: (Array.isArray(theme.palette.colors)) ? theme.palette.colors as string[] : [],
     name: theme.name,
     bgStyle: theme.bgStyle,
     borderStyle: theme.borderStyle,

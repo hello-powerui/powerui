@@ -82,26 +82,27 @@ export function NeutralPaletteManager({ isOpen, onOpenChange, onSelectPalette }:
 
   const shadeOrder = ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
 
-  // No more built-in palettes - all palettes are user-created
-  const userPalettes = neutralPalettes;
+  // Separate built-in and user palettes
+  const builtInPalettes = neutralPalettes.filter(p => p.isBuiltIn);
+  const userPalettes = neutralPalettes.filter(p => !p.isBuiltIn);
 
   return (
     <>
       <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-2xl border border-gray-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] overflow-hidden">
-            <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-5 z-10">
+          <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[90vh] bg-white rounded-lg shadow-2xl border border-gray-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] overflow-hidden">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <Dialog.Title className="text-xl font-semibold text-gray-900">
+                  <Dialog.Title className="text-lg font-semibold text-gray-900">
                     Manage Neutral Palettes
                   </Dialog.Title>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Create and manage neutral color palettes for your themes
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    Choose or create neutral color palettes for your themes
                   </p>
                 </div>
-                <Dialog.Close className="rounded-lg p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all">
+                <Dialog.Close className="rounded-md p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
                   <XIcon />
                 </Dialog.Close>
               </div>
@@ -109,38 +110,76 @@ export function NeutralPaletteManager({ isOpen, onOpenChange, onSelectPalette }:
 
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
               <div className="flex justify-end mb-6">
-                <Button onClick={handleCreateNew} className="gap-2 bg-gray-900 hover:bg-gray-800 text-white shadow-sm">
+                <button
+                  onClick={handleCreateNew} 
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-md shadow-sm transition-colors"
+                >
                   <PlusIcon />
                   Create New Palette
-                </Button>
+                </button>
               </div>
+
+              {/* Built-in Palettes */}
+              {builtInPalettes.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xs font-medium uppercase tracking-wide text-gray-500 mb-3">Built-in Palettes</h3>
+                  <div className="space-y-3">
+                    {builtInPalettes.map((palette) => (
+                      <div
+                        key={palette.id}
+                        className="border border-gray-200 rounded-md p-3 bg-white hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer group"
+                        onClick={() => handleSelectPalette(palette)}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-medium text-gray-900">{palette.name}</h4>
+                            {palette.id === 'azure-default' && (
+                              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded">Default</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-12 gap-0.5">
+                          {shadeOrder.map((shade) => (
+                            <div
+                              key={shade}
+                              className="h-6 first:rounded-l-sm last:rounded-r-sm"
+                              style={{ backgroundColor: (palette.shades as any)?.[shade] || '#ccc' }}
+                              title={`${shade}: ${(palette.shades as any)?.[shade] || 'N/A'}`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* User Palettes */}
               {userPalettes.length > 0 && (
                 <div className="mb-8">
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600 mb-4">Your Palettes</h3>
-                  <div className="grid gap-4">
+                  <h3 className="text-xs font-medium uppercase tracking-wide text-gray-500 mb-3">Your Palettes</h3>
+                  <div className="space-y-3">
                     {userPalettes.map((palette) => (
                       <div
                         key={palette.id}
-                        className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-lg hover:border-gray-300 transition-all duration-200 cursor-pointer group"
+                        className="border border-gray-200 rounded-md p-3 bg-white hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer group"
                         onClick={() => handleSelectPalette(palette)}
                       >
-                        <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-start justify-between mb-2">
                           <div>
-                            <h4 className="font-medium text-gray-900">{palette.name}</h4>
+                            <h4 className="text-sm font-medium text-gray-900">{palette.name}</h4>
                           </div>
                           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                             <button
                               onClick={() => handleEdit(palette)}
-                              className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-all"
+                              className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
                               title="Edit palette"
                             >
                               <EditIcon />
                             </button>
                             <button
                               onClick={() => handleDelete(palette.id)}
-                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
+                              className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                               title="Delete palette"
                             >
                               <TrashIcon />
@@ -151,9 +190,9 @@ export function NeutralPaletteManager({ isOpen, onOpenChange, onSelectPalette }:
                           {shadeOrder.map((shade) => (
                             <div
                               key={shade}
-                              className="h-8 first:rounded-l last:rounded-r shadow-sm"
+                              className="h-6 first:rounded-l-sm last:rounded-r-sm"
                               style={{ backgroundColor: (palette.shades as any)?.[shade] || '#ccc' }}
-                              title={`Shade ${shade}: ${(palette.shades as any)?.[shade] || 'N/A'}`}
+                              title={`${shade}: ${(palette.shades as any)?.[shade] || 'N/A'}`}
                             />
                           ))}
                         </div>

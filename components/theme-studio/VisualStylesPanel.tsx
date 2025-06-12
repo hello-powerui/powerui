@@ -31,17 +31,21 @@ export function VisualStylesPanel({
   onThemeChange 
 }: VisualStylesPanelProps) {
   const {
-    theme,
+    currentTheme: theme,
     setTheme,
     selectedVariant,
     setSelectedVariant,
     selectedState,
     setSelectedState,
-    undoChanges,
-    redoChanges,
-    canUndo,
-    canRedo
+    undo,
+    redo,
+    history,
+    historyIndex
   } = useThemeAdvancedStore();
+
+  // Compute undo/redo availability
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < history.length - 1;
 
   const [visualSchema, setVisualSchema] = useState<any>(null);
   const [variants, setVariants] = useState<string[]>(['*']);
@@ -202,7 +206,7 @@ export function VisualStylesPanel({
                               solid: {
                                 type: 'object',
                                 properties: {
-                                  color: { type: 'string', format: 'color', title: 'Background Color' }
+                                  color: { type: 'string', title: 'Background Color' }
                                 }
                               }
                             }
@@ -222,7 +226,7 @@ export function VisualStylesPanel({
                               solid: {
                                 type: 'object',
                                 properties: {
-                                  color: { type: 'string', format: 'color', title: 'Border Color' }
+                                  color: { type: 'string', title: 'Border Color' }
                                 }
                               }
                             }
@@ -233,7 +237,7 @@ export function VisualStylesPanel({
                   }
                 }}
                 value={theme?.visualStyles?.['*']?.['*'] || {}}
-                onChange={handlePropertyChange}
+                onChange={(value) => handlePropertyChange([], value)}
                 path={[]}
                 level={0}
                 schemaLoader={schemaLoader}
@@ -336,7 +340,7 @@ export function VisualStylesPanel({
                 ? theme?.visualStyles?.[selectedVisual]?.[selectedVariant || '*']?.[selectedState] || {}
                 : theme?.visualStyles?.[selectedVisual]?.[selectedVariant || '*'] || {}
             }
-            onChange={handlePropertyChange}
+            onChange={(value) => handlePropertyChange([], value)}
             path={[]}
             level={0}
             schemaLoader={schemaLoader}
@@ -355,7 +359,7 @@ export function VisualStylesPanel({
         <Button
           variant="outline"
           size="sm"
-          onClick={undoChanges}
+          onClick={undo}
           disabled={!canUndo}
           className="text-xs"
         >
@@ -364,7 +368,7 @@ export function VisualStylesPanel({
         <Button
           variant="outline"
           size="sm"
-          onClick={redoChanges}
+          onClick={redo}
           disabled={!canRedo}
           className="text-xs"
         >

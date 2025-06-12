@@ -17,7 +17,7 @@ const CheckIcon = () => (
 );
 
 export function ModernTypographyTab() {
-  const { theme, updateThemeProperty } = useThemeBuilderStore();
+  const { theme, setFontFamily } = useThemeBuilderStore();
 
   const fontFamilies = [
     // Default Power BI Fonts
@@ -70,7 +70,7 @@ export function ModernTypographyTab() {
 
         <Select.Root
           value={theme.fontFamily}
-          onValueChange={(value) => updateThemeProperty('fontFamily', value)}
+          onValueChange={(value) => setFontFamily(value)}
         >
           <Select.Trigger className="flex h-10 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
             <Select.Value />

@@ -43,6 +43,8 @@ import { ImportThemeModal } from '@/components/theme-advanced/ui/import-theme-mo
 import { CollapsibleSection } from '@/components/theme-advanced/ui/collapsible-section';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 import { ChangeIndicator } from '@/components/theme-advanced/ui/change-indicator';
+import { PowerBITheme } from '@/lib/theme-advanced/types';
+import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 
 // Icons
 const BackIcon = () => (
@@ -109,6 +111,7 @@ export default function UnifiedThemeStudio() {
   
   const { 
     theme, 
+    setTheme,
     setPalette, 
     setNeutralPalette,
     setThemeMode,
@@ -139,7 +142,7 @@ export default function UnifiedThemeStudio() {
   
   // Sync theme mode to advanced store
   useEffect(() => {
-    setAdvancedTheme((prev) => {
+    setAdvancedTheme((prev: PowerBITheme) => {
       if (prev.mode !== theme.mode) {
         return { ...prev, mode: theme.mode };
       }
@@ -171,6 +174,7 @@ export default function UnifiedThemeStudio() {
       const themeDataParam = searchParams.get('themeData') || searchParams.get('data');
       const name = searchParams.get('name');
       const description = searchParams.get('description');
+      const themeId = searchParams.get('id');
       
       if (themeDataParam) {
         try {
@@ -180,7 +184,12 @@ export default function UnifiedThemeStudio() {
           if (decodedTheme.palette || decodedTheme.dataColors) {
             setPalette(decodedTheme.palette || decodedTheme.dataColors);
           }
-          if (decodedTheme.neutralPalette) setNeutralPalette(decodedTheme.neutralPalette);
+          if (decodedTheme.neutralPalette) {
+            setNeutralPalette(decodedTheme.neutralPalette);
+          } else {
+            // Ensure Azure palette is set as default if no neutral palette exists
+            setNeutralPalette(AZURE_NEUTRAL_PALETTE);
+          }
           if (decodedTheme.mode || decodedTheme.colorMode) {
             setThemeMode(decodedTheme.mode || decodedTheme.colorMode);
           }
@@ -200,7 +209,7 @@ export default function UnifiedThemeStudio() {
           // Load visual styles
           if (decodedTheme.visualStyles) {
             setVisualSettings(decodedTheme.visualStyles);
-            setAdvancedTheme((prev) => ({ ...prev, visualStyles: decodedTheme.visualStyles }));
+            setAdvancedTheme((prev: PowerBITheme) => ({ ...prev, visualStyles: decodedTheme.visualStyles }));
             
             // Update sidebar visibility based on content
             const hasVisualContent = Object.keys(decodedTheme.visualStyles).length > 0;
@@ -217,6 +226,11 @@ export default function UnifiedThemeStudio() {
           
           // Set theme name
           if (name) setThemeName(decodeURIComponent(name));
+          
+          // Set theme ID if provided
+          if (themeId) {
+            setTheme({ id: themeId });
+          }
           
           // Initialize change tracking with loaded theme
           const loadedThemeState = {
@@ -321,8 +335,8 @@ export default function UnifiedThemeStudio() {
     const themeInput = {
       name: theme.name,
       mode: theme.mode,
-      dataColors: theme.palette.colors,
-      neutralPalette: theme.neutralPalette.shades,
+      dataColors: (Array.isArray(theme.palette.colors)) ? theme.palette.colors as string[] : [],
+      neutralPalette: (theme.neutralPalette?.shades && typeof theme.neutralPalette.shades === 'object' && !Array.isArray(theme.neutralPalette.shades)) ? theme.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
       fontFamily: theme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
       borderRadius: theme.borderRadius,
       bgStyle: theme.bgStyle || 'default',
@@ -397,7 +411,7 @@ export default function UnifiedThemeStudio() {
     // Reset visual styles
     if (originalTheme.visualStyles) {
       setVisualSettings(originalTheme.visualStyles);
-      setAdvancedTheme((prev) => ({ ...prev, visualStyles: originalTheme.visualStyles }));
+      setAdvancedTheme((prev: PowerBITheme) => ({ ...prev, visualStyles: originalTheme.visualStyles }));
     }
     
     // Clear all change tracking
@@ -422,8 +436,8 @@ export default function UnifiedThemeStudio() {
       const themeInput = {
       name: themeName,
       mode: theme.mode,
-      dataColors: theme.palette.colors,
-      neutralPalette: theme.neutralPalette.shades,
+      dataColors: (Array.isArray(theme.palette.colors)) ? theme.palette.colors as string[] : [],
+      neutralPalette: (theme.neutralPalette?.shades && typeof theme.neutralPalette.shades === 'object' && !Array.isArray(theme.neutralPalette.shades)) ? theme.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
       fontFamily: theme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
       borderRadius: theme.borderRadius,
       bgStyle: theme.bgStyle || 'default',
@@ -574,7 +588,7 @@ export default function UnifiedThemeStudio() {
                     <Label className="text-sm font-medium">Data Colors</Label>
                     <ChangeIndicator hasChanged={hasChanges(['palette'])} />
                   </div>
-                  <p className="text-xs text-gray-600 mt-0.5">{theme.palette.name || 'Custom'} • {theme.palette.colors.length} colors</p>
+                  <p className="text-xs text-gray-600 mt-0.5">{theme.palette.name || 'Custom'} • {Array.isArray(theme.palette.colors) ? theme.palette.colors.length : 0} colors</p>
                 </div>
                 <button
                   onClick={() => setShowPaletteManager(true)}
@@ -586,7 +600,7 @@ export default function UnifiedThemeStudio() {
               
               {/* Compact color grid */}
               <div className="grid grid-cols-8 gap-1">
-                {theme.palette.colors.map((color: string, i: number) => (
+                {(Array.isArray(theme.palette.colors) ? theme.palette.colors as string[] : []).map((color: string, i: number) => (
                   <div
                     key={i}
                     className="aspect-square rounded-md border border-gray-200 hover:scale-110 transition-transform cursor-pointer"
@@ -641,7 +655,7 @@ export default function UnifiedThemeStudio() {
                     <Label className="text-sm font-medium">Neutral Palette</Label>
                     <ChangeIndicator hasChanged={hasChanges(['neutralPalette'])} />
                   </div>
-                  <p className="text-xs text-gray-600 mt-0.5">{theme.neutralPalette.name}</p>
+                  <p className="text-xs text-gray-600 mt-0.5">{theme.neutralPalette?.name || 'Azure'}</p>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
@@ -661,7 +675,7 @@ export default function UnifiedThemeStudio() {
               
               {/* Compact neutral gradient */}
               <div className="h-8 rounded-md overflow-hidden flex border border-gray-200">
-                {Object.values(theme.neutralPalette.shades).map((shade: any, i: number) => (
+                {Object.values(theme.neutralPalette?.shades || AZURE_NEUTRAL_PALETTE.shades).map((shade: any, i: number) => (
                   <div
                     key={i}
                     className="flex-1 h-full"
@@ -675,7 +689,7 @@ export default function UnifiedThemeStudio() {
               {showNeutralPreview && (
                 <div className="mt-3 pt-3 border-t border-gray-100 space-y-1.5">
                   <p className="text-xs font-medium text-gray-700 mb-2">Auto-mapped to:</p>
-                  {getNeutralPalettePreview(theme.neutralPalette, theme.mode).slice(0, 4).map((mapping) => (
+                  {getNeutralPalettePreview(theme.neutralPalette || AZURE_NEUTRAL_PALETTE, theme.mode).slice(0, 4).map((mapping) => (
                     <div key={mapping.property} className="flex items-center gap-2">
                       <div 
                         className="w-3 h-3 rounded border border-gray-200"
@@ -727,7 +741,7 @@ export default function UnifiedThemeStudio() {
                     Automatically derived from your neutral palette
                   </p>
                   <div className="grid grid-cols-2 gap-2">
-                    {getNeutralPalettePreview(theme.neutralPalette, theme.mode)
+                    {getNeutralPalettePreview(theme.neutralPalette || AZURE_NEUTRAL_PALETTE, theme.mode)
                       .filter(m => ['firstLevelElements', 'secondLevelElements', 'thirdLevelElements', 'fourthLevelElements'].includes(m.property))
                       .map((mapping) => (
                       <div key={mapping.property} className="flex items-center gap-2">
@@ -1336,12 +1350,16 @@ export default function UnifiedThemeStudio() {
         onSelectPalette={(palette) => {
           // Handle palette selection
           if (typeof palette === 'string') {
-            // Built-in palette ID
-            setNeutralPaletteWithTracking({ 
-              id: palette, 
-              name: palette.charAt(0).toUpperCase() + palette.slice(1), 
-              shades: {} // Will be loaded from theme data
-            });
+            // Built-in palette ID - use Azure palette data if it's the azure-default
+            if (palette === 'azure-default') {
+              setNeutralPaletteWithTracking(AZURE_NEUTRAL_PALETTE);
+            } else {
+              setNeutralPaletteWithTracking({ 
+                id: palette, 
+                name: palette.charAt(0).toUpperCase() + palette.slice(1), 
+                shades: {} // Will be loaded from theme data
+              });
+            }
           } else {
             // Custom palette with shades
             setNeutralPaletteWithTracking({
@@ -1360,7 +1378,16 @@ export default function UnifiedThemeStudio() {
         onImport={(importedTheme) => {
           // Load foundation settings from imported theme
           if (importedTheme.dataColors) {
-            setPalette(importedTheme.dataColors);
+            setPalette({
+              id: 'imported',
+              name: 'Imported Colors',
+              colors: importedTheme.dataColors,
+              userId: 'temp',
+              description: 'Imported from theme',
+              isBuiltIn: false,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            });
           }
           
           // Extract foundation settings from visualStyles if present
@@ -1384,7 +1411,7 @@ export default function UnifiedThemeStudio() {
           // Load visual styles
           if (importedTheme.visualStyles) {
             setVisualSettings(importedTheme.visualStyles);
-            setAdvancedTheme((prev) => ({ ...prev, visualStyles: importedTheme.visualStyles }));
+            setAdvancedTheme((prev: PowerBITheme) => ({ ...prev, visualStyles: importedTheme.visualStyles }));
             
             // Update sidebar visibility based on content
             const hasVisualContent = Object.keys(importedTheme.visualStyles).length > 0;

@@ -74,16 +74,16 @@ export class StyleGenerator {
     
     // Typography
     styles.fontFamily = 'var(--font-family)';
-    styles.fontSize = visualOverrides?.fontSize ? `${visualOverrides.fontSize}px` : 'var(--font-size)';
-    styles.fontWeight = visualOverrides?.fontWeight || 'var(--font-weight)';
-    styles.fontStyle = visualOverrides?.fontStyle || 'var(--font-style)';
+    styles.fontSize = (visualOverrides && typeof visualOverrides === 'object' && visualOverrides.fontSize) ? `${visualOverrides.fontSize}px` : 'var(--font-size)';
+    styles.fontWeight = (visualOverrides && typeof visualOverrides === 'object' && visualOverrides.fontWeight) || 'var(--font-weight)';
+    styles.fontStyle = (visualOverrides && typeof visualOverrides === 'object' && visualOverrides.fontStyle) || 'var(--font-style)';
     styles.textDecoration = 'var(--text-decoration)';
     styles.lineHeight = 'var(--line-height)';
     
     // Colors
-    const background = visualOverrides?.background || theme.background;
-    const foreground = visualOverrides?.foreground || theme.foreground;
-    const border = visualOverrides?.border || theme.border;
+    const background = (visualOverrides && typeof visualOverrides === 'object' && visualOverrides.background) || theme.background;
+    const foreground = (visualOverrides && typeof visualOverrides === 'object' && visualOverrides.foreground) || theme.foreground;
+    const border = (visualOverrides && typeof visualOverrides === 'object' && visualOverrides.border) || theme.border;
     
     if (background?.solid?.color) {
       styles.backgroundColor = background.solid.color;

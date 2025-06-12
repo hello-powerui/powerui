@@ -33,7 +33,7 @@ const EditIcon = () => (
 );
 
 export function ModernColorTab() {
-  const { theme, updateThemeProperty } = useThemeBuilderStore();
+  const { theme, setPalette, setThemeMode, setNeutralPalette } = useThemeBuilderStore();
   const { colorPalettes, neutralPalettes, loadPalettes, selectColorPalette } = usePaletteStore();
   const [isPaletteManagerOpen, setIsPaletteManagerOpen] = useState(false);
   const [isNeutralPaletteManagerOpen, setIsNeutralPaletteManagerOpen] = useState(false);
@@ -58,15 +58,15 @@ export function ModernColorTab() {
 
   // Find the currently selected palette based on colors
   useEffect(() => {
-    if (colorPalettes.length > 0 && theme.dataColors) {
+    if (colorPalettes.length > 0 && theme.palette.colors) {
       const matchingPalette = colorPalettes.find(p => 
-        JSON.stringify(p.colors) === JSON.stringify(theme.dataColors)
+        JSON.stringify(p.colors) === JSON.stringify(theme.palette.colors)
       );
       if (matchingPalette) {
         setSelectedPaletteId(matchingPalette.id);
       }
     }
-  }, [colorPalettes, theme.dataColors]);
+  }, [colorPalettes, theme.palette.colors]);
 
   // No more built-in palettes - all palettes are user-created
   const allNeutralPalettes = neutralPalettes;
@@ -75,8 +75,16 @@ export function ModernColorTab() {
     const palette = colorPalettes.find(p => p.id === paletteId);
     if (palette) {
       setSelectedPaletteId(paletteId);
-      updateThemeProperty('dataColors', palette.colors as string[]);
-      updateThemeProperty('dataPalette', paletteId);
+      setPalette({
+        id: palette.id,
+        name: palette.name,
+        colors: palette.colors,
+        userId: palette.userId,
+        description: palette.description,
+        isBuiltIn: palette.isBuiltIn,
+        createdAt: palette.createdAt,
+        updatedAt: palette.updatedAt
+      });
     }
   };
 
@@ -95,7 +103,7 @@ export function ModernColorTab() {
         
         <RadioGroup.Root
           value={theme.mode}
-          onValueChange={(value) => updateThemeProperty('mode', value as 'light' | 'dark')}
+          onValueChange={(value) => setThemeMode(value as 'light' | 'dark')}
           className="flex gap-3"
         >
           <div className="flex items-center space-x-2">
@@ -257,28 +265,32 @@ export function ModernColorTab() {
           onValueChange={(value) => {
             const palette = allNeutralPalettes.find(p => p.id === value);
             if (palette) {
-              if (palette.isBuiltIn) {
-                // For built-in palettes, just pass the ID
-                updateThemeProperty('neutralPalette', value);
-              } else {
-                // For custom palettes, pass the shades object
-                updateThemeProperty('neutralPalette', palette.shades);
-              }
+              setNeutralPalette({
+                id: palette.id,
+                name: palette.name,
+                shades: palette.shades,
+                userId: palette.userId,
+                isBuiltIn: palette.isBuiltIn,
+                createdAt: palette.createdAt,
+                updatedAt: palette.updatedAt
+              });
             }
           }}
         >
           <Select.Trigger className="flex h-9 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
             <Select.Value>
               {(() => {
-                if (typeof theme.neutralPalette === 'string') {
-                  const palette = allNeutralPalettes.find(p => p.id === theme.neutralPalette);
-                  return palette?.name || theme.neutralPalette;
-                } else {
+                if (theme.neutralPalette?.id) {
+                  const palette = allNeutralPalettes.find(p => p.id === theme.neutralPalette.id);
+                  return palette?.name || theme.neutralPalette.name;
+                } else if (theme.neutralPalette?.shades) {
                   // Find palette by matching shades
                   const customPalette = allNeutralPalettes.find(p => 
-                    JSON.stringify(p.shades) === JSON.stringify(theme.neutralPalette)
+                    JSON.stringify(p.shades) === JSON.stringify(theme.neutralPalette.shades)
                   );
                   return customPalette?.name || 'Custom';
+                } else {
+                  return 'Azure'; // Default fallback
                 }
               })()}
             </Select.Value>
@@ -358,10 +370,25 @@ export function ModernColorTab() {
         isOpen={isNeutralPaletteManagerOpen}
         onOpenChange={setIsNeutralPaletteManagerOpen}
         onSelectPalette={(paletteIdOrShades) => {
-          // The NeutralPaletteManager now passes the correct data:
-          // - string ID for built-in palettes
-          // - shades object for custom palettes
-          updateThemeProperty('neutralPalette', paletteIdOrShades);
+          // Handle both palette ID and shades object
+          if (typeof paletteIdOrShades === 'string') {
+            // Find the palette by ID
+            const palette = allNeutralPalettes.find(p => p.id === paletteIdOrShades);
+            if (palette) {
+              setNeutralPalette({
+                id: palette.id,
+                name: palette.name,
+                shades: palette.shades,
+                userId: palette.userId,
+                isBuiltIn: palette.isBuiltIn,
+                createdAt: palette.createdAt,
+                updatedAt: palette.updatedAt
+              });
+            }
+          } else {
+            // Assume it's a shades object with id and name
+            setNeutralPalette(paletteIdOrShades as any);
+          }
           setIsNeutralPaletteManagerOpen(false);
         }}
       />

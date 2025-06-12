@@ -54,41 +54,18 @@ export async function DELETE(
     const dbUserId = await UserService.ensureUserExists(userId);
     const { id } = await params;
     
-    // Check if palette is referenced by any themes
-    const themes = await ThemeService.getUserThemes(dbUserId);
-    const referencingThemes = themes.filter(theme => theme.dataPalette === id);
-    
-    try {
-      await PaletteService.deleteColorPalette(id, dbUserId);
-    } catch (error) {
-      return NextResponse.json(
-        { error: 'Palette not found or unauthorized' },
-        { status: 404 }
-      );
-    }
-    
-    // Reset themes that were using this palette
-    if (referencingThemes.length > 0) {
-      const defaultPalette = await PaletteService.getBuiltInColorPalettes();
-      const defaultPaletteId = defaultPalette[0]?.id;
-      
-      if (defaultPaletteId) {
-        for (const theme of referencingThemes) {
-          await ThemeService.updateTheme(theme.id, dbUserId, {
-            dataPalette: defaultPaletteId
-          });
-        }
-      }
-    }
+    const result = await PaletteService.deleteColorPalette(id, dbUserId);
     
     return NextResponse.json({ 
       success: true,
-      affectedThemes: referencingThemes.map(t => t.name)
+      message: result.updatedThemes > 0 
+        ? `Palette deleted successfully. ${result.updatedThemes} theme(s) updated to use default colors.`
+        : 'Palette deleted successfully.'
     });
   } catch (error) {
     console.error('Error deleting color palette:', error);
     return NextResponse.json(
-      { error: 'Failed to delete palette' },
+      { error: error instanceof Error ? error.message : 'Failed to delete palette' },
       { status: 500 }
     );
   }

@@ -325,7 +325,6 @@ export const useThemeAdvancedStore = create<ThemeAdvancedState>()(
           selectedProperty: '',
           selectedSection: 'properties',
           selectedState: 'default',
-          selectedState: 'default',
           expandedPanels: [],
           isDirty: false,
           validationErrors: [],

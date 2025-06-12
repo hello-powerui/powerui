@@ -28,6 +28,7 @@ export interface ThemeSchema {
   required?: string[];
   additionalProperties?: boolean;
   description?: string;
+  definitions?: Record<string, SchemaProperty>;
 }
 
 export interface PowerBITheme {

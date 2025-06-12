@@ -71,7 +71,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
           name: 'Default Palette',
           colors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56'],
           isBuiltIn: true,
-          userId: null,
+          userId: 'system',
           description: 'Default color palette',
           createdAt: new Date(),
           updatedAt: new Date()
@@ -85,13 +85,21 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         if (response.ok) {
           try {
             const neutralData = await response.json();
-            validNeutralPalettes = Array.isArray(neutralData) ? neutralData : [];
+            validNeutralPalettes = Array.isArray(neutralData) ? neutralData.filter((p: any) => 
+              p.id && p.name && p.shades && typeof p.shades === 'object'
+            ) : [];
           } catch (err) {
             console.error('Error parsing neutral palettes response:', err);
           }
         } else {
           console.error('Failed to load neutral palettes:', response.status);
         }
+      }
+      
+      // Ensure Azure palette is always available as fallback
+      if (!validNeutralPalettes.some((p: any) => p.id === 'azure-default')) {
+        const { AZURE_NEUTRAL_PALETTE } = await import('@/lib/defaults/palettes');
+        validNeutralPalettes.unshift(AZURE_NEUTRAL_PALETTE);
       }
       
       set({ 
@@ -101,6 +109,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
       });
     } catch (error) {
       console.error('Failed to load palettes:', error);
+      const { AZURE_NEUTRAL_PALETTE } = await import('@/lib/defaults/palettes');
       set({ 
         error: error instanceof Error ? error.message : 'Failed to load palettes', 
         isLoading: false,
@@ -110,12 +119,12 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
           name: 'Fallback Palette',
           colors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56'],
           isBuiltIn: true,
-          userId: null,
+          userId: 'system',
           description: 'Fallback color palette',
           createdAt: new Date(),
           updatedAt: new Date()
         }],
-        neutralPalettes: []
+        neutralPalettes: [AZURE_NEUTRAL_PALETTE]
       });
     }
   },
@@ -141,7 +150,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         isLoading: false
       }));
     } catch (error) {
-      set({ error: error.message, isLoading: false });
+      set({ error: error instanceof Error ? error.message : 'Failed to create palette', isLoading: false });
       throw error;
     }
   },
@@ -165,7 +174,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         isLoading: false
       }));
     } catch (error) {
-      set({ error: error.message, isLoading: false });
+      set({ error: error instanceof Error ? error.message : 'Failed to update palette', isLoading: false });
       throw error;
     }
   },
@@ -185,7 +194,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         isLoading: false
       }));
     } catch (error) {
-      set({ error: error.message, isLoading: false });
+      set({ error: error instanceof Error ? error.message : 'Failed to delete palette', isLoading: false });
       throw error;
     }
   },
@@ -212,7 +221,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
       }));
       return palette;
     } catch (error) {
-      set({ error: error.message, isLoading: false });
+      set({ error: error instanceof Error ? error.message : 'Failed to create neutral palette', isLoading: false });
       throw error;
     }
   },
@@ -236,7 +245,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         isLoading: false
       }));
     } catch (error) {
-      set({ error: error.message, isLoading: false });
+      set({ error: error instanceof Error ? error.message : 'Failed to update neutral palette', isLoading: false });
       throw error;
     }
   },
@@ -256,7 +265,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         isLoading: false
       }));
     } catch (error) {
-      set({ error: error.message, isLoading: false });
+      set({ error: error instanceof Error ? error.message : 'Failed to delete neutral palette', isLoading: false });
       throw error;
     }
   },

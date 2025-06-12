@@ -6,6 +6,7 @@ import { KPICard } from './preview/KPICard';
 import { StackedColumnChart } from './preview/StackedColumnChart';
 import { LineAreaChart } from './preview/LineAreaChart';
 import { DataTableWithProgress } from './preview/DataTableWithProgress';
+import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 
 export function PreviewDashboard() {
   const { theme } = useThemeBuilderStore();
@@ -13,10 +14,10 @@ export function PreviewDashboard() {
   // Convert ThemeBuilderTheme to ThemeGenerationInput
   const themeInput = {
     mode: theme.mode,
-    neutralPalette: theme.neutralPalette.shades,
+    neutralPalette: (theme.neutralPalette?.shades && typeof theme.neutralPalette.shades === 'object' && !Array.isArray(theme.neutralPalette.shades)) ? theme.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
     fontFamily: theme.fontFamily,
     borderRadius: theme.borderRadius,
-    dataColors: theme.palette.colors,
+    dataColors: (Array.isArray(theme.palette.colors)) ? theme.palette.colors as string[] : [],
     name: theme.name,
     bgStyle: theme.bgStyle,
     borderStyle: theme.borderStyle,

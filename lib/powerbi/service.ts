@@ -65,6 +65,10 @@ export class PowerBIService {
     this.accessToken = data.accessToken;
     this.tokenExpiry = new Date(data.expiresOn);
 
+    if (!this.accessToken) {
+      throw new Error('Failed to obtain access token');
+    }
+
     return this.accessToken;
   }
 

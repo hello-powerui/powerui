@@ -1,4 +1,5 @@
 import { NeutralPalette } from '@/lib/generated/prisma';
+import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 
 interface ThemeColorMapping {
   light: {
@@ -37,7 +38,13 @@ export function mapNeutralPaletteToTheme(
   palette: NeutralPalette,
   mode: 'light' | 'dark'
 ): Partial<ThemeColorMapping['light']> {
-  const shades = palette.shades;
+  // Defensive check: if palette is invalid, use Azure default
+  if (!palette || !palette.shades || typeof palette.shades !== 'object') {
+    console.warn('Invalid neutral palette provided, falling back to Azure default');
+    palette = AZURE_NEUTRAL_PALETTE as NeutralPalette;
+  }
+  
+  const shades = palette.shades as Record<string, string>;
   
   if (mode === 'light') {
     return {

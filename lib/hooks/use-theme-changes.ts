@@ -22,7 +22,7 @@ export const useThemeChanges = create<ThemeChangesState>((set, get) => ({
   trackChange: (path: string[]) => {
     const pathString = path.join('.');
     set((state) => ({
-      changedPaths: new Set([...state.changedPaths, pathString])
+      changedPaths: new Set([...Array.from(state.changedPaths), pathString])
     }));
   },
   

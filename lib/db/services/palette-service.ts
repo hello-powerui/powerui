@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db/prisma'
 import type { ColorPalette, NeutralPalette, Prisma } from '@/lib/generated/prisma'
+import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes'
 
 export class PaletteService {
   /**
@@ -65,15 +66,44 @@ export class PaletteService {
   }
 
   /**
-   * Delete a color palette
+   * Delete a color palette and cascade update themes to default colors
    */
-  static async deleteColorPalette(paletteId: string, userId: string): Promise<void> {
+  static async deleteColorPalette(paletteId: string, userId: string): Promise<{ deletedPalette: boolean; updatedThemes: number }> {
+    // Find themes using this palette
+    const affectedThemes = await this.findThemesUsingColorPalette(paletteId, userId);
+    
+    // Update affected themes to use default colors
+    const updatePromises = affectedThemes.map(theme => {
+      const updatedThemeData = {
+        ...(theme.themeData as Record<string, any> || {}),
+        palette: DEFAULT_COLOR_PALETTE,
+        dataColors: DEFAULT_COLOR_PALETTE.colors
+      };
+      
+      return prisma.theme.update({
+        where: { id: theme.id },
+        data: { 
+          themeData: updatedThemeData,
+          // Also update the dataPalette field to reference powerui-default
+          dataPalette: 'powerui-default'
+        }
+      });
+    });
+    
+    await Promise.all(updatePromises);
+    
+    // Now delete the palette
     await prisma.colorPalette.delete({
       where: {
         id: paletteId,
         userId,
       },
-    })
+    });
+    
+    return {
+      deletedPalette: true,
+      updatedThemes: affectedThemes.length
+    };
   }
 
   /**
@@ -137,15 +167,75 @@ export class PaletteService {
   }
 
   /**
-   * Delete a neutral palette
+   * Find themes using a specific neutral palette
    */
-  static async deleteNeutralPalette(paletteId: string, userId: string): Promise<void> {
+  private static async findThemesUsingNeutralPalette(paletteId: string, userId: string) {
+    return prisma.theme.findMany({
+      where: {
+        userId,
+        neutralPalette: 'custom',
+        themeData: {
+          path: ['neutralPalette', 'id'],
+          equals: paletteId
+        }
+      }
+    });
+  }
+
+  /**
+   * Find themes using a specific color palette  
+   */
+  private static async findThemesUsingColorPalette(paletteId: string, userId: string) {
+    return prisma.theme.findMany({
+      where: {
+        userId,
+        dataPalette: 'custom',
+        themeData: {
+          path: ['palette', 'id'],
+          equals: paletteId
+        }
+      }
+    });
+  }
+
+  /**
+   * Delete a neutral palette and cascade update themes to Azure default
+   */
+  static async deleteNeutralPalette(paletteId: string, userId: string): Promise<{ deletedPalette: boolean; updatedThemes: number }> {
+    // Find themes using this palette
+    const affectedThemes = await this.findThemesUsingNeutralPalette(paletteId, userId);
+    
+    // Update affected themes to use Azure default
+    const updatePromises = affectedThemes.map(theme => {
+      const updatedThemeData = {
+        ...(theme.themeData as Record<string, any> || {}),
+        neutralPalette: AZURE_NEUTRAL_PALETTE
+      };
+      
+      return prisma.theme.update({
+        where: { id: theme.id },
+        data: { 
+          themeData: updatedThemeData,
+          // Also update the neutralPalette field to reference azure-default
+          neutralPalette: 'azure-default'
+        }
+      });
+    });
+    
+    await Promise.all(updatePromises);
+    
+    // Now delete the palette
     await prisma.neutralPalette.delete({
       where: {
         id: paletteId,
         userId,
       },
-    })
+    });
+    
+    return {
+      deletedPalette: true,
+      updatedThemes: affectedThemes.length
+    };
   }
 
   /**
@@ -165,6 +255,25 @@ export class PaletteService {
 
     // Built-in neutral palettes
     const builtInNeutrals = [
+      {
+        id: 'azure-default',
+        name: 'Azure',
+        shades: {
+          "25": "#F7F8F8", 
+          "50": "#F1F3F4", 
+          "100": "#E4E7E9", 
+          "200": "#C9D0D3", 
+          "300": "#AEB8BD", 
+          "400": "#93A1A7", 
+          "500": "#788991", 
+          "600": "#606E74", 
+          "700": "#485257", 
+          "800": "#30373A", 
+          "900": "#181B1D", 
+          "950": "#0C0E0E" 
+        },
+        isBuiltIn: true,
+      },
       {
         id: 'cool',
         name: 'Cool',
@@ -231,7 +340,10 @@ export class PaletteService {
       await prisma.neutralPalette.upsert({
         where: { id: palette.id },
         update: palette,
-        create: palette,
+        create: {
+          ...palette,
+          userId: 'system',
+        },
       })
     }
   }

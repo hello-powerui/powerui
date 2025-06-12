@@ -1,8 +1,10 @@
 import { create } from 'zustand';
-import { ColorPalette, NeutralPalette } from './palette-store';
+import { ColorPalette, NeutralPalette } from '@/lib/generated/prisma';
 import { StructuralColors, TextClasses } from '@/lib/theme-generation/types';
+import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
 
 interface ThemeBuilderTheme {
+  id?: string;
   name: string;
   description?: string;
   mode: 'light' | 'dark';
@@ -53,29 +55,8 @@ interface ThemeBuilderState {
 const defaultTheme: ThemeBuilderTheme = {
   name: 'Untitled Theme',
   mode: 'light',
-  palette: {
-    id: 'default',
-    name: 'Default',
-    colors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56', '#3498DB', '#A66999']
-  },
-  neutralPalette: {
-    id: 'azure',
-    name: 'Azure',
-    shades: {
-      '25': '#FBFDFF',
-      '50': '#F5FAFF',
-      '100': '#E6F3FF',
-      '200': '#C2E4FF',
-      '300': '#8CC7FF',
-      '400': '#4DA6FF',
-      '500': '#1A82E2',
-      '600': '#0059CC',
-      '700': '#003A8C',
-      '800': '#00265E',
-      '900': '#001A40',
-      '950': '#001333'
-    }
-  },
+  palette: DEFAULT_COLOR_PALETTE,
+  neutralPalette: AZURE_NEUTRAL_PALETTE,
   fontFamily: 'Segoe UI',
   borderRadius: 4,
   spacing: 'normal',
@@ -205,9 +186,14 @@ export const useThemeBuilderStore = create<ThemeBuilderState>((set, get) => ({
         }
       };
       
+      // Determine if this is an update or create operation
+      const isUpdate = theme.id !== undefined;
+      const url = isUpdate ? `/api/themes/${theme.id}` : '/api/themes';
+      const method = isUpdate ? 'PUT' : 'POST';
+      
       // Save theme via API
-      const response = await fetch('/api/themes', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(themeInput)
       });
@@ -216,7 +202,14 @@ export const useThemeBuilderStore = create<ThemeBuilderState>((set, get) => ({
         throw new Error('Failed to save theme');
       }
       
-      return await response.json();
+      const savedTheme = await response.json();
+      
+      // Update the theme ID if this was a create operation
+      if (!isUpdate && savedTheme.id) {
+        set({ theme: { ...theme, id: savedTheme.id } });
+      }
+      
+      return savedTheme;
     } finally {
       set({ isSaving: false });
     }

@@ -9,7 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { useThemeBuilderStore } from '@/lib/stores/theme-builder-store';
-import { ThemeDataColor } from '@/lib/theme-generation/types';
+
+type ThemeDataColor = string | { color: string } | { dataColorIndex: number };
 
 interface TextClass {
   fontFace?: string;
@@ -140,19 +141,34 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
   const getColorValue = (fontColor?: ThemeDataColor): string => {
     if (!fontColor) return '#000000';
     
-    if ('color' in fontColor) {
+    // If it's a string, return it directly
+    if (typeof fontColor === 'string') {
+      return fontColor;
+    }
+    
+    // If it's an object with color property
+    if (typeof fontColor === 'object' && 'color' in fontColor) {
       return fontColor.color;
     }
     
-    if ('dataColorIndex' in fontColor && fontColor.dataColorIndex !== undefined) {
-      return dataColors[fontColor.dataColorIndex] || '#000000';
+    // If it's an object with dataColorIndex property
+    if (typeof fontColor === 'object' && 'dataColorIndex' in fontColor && fontColor.dataColorIndex !== undefined) {
+      return (dataColors && Array.isArray(dataColors)) ? (dataColors[fontColor.dataColorIndex] as string) || '#000000' : '#000000';
     }
     
     return '#000000';
   };
 
   const isDataColor = (fontColor?: ThemeDataColor): boolean => {
-    return fontColor ? 'dataColorIndex' in fontColor : false;
+    if (!fontColor || typeof fontColor !== 'object') return false;
+    return 'dataColorIndex' in fontColor;
+  };
+
+  const getDataColorIndex = (fontColor?: ThemeDataColor): number => {
+    if (fontColor && typeof fontColor === 'object' && 'dataColorIndex' in fontColor) {
+      return fontColor.dataColorIndex;
+    }
+    return 0;
   };
 
   return (
@@ -199,7 +215,7 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
                       <Label htmlFor={`${className}-color`}>Color</Label>
                       {useDataColor ? (
                         <Select
-                          value={textClass.fontColor?.dataColorIndex?.toString() || '0'}
+                          value={getDataColorIndex(textClass.fontColor).toString()}
                           onValueChange={(value) => handleDataColorSelect(className, value)}
                         >
                           <SelectTrigger id={`${className}-color`}>
@@ -207,7 +223,7 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="custom">Custom Color</SelectItem>
-                            {dataColors.map((color, index) => (
+                            {(dataColors && Array.isArray(dataColors) ? dataColors as string[] : []).map((color: string, index: number) => (
                               <SelectItem key={index} value={index.toString()}>
                                 <div className="flex items-center gap-2">
                                   <div 
@@ -239,7 +255,7 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="custom">Custom</SelectItem>
-                              {dataColors.map((_, index) => (
+                              {(dataColors && Array.isArray(dataColors) ? dataColors as string[] : []).map((_: string, index: number) => (
                                 <SelectItem key={index} value={index.toString()}>
                                   DC{index + 1}
                                 </SelectItem>
