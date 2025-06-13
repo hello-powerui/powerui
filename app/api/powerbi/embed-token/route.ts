@@ -22,26 +22,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // First, get an access token
-    console.log('[EMBED-TOKEN] Fetching access token...');
-    const tokenUrl = new URL('/api/powerbi/token', request.url).toString();
-    console.log('[EMBED-TOKEN] Token URL:', tokenUrl);
-    
-    const tokenResponse = await fetch(tokenUrl, { method: 'POST' });
-    console.log('[EMBED-TOKEN] Token response status:', tokenResponse.status);
+    // Get credentials
+    const clientId = process.env.POWERBI_CLIENT_ID;
+    const clientSecret = process.env.POWERBI_CLIENT_SECRET;
+    const tenantId = process.env.POWERBI_TENANT_ID || powerBIConfig.tenantId;
+
+    console.log('[EMBED-TOKEN] Environment check:', {
+      hasClientId: !!clientId,
+      hasClientSecret: !!clientSecret,
+      tenantId: tenantId
+    });
+
+    if (!clientId || !clientSecret) {
+      console.error('[EMBED-TOKEN] Missing Power BI credentials');
+      return NextResponse.json(
+        { error: 'Power BI credentials not configured' },
+        { status: 500 }
+      );
+    }
+
+    // Get access token directly
+    const params = new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: clientId,
+      client_secret: clientSecret,
+      scope: powerBIConfig.scope,
+    });
+
+    console.log('[EMBED-TOKEN] Getting access token from Azure AD...');
+    const tokenResponse = await fetch(
+      `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+      }
+    );
 
     if (!tokenResponse.ok) {
       const tokenError = await tokenResponse.text();
-      console.log('[EMBED-TOKEN] Failed to get access token:', tokenError);
+      console.error('[EMBED-TOKEN] Failed to get access token:', tokenError);
       return NextResponse.json(
-        { error: 'Failed to get access token', details: tokenError },
+        { error: 'Failed to authenticate with Power BI', details: tokenError },
         { status: 500 }
       );
     }
 
     const tokenData = await tokenResponse.json();
-    console.log('[EMBED-TOKEN] Token data received');
-    const { accessToken } = tokenData;
+    const accessToken = tokenData.access_token;
+    console.log('[EMBED-TOKEN] Successfully got access token');
 
     // Get report details
     console.log('[EMBED-TOKEN] Fetching report details...');
