@@ -1,0 +1,384 @@
+'use client';
+
+import * as React from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { ChevronDown, Search } from 'lucide-react';
+import { TOKEN_REGISTRY } from '@/lib/theme-generation/token-registry';
+import { resolveToken } from '@/lib/theme-generation/token-registry';
+
+// Types for different value formats
+export type SimpleColorValue = string;
+export type PowerBIColorValue = { solid: { color: any } };
+export type ThemeStudioColorValue = { color?: string; themeColor?: { id: number; shade?: number } };
+export type UnifiedColorValue = SimpleColorValue | PowerBIColorValue | ThemeStudioColorValue;
+
+export interface UnifiedColorPickerProps {
+  value?: UnifiedColorValue;
+  onChange?: (value: UnifiedColorValue) => void;
+  label?: string;
+  description?: string;
+  required?: boolean;
+  format?: 'simple' | 'powerbi' | 'themestudio';
+  enableTokens?: boolean;
+  enableThemeColors?: boolean;
+  enableShades?: boolean;
+  mode?: 'light' | 'dark';
+  neutralPalette?: string[];
+  className?: string;
+  placeholder?: string;
+}
+
+const PRESET_COLORS = [
+  '#000000', '#FFFFFF', '#F3F4F6', '#E5E7EB', '#D1D5DB', '#9CA3AF',
+  '#6B7280', '#4B5563', '#374151', '#1F2937', '#111827', '#030712',
+  '#DC2626', '#EF4444', '#F87171', '#F59E0B', '#FDE047', '#84CC16',
+  '#22C55E', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9', '#3B82F6',
+  '#6366F1', '#8B5CF6', '#A855F7', '#D946EF', '#EC4899', '#F43F5E',
+];
+
+const THEME_COLORS = [
+  { id: 0, name: 'Color 1', preview: '#3B82F6' },
+  { id: 1, name: 'Color 2', preview: '#10B981' },
+  { id: 2, name: 'Color 3', preview: '#F59E0B' },
+  { id: 3, name: 'Color 4', preview: '#EF4444' },
+  { id: 4, name: 'Color 5', preview: '#8B5CF6' },
+  { id: 5, name: 'Color 6', preview: '#EC4899' },
+  { id: 6, name: 'Color 7', preview: '#06B6D4' },
+  { id: 7, name: 'Color 8', preview: '#F97316' },
+];
+
+const SHADE_OPTIONS = [
+  { value: -0.5, label: '-50%' },
+  { value: -0.25, label: '-25%' },
+  { value: 0, label: 'Base' },
+  { value: 0.25, label: '+25%' },
+  { value: 0.5, label: '+50%' },
+];
+
+export function UnifiedColorPicker({
+  value,
+  onChange,
+  label,
+  description,
+  required,
+  format = 'simple',
+  enableTokens = true,
+  enableThemeColors = true,
+  enableShades = false,
+  mode = 'light',
+  neutralPalette,
+  className,
+  placeholder = 'Select color',
+}: UnifiedColorPickerProps) {
+  const [open, setOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [selectedTab, setSelectedTab] = React.useState('custom');
+  const [selectedThemeColor, setSelectedThemeColor] = React.useState<number | null>(null);
+  const [selectedShade, setSelectedShade] = React.useState(0);
+
+  // Extract display value based on format
+  const getDisplayValue = (): string => {
+    if (!value) return '';
+    
+    if (typeof value === 'string') {
+      return value;
+    } else if ('solid' in value && value.solid?.color) {
+      const color = value.solid.color;
+      if (typeof color === 'string') return color;
+      if (color.expr?.ThemeDataColor?.ColorId !== undefined) {
+        const themeColor = THEME_COLORS[color.expr.ThemeDataColor.ColorId];
+        return themeColor ? `Theme ${themeColor.name}` : '';
+      }
+    } else if ('color' in value && value.color) {
+      return value.color;
+    } else if ('themeColor' in value && value.themeColor) {
+      const themeColor = THEME_COLORS[value.themeColor.id];
+      const shade = value.themeColor.shade || 0;
+      return themeColor ? `Theme ${themeColor.name}${shade !== 0 ? ` (${shade > 0 ? '+' : ''}${shade * 100}%)` : ''}` : '';
+    }
+    return '';
+  };
+
+  // Get preview color
+  const getPreviewColor = (): string => {
+    const displayValue = getDisplayValue();
+    if (displayValue.startsWith('#')) return displayValue;
+    if (displayValue.startsWith('@')) {
+      const neutralObj = neutralPalette ? Object.fromEntries(neutralPalette.map((color, i) => [String(i * 100), color])) : {};
+      const resolved = resolveToken(displayValue, mode, { neutral: neutralObj, dataColors: [] });
+      return resolved || '#000000';
+    }
+    if (displayValue.startsWith('Theme')) {
+      const match = displayValue.match(/Color (\d+)/);
+      if (match) {
+        const colorIndex = parseInt(match[1]) - 1;
+        return THEME_COLORS[colorIndex]?.preview || '#000000';
+      }
+    }
+    return '#000000';
+  };
+
+  // Format value based on format prop
+  const formatValue = (rawValue: any): UnifiedColorValue => {
+    if (!rawValue) return format === 'simple' ? '' : format === 'powerbi' ? { solid: { color: '' } } : { color: '' };
+    
+    switch (format) {
+      case 'simple':
+        return typeof rawValue === 'string' ? rawValue : '';
+      case 'powerbi':
+        if (typeof rawValue === 'string') {
+          if (rawValue.startsWith('@')) {
+            return { solid: { color: rawValue } };
+          } else {
+            return { solid: { color: rawValue } };
+          }
+        } else if (typeof rawValue === 'number') {
+          return { solid: { color: { expr: { ThemeDataColor: { ColorId: rawValue } } } } };
+        }
+        return { solid: { color: rawValue } };
+      case 'themestudio':
+        if (typeof rawValue === 'string') {
+          return { color: rawValue };
+        } else if (typeof rawValue === 'object' && rawValue.themeColor) {
+          return rawValue;
+        }
+        return { color: rawValue };
+      default:
+        return rawValue;
+    }
+  };
+
+  const handleColorChange = (newValue: any) => {
+    const formatted = formatValue(newValue);
+    onChange?.(formatted);
+    setOpen(false);
+  };
+
+  const handleThemeColorSelect = (colorId: number) => {
+    setSelectedThemeColor(colorId);
+    if (enableShades) {
+      setSelectedTab('theme');
+    } else {
+      handleColorChange(format === 'themestudio' ? { themeColor: { id: colorId, shade: 0 } } : colorId);
+    }
+  };
+
+  const handleShadeSelect = (shade: number) => {
+    setSelectedShade(shade);
+    if (selectedThemeColor !== null) {
+      handleColorChange({ themeColor: { id: selectedThemeColor, shade } });
+    }
+  };
+
+  const filteredTokens = React.useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    const grouped: Record<string, string[]> = {};
+    
+    Object.entries(TOKEN_REGISTRY).forEach(([token, definition]) => {
+      if (!searchQuery || 
+          token.toLowerCase().includes(query) || 
+          definition.name.toLowerCase().includes(query) ||
+          token.replace(/@|-/g, ' ').toLowerCase().includes(query)) {
+        
+        if (!grouped[definition.category]) {
+          grouped[definition.category] = [];
+        }
+        grouped[definition.category].push(token);
+      }
+    });
+    
+    return grouped;
+  }, [searchQuery]);
+
+  const availableTabs = React.useMemo(() => {
+    const tabs = ['custom'];
+    if (enableTokens) tabs.unshift('tokens');
+    if (enableThemeColors) tabs.push('theme');
+    return tabs;
+  }, [enableTokens, enableThemeColors]);
+
+  React.useEffect(() => {
+    if (!availableTabs.includes(selectedTab)) {
+      setSelectedTab(availableTabs[0]);
+    }
+  }, [availableTabs, selectedTab]);
+
+  return (
+    <div className={cn("space-y-2", className)}>
+      {(label || required) && (
+        <div className="flex items-center gap-2">
+          {label && <Label>{label}</Label>}
+          {required && <Badge variant="secondary" className="text-xs">Required</Badge>}
+        </div>
+      )}
+      {description && (
+        <p className="text-sm text-muted-foreground">{description}</p>
+      )}
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between font-normal"
+          >
+            <div className="flex items-center gap-2">
+              <div
+                className="h-5 w-5 rounded border border-gray-200"
+                style={{ backgroundColor: getPreviewColor() }}
+              />
+              <span className="truncate">
+                {getDisplayValue() || placeholder}
+              </span>
+            </div>
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[320px] p-0" align="start">
+          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+            <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}>
+              {enableTokens && <TabsTrigger value="tokens">Tokens</TabsTrigger>}
+              <TabsTrigger value="custom">Custom</TabsTrigger>
+              {enableThemeColors && <TabsTrigger value="theme">Theme</TabsTrigger>}
+            </TabsList>
+            
+            {enableTokens && (
+              <TabsContent value="tokens" className="p-3 space-y-3">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search tokens..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
+                <div className="max-h-[300px] overflow-y-auto space-y-3">
+                  {Object.entries(filteredTokens).map(([category, tokens]) => (
+                    <div key={category}>
+                      <p className="text-xs font-medium text-muted-foreground mb-2">
+                        {category}
+                      </p>
+                      <div className="grid grid-cols-2 gap-1">
+                        {tokens.map((token) => {
+                          const neutralObj = neutralPalette ? Object.fromEntries(neutralPalette.map((color, i) => [String(i * 100), color])) : {};
+                          const resolvedColor = resolveToken(token, mode, { neutral: neutralObj, dataColors: [] });
+                          return (
+                            <Button
+                              key={token}
+                              variant="ghost"
+                              size="sm"
+                              className="justify-start gap-2 h-8 px-2"
+                              onClick={() => handleColorChange(token)}
+                            >
+                              <div
+                                className="h-4 w-4 rounded border border-gray-200 shrink-0"
+                                style={{ backgroundColor: resolvedColor || '#000' }}
+                              />
+                              <span className="text-xs truncate">{token}</span>
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+            )}
+            
+            <TabsContent value="custom" className="p-3 space-y-3">
+              <div className="space-y-2">
+                <Label>Hex Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="color"
+                    value={getDisplayValue().startsWith('#') ? getDisplayValue() : '#000000'}
+                    onChange={(e) => handleColorChange(e.target.value)}
+                    className="w-16 h-9 p-1 cursor-pointer"
+                  />
+                  <Input
+                    type="text"
+                    placeholder="#000000"
+                    value={getDisplayValue().startsWith('#') ? getDisplayValue() : ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.match(/^#[0-9A-Fa-f]{0,6}$/)) {
+                        handleColorChange(value);
+                      }
+                    }}
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Preset Colors</Label>
+                <div className="grid grid-cols-6 gap-1">
+                  {PRESET_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      className="h-8 w-full rounded border-2 border-gray-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      style={{ backgroundColor: color }}
+                      onClick={() => handleColorChange(color)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+            
+            {enableThemeColors && (
+              <TabsContent value="theme" className="p-3 space-y-3">
+                <div className="space-y-2">
+                  <Label>Theme Colors</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {THEME_COLORS.map((color) => (
+                      <Button
+                        key={color.id}
+                        variant={selectedThemeColor === color.id ? "default" : "outline"}
+                        size="sm"
+                        className="justify-start gap-2"
+                        onClick={() => handleThemeColorSelect(color.id)}
+                      >
+                        <div
+                          className="h-4 w-4 rounded border border-gray-200"
+                          style={{ backgroundColor: color.preview }}
+                        />
+                        <span>{color.name}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                {enableShades && selectedThemeColor !== null && (
+                  <div className="space-y-2">
+                    <Label>Shade Adjustment</Label>
+                    <div className="grid grid-cols-3 gap-1">
+                      {SHADE_OPTIONS.map((option) => (
+                        <Button
+                          key={option.value}
+                          variant={selectedShade === option.value ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handleShadeSelect(option.value)}
+                        >
+                          {option.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+            )}
+          </Tabs>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}

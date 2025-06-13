@@ -1,5 +1,6 @@
 import { ThemeGenerationInput } from './types';
-import { resolveToken, ColorPalettes } from './token-registry';
+import { ColorPalettes } from './token-registry';
+import { createUnifiedTokenResolver } from './shared-token-resolver';
 import { replaceTokens } from './utils';
 import { mapNeutralPaletteToTheme } from './neutral-mapper';
 import { createEmptyTheme } from './empty-theme';
@@ -59,26 +60,12 @@ export class ClientPreviewGenerator {
     palettes: ColorPalettes,
     dataColors: string[]
   ) {
-    return (token: string): any => {
-      // Try to resolve as a registered token
-      const resolved = resolveToken(token, mode, palettes);
-      if (resolved) return resolved;
-      
-      // Handle special cases
-      if (token === 'name') return 'Preview Theme';
-      if (token === 'dataColors') return dataColors;
-      if (token === 'border-radius') return 4;
-      if (token === 'padding') return 16;
-      
-      // Return fallback color based on token prefix
-      if (token.startsWith('bg-')) return mode === 'light' ? '#F5F5F5' : '#1A1A1A';
-      if (token.startsWith('text-')) return mode === 'light' ? '#1A1A1A' : '#F5F5F5';
-      if (token.startsWith('border-')) return mode === 'light' ? '#CCCCCC' : '#4D4D4D';
-      if (token.startsWith('fg-')) return mode === 'light' ? '#1A1A1A' : '#FFFFFF';
-      
-      // Default fallback
-      return mode === 'light' ? '#000000' : '#FFFFFF';
-    };
+    return createUnifiedTokenResolver({
+      mode,
+      palettes,
+      dataColors,
+      isPreview: true
+    });
   }
   
   private formatTextClasses(textClasses: any): any {

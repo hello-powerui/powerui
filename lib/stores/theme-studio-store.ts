@@ -532,5 +532,3 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
   )
 );
 
-// Export a separate hook for backward compatibility with theme-builder usage
-export const useThemeBuilderStore = useThemeStudioStore;

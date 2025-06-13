@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { PropertyInput } from './property-input';
-import { AdvancedColorPicker } from './advanced-color-picker';
+import { UnifiedColorPicker } from '@/components/ui/unified-color-picker';
 import { CollapsibleSection } from '../ui/collapsible-section';
 import { Card } from '@/components/ui/card';
 import { FillControl, NumberControl, BooleanControl } from './controls';
@@ -1297,13 +1297,16 @@ export function SchemaForm({
   // Handle color properties
   if (isColorProperty(schema, path[path.length - 1])) {
     return (
-      <AdvancedColorPicker
+      <UnifiedColorPicker
         label={schema.title || formatPropertyName(path[path.length - 1])}
         value={value}
         onChange={handleChange}
         description={schema.description}
         required={schema.required?.includes(path[path.length - 1])}
-        path={path}
+        format="themestudio"
+        enableTokens={false}
+        enableThemeColors={true}
+        enableShades={true}
       />
     );
   }

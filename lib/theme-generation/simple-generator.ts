@@ -1,12 +1,11 @@
 import { ThemeGenerationInput, ColorPalette } from './types';
-import { resolveColors, ColorPalettes } from './theme-config';
+import { ColorPalettes } from './token-registry';
 import { validateNeutralPalette, replaceTokens } from './utils';
 import { createEmptyTheme } from './empty-theme';
 import { mapNeutralPaletteToTheme } from './neutral-mapper';
-import { resolveToken } from './token-registry';
+import { createUnifiedTokenResolver } from './shared-token-resolver';
 
 export class SimpleThemeGenerator {
-  private colors: Record<string, string> = {};
   
   generate(input: ThemeGenerationInput): any {
     // Validate input
@@ -23,9 +22,13 @@ export class SimpleThemeGenerator {
       dataColors: input.dataColors
     };
     
-    // Resolve all colors based on mode
-    const colors = resolveColors(input.mode, palettes);
-    this.colors = colors;
+    // Create token resolver
+    const resolveToken = createUnifiedTokenResolver({
+      name: input.name,
+      mode: input.mode,
+      palettes,
+      dataColors: input.dataColors
+    });
     
     // Start with empty theme
     const theme = createEmptyTheme(input.name, input.dataColors);
@@ -33,25 +36,25 @@ export class SimpleThemeGenerator {
     // Override with resolved colors
     Object.assign(theme, {
       // Critical colors for Power BI
-      background: colors['text-secondary'], // Power BI uses this differently
-      backgroundLight: colors['background-active'],
-      backgroundNeutral: colors['background-secondary'],
-      foreground: colors['text-secondary'],
-      foregroundNeutralSecondary: colors['text-secondary'],
-      foregroundNeutralTertiary: colors['text-tertiary'],
+      background: resolveToken('@text-secondary'), // Power BI uses this differently
+      backgroundLight: resolveToken('@bg-active'),
+      backgroundNeutral: resolveToken('@bg-secondary'),
+      foreground: resolveToken('@text-secondary'),
+      foregroundNeutralSecondary: resolveToken('@text-secondary'),
+      foregroundNeutralTertiary: resolveToken('@text-tertiary'),
       
       // Semantic colors
-      bad: colors['error'],
-      good: colors['success'],
-      neutral: colors['warning'],
-      center: colors['text-primary'],
+      bad: resolveToken('@text-error-primary'),
+      good: resolveToken('@text-success-primary'),
+      neutral: resolveToken('@text-warning-primary'),
+      center: resolveToken('@text-primary'),
       
       // Structural colors (used by various visuals)
-      firstLevelElements: colors['firstLevelElements'],
-      secondLevelElements: colors['secondLevelElements'],
-      thirdLevelElements: colors['thirdLevelElements'],
-      fourthLevelElements: colors['fourthLevelElements'],
-      tableAccent: colors['tableAccent'],
+      firstLevelElements: resolveToken('@firstLevelElements'),
+      secondLevelElements: resolveToken('@secondLevelElements'),
+      thirdLevelElements: resolveToken('@thirdLevelElements'),
+      fourthLevelElements: resolveToken('@fourthLevelElements'),
+      tableAccent: resolveToken('@tableAccent'),
       
       // Text classes - user provides these
       textClasses: {},
@@ -86,55 +89,11 @@ export class SimpleThemeGenerator {
     
     // Apply custom visual styles if provided
     if (input.visualStyles && Object.keys(input.visualStyles).length > 0) {
-      // Create token resolver
-      const tokenResolver = this.createTokenResolver(input, colors);
-      const resolved = replaceTokens(input.visualStyles, tokenResolver, input.dataColors);
+      const resolved = replaceTokens(input.visualStyles, resolveToken, input.dataColors);
       theme.visualStyles = resolved;
     }
     
     return theme;
-  }
-  
-  private createTokenResolver(input: ThemeGenerationInput, colors: Record<string, string>) {
-    return (token: string): any => {
-      // Prepare palettes for token resolution
-      const palettes: ColorPalettes = {
-        neutral: input.neutralPalette as Record<string, string>,
-        dataColors: input.dataColors
-      };
-      
-      // Try to resolve using centralized token registry
-      const resolved = resolveToken(token, input.mode, palettes);
-      if (resolved) return resolved;
-      
-      // Direct color mappings from theme-config
-      if (colors[token]) {
-        return colors[token];
-      }
-      
-      // Check for font tokens - users provide font names directly
-      if (token.startsWith('font-')) {
-        const fontStyle = token.replace('font-', '');
-        if (fontStyle === 'regular') return input.fontFamily;
-        if (fontStyle === 'bold') return `${input.fontFamily} Bold`;
-        if (fontStyle === 'semibold') return `${input.fontFamily} SemiBold`;
-        if (fontStyle === 'light') return `${input.fontFamily} Light`;
-      }
-      
-      // Direct value tokens
-      if (token === 'name') return input.name;
-      if (token === 'dataColors') return input.dataColors;
-      if (token === 'border-radius') return input.borderRadius;
-      if (token === 'padding') return 16; // Default padding
-      
-      // Return a fallback color for unresolved tokens
-      if (token.startsWith('bg-')) return input.mode === 'light' ? '#F5F5F5' : '#1A1A1A';
-      if (token.startsWith('text-')) return input.mode === 'light' ? '#1A1A1A' : '#F5F5F5';
-      if (token.startsWith('border-')) return input.mode === 'light' ? '#CCCCCC' : '#4D4D4D';
-      if (token.startsWith('fg-')) return input.mode === 'light' ? '#1A1A1A' : '#FFFFFF';
-      
-      return input.mode === 'light' ? '#000000' : '#FFFFFF';
-    };
   }
   
   private validateInput(input: ThemeGenerationInput): void {

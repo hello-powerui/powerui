@@ -1,6 +1,12 @@
-import { ColorPalettes } from './theme-config';
+import { NeutralPalette } from '@/lib/generated/prisma';
 
-export type { ColorPalettes };
+// Type definitions for theme configuration
+export interface ColorPalettes {
+  neutral: Record<string, string> | null;
+  dataColors: string[];
+}
+
+export type ColorResolver = (palettes: ColorPalettes) => string;
 
 export interface TokenDefinition {
   name: string;
@@ -238,6 +244,106 @@ export const TOKEN_REGISTRY: Record<string, TokenDefinition> = {
     category: 'Foreground',
     light: () => '#059669',
     dark: () => '#34D399'
+  },
+
+  // Visual-specific tokens
+  '@table-header-bg': {
+    name: 'Table header background',
+    category: 'Visual Elements',
+    light: (p) => p.neutral?.['100'] || '#EEEEEE',
+    dark: (p) => p.neutral?.['800'] || '#333333'
+  },
+  '@table-header-text': {
+    name: 'Table header text',
+    category: 'Visual Elements',
+    light: (p) => p.neutral?.['700'] || '#404040',
+    dark: (p) => p.neutral?.['200'] || '#E0E0E0'
+  },
+  '@table-row-alt': {
+    name: 'Table alternate row',
+    category: 'Visual Elements',
+    light: (p) => p.neutral?.['50'] || '#F5F5F5',
+    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
+  },
+  '@table-gridline': {
+    name: 'Table gridline',
+    category: 'Visual Elements',
+    light: (p) => p.neutral?.['200'] || '#E0E0E0',
+    dark: (p) => p.neutral?.['700'] || '#404040'
+  },
+  '@table-total-bg': {
+    name: 'Table total background',
+    category: 'Visual Elements',
+    light: (p) => p.neutral?.['200'] || '#E0E0E0',
+    dark: (p) => p.neutral?.['700'] || '#404040'
+  },
+  '@chart-gridline': {
+    name: 'Chart gridline',
+    category: 'Visual Elements',
+    light: (p) => p.neutral?.['200'] || '#E0E0E0',
+    dark: (p) => p.neutral?.['800'] || '#333333'
+  },
+  '@chart-axis-text': {
+    name: 'Chart axis text',
+    category: 'Visual Elements',
+    light: (p) => p.neutral?.['600'] || '#666666',
+    dark: (p) => p.neutral?.['400'] || '#999999'
+  },
+  '@card-background': {
+    name: 'Card background',
+    category: 'Visual Elements',
+    light: () => '#FFFFFF',
+    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
+  },
+  '@card-border': {
+    name: 'Card border',
+    category: 'Visual Elements',
+    light: (p) => p.neutral?.['200'] || '#E0E0E0',
+    dark: (p) => p.neutral?.['700'] || '#404040'
+  },
+  '@tooltip-background': {
+    name: 'Tooltip background',
+    category: 'Visual Elements',
+    light: (p) => p.neutral?.['900'] || '#1A1A1A',
+    dark: (p) => p.neutral?.['100'] || '#EEEEEE'
+  },
+  '@tooltip-text': {
+    name: 'Tooltip text',
+    category: 'Visual Elements',
+    light: () => '#FFFFFF',
+    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
+  },
+
+  // Structural colors (from neutral palette mapping)
+  '@firstLevelElements': {
+    name: 'First level elements',
+    category: 'Structural',
+    light: (p) => p.neutral?.['800'] || '#333333',
+    dark: (p) => p.neutral?.['200'] || '#E0E0E0'
+  },
+  '@secondLevelElements': {
+    name: 'Second level elements',
+    category: 'Structural',
+    light: (p) => p.neutral?.['600'] || '#666666',
+    dark: (p) => p.neutral?.['400'] || '#999999'
+  },
+  '@thirdLevelElements': {
+    name: 'Third level elements',
+    category: 'Structural',
+    light: (p) => p.neutral?.['400'] || '#999999',
+    dark: (p) => p.neutral?.['600'] || '#666666'
+  },
+  '@fourthLevelElements': {
+    name: 'Fourth level elements',
+    category: 'Structural',
+    light: (p) => p.neutral?.['300'] || '#CCCCCC',
+    dark: (p) => p.neutral?.['700'] || '#404040'
+  },
+  '@tableAccent': {
+    name: 'Table accent',
+    category: 'Structural',
+    light: (p) => p.neutral?.['200'] || '#E0E0E0',
+    dark: (p) => p.neutral?.['700'] || '#404040'
   }
 };
 

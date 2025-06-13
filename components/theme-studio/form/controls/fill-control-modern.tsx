@@ -1,7 +1,7 @@
 'use client';
 
-import { useThemeStudioStore, useThemeBuilderStore } from '@/lib/stores/theme-studio-store';
-import { ModernColorPicker } from '@/components/ui/modern-color-picker';
+import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
+import { UnifiedColorPicker } from '@/components/ui/unified-color-picker';
 
 interface FillControlProps {
   label: string;
@@ -21,17 +21,19 @@ export function FillControl({
   path,
 }: FillControlProps) {
   const currentTheme = useThemeStudioStore((state) => state.currentTheme);
-  const neutralPalette = useThemeBuilderStore((state) => state.theme.neutralPalette);
+  const neutralPalette = useThemeStudioStore((state) => state.theme.neutralPalette);
   
   return (
-    <ModernColorPicker
+    <UnifiedColorPicker
       label={label}
       description={description}
       value={value}
       onChange={onChange}
-      dataColors={currentTheme.dataColors || []}
+      format="powerbi"
+      enableTokens={true}
+      enableThemeColors={true}
       mode={currentTheme.mode || 'light'}
-      neutralPalette={neutralPalette?.shades as Record<string, string> | undefined}
+      neutralPalette={Object.values(neutralPalette?.shades || {}) as string[]}
     />
   );
 }

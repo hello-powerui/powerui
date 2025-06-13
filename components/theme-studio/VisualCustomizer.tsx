@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ColorPicker } from '@/components/ui/color-picker';
+import { UnifiedColorPicker } from '@/components/ui/unified-color-picker';
 import { ChevronRight, RotateCcw, Copy, Palette } from 'lucide-react';
 
 interface VisualCustomizerProps {

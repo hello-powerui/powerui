@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { ColorPicker } from '@/components/ui/color-picker';
+import { UnifiedColorPicker } from '@/components/ui/unified-color-picker';
 import { 
   Select,
   SelectContent,
@@ -21,10 +21,9 @@ import {
 } from '@/components/ui/dialog';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { usePaletteStore } from '@/lib/stores/palette-store';
-import { PowerBIPreview } from '@/components/theme-studio/PowerBIPreview';
-import { PaletteManager } from '@/components/palette/PaletteManager';
-import { NeutralPaletteManager } from '@/components/palette/NeutralPaletteManager';
-import { TextClassesEditor } from '@/components/theme-studio/TextClassesEditor';
+import { PowerBIPreview } from '@/components/theme-studio/preview/PowerBIPreview';
+import { UnifiedPaletteManager } from '@/components/theme-studio/palette/UnifiedPaletteManager';
+import { TextClassesEditor } from '@/components/theme-studio/typography/TextClassesEditor';
 import { generateTheme, getNeutralPalettePreview } from '@/lib/theme-generation';
 import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-generator';
 import { validateVisualStyles, findUnknownTokens } from '@/lib/theme-generation/token-validator';
@@ -111,8 +110,10 @@ export default function UnifiedThemeStudio() {
   const hasChanges = useThemeChanges(state => state.hasChanges);
   const changedPaths = useThemeChanges(state => state.changedPaths);
   
+  // Unified theme studio store
   const { 
     theme, 
+    currentTheme: studioTheme,
     setTheme,
     setPalette, 
     setNeutralPalette,
@@ -121,13 +122,7 @@ export default function UnifiedThemeStudio() {
     setStructuralColors,
     setStructuralColorsMode,
     updateTextClasses,
-    generateAndSaveTheme
-  } = useThemeStudioStore();
-  
-  // const { palettes, neutralPalettes } = usePaletteStore();
-  const { 
-    currentTheme: studioTheme, 
-    setTheme: setStudioTheme,
+    generateAndSaveTheme,
     selectedState,
     setSelectedState,
     selectedVariant,
@@ -138,15 +133,7 @@ export default function UnifiedThemeStudio() {
     deleteVariant
   } = useThemeStudioStore();
   
-  // Sync theme mode to studio store
-  useEffect(() => {
-    setStudioTheme((prev: PowerBITheme) => {
-      if (prev.mode !== theme.mode) {
-        return { ...prev, mode: theme.mode };
-      }
-      return prev;
-    });
-  }, [theme.mode, setStudioTheme]);
+  // Theme mode is now automatically synced in the unified store
   
   // Load schema on mount
   useEffect(() => {
@@ -235,14 +222,8 @@ export default function UnifiedThemeStudio() {
               const validatedStyles = validateVisualStyles(savedTheme.visualStyles);
               setVisualSettings(validatedStyles);
               
-              // Set up advanced theme store
-              const studioThemeData = {
-                name: savedTheme.name || apiResponse.name || 'My Theme',
-                mode: savedTheme.mode || 'light',
-                dataColors: savedTheme.palette?.colors || [],
-                visualStyles: validatedStyles
-              };
-              setStudioTheme(studioThemeData);
+              // Visual styles are handled through the unified store
+              // The updateThemeProperty will update the currentTheme internally
               
               // Update sidebar visibility if there are visual styles
               if (Object.keys(validatedStyles).length > 0) {
@@ -396,14 +377,7 @@ export default function UnifiedThemeStudio() {
     if (originalTheme.visualStyles) {
       setVisualSettings(originalTheme.visualStyles);
       
-      // Update studio theme store
-      const studioThemeData = {
-        name: originalTheme.name || 'My Theme',
-        mode: originalTheme.mode || 'light',
-        dataColors: originalTheme.palette?.colors || [],
-        visualStyles: originalTheme.visualStyles
-      };
-      setStudioTheme(studioThemeData);
+      // Visual styles are handled through the unified store
     } else {
       // Reset visual styles to empty
       setVisualSettings({});
@@ -812,11 +786,7 @@ export default function UnifiedThemeStudio() {
                       setVisualSettings(updatedVisualSettings);
                       trackChange(['visualStyles', 'report']);
                       
-                      const newTheme = {
-                        ...studioTheme,
-                        visualStyles: updatedVisualSettings
-                      };
-                      setStudioTheme(newTheme);
+                      // Visual styles are automatically synced in the unified store
                     }}
                     schemaLoader={schemaLoader}
                     path={['visualStyles', 'report', '*']}
@@ -844,11 +814,7 @@ export default function UnifiedThemeStudio() {
                       setVisualSettings(updatedVisualSettings);
                       trackChange(['visualStyles', 'page']);
                       
-                      const newTheme = {
-                        ...studioTheme,
-                        visualStyles: updatedVisualSettings
-                      };
-                      setStudioTheme(newTheme);
+                      // Visual styles are automatically synced in the unified store
                     }}
                     schemaLoader={schemaLoader}
                     path={['visualStyles', 'page', '*']}
@@ -876,11 +842,7 @@ export default function UnifiedThemeStudio() {
                       setVisualSettings(updatedVisualSettings);
                       trackChange(['visualStyles', 'filter']);
                       
-                      const newTheme = {
-                        ...studioTheme,
-                        visualStyles: updatedVisualSettings
-                      };
-                      setStudioTheme(newTheme);
+                      // Visual styles are automatically synced in the unified store
                     }}
                     schemaLoader={schemaLoader}
                     path={['visualStyles', 'filter', '*']}
@@ -1135,11 +1097,7 @@ export default function UnifiedThemeStudio() {
                       trackChange(['visualStyles', selectedVisual, selectedVariant]);
                       
                       // Also update studio theme store
-                      const newTheme = {
-                        ...studioTheme,
-                        visualStyles: updatedVisualSettings
-                      };
-                      setStudioTheme(newTheme);
+                      // Visual styles are automatically synced in the unified store
                     }}
                     schemaLoader={schemaLoader}
                     path={[]}
@@ -1178,11 +1136,7 @@ export default function UnifiedThemeStudio() {
                       trackChange(['visualStyles', '*']);
                       
                       // Also update studio theme store
-                      const newTheme = {
-                        ...studioTheme,
-                        visualStyles: updatedVisualSettings
-                      };
-                      setStudioTheme(newTheme);
+                      // Visual styles are automatically synced in the unified store
                     }}
                     visualStyles={visualSettings}
                     onVisualStylesChange={(newVisualStyles) => {
@@ -1237,32 +1191,28 @@ export default function UnifiedThemeStudio() {
       </div>
       </div>
 
-      {/* Modals */}
-      <Dialog open={showPaletteManager} onOpenChange={setShowPaletteManager}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Manage Color Palettes</DialogTitle>
-          </DialogHeader>
-          <PaletteManager 
-            selectedPaletteId={theme.palette.id}
-            onSelect={(palette) => {
-              setPaletteWithTracking(palette);
-              setShowPaletteManager(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Palette Modals */}
+      <UnifiedPaletteManager
+        open={showPaletteManager}
+        onOpenChange={setShowPaletteManager}
+        mode="select"
+        paletteType="color"
+        selectedColorPaletteId={theme.palette.id}
+        onSelectColorPalette={(palette) => {
+          setPaletteWithTracking(palette);
+        }}
+      />
 
-      <NeutralPaletteManager 
-        isOpen={showNeutralPaletteManager}
+      <UnifiedPaletteManager
+        open={showNeutralPaletteManager}
         onOpenChange={setShowNeutralPaletteManager}
-        onSelectPalette={(palette) => {
-          // Handle palette selection - now always receives full palette object
+        mode="select"
+        paletteType="neutral"
+        selectedNeutralPaletteId={theme.neutralPalette?.id}
+        onSelectNeutralPalette={(palette) => {
           if (palette && typeof palette === 'object' && 'shades' in palette && palette.shades) {
-            // Full palette object with shades
             setNeutralPaletteWithTracking(palette);
           } else {
-            // Fallback to Azure palette if invalid
             console.warn('Invalid palette selected, falling back to Azure:', palette);
             setNeutralPaletteWithTracking(AZURE_NEUTRAL_PALETTE);
           }
@@ -1310,17 +1260,8 @@ export default function UnifiedThemeStudio() {
           if (importedTheme.visualStyles) {
             setVisualSettings(importedTheme.visualStyles);
             
-            // Create a complete theme object for the advanced store
-            const completeTheme = {
-              // Include any other theme properties first
-              ...importedTheme,
-              // Then override with explicit values
-              name: importedTheme.name || 'Imported Theme',
-              mode: importedTheme.mode || 'light',
-              dataColors: importedTheme.dataColors || [],
-              visualStyles: importedTheme.visualStyles
-            };
-            setStudioTheme(completeTheme);
+            // Visual styles are handled through the unified store
+            // The unified store automatically syncs visual styles with currentTheme
             
             // Update sidebar visibility based on content
             const hasVisualContent = Object.keys(importedTheme.visualStyles).length > 0;

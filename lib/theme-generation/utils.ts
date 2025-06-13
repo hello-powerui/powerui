@@ -123,7 +123,7 @@ export function replaceTokens(
         
         // Handle token references
         if (typeof colorValue === 'string' && colorValue.startsWith('@')) {
-          const resolved = tokenResolver(colorValue.slice(1));
+          const resolved = tokenResolver(colorValue);
           return { solid: { color: resolved } };
         }
         
@@ -142,7 +142,7 @@ export function replaceTokens(
         
         // Handle token references
         if (typeof colorValue === 'string' && colorValue.startsWith('@')) {
-          const resolved = tokenResolver(colorValue.slice(1));
+          const resolved = tokenResolver(colorValue);
           return { ...obj, color: { solid: { color: resolved } } };
         }
         
@@ -173,7 +173,7 @@ export function replaceTokens(
       return result;
     }
   } else if (typeof obj === 'string' && obj.startsWith('@')) {
-    const resolved = tokenResolver(obj.slice(1));
+    const resolved = tokenResolver(obj);
     // Always return the resolved value, even if null
     // The token resolver should always return a valid color or null
     return resolved;

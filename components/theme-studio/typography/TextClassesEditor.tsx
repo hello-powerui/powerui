@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { ColorPicker } from '@/components/ui/color-picker';
+import { UnifiedColorPicker } from '@/components/ui/unified-color-picker';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 
 type ThemeDataColor = string | { color: string } | { dataColorIndex: number };
@@ -238,9 +238,12 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
                         </Select>
                       ) : (
                         <div className="flex gap-2">
-                          <ColorPicker
+                          <UnifiedColorPicker
                             value={colorValue}
-                            onChange={(color) => handleFontColorChange(className, color)}
+                            onChange={(color) => handleFontColorChange(className, typeof color === 'string' ? color : '#000000')}
+                            format="simple"
+                            enableTokens={false}
+                            enableThemeColors={false}
                           />
                           <Select
                             value="custom"

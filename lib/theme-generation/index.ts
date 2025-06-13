@@ -4,9 +4,6 @@ export * from './utils';
 export * from './client';
 export * from './neutral-mapper';
 
-// Export new theme configuration
-export * from './theme-config';
-
 // Export token system utilities
 export * from './token-registry';
 export * from './token-validator';

@@ -1,7 +1,0 @@
-/* Preview Dashboard Styles */
-.preview-dashboard {
-  /* Let theme CSS variables handle all styling */
-  transition: all 0.3s ease;
-}
-
-/* Remove all hardcoded backgrounds - theme CSS variables will handle these */

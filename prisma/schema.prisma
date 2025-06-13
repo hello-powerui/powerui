@@ -4,8 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model ColorPalette {
@@ -62,19 +63,26 @@ model Theme {
   themeData      Json             // Contains all theme settings
   version        String           @default("2.0") // Theme schema version
   isDefault      Boolean          @default(false)
+  organizationId String?          // For team themes
+  visibility     ThemeVisibility  @default(PRIVATE)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   
   // Relations
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   generatedThemes GeneratedTheme[]
+  sharedWith     ThemeShare[]
   
   @@index([userId, createdAt])
+  @@index([organizationId])
 }
 
 model User {
   id              String           @id // Clerk user ID
   email           String           @unique
+  plan            UserPlan         @default(PRO)
+  stripeCustomerId String?         @unique
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   
@@ -82,4 +90,100 @@ model User {
   themes          Theme[]
   colorPalettes   ColorPalette[]
   neutralPalettes NeutralPalette[]
+  organizationMemberships OrganizationMember[]
+  purchase        Purchase?
+}
+
+model Organization {
+  id           String   @id @default(uuid())
+  clerkOrgId   String   @unique
+  name         String
+  seats        Int      // 5 or 10 seats
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  members      OrganizationMember[]
+  themes       Theme[]
+  purchase     Purchase?
+}
+
+model OrganizationMember {
+  id             String   @id @default(uuid())
+  organizationId String
+  userId         String
+  role           OrganizationRole @default(MEMBER)
+  createdAt      DateTime @default(now())
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+model Purchase {
+  id                String   @id @default(uuid())
+  userId            String?  @unique
+  organizationId    String?  @unique
+  stripeCustomerId  String
+  stripePaymentId   String   @unique
+  stripePriceId     String
+  amount            Int      // Amount in cents
+  currency          String   @default("usd")
+  plan              PurchasePlan
+  seats             Int?     // For team plans
+  status            PurchaseStatus @default(PENDING)
+  createdAt         DateTime @default(now())
+  
+  // Relations
+  user              User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization      Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([status])
+}
+
+model ThemeShare {
+  id        String   @id @default(uuid())
+  themeId   String
+  sharedBy  String   // User ID who shared
+  sharedWith String  // User ID or Organization ID
+  createdAt DateTime @default(now())
+  
+  // Relations
+  theme     Theme    @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  
+  @@unique([themeId, sharedWith])
+  @@index([sharedWith])
+}
+
+// Enums
+enum UserPlan {
+  PRO
+  TEAM
+}
+
+enum PurchasePlan {
+  PRO
+  TEAM_5
+  TEAM_10
+}
+
+enum OrganizationRole {
+  ADMIN
+  MEMBER
+}
+
+enum PurchaseStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum ThemeVisibility {
+  PRIVATE
+  ORGANIZATION
+  PUBLIC
 }
