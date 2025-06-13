@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { CheckIcon, ArrowRightIcon, Sparkles, Palette, BookOpen, Bot, Users } from 'lucide-react'
 import { useState } from 'react'
 
+export const dynamic = 'force-dynamic'
+
 const testimonials = [
   {
     quote: "Power UI enables me to quickly deliver polished, app-like reports, saving me a tremendous amount of time and effort...",

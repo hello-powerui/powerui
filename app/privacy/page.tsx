@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4">
