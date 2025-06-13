@@ -20,7 +20,6 @@ export async function GET(
     
     return NextResponse.json(theme);
   } catch (error) {
-    console.error('Error fetching theme:', error);
     return NextResponse.json(
       { error: 'Failed to fetch theme' },
       { status: 500 }
@@ -45,37 +44,13 @@ export async function PUT(
         { status: 404 }
       );
     }
-    
-    // Create update data with proper formatting
+
     const updateData = {
       name: data.name,
       description: data.description,
-      dataPalette: Array.isArray(data.dataColors) ? 'custom' : data.dataColors,
-      neutralPalette: typeof data.neutralPalette === 'string' ? data.neutralPalette : 'custom',
-      fontFamily: data.fontFamily,
-      colorMode: data.mode,
-      borders: String(data.borderRadius),
-      bgStyle: data.bgStyle,
-      borderStyle: data.borderStyle,
-      paddingStyle: data.paddingStyle,
-      showBorders: data.showBorders,
-      // Store complete theme data for re-loading
-      themeData: data.themeData || {
-        name: data.name,
-        dataColors: data.dataColors,
-        neutralPalette: data.neutralPalette,
-        mode: data.mode,
-        fontFamily: data.fontFamily,
-        fontSize: data.fontSize,
-        borderRadius: data.borderRadius,
-        bgStyle: data.bgStyle,
-        borderStyle: data.borderStyle,
-        paddingStyle: data.paddingStyle,
-        showBorders: data.showBorders,
-        spacing: data.spacing,
-        description: data.description,
-      },
-      version: '1.0', // Update version if schema changes
+      // Store the complete theme data as-is
+      themeData: data.themeData,
+      version: '2.0', // Update version to indicate new format
     };
     
     const updatedTheme = await ThemeService.updateTheme(
@@ -86,7 +61,6 @@ export async function PUT(
     
     return NextResponse.json(updatedTheme);
   } catch (error) {
-    console.error('Error updating theme:', error);
     return NextResponse.json(
       { error: 'Failed to update theme' },
       { status: 500 }
@@ -115,7 +89,6 @@ export async function DELETE(
     
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting theme:', error);
     return NextResponse.json(
       { error: 'Failed to delete theme' },
       { status: 500 }

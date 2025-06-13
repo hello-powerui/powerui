@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { Input } from './input';
 import { cn } from '@/lib/utils';
 import { Search, X } from 'lucide-react';
+import { getTokenOptions, resolveToken, ColorPalettes } from '@/lib/theme-generation/token-registry';
 
 interface ModernColorPickerProps {
   value: any;
@@ -13,6 +14,7 @@ interface ModernColorPickerProps {
   mode?: 'light' | 'dark';
   label?: string;
   description?: string;
+  neutralPalette?: Record<string, string>;
 }
 
 type ColorType = 'token' | 'theme' | 'custom';
@@ -23,52 +25,8 @@ interface TokenOption {
   category: string;
 }
 
-const TOKEN_OPTIONS: TokenOption[] = [
-  // Backgrounds
-  { token: '@bg-primary', description: 'Primary background', category: 'Backgrounds' },
-  { token: '@bg-primary_alt', description: 'Primary alternative', category: 'Backgrounds' },
-  { token: '@bg-primary_hover', description: 'Primary hover', category: 'Backgrounds' },
-  { token: '@bg-secondary', description: 'Secondary background', category: 'Backgrounds' },
-  { token: '@bg-secondary_alt', description: 'Secondary alternative', category: 'Backgrounds' },
-  { token: '@bg-tertiary', description: 'Tertiary background', category: 'Backgrounds' },
-  { token: '@bg-quaternary', description: 'Quaternary background', category: 'Backgrounds' },
-  { token: '@bg-active', description: 'Active state', category: 'Backgrounds' },
-  { token: '@bg-disabled', description: 'Disabled state', category: 'Backgrounds' },
-  { token: '@bg-brand-primary', description: 'Brand primary', category: 'Backgrounds' },
-  { token: '@bg-brand-solid', description: 'Brand solid', category: 'Backgrounds' },
-  { token: '@bg-error-primary', description: 'Error background', category: 'Backgrounds' },
-  { token: '@bg-warning-primary', description: 'Warning background', category: 'Backgrounds' },
-  { token: '@bg-success-primary', description: 'Success background', category: 'Backgrounds' },
-  
-  // Text
-  { token: '@text-primary', description: 'Primary text', category: 'Text' },
-  { token: '@text-secondary', description: 'Secondary text', category: 'Text' },
-  { token: '@text-tertiary', description: 'Tertiary text', category: 'Text' },
-  { token: '@text-disabled', description: 'Disabled text', category: 'Text' },
-  { token: '@text-placeholder', description: 'Placeholder text', category: 'Text' },
-  { token: '@text-brand-primary', description: 'Brand text', category: 'Text' },
-  { token: '@text-error-primary', description: 'Error text', category: 'Text' },
-  { token: '@text-warning-primary', description: 'Warning text', category: 'Text' },
-  { token: '@text-success-primary', description: 'Success text', category: 'Text' },
-  
-  // Borders
-  { token: '@border-primary', description: 'Primary border', category: 'Borders' },
-  { token: '@border-secondary', description: 'Secondary border', category: 'Borders' },
-  { token: '@border-tertiary', description: 'Tertiary border', category: 'Borders' },
-  { token: '@border-disabled', description: 'Disabled border', category: 'Borders' },
-  { token: '@border-brand', description: 'Brand border', category: 'Borders' },
-  { token: '@border-error', description: 'Error border', category: 'Borders' },
-  
-  // Foreground
-  { token: '@fg-primary', description: 'Primary foreground', category: 'Foreground' },
-  { token: '@fg-secondary', description: 'Secondary foreground', category: 'Foreground' },
-  { token: '@fg-tertiary', description: 'Tertiary foreground', category: 'Foreground' },
-  { token: '@fg-disabled', description: 'Disabled foreground', category: 'Foreground' },
-  { token: '@fg-brand-primary', description: 'Brand foreground', category: 'Foreground' },
-  { token: '@fg-error-primary', description: 'Error foreground', category: 'Foreground' },
-  { token: '@fg-warning-primary', description: 'Warning foreground', category: 'Foreground' },
-  { token: '@fg-success-primary', description: 'Success foreground', category: 'Foreground' },
-];
+// Get token options from centralized registry
+const TOKEN_OPTIONS: TokenOption[] = getTokenOptions();
 
 const PRESET_COLORS = [
   '#000000', '#1a1a1a', '#333333', '#4d4d4d', '#666666', '#808080', '#999999', '#b3b3b3', '#cccccc', '#e5e5e5', '#f5f5f5', '#ffffff',
@@ -89,7 +47,8 @@ export function ModernColorPicker({
   dataColors = [],
   mode = 'light',
   label,
-  description
+  description,
+  neutralPalette
 }: ModernColorPickerProps) {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<ColorType>('token');
@@ -107,7 +66,7 @@ export function ModernColorPicker({
       return {
         type: 'token' as ColorType,
         displayValue: value.solid.color,
-        color: getTokenPreviewColor(value.solid.color, mode)
+        color: getTokenPreviewColor(value.solid.color, mode, dataColors, neutralPalette)
       };
     }
 
@@ -131,7 +90,7 @@ export function ModernColorPicker({
     }
 
     return { type: 'custom' as ColorType, displayValue: '#000000', color: '#000000' };
-  }, [value, dataColors, mode]);
+  }, [value, dataColors, mode, neutralPalette]);
 
   // Set active tab based on current value
   useEffect(() => {
@@ -293,7 +252,7 @@ export function ModernColorPicker({
                         >
                           <div 
                             className="w-3 h-3 rounded border border-gray-200 flex-shrink-0"
-                            style={{ backgroundColor: getTokenPreviewColor(token.token, mode) }}
+                            style={{ backgroundColor: getTokenPreviewColor(token.token, mode, dataColors, neutralPalette) }}
                           />
                           <div className="flex-1 min-w-0">
                             <div className="font-mono text-xs text-gray-900 truncate">
@@ -400,37 +359,19 @@ export function ModernColorPicker({
 }
 
 // Helper function to get token preview color
-function getTokenPreviewColor(token: string, mode: 'light' | 'dark'): string {
-  // This is a simplified preview - actual colors come from theme generation
-  const lightColors: Record<string, string> = {
-    '@bg-primary': '#ffffff',
-    '@bg-secondary': '#f5f5f5',
-    '@bg-tertiary': '#e5e5e5',
-    '@text-primary': '#1a1a1a',
-    '@text-secondary': '#4d4d4d',
-    '@border-primary': '#cccccc',
-    '@fg-primary': '#1a1a1a',
+function getTokenPreviewColor(
+  token: string, 
+  mode: 'light' | 'dark',
+  dataColors: string[] = [],
+  neutralPalette?: Record<string, string>
+): string {
+  // Create palettes object for token resolution
+  const palettes: ColorPalettes = {
+    neutral: neutralPalette || null,
+    dataColors: dataColors
   };
   
-  const darkColors: Record<string, string> = {
-    '@bg-primary': '#0d0d0d',
-    '@bg-secondary': '#1a1a1a',
-    '@bg-tertiary': '#2d2d2d',
-    '@text-primary': '#f5f5f5',
-    '@text-secondary': '#cccccc',
-    '@border-primary': '#4d4d4d',
-    '@fg-primary': '#ffffff',
-  };
-  
-  const colors = mode === 'light' ? lightColors : darkColors;
-  
-  // Handle mode-specific tokens
-  if (token.includes(':')) {
-    const [specMode, baseToken] = token.split(':');
-    const modeColors = specMode === 'light' ? lightColors : darkColors;
-    return modeColors[`@${baseToken}`] || '#808080';
-  }
-  
-  // Return color or fallback
-  return colors[token] || '#808080';
+  // Use centralized token resolver
+  const resolved = resolveToken(token, mode, palettes);
+  return resolved || '#808080';
 }

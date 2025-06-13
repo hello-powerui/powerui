@@ -11,14 +11,14 @@ export function validateNeutralPalette(palette: any): palette is ColorPalette {
   // Check all required shades exist
   const missing = requiredShades.filter(shade => !(shade in palette));
   if (missing.length > 0) {
-    console.warn(`Neutral palette missing required shades: ${missing.join(', ')}`);
+    // Neutral palette missing required shades
     return false;
   }
   
   // Validate hex codes
   for (const [shade, color] of Object.entries(palette)) {
     if (typeof color !== 'string' || !color.startsWith('#') || (color.length !== 4 && color.length !== 7)) {
-      console.warn(`Invalid hex code for shade ${shade}: ${color}`);
+      // Invalid hex code for shade
       return false;
     }
   }
@@ -85,7 +85,7 @@ export function updateThemePath(theme: any, path: string, value: any): void {
       current[last.name] = value;
     }
   } catch (error) {
-    console.error(`Error updating path ${path}:`, error);
+    // Error updating path - fail silently
   }
 }
 

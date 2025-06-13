@@ -19,15 +19,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useThemeBuilderStore } from '@/lib/stores/theme-builder-store';
+import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { usePaletteStore } from '@/lib/stores/palette-store';
-import { useThemeAdvancedStore } from '@/lib/stores/theme-advanced-store';
 import { PowerBIPreview } from '@/components/theme-studio/PowerBIPreview';
 import { PaletteManager } from '@/components/palette/PaletteManager';
 import { NeutralPaletteManager } from '@/components/palette/NeutralPaletteManager';
 import { TextClassesEditor } from '@/components/theme-studio/TextClassesEditor';
 import { generateTheme, getNeutralPalettePreview } from '@/lib/theme-generation';
+import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-generator';
+import { validateVisualStyles, findUnknownTokens } from '@/lib/theme-generation/token-validator';
 import { toast } from 'sonner';
+import { useDebounce } from '@/lib/hooks/use-debounce';
 import { 
   ChevronLeft, 
   ChevronRight,
@@ -36,14 +38,14 @@ import {
   Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { SchemaLoader } from '@/lib/theme-advanced/services/schema-loader';
-import { SchemaForm } from '@/components/theme-advanced/form/schema-form';
-import { GlobalPropertySelector } from '@/components/theme-advanced/form/global-property-selector';
-import { ImportThemeModal } from '@/components/theme-advanced/ui/import-theme-modal';
-import { CollapsibleSection } from '@/components/theme-advanced/ui/collapsible-section';
+import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
+import { SchemaForm } from '@/components/theme-studio/form/schema-form';
+import { GlobalPropertySelector } from '@/components/theme-studio/form/global-property-selector';
+import { ImportThemeModal } from '@/components/theme-studio/ui/import-theme-modal';
+import { CollapsibleSection } from '@/components/theme-studio/ui/collapsible-section';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
-import { ChangeIndicator } from '@/components/theme-advanced/ui/change-indicator';
-import { PowerBITheme } from '@/lib/theme-advanced/types';
+import { ChangeIndicator } from '@/components/theme-studio/ui/change-indicator';
+import { PowerBITheme } from '@/lib/theme-studio/types';
 import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 
 // Icons
@@ -86,7 +88,7 @@ export default function UnifiedThemeStudio() {
   const [isSaving, setIsSaving] = useState(false);
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
   
-  // Advanced editor states
+  // Studio editor states
   const [selectedSection, setSelectedSection] = useState<'global' | 'properties' | 'visuals'>('visuals');
   const [selectedProperty, setSelectedProperty] = useState<string>('');
   const [schemaLoader] = useState(() => SchemaLoader.getInstance());
@@ -116,20 +118,16 @@ export default function UnifiedThemeStudio() {
     setNeutralPalette,
     setThemeMode,
     setFontFamily,
-    setBorderRadius,
-    setSpacing,
-    setBgStyle,
-    setBorderStyle,
     setStructuralColors,
     setStructuralColorsMode,
     updateTextClasses,
     generateAndSaveTheme
-  } = useThemeBuilderStore();
+  } = useThemeStudioStore();
   
   // const { palettes, neutralPalettes } = usePaletteStore();
   const { 
-    currentTheme: advancedTheme, 
-    setTheme: setAdvancedTheme,
+    currentTheme: studioTheme, 
+    setTheme: setStudioTheme,
     selectedState,
     setSelectedState,
     selectedVariant,
@@ -138,17 +136,17 @@ export default function UnifiedThemeStudio() {
     getVisualVariants,
     createVariant,
     deleteVariant
-  } = useThemeAdvancedStore();
+  } = useThemeStudioStore();
   
-  // Sync theme mode to advanced store
+  // Sync theme mode to studio store
   useEffect(() => {
-    setAdvancedTheme((prev: PowerBITheme) => {
+    setStudioTheme((prev: PowerBITheme) => {
       if (prev.mode !== theme.mode) {
         return { ...prev, mode: theme.mode };
       }
       return prev;
     });
-  }, [theme.mode, setAdvancedTheme]);
+  }, [theme.mode, setStudioTheme]);
   
   // Load schema on mount
   useEffect(() => {
@@ -162,103 +160,124 @@ export default function UnifiedThemeStudio() {
       setTopLevelProperties(schemaLoader.getTopLevelProperties());
       setSchemaLoaded(true);
       } catch (error) {
-      console.error('Failed to load schema:', error);
+      // Silently fail - schema will be loaded on next attempt
       }
     };
     loadSchema();
   }, [schemaLoader]);
 
-  // Load theme from URL parameters
+  // Load theme from API if themeId is provided
   useEffect(() => {
     if (schemaLoaded && !isThemeLoaded) {
-      const themeDataParam = searchParams.get('themeData') || searchParams.get('data');
-      const name = searchParams.get('name');
-      const description = searchParams.get('description');
-      const themeId = searchParams.get('id');
+      const themeId = searchParams.get('themeId');
       
-      if (themeDataParam) {
-        try {
-          const decodedTheme = JSON.parse(decodeURIComponent(themeDataParam));
-          
-          // Load foundation settings (handle both old and new field names)
-          if (decodedTheme.palette || decodedTheme.dataColors) {
-            setPalette(decodedTheme.palette || decodedTheme.dataColors);
-          }
-          if (decodedTheme.neutralPalette) {
-            setNeutralPalette(decodedTheme.neutralPalette);
-          } else {
-            // Ensure Azure palette is set as default if no neutral palette exists
-            setNeutralPalette(AZURE_NEUTRAL_PALETTE);
-          }
-          if (decodedTheme.mode || decodedTheme.colorMode) {
-            setThemeMode(decodedTheme.mode || decodedTheme.colorMode);
-          }
-          if (decodedTheme.fontFamily) setFontFamily(decodedTheme.fontFamily);
-          if (decodedTheme.borderRadius !== undefined) setBorderRadius(decodedTheme.borderRadius);
-          if (decodedTheme.spacing !== undefined) setSpacing(decodedTheme.spacing);
-          if (decodedTheme.bgStyle) setBgStyle(decodedTheme.bgStyle);
-          if (decodedTheme.borderStyle) setBorderStyle(decodedTheme.borderStyle);
-          if (decodedTheme.structuralColors) {
-            setStructuralColors(decodedTheme.structuralColors);
-            if (decodedTheme.structuralColorsMode) {
-              setStructuralColorsMode(decodedTheme.structuralColorsMode);
+      if (themeId) {
+        // Load theme from API
+        const loadThemeFromAPI = async () => {
+          try {
+            const response = await fetch(`/api/themes/${themeId}`);
+            if (!response.ok) {
+              throw new Error('Failed to load theme');
             }
-          }
-          if (decodedTheme.textClasses) updateTextClasses(decodedTheme.textClasses);
-          
-          // Load visual styles
-          if (decodedTheme.visualStyles) {
-            setVisualSettings(decodedTheme.visualStyles);
-            setAdvancedTheme((prev: PowerBITheme) => ({ ...prev, visualStyles: decodedTheme.visualStyles }));
             
-            // Update sidebar visibility based on content
-            const hasVisualContent = Object.keys(decodedTheme.visualStyles).length > 0;
-            if (hasVisualContent) {
-              setShowVisualStyles(true);
-              // If there's visual content but no foundation content, hide foundation
-              const hasFoundationContent = decodedTheme.palette || decodedTheme.neutralPalette || 
-                decodedTheme.fontFamily || decodedTheme.textClasses;
-              if (!hasFoundationContent) {
-                setShowFoundation(false);
+            const apiResponse = await response.json();
+            
+            // Get the complete theme data
+            const savedTheme = apiResponse.themeData || {};
+            
+            // Load foundation settings
+            if (savedTheme.palette) {
+              setPalette(savedTheme.palette);
+            }
+            
+            if (savedTheme.neutralPalette) {
+              setNeutralPalette(savedTheme.neutralPalette);
+            }
+            
+            // Store palette references if available
+            if (savedTheme.paletteId || savedTheme.neutralPaletteId) {
+              setTheme({ 
+                ...theme,
+                paletteId: savedTheme.paletteId,
+                neutralPaletteId: savedTheme.neutralPaletteId 
+              });
+            }
+            
+            if (savedTheme.mode) {
+              setThemeMode(savedTheme.mode);
+            }
+            
+            if (savedTheme.fontFamily) {
+              setFontFamily(savedTheme.fontFamily);
+            }
+            
+            if (savedTheme.structuralColors) {
+              setStructuralColors(savedTheme.structuralColors);
+              if (savedTheme.structuralColorsMode) {
+                setStructuralColorsMode(savedTheme.structuralColorsMode);
               }
             }
-          }
-          
-          // Set theme name
-          if (name) setThemeName(decodeURIComponent(name));
-          
-          // Set theme ID if provided
-          if (themeId) {
-            setTheme({ id: themeId });
-          }
-          
-          // Initialize change tracking with loaded theme
-          const loadedThemeState = {
-            ...decodedTheme,
-            visualStyles: decodedTheme.visualStyles || {}
-          };
-          setOriginalTheme(loadedThemeState);
-          setIsThemeLoaded(true);
-          
-          toast.success('Theme loaded successfully');
-        } catch (error) {
-          console.error('Failed to load theme from URL:', error);
-          toast.error('Failed to load theme');
-        }
-      } else {
-        // No theme data in URL, initialize with current state after a short delay
-        // to ensure stores are properly initialized
-        setTimeout(() => {
-          const currentThemeState = {
-            ...theme,
-            visualStyles: {
-              ...visualSettings,
-              ...advancedTheme?.visualStyles
+            
+            if (savedTheme.textClasses) {
+              updateTextClasses(savedTheme.textClasses);
             }
-          };
-          setOriginalTheme(currentThemeState);
-          setIsThemeLoaded(true);
-        }, 0);
+            
+            // Load visual styles with validation
+            if (savedTheme.visualStyles) {
+              // Check for unknown tokens
+              const unknownTokens = findUnknownTokens(savedTheme.visualStyles);
+              if (unknownTokens.length > 0) {
+                console.warn('Unknown tokens found:', unknownTokens);
+                toast.warning(`Theme loaded with ${unknownTokens.length} unknown token(s). They have been replaced with defaults.`);
+              }
+              
+              // Validate and sanitize visual styles
+              const validatedStyles = validateVisualStyles(savedTheme.visualStyles);
+              setVisualSettings(validatedStyles);
+              
+              // Set up advanced theme store
+              const studioThemeData = {
+                name: savedTheme.name || apiResponse.name || 'My Theme',
+                mode: savedTheme.mode || 'light',
+                dataColors: savedTheme.palette?.colors || [],
+                visualStyles: validatedStyles
+              };
+              setStudioTheme(studioThemeData);
+              
+              // Update sidebar visibility if there are visual styles
+              if (Object.keys(validatedStyles).length > 0) {
+                setShowVisualStyles(true);
+              }
+            }
+            
+            // Set theme metadata
+            setThemeName(savedTheme.name || apiResponse.name || 'My Theme');
+            setTheme({ 
+              id: themeId, 
+              name: savedTheme.name || apiResponse.name,
+              description: savedTheme.description || apiResponse.description 
+            });
+            
+            // Initialize change tracking
+            setOriginalTheme(savedTheme);
+            setIsThemeLoaded(true);
+            
+            toast.success('Theme loaded successfully');
+          } catch (error) {
+            toast.error('Failed to load theme');
+            setIsThemeLoaded(true);
+          }
+        };
+        
+        loadThemeFromAPI();
+      } else {
+        // New theme - initialize with defaults
+        const defaultThemeState = {
+          ...theme,
+          visualStyles: {}
+        };
+        setOriginalTheme(defaultThemeState);
+        setIsThemeLoaded(true);
       }
     }
   }, [schemaLoaded, isThemeLoaded, searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -284,26 +303,6 @@ export default function UnifiedThemeStudio() {
     trackChange(['fontFamily']);
   };
 
-  const setBorderRadiusWithTracking = (radius: number) => {
-    setBorderRadius(radius);
-    trackChange(['borderRadius']);
-  };
-
-  const setSpacingWithTracking = (spacing: 'compact' | 'normal' | 'relaxed') => {
-    setSpacing(spacing);
-    trackChange(['spacing']);
-  };
-
-  const setBgStyleWithTracking = (style: string) => {
-    setBgStyle(style);
-    trackChange(['bgStyle']);
-  };
-
-  const setBorderStyleWithTracking = (style: string) => {
-    setBorderStyle(style);
-    trackChange(['borderStyle']);
-  };
-
   const setStructuralColorsWithTracking = (colors: any) => {
     setStructuralColors(colors);
     trackChange(['structuralColors']);
@@ -319,65 +318,54 @@ export default function UnifiedThemeStudio() {
     trackChange(['textClasses']);
   };
 
-  // Generate theme whenever foundation or visual settings change
+  // Debounced values for preview generation
+  const debouncedTheme = useDebounce(theme, 300);
+  const debouncedVisualSettings = useDebounce(visualSettings, 300);
+  
+  // Generate theme for preview (with resolved tokens) - using client-side generation
   useEffect(() => {
-    // Merge visual settings with canvas properties from advancedTheme
-    const mergedVisualStyles = {
-      ...visualSettings,
-      // Include global visual settings
-      ...(advancedTheme?.visualStyles?.['*'] && { '*': advancedTheme.visualStyles['*'] }),
-      // Include canvas properties if they exist
-      ...(advancedTheme?.visualStyles?.report && { report: advancedTheme.visualStyles.report }),
-      ...(advancedTheme?.visualStyles?.page && { page: advancedTheme.visualStyles.page }),
-      ...(advancedTheme?.visualStyles?.filter && { filter: advancedTheme.visualStyles.filter })
+    const themeInput = {
+      name: debouncedTheme.name,
+      mode: debouncedTheme.mode,
+      dataColors: (Array.isArray(debouncedTheme.palette.colors)) ? debouncedTheme.palette.colors as string[] : [],
+      neutralPalette: (debouncedTheme.neutralPalette?.shades && typeof debouncedTheme.neutralPalette.shades === 'object' && !Array.isArray(debouncedTheme.neutralPalette.shades)) ? debouncedTheme.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
+      fontFamily: debouncedTheme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
+      borderRadius: 4,
+      bgStyle: 'default',
+      borderStyle: 'default',
+      paddingStyle: 'default',
+      visualStyles: debouncedVisualSettings,
+      structuralColors: debouncedTheme.structuralColorsMode === 'custom' ? debouncedTheme.structuralColors : undefined,
+      textClasses: debouncedTheme.textClasses && Object.keys(debouncedTheme.textClasses).length > 0 ? debouncedTheme.textClasses : undefined
     };
     
-    const themeInput = {
-      name: theme.name,
-      mode: theme.mode,
-      dataColors: (Array.isArray(theme.palette.colors)) ? theme.palette.colors as string[] : [],
-      neutralPalette: (theme.neutralPalette?.shades && typeof theme.neutralPalette.shades === 'object' && !Array.isArray(theme.neutralPalette.shades)) ? theme.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
-      fontFamily: theme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
-      borderRadius: theme.borderRadius,
-      bgStyle: theme.bgStyle || 'default',
-      borderStyle: theme.borderStyle || 'default',
-      paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default',
-      visualStyles: mergedVisualStyles,
-      structuralColors: theme.structuralColorsMode === 'custom' ? theme.structuralColors : undefined,
-      textClasses: theme.textClasses && Object.keys(theme.textClasses).length > 0 ? theme.textClasses : undefined
-    };
-    generateTheme(themeInput).then(setGeneratedTheme);
-  }, [theme, visualSettings, advancedTheme?.visualStyles]); // eslint-disable-line react-hooks/exhaustive-deps
+    // Use client-side preview generator for instant updates
+    const previewGenerator = getPreviewGenerator();
+    const previewTheme = previewGenerator.generatePreview(themeInput);
+    setGeneratedTheme(previewTheme);
+  }, [debouncedTheme, debouncedVisualSettings]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Merge visual settings with canvas properties from advancedTheme
-      const mergedVisualStyles = {
-        ...visualSettings,
-        // Include global visual settings
-        ...(advancedTheme?.visualStyles?.['*'] && { '*': advancedTheme.visualStyles['*'] }),
-        // Include canvas properties if they exist
-        ...(advancedTheme?.visualStyles?.report && { report: advancedTheme.visualStyles.report }),
-        ...(advancedTheme?.visualStyles?.page && { page: advancedTheme.visualStyles.page }),
-        ...(advancedTheme?.visualStyles?.filter && { filter: advancedTheme.visualStyles.filter })
-      };
+      // Save the theme with current visual styles (preserving tokens)
+      await generateAndSaveTheme(themeName, visualSettings);
       
-      // Save the theme with visual customizations
-      const themeData = {
-      ...theme,
-      name: themeName,
-      visualStyles: mergedVisualStyles
+      // Update the original theme for change tracking
+      const savedThemeState = {
+        ...theme,
+        name: themeName,
+        visualStyles: visualSettings
       };
+      setOriginalTheme(savedThemeState);
       
-      await generateAndSaveTheme(themeName, mergedVisualStyles);
-      toast.success('Theme saved successfully');
-      // Clear change indicators after successful save
+      // Clear change indicators
       clearChanges();
-      // Reset the original theme to the newly saved state
-      setOriginalTheme(themeData);
+      
+      toast.success('Theme saved successfully');
     } catch (error) {
-      toast.error('Failed to save theme');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save theme';
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -396,10 +384,6 @@ export default function UnifiedThemeStudio() {
     if (originalTheme.neutralPalette) setNeutralPalette(originalTheme.neutralPalette);
     if (originalTheme.mode) setThemeMode(originalTheme.mode);
     if (originalTheme.fontFamily) setFontFamily(originalTheme.fontFamily);
-    if (originalTheme.borderRadius !== undefined) setBorderRadius(originalTheme.borderRadius);
-    if (originalTheme.spacing !== undefined) setSpacing(originalTheme.spacing);
-    if (originalTheme.bgStyle) setBgStyle(originalTheme.bgStyle);
-    if (originalTheme.borderStyle) setBorderStyle(originalTheme.borderStyle);
     if (originalTheme.structuralColors) {
       setStructuralColors(originalTheme.structuralColors);
       if (originalTheme.structuralColorsMode) {
@@ -411,7 +395,18 @@ export default function UnifiedThemeStudio() {
     // Reset visual styles
     if (originalTheme.visualStyles) {
       setVisualSettings(originalTheme.visualStyles);
-      setAdvancedTheme((prev: PowerBITheme) => ({ ...prev, visualStyles: originalTheme.visualStyles }));
+      
+      // Update studio theme store
+      const studioThemeData = {
+        name: originalTheme.name || 'My Theme',
+        mode: originalTheme.mode || 'light',
+        dataColors: originalTheme.palette?.colors || [],
+        visualStyles: originalTheme.visualStyles
+      };
+      setStudioTheme(studioThemeData);
+    } else {
+      // Reset visual styles to empty
+      setVisualSettings({});
     }
     
     // Clear all change tracking
@@ -422,34 +417,25 @@ export default function UnifiedThemeStudio() {
 
   const handleExport = async () => {
     try {
-      // Merge visual settings with canvas properties from advancedTheme
-      const mergedVisualStyles = {
-        ...visualSettings,
-        // Include global visual settings
-        ...(advancedTheme?.visualStyles?.['*'] && { '*': advancedTheme.visualStyles['*'] }),
-        // Include canvas properties if they exist
-        ...(advancedTheme?.visualStyles?.report && { report: advancedTheme.visualStyles.report }),
-        ...(advancedTheme?.visualStyles?.page && { page: advancedTheme.visualStyles.page }),
-        ...(advancedTheme?.visualStyles?.filter && { filter: advancedTheme.visualStyles.filter })
+      const themeInput = {
+        name: themeName,
+        mode: theme.mode,
+        dataColors: (Array.isArray(theme.palette.colors)) ? theme.palette.colors as string[] : [],
+        neutralPalette: (theme.neutralPalette?.shades && typeof theme.neutralPalette.shades === 'object' && !Array.isArray(theme.neutralPalette.shades)) ? theme.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
+        fontFamily: theme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
+        borderRadius: 4, // Default value
+        bgStyle: 'default',
+        borderStyle: 'default',
+        paddingStyle: 'default',
+        visualStyles: visualSettings, // This contains tokens
+        structuralColors: theme.structuralColorsMode === 'custom' ? theme.structuralColors : undefined,
+        textClasses: theme.textClasses && Object.keys(theme.textClasses).length > 0 ? theme.textClasses : undefined
       };
       
-      const themeInput = {
-      name: themeName,
-      mode: theme.mode,
-      dataColors: (Array.isArray(theme.palette.colors)) ? theme.palette.colors as string[] : [],
-      neutralPalette: (theme.neutralPalette?.shades && typeof theme.neutralPalette.shades === 'object' && !Array.isArray(theme.neutralPalette.shades)) ? theme.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
-      fontFamily: theme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
-      borderRadius: theme.borderRadius,
-      bgStyle: theme.bgStyle || 'default',
-      borderStyle: theme.borderStyle || 'default',
-      paddingStyle: theme.spacing === 'compact' ? 'default' : theme.spacing === 'relaxed' ? 'large' : 'default',
-      visualStyles: mergedVisualStyles,
-      structuralColors: theme.structuralColorsMode === 'custom' ? theme.structuralColors : undefined,
-      textClasses: theme.textClasses && Object.keys(theme.textClasses).length > 0 ? theme.textClasses : undefined
-      };
+      // Generate theme with resolved tokens for export
       const exportedTheme = await generateTheme(themeInput);
       const blob = new Blob([JSON.stringify(exportedTheme, null, 2)], {
-      type: 'application/json'
+        type: 'application/json'
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -574,7 +560,7 @@ export default function UnifiedThemeStudio() {
               <Label className="text-sm font-medium mb-2 block">Description</Label>
               <textarea
                 value={theme.description || ''}
-                onChange={(e) => useThemeBuilderStore.getState().setTheme({ description: e.target.value })}
+                onChange={(e) => useThemeStudioStore.getState().setTheme({ description: e.target.value })}
                 placeholder="Add a description for your theme..."
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md resize-none h-16 focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
               />
@@ -815,18 +801,22 @@ export default function UnifiedThemeStudio() {
                 >
                   <SchemaForm
                     schema={schemaLoader.getVisualSchema('report')?.properties?.['*'] || {}}
-                    value={advancedTheme?.visualStyles?.report?.['*'] || {}}
+                    value={visualSettings.report?.['*'] || {}}
                     onChange={(value) => {
-                      const newTheme = {
-                        ...advancedTheme,
-                        visualStyles: {
-                          ...advancedTheme.visualStyles,
-                          report: {
-                            '*': value
-                          }
+                      const updatedVisualSettings = {
+                        ...visualSettings,
+                        report: {
+                          '*': value
                         }
                       };
-                      setAdvancedTheme(newTheme);
+                      setVisualSettings(updatedVisualSettings);
+                      trackChange(['visualStyles', 'report']);
+                      
+                      const newTheme = {
+                        ...studioTheme,
+                        visualStyles: updatedVisualSettings
+                      };
+                      setStudioTheme(newTheme);
                     }}
                     schemaLoader={schemaLoader}
                     path={['visualStyles', 'report', '*']}
@@ -843,18 +833,22 @@ export default function UnifiedThemeStudio() {
                 >
                   <SchemaForm
                     schema={schemaLoader.getVisualSchema('page')?.properties?.['*'] || {}}
-                    value={advancedTheme?.visualStyles?.page?.['*'] || {}}
+                    value={visualSettings.page?.['*'] || {}}
                     onChange={(value) => {
-                      const newTheme = {
-                        ...advancedTheme,
-                        visualStyles: {
-                          ...advancedTheme.visualStyles,
-                          page: {
-                            '*': value
-                          }
+                      const updatedVisualSettings = {
+                        ...visualSettings,
+                        page: {
+                          '*': value
                         }
                       };
-                      setAdvancedTheme(newTheme);
+                      setVisualSettings(updatedVisualSettings);
+                      trackChange(['visualStyles', 'page']);
+                      
+                      const newTheme = {
+                        ...studioTheme,
+                        visualStyles: updatedVisualSettings
+                      };
+                      setStudioTheme(newTheme);
                     }}
                     schemaLoader={schemaLoader}
                     path={['visualStyles', 'page', '*']}
@@ -871,18 +865,22 @@ export default function UnifiedThemeStudio() {
                 >
                   <SchemaForm
                     schema={schemaLoader.getVisualSchema('filter')?.properties?.['*'] || {}}
-                    value={advancedTheme?.visualStyles?.filter?.['*'] || {}}
+                    value={visualSettings.filter?.['*'] || {}}
                     onChange={(value) => {
-                      const newTheme = {
-                        ...advancedTheme,
-                        visualStyles: {
-                          ...advancedTheme.visualStyles,
-                          filter: {
-                            '*': value
-                          }
+                      const updatedVisualSettings = {
+                        ...visualSettings,
+                        filter: {
+                          '*': value
                         }
                       };
-                      setAdvancedTheme(newTheme);
+                      setVisualSettings(updatedVisualSettings);
+                      trackChange(['visualStyles', 'filter']);
+                      
+                      const newTheme = {
+                        ...studioTheme,
+                        visualStyles: updatedVisualSettings
+                      };
+                      setStudioTheme(newTheme);
                     }}
                     schemaLoader={schemaLoader}
                     path={['visualStyles', 'filter', '*']}
@@ -924,99 +922,6 @@ export default function UnifiedThemeStudio() {
               </Select>
             </div>
 
-            {/* Visual Style Properties */}
-            <div className="bg-white rounded-md border border-gray-200 p-4">
-              <div className="flex items-center gap-1.5 mb-3">
-                <h3 className="text-sm font-medium text-gray-900">Visual Style</h3>
-                <ChangeIndicator hasChanged={hasChanges(['borderRadius']) || hasChanges(['spacing']) || hasChanges(['bgStyle']) || hasChanges(['borderStyle'])} />
-              </div>
-              
-              <div className="space-y-3">
-                {/* Border Radius */}
-                <div>
-                  <Label className="text-xs text-gray-600 mb-1.5 block">Border Radius</Label>
-                  <div className="grid grid-cols-3 gap-1">
-                    {[
-                      { value: 0, label: 'Sharp' },
-                      { value: 4, label: 'Default' },
-                      { value: 8, label: 'Rounded' }
-                    ].map(({ value, label }) => (
-                      <button
-                        key={value}
-                        onClick={() => setBorderRadiusWithTracking(value)}
-                        className={`px-3 py-1.5 text-xs rounded-md border transition-all ${
-                          theme.borderRadius === value
-                            ? 'bg-gray-900 text-white border-gray-900'
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Spacing */}
-                <div>
-                  <Label className="text-xs text-gray-600 mb-1.5 block">Spacing</Label>
-                  <div className="grid grid-cols-3 gap-1">
-                    {[
-                      { value: 'compact', label: 'Compact' },
-                      { value: 'normal', label: 'Normal' },
-                      { value: 'relaxed', label: 'Relaxed' }
-                    ].map(({ value, label }) => (
-                      <button
-                        key={value}
-                        onClick={() => setSpacingWithTracking(value as 'compact' | 'normal' | 'relaxed')}
-                        className={`px-3 py-1.5 text-xs rounded-md border transition-all ${
-                          theme.spacing === value
-                            ? 'bg-gray-900 text-white border-gray-900'
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Container Style */}
-                <div>
-                  <Label className="text-xs text-gray-600 mb-1.5 block">Container Style</Label>
-                  <Select 
-                    value={theme.bgStyle} 
-                    onValueChange={setBgStyleWithTracking}
-                  >
-                    <SelectTrigger className="w-full h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default">Default</SelectItem>
-                      <SelectItem value="subtle-contrast">Subtle Contrast</SelectItem>
-                      <SelectItem value="inversed-contrast">Inversed Contrast</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Border Style */}
-                <div>
-                  <Label className="text-xs text-gray-600 mb-1.5 block">Border Style</Label>
-                  <Select 
-                    value={theme.borderStyle} 
-                    onValueChange={setBorderStyleWithTracking}
-                  >
-                    <SelectTrigger className="w-full h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default">Default Borders</SelectItem>
-                      <SelectItem value="subtle">Subtle Borders</SelectItem>
-                      <SelectItem value="none">No Borders</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
 
             </div>
           </div>
@@ -1213,27 +1118,28 @@ export default function UnifiedThemeStudio() {
                       schemaLoader.getPropertySchema(['visualStyles', selectedVisual]) ||
                       { type: 'object' }
                     }
-                    value={{ '*': advancedTheme.visualStyles?.[selectedVisual]?.[selectedVariant] || {} }}
+                    value={{ '*': visualSettings[selectedVisual]?.[selectedVariant] || {} }}
                     onChange={(value) => {
                       // Extract the value from the * wrapper
                       const variantValue = value['*'] || value;
                       
-                      // Update the specific variant
-                      const newTheme = {
-                        ...advancedTheme,
-                        visualStyles: {
-                          ...advancedTheme.visualStyles,
-                          [selectedVisual]: {
-                            ...advancedTheme.visualStyles?.[selectedVisual],
-                            [selectedVariant]: variantValue
-                          }
+                      // Update visual settings directly
+                      const updatedVisualSettings = {
+                        ...visualSettings,
+                        [selectedVisual]: {
+                          ...visualSettings[selectedVisual],
+                          [selectedVariant]: variantValue
                         }
                       };
-                      setAdvancedTheme(newTheme);
-                      // Update visual settings for theme generation
-                      if (newTheme.visualStyles) {
-                        setVisualSettings(newTheme.visualStyles);
-                      }
+                      setVisualSettings(updatedVisualSettings);
+                      trackChange(['visualStyles', selectedVisual, selectedVariant]);
+                      
+                      // Also update studio theme store
+                      const newTheme = {
+                        ...studioTheme,
+                        visualStyles: updatedVisualSettings
+                      };
+                      setStudioTheme(newTheme);
                     }}
                     schemaLoader={schemaLoader}
                     path={[]}
@@ -1255,38 +1161,41 @@ export default function UnifiedThemeStudio() {
                   
                   {/* Global Settings Property Selector */}
                   <GlobalPropertySelector
-                    value={advancedTheme.visualStyles?.['*']?.['*']?.['*'] || [{}]}
+                    value={visualSettings['*']?.['*']?.['*'] || [{}]}
                     onChange={(value) => {
-                      const newTheme = {
-                        ...advancedTheme,
-                        visualStyles: {
-                          ...advancedTheme.visualStyles,
+                      // Update visual settings directly
+                      const updatedVisualSettings = {
+                        ...visualSettings,
+                        '*': {
+                          ...visualSettings['*'],
                           '*': {
-                            ...advancedTheme.visualStyles?.['*'],
-                            '*': {
-                              ...advancedTheme.visualStyles?.['*']?.['*'],
-                              '*': value
-                            }
+                            ...visualSettings['*']?.['*'],
+                            '*': value
                           }
                         }
                       };
-                      setAdvancedTheme(newTheme);
-                      // Update visual settings for theme generation
-                      if (newTheme.visualStyles) {
-                        setVisualSettings(newTheme.visualStyles);
-                      }
-                    }}
-                    visualStyles={advancedTheme.visualStyles}
-                    onVisualStylesChange={(newVisualStyles) => {
+                      setVisualSettings(updatedVisualSettings);
+                      trackChange(['visualStyles', '*']);
+                      
+                      // Also update studio theme store
                       const newTheme = {
-                        ...advancedTheme,
+                        ...studioTheme,
+                        visualStyles: updatedVisualSettings
+                      };
+                      setStudioTheme(newTheme);
+                    }}
+                    visualStyles={visualSettings}
+                    onVisualStylesChange={(newVisualStyles) => {
+                      // Update visual settings directly
+                      setVisualSettings(newVisualStyles);
+                      trackChange(['visualStyles']);
+                      
+                      // Also update studio theme store
+                      const newTheme = {
+                        ...studioTheme,
                         visualStyles: newVisualStyles
                       };
-                      setAdvancedTheme(newTheme);
-                      // Update visual settings for theme generation
-                      if (newVisualStyles) {
-                        setVisualSettings(newVisualStyles);
-                      }
+                      setStudioTheme(newTheme);
                     }}
                     schemaLoader={schemaLoader}
                   />
@@ -1400,7 +1309,18 @@ export default function UnifiedThemeStudio() {
           // Load visual styles
           if (importedTheme.visualStyles) {
             setVisualSettings(importedTheme.visualStyles);
-            setAdvancedTheme((prev: PowerBITheme) => ({ ...prev, visualStyles: importedTheme.visualStyles }));
+            
+            // Create a complete theme object for the advanced store
+            const completeTheme = {
+              // Include any other theme properties first
+              ...importedTheme,
+              // Then override with explicit values
+              name: importedTheme.name || 'Imported Theme',
+              mode: importedTheme.mode || 'light',
+              dataColors: importedTheme.dataColors || [],
+              visualStyles: importedTheme.visualStyles
+            };
+            setStudioTheme(completeTheme);
             
             // Update sidebar visibility based on content
             const hasVisualContent = Object.keys(importedTheme.visualStyles).length > 0;

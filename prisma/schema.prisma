@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
@@ -11,7 +8,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User model - references Clerk user ID
+model ColorPalette {
+  id          String   @id @default(uuid())
+  userId      String
+  name        String
+  description String?
+  colors      Json     // Array of hex colors ["#2568E8", "#8338EC", ...]
+  isBuiltIn   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([isBuiltIn])
+  @@index([userId, name])
+}
+
+model GeneratedTheme {
+  id            String   @id @default(uuid())
+  themeId       String
+  generatedJson Json     // The complete Power BI theme JSON
+  version       String   // Schema version used (e.g., "2.143")
+  createdAt     DateTime @default(now())
+  
+  // Relations
+  theme         Theme    @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@index([themeId, createdAt])
+}
+
+model NeutralPalette {
+  id          String   @id @default(uuid())
+  userId      String?  // Nullable for built-in palettes
+  name        String
+  shades      Json     // Object with shade values {"25": "#FAFAFA", "50": "#F5F5F5", ...}
+  isBuiltIn   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([isBuiltIn])
+  @@index([userId, name])
+}
+
+model Theme {
+  id             String           @id @default(uuid())
+  userId         String
+  name           String
+  description    String?
+  themeData      Json             // Contains all theme settings
+  version        String           @default("2.0") // Theme schema version
+  isDefault      Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  
+  // Relations
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  generatedThemes GeneratedTheme[]
+  
+  @@index([userId, createdAt])
+}
+
 model User {
   id              String           @id // Clerk user ID
   email           String           @unique
@@ -22,110 +82,4 @@ model User {
   themes          Theme[]
   colorPalettes   ColorPalette[]
   neutralPalettes NeutralPalette[]
-  advancedThemes  AdvancedTheme[]
-}
-
-// Theme model - stores user's Power BI themes
-model Theme {
-  id            String   @id @default(uuid())
-  userId        String
-  name          String
-  description   String?
-  
-  // Theme settings
-  dataPalette   String   // References palette ID or 'power-ui'
-  neutralPalette String  // References neutral palette ID or built-in name
-  fontFamily    String   // 'segoe-ui', 'arial', etc.
-  colorMode     String   // 'light' or 'dark'
-  borders       String   // '0', '4', '8', '12'
-  bgStyle       String   // 'default', 'subtle-contrast', 'inversed-contrast'
-  borderStyle   String   // 'default', 'subtle', 'none'
-  paddingStyle  String   // 'default', 'large'
-  showBorders   Boolean  @default(true)
-  isDefault     Boolean  @default(false)
-  
-  // Complete theme data for re-loading in builder
-  themeData     Json?    // Stores all theme settings as JSON
-  version       String   @default("1.0") // Theme schema version for backward compatibility
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  // Relations
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  generatedThemes GeneratedTheme[]
-  
-  @@index([userId, createdAt])
-}
-
-// Color palette model - stores custom color palettes
-model ColorPalette {
-  id          String   @id @default(uuid())
-  userId      String
-  name        String
-  description String?
-  colors      Json     // Array of hex colors ["#2568E8", "#8338EC", ...]
-  isBuiltIn   Boolean  @default(false)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@index([userId, name])
-  @@index([isBuiltIn])
-}
-
-// Neutral palette model - stores grayscale palettes
-model NeutralPalette {
-  id          String   @id @default(uuid())
-  userId      String?  // Nullable for built-in palettes
-  name        String
-  shades      Json     // Object with shade values {"25": "#FAFAFA", "50": "#F5F5F5", ...}
-  isBuiltIn   Boolean  @default(false)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relations
-  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@index([userId, name])
-  @@index([isBuiltIn])
-}
-
-// Generated theme cache - stores the generated Power BI JSON
-model GeneratedTheme {
-  id            String   @id @default(uuid())
-  themeId       String
-  generatedJson Json     // The complete Power BI theme JSON
-  version       String   // Schema version used (e.g., "2.143")
-  
-  createdAt     DateTime @default(now())
-  
-  // Relations
-  theme         Theme    @relation(fields: [themeId], references: [id], onDelete: Cascade)
-  
-  @@index([themeId, createdAt])
-}
-
-// Advanced theme model - stores complete Power BI theme configurations
-model AdvancedTheme {
-  id            String   @id @default(cuid())
-  name          String
-  description   String?
-  themeData     Json     // Full Power BI theme JSON
-  schemaVersion String   // Track schema version (e.g., "2.143")
-  userId        String
-  isPublic      Boolean  @default(false)
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  // Relations
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@index([userId])
-  @@index([isPublic])
 }

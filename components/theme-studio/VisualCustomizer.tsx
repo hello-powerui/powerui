@@ -375,12 +375,12 @@ export function VisualCustomizer({
           variant="outline" 
           className="w-full"
           onClick={() => {
-            // TODO: Open advanced editor for this visual
-            console.log('Open advanced editor for', visualType);
+            // TODO: Open studio editor for this visual
+            console.log('Open studio editor for', visualType);
           }}
         >
           <Palette className="w-4 h-4 mr-2" />
-          Open Advanced Editor
+          Open Studio Editor
         </Button>
       </div>
     </Card>

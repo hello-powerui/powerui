@@ -1,9 +1,9 @@
 import { ThemeGenerationInput, ColorPalette } from './types';
 import { resolveColors, ColorPalettes } from './theme-config';
 import { validateNeutralPalette, replaceTokens } from './utils';
-import { TOKEN_MAPPINGS } from './token-mappings';
 import { createEmptyTheme } from './empty-theme';
 import { mapNeutralPaletteToTheme } from './neutral-mapper';
+import { resolveToken } from './token-registry';
 
 export class SimpleThemeGenerator {
   private colors: Record<string, string> = {};
@@ -97,61 +97,19 @@ export class SimpleThemeGenerator {
   
   private createTokenResolver(input: ThemeGenerationInput, colors: Record<string, string>) {
     return (token: string): any => {
-      // Direct color mappings
-      if (colors[token]) {
-        return colors[token];
-      }
-      
-      // Check for color token prefixes that might map differently
-      const colorMappings: Record<string, string> = {
-        // Background tokens
-        'bg-primary': colors['background-primary'],
-        'bg-primary_alt': colors['background-secondary'],
-        'bg-primary_hover': colors['background-active'],
-        'bg-secondary': colors['background-secondary'],
-        'bg-secondary_alt': colors['background-tertiary'],
-        'bg-tertiary': colors['background-tertiary'],
-        'bg-quaternary': colors['background-tertiary'],
-        'bg-active': colors['background-active'],
-        'bg-disabled': colors['background-disabled'],
-        'bg-brand-primary': colors['background-primary'],
-        'bg-brand-solid': colors['background-primary'],
-        'bg-error-primary': colors['error'],
-        'bg-warning-primary': colors['warning'],
-        'bg-success-primary': colors['success'],
-        
-        // Text tokens
-        'text-primary': colors['text-primary'],
-        'text-secondary': colors['text-secondary'],
-        'text-tertiary': colors['text-tertiary'],
-        'text-disabled': colors['text-disabled'],
-        'text-placeholder': colors['text-tertiary'],
-        'text-brand-primary': colors['text-primary'],
-        'text-error-primary': colors['error'],
-        'text-warning-primary': colors['warning'],
-        'text-success-primary': colors['success'],
-        
-        // Border tokens
-        'border-primary': colors['border-primary'],
-        'border-secondary': colors['border-secondary'],
-        'border-tertiary': colors['border-tertiary'],
-        'border-disabled': colors['border-tertiary'],
-        'border-brand': colors['border-primary'],
-        'border-error': colors['error'],
-        
-        // Foreground tokens
-        'fg-primary': colors['text-primary'],
-        'fg-secondary': colors['text-secondary'],
-        'fg-tertiary': colors['text-tertiary'],
-        'fg-disabled': colors['text-disabled'],
-        'fg-brand-primary': colors['text-primary'],
-        'fg-error-primary': colors['error'],
-        'fg-warning-primary': colors['warning'],
-        'fg-success-primary': colors['success'],
+      // Prepare palettes for token resolution
+      const palettes: ColorPalettes = {
+        neutral: input.neutralPalette as Record<string, string>,
+        dataColors: input.dataColors
       };
       
-      if (colorMappings[token]) {
-        return colorMappings[token];
+      // Try to resolve using centralized token registry
+      const resolved = resolveToken(token, input.mode, palettes);
+      if (resolved) return resolved;
+      
+      // Direct color mappings from theme-config
+      if (colors[token]) {
+        return colors[token];
       }
       
       // Check for font tokens - users provide font names directly
@@ -168,11 +126,6 @@ export class SimpleThemeGenerator {
       if (token === 'dataColors') return input.dataColors;
       if (token === 'border-radius') return input.borderRadius;
       if (token === 'padding') return 16; // Default padding
-      
-      // Only warn in development
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(`Token not resolved: ${token}`);
-      }
       
       // Return a fallback color for unresolved tokens
       if (token.startsWith('bg-')) return input.mode === 'light' ? '#F5F5F5' : '#1A1A1A';
@@ -197,14 +150,14 @@ export class SimpleThemeGenerator {
     // Validate and fix neutral palette if needed
     if (typeof input.neutralPalette === 'object' && input.neutralPalette !== null) {
       if (!validateNeutralPalette(input.neutralPalette)) {
-        console.warn('Neutral palette validation failed, using Azure default as fallback');
+        // Neutral palette validation failed, using Azure default as fallback
         // Import Azure palette as fallback
         const { AZURE_NEUTRAL_PALETTE } = require('@/lib/defaults/palettes');
         input.neutralPalette = AZURE_NEUTRAL_PALETTE.shades;
       }
     } else {
       // If neutral palette is missing or invalid, use Azure default
-      console.warn('Missing or invalid neutral palette, using Azure default');
+      // Missing or invalid neutral palette, using Azure default
       const { AZURE_NEUTRAL_PALETTE } = require('@/lib/defaults/palettes');
       input.neutralPalette = AZURE_NEUTRAL_PALETTE.shades;
     }

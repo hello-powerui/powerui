@@ -83,9 +83,7 @@ export class PaletteService {
       return prisma.theme.update({
         where: { id: theme.id },
         data: { 
-          themeData: updatedThemeData,
-          // Also update the dataPalette field to reference powerui-default
-          dataPalette: 'powerui-default'
+          themeData: updatedThemeData
         }
       });
     });
@@ -173,7 +171,6 @@ export class PaletteService {
     return prisma.theme.findMany({
       where: {
         userId,
-        neutralPalette: 'custom',
         themeData: {
           path: ['neutralPalette', 'id'],
           equals: paletteId
@@ -189,7 +186,6 @@ export class PaletteService {
     return prisma.theme.findMany({
       where: {
         userId,
-        dataPalette: 'custom',
         themeData: {
           path: ['palette', 'id'],
           equals: paletteId
@@ -215,9 +211,7 @@ export class PaletteService {
       return prisma.theme.update({
         where: { id: theme.id },
         data: { 
-          themeData: updatedThemeData,
-          // Also update the neutralPalette field to reference azure-default
-          neutralPalette: 'azure-default'
+          themeData: updatedThemeData
         }
       });
     });

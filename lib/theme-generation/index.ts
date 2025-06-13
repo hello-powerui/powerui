@@ -7,6 +7,11 @@ export * from './neutral-mapper';
 // Export new theme configuration
 export * from './theme-config';
 
+// Export token system utilities
+export * from './token-registry';
+export * from './token-validator';
+export * from './client-preview-generator';
+
 // Server-only exports - don't include in client bundle
 // export * from './generator';
 // export * from './data-loader';

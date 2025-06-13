@@ -24,51 +24,8 @@ export default function ThemeDetailPage({
       }
 
       try {
-        // Fetch theme data
-        const response = await fetch(`/api/themes/${id}`);
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            router.push('/themes');
-            return;
-          }
-          throw new Error('Failed to load theme');
-        }
-
-        const theme = await response.json();
-        
-        // If theme has themeData, use that for loading in builder
-        const themeData = theme.themeData || {
-          name: theme.name,
-          // Fix for custom palettes - use stored colors if dataPalette is 'custom'
-          dataColors: theme.dataPalette === 'custom' 
-            ? (theme.themeData?.dataColors || DEFAULT_COLOR_PALETTE.colors)
-            : theme.dataPalette,
-          neutralPalette: theme.neutralPalette === 'custom' 
-            ? (theme.themeData?.neutralPalette || AZURE_NEUTRAL_PALETTE)
-            : theme.neutralPalette,
-          mode: theme.colorMode,
-          fontFamily: theme.fontFamily,
-          fontSize: 14, // Default if not stored
-          borderRadius: parseInt(theme.borders),
-          bgStyle: theme.bgStyle,
-          borderStyle: theme.borderStyle,
-          paddingStyle: theme.paddingStyle,
-          showBorders: theme.showBorders,
-          spacing: 'default', // Default if not stored
-          description: theme.description, // Include description
-        };
-
-        // Encode theme data in URL params
-        const queryParams = new URLSearchParams({
-          id: theme.id,
-          data: encodeURIComponent(JSON.stringify(themeData)),
-          name: encodeURIComponent(theme.name || 'My Theme'),
-          description: encodeURIComponent(theme.description || ''),
-        });
-
-        // Navigate to builder with theme data
-        router.push(`/themes/studio?${queryParams.toString()}`);
+        // Navigate directly to studio with theme ID - let studio handle loading
+        router.push(`/themes/studio?themeId=${id}`);
       } catch (error) {
         console.error('Error loading theme:', error);
         router.push('/themes');

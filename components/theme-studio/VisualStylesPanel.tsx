@@ -11,10 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { SchemaForm } from '@/components/theme-advanced/form/schema-form';
-import { CollapsibleSection } from '@/components/theme-advanced/ui/collapsible-section';
-import { loadVisualSchema, SchemaLoader } from '@/lib/theme-advanced/services/schema-loader';
-import { useThemeAdvancedStore } from '@/lib/stores/theme-advanced-store';
+import { SchemaForm } from '@/components/theme-studio/form/schema-form';
+import { CollapsibleSection } from '@/components/theme-studio/ui/collapsible-section';
+import { loadVisualSchema, SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
+import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { Plus, Trash2, Copy, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
@@ -41,7 +41,7 @@ export function VisualStylesPanel({
     redo,
     history,
     historyIndex
-  } = useThemeAdvancedStore();
+  } = useThemeStudioStore();
 
   // Compute undo/redo availability
   const canUndo = historyIndex > 0;

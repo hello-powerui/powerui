@@ -199,10 +199,10 @@ export default function ThemesPage() {
                 {/* Compact metadata pills */}
                 <div className="flex gap-2 mb-3 flex-wrap">
                   <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                    {theme.colorMode}
+                    {(theme.themeData as any)?.mode || 'light'}
                   </span>
                   <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                    {theme.fontFamily.replace('-', ' ')}
+                    {((theme.themeData as any)?.fontFamily || 'Segoe UI').replace('-', ' ')}
                   </span>
                 </div>
                 
@@ -217,14 +217,7 @@ export default function ThemesPage() {
                   <button 
                     className="px-3 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                     onClick={async () => {
-                      const themeInput = theme.themeData || {
-                        name: theme.name,
-                        mode: theme.colorMode || 'light',
-                        dataColors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C'],
-                        neutralPalette: ['#FFFFFF', '#F5F5F5', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#757575', '#616161', '#424242', '#212121', '#000000'],
-                        fontFamily: theme.fontFamily || 'segoe-ui',
-                        borderRadius: parseInt(theme.borders || '4'),
-                      };
+                      const themeInput = theme.themeData as any;
                       
                       const response = await fetch('/api/generate-theme', {
                         method: 'POST',

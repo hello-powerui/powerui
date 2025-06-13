@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { ColorPicker } from '@/components/ui/color-picker';
-import { useThemeBuilderStore } from '@/lib/stores/theme-builder-store';
+import { useThemeBuilderStore } from '@/lib/stores/theme-studio-store';
 
 type ThemeDataColor = string | { color: string } | { dataColorIndex: number };
 
