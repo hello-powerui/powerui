@@ -360,7 +360,7 @@ export default function Home() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">We're constantly improving Power UI</h2>
+            <h2 className="text-4xl font-bold mb-4">We&apos;re constantly improving Power UI</h2>
             <h3 className="text-2xl text-gray-600 mb-6">New features every month based on user feedback</h3>
             <p className="text-lg text-gray-600">
               Stay ahead of design trends with regular updates. Your one-time purchase includes all future enhancements and new resources.
@@ -368,7 +368,7 @@ export default function Home() {
           </div>
 
           <div className="bg-gray-50 rounded-xl p-8">
-            <h3 className="text-xl font-semibold mb-6">What's Coming</h3>
+            <h3 className="text-xl font-semibold mb-6">What&apos;s Coming</h3>
             <div className="space-y-4">
               <div className="flex items-center">
                 <span className="text-green-500 mr-3">✅</span>
@@ -401,7 +401,7 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-8">
             {testimonials.map((testimonial, index) => (
               <div key={index} className="bg-white p-8 rounded-xl border border-gray-200">
-                <p className="text-gray-700 mb-4 italic">"{testimonial.quote}"</p>
+                <p className="text-gray-700 mb-4 italic">&quot;{testimonial.quote}&quot;</p>
                 <div>
                   <p className="font-semibold">{testimonial.author}</p>
                   {testimonial.role && (
@@ -556,7 +556,7 @@ export default function Home() {
               Join 1,000+ analysts creating reports that get noticed
             </h2>
             <h3 className="text-2xl text-gray-600">
-              Whether you're building your first dashboard or your hundredth, Power UI adapts to your skill level
+              Whether you&apos;re building your first dashboard or your hundredth, Power UI adapts to your skill level
             </h3>
           </div>
 
@@ -591,7 +591,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto text-center">
-          <h3 className="text-2xl font-bold mb-4">Questions? We're here to help.</h3>
+          <h3 className="text-2xl font-bold mb-4">Questions? We&apos;re here to help.</h3>
           <p className="mb-8">
             Email us at{' '}
             <a href="mailto:hello@powerui.com" className="underline">
