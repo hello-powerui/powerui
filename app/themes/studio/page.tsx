@@ -1149,7 +1149,7 @@ export default function UnifiedThemeStudio() {
                         ...studioTheme,
                         visualStyles: newVisualStyles
                       };
-                      setStudioTheme(newTheme);
+                      setTheme(newTheme);
                     }}
                     schemaLoader={schemaLoader}
                   />
