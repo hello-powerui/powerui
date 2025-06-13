@@ -84,7 +84,7 @@ export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbe
     if (isInitialLoad.current) {
       loadReport();
     }
-  }, []); // Empty dependency array - only run on mount
+  }, [powerBIService, generatedTheme]); // Include required dependencies
 
   // Apply theme when it changes (with debounce to prevent rapid updates)
   useEffect(() => {

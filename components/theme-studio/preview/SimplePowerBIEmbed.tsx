@@ -84,7 +84,7 @@ export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbe
     if (isInitialLoad.current && generatedTheme) {
       loadReport();
     }
-  }, [generatedTheme]); // Re-run when generatedTheme changes
+  }, [generatedTheme, powerBIService]); // Include required dependencies
 
   // Apply theme when it changes (with debounce to prevent rapid updates)
   useEffect(() => {

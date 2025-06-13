@@ -1,0 +1,110 @@
+[14:15:20.873] Running build in Washington, D.C., USA (East) – iad1
+[14:15:20.874] Build machine configuration: 2 cores, 8 GB
+[14:15:20.885] Cloning github.com/hello-powerui/powerui (Branch: vercel-deployment-test, Commit: 23ce41b)
+[14:15:21.250] Cloning completed: 364.000ms
+[14:15:22.361] Restored build cache from previous deployment (D7wcbSuxYwVc58LjFWfXB7MdQ82o)
+[14:15:22.986] Running "vercel build"
+[14:15:23.506] Vercel CLI 42.2.0
+[14:15:24.481] Installing dependencies...
+[14:15:28.063] npm warn deprecated lodash.isequal@4.5.0: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
+[14:15:45.296] 
+[14:15:45.296] > powerui@2.0.0 postinstall
+[14:15:45.296] > prisma generate
+[14:15:45.296] 
+[14:15:45.996] Prisma schema loaded from prisma/schema.prisma
+[14:15:46.305] 
+[14:15:46.306] ✔ Generated Prisma Client (v6.9.0) to ./lib/generated/prisma in 125ms
+[14:15:46.306] 
+[14:15:46.306] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+[14:15:46.306] 
+[14:15:46.306] Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+[14:15:46.307] 
+[14:15:46.359] 
+[14:15:46.360] added 171 packages, removed 987 packages, and changed 340 packages in 22s
+[14:15:46.360] 
+[14:15:46.360] 161 packages are looking for funding
+[14:15:46.360]   run `npm fund` for details
+[14:15:46.430] Running "npm run build"
+[14:15:46.580] 
+[14:15:46.580] > powerui@2.0.0 build
+[14:15:46.580] > prisma generate && next build
+[14:15:46.580] 
+[14:15:47.292] Prisma schema loaded from prisma/schema.prisma
+[14:15:47.586] 
+[14:15:47.587] ✔ Generated Prisma Client (v6.9.0) to ./lib/generated/prisma in 112ms
+[14:15:47.587] 
+[14:15:47.587] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+[14:15:47.587] 
+[14:15:47.587] Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+[14:15:47.588] 
+[14:15:48.322] Attention: Next.js now collects completely anonymous telemetry regarding usage.
+[14:15:48.322] This information is used to shape Next.js' roadmap and prioritize features.
+[14:15:48.323] You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+[14:15:48.323] https://nextjs.org/telemetry
+[14:15:48.323] 
+[14:15:48.382]    ▲ Next.js 15.3.3
+[14:15:48.382] 
+[14:15:48.455]    Creating an optimized production build ...
+[14:15:49.106]  ⚠ nodejs runtime support for middleware requires experimental.nodeMiddleware be enabled in your next.config
+[14:16:03.600]  ⚠ nodejs runtime support for middleware requires experimental.nodeMiddleware be enabled in your next.config
+[14:16:04.610]  ⚠ nodejs runtime support for middleware requires experimental.nodeMiddleware be enabled in your next.config
+[14:16:13.361]  ✓ Compiled successfully in 21.0s
+[14:16:13.366]    Linting and checking validity of types ...
+[14:16:34.802] 
+[14:16:34.803] ./components/theme-studio/SimplePowerBIEmbed.tsx
+[14:16:34.804] 87:6  Warning: React Hook useEffect has missing dependencies: 'generatedTheme' and 'powerBIService'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+[14:16:34.804] 
+[14:16:34.804] ./components/theme-studio/preview/SimplePowerBIEmbed.tsx
+[14:16:34.804] 87:6  Warning: React Hook useEffect has a missing dependency: 'powerBIService'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+[14:16:34.804] 
+[14:16:34.805] info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+[14:16:34.806]    Collecting page data ...
+[14:16:37.850]    Generating static pages (0/24) ...
+[14:16:39.145]    Generating static pages (6/24) 
+[14:16:39.148]    Generating static pages (12/24) 
+[14:16:39.230]    Generating static pages (18/24) 
+[14:16:39.231]  ✓ Generating static pages (24/24)
+[14:16:39.634]    Finalizing page optimization ...
+[14:16:39.636]    Collecting build traces ...
+[14:16:46.086] 
+[14:16:46.096] Route (app)                                 Size  First Load JS
+[14:16:46.097] ┌ ○ /                                       6 kB         111 kB
+[14:16:46.097] ├ ○ /_not-found                            981 B         102 kB
+[14:16:46.100] ├ ƒ /api/auth/sync                         179 B         101 kB
+[14:16:46.100] ├ ƒ /api/auth/user-sync                    179 B         101 kB
+[14:16:46.100] ├ ƒ /api/checkout                          179 B         101 kB
+[14:16:46.100] ├ ƒ /api/generate-neutral-palette          179 B         101 kB
+[14:16:46.100] ├ ƒ /api/generate-theme                    179 B         101 kB
+[14:16:46.100] ├ ƒ /api/palettes/color                    179 B         101 kB
+[14:16:46.100] ├ ƒ /api/palettes/color/[id]               179 B         101 kB
+[14:16:46.101] ├ ƒ /api/palettes/neutral                  179 B         101 kB
+[14:16:46.101] ├ ƒ /api/palettes/neutral/[id]             179 B         101 kB
+[14:16:46.101] ├ ƒ /api/powerbi/embed-token               179 B         101 kB
+[14:16:46.101] ├ ƒ /api/powerbi/token                     179 B         101 kB
+[14:16:46.101] ├ ƒ /api/themes                            179 B         101 kB
+[14:16:46.101] ├ ƒ /api/themes/[id]                       179 B         101 kB
+[14:16:46.101] ├ ƒ /api/webhooks/clerk                    179 B         101 kB
+[14:16:46.101] ├ ○ /contact-sales                         186 B         105 kB
+[14:16:46.101] ├ ○ /dashboard                           2.57 kB         107 kB
+[14:16:46.101] ├ ○ /examples                              186 B         105 kB
+[14:16:46.102] ├ ○ /palettes                            1.14 kB         150 kB
+[14:16:46.102] ├ ○ /pricing                             2.46 kB         132 kB
+[14:16:46.102] ├ ○ /privacy                               186 B         105 kB
+[14:16:46.104] ├ ƒ /sign-in/[[...sign-in]]              2.19 kB         134 kB
+[14:16:46.104] ├ ƒ /sign-up/[[...sign-up]]              2.19 kB         134 kB
+[14:16:46.104] ├ ○ /terms                                 186 B         105 kB
+[14:16:46.104] ├ ○ /themes                              2.47 kB         104 kB
+[14:16:46.105] ├ ƒ /themes/[id]                           813 B         127 kB
+[14:16:46.105] └ ○ /themes/studio                       38.1 kB         196 kB
+[14:16:46.105] + First Load JS shared by all             101 kB
+[14:16:46.105]   ├ chunks/1684-0ea4bf9c79cc3e05.js      45.9 kB
+[14:16:46.105]   ├ chunks/4bd1b696-16947b056d56ecc7.js  53.2 kB
+[14:16:46.105]   └ other shared chunks (total)          2.14 kB
+[14:16:46.105] 
+[14:16:46.105] 
+[14:16:46.107] ○  (Static)   prerendered as static content
+[14:16:46.107] ƒ  (Dynamic)  server-rendered on demand
+[14:16:46.107] 
+[14:16:46.265] Error: middleware.ts: `config.runtime: "nodejs"` semantics will evolve soon. Please remove the `runtime` key to keep the existing behavior.
+[14:16:46.636] 
+[14:16:49.752] Exiting build container
