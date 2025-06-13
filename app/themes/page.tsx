@@ -4,6 +4,8 @@ import { useRouter, redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 
+export const dynamic = 'force-dynamic';
+
 interface Theme {
   id: string;
   name: string;

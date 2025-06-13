@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@/lib/hooks/use-user';
 import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
 
+export const dynamic = 'force-dynamic';
+
 export default function ThemeDetailPage({
   params,
 }: {
