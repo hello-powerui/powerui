@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
-import { ClerkProvider } from '@clerk/nextjs'
 import { AppHeader } from '@/components/ui/app-header'
 import { Toaster } from 'sonner'
+import { Providers } from './providers'
 import './globals.css'
 import './fonts.css'
 
@@ -16,14 +16,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className="font-segoe">
+    <html lang="en">
+      <body className="font-segoe">
+        <Providers>
           <AppHeader />
           <main>{children}</main>
           <Toaster position="bottom-right" />
-        </body>
-      </html>
-    </ClerkProvider>
+        </Providers>
+      </body>
+    </html>
   )
 }
