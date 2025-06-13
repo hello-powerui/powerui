@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,7 +72,7 @@ const GlobalIcon = () => (
   </svg>
 );
 
-export default function UnifiedThemeStudio() {
+function UnifiedThemeStudioContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedVisual, setSelectedVisual] = useState<string>('');
@@ -1351,5 +1351,17 @@ export default function UnifiedThemeStudio() {
         onUpdateTextClasses={updateTextClassesWithTracking}
       />
       </div>
+  );
+}
+
+export default function UnifiedThemeStudio() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    }>
+      <UnifiedThemeStudioContent />
+    </Suspense>
   );
 }

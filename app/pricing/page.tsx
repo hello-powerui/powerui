@@ -6,61 +6,53 @@ import Link from "next/link";
 
 const plans = [
   {
-    name: "Free",
-    price: "$0",
-    description: "Perfect for trying out PowerUI",
+    name: "Pro",
+    price: "$119",
+    description: "One-time purchase for individual professionals",
     features: [
-      "3 custom themes",
-      "Basic color palettes",
-      "Export to Power BI",
-      "Community support",
+      "Complete theme generator access",
+      "15+ example reports with source files",
+      "100+ page design guide (PDF)",
+      "Figma design system",
+      "1,500+ professional icons",
+      "All future updates included",
     ],
-    limitations: [
-      "Limited theme customization",
-      "No advanced styling options",
-      "No priority support",
+    limitations: [],
+    cta: "Get Pro Access",
+    ctaLink: "/checkout?plan=pro",
+    highlighted: true,
+    badge: "Best Value",
+  },
+  {
+    name: "Team (5 seats)",
+    price: "$399",
+    description: "Perfect for small teams",
+    features: [
+      "Everything in Pro",
+      "5 transferable licenses",
+      "Team member management portal",
+      "Priority email support",
+      "Team training resources",
     ],
-    cta: "Get Started",
-    ctaLink: "/sign-up",
+    limitations: [],
+    cta: "Get Team Access",
+    ctaLink: "/checkout?plan=team-5",
     highlighted: false,
   },
   {
-    name: "Pro",
-    price: "$19",
-    period: "per month",
-    description: "For professionals and small teams",
+    name: "Team (10 seats)",
+    price: "$699",
+    description: "For larger teams and organizations",
     features: [
-      "Unlimited themes",
-      "Advanced color palettes",
-      "Custom typography",
-      "Theme versioning",
-      "Priority email support",
-      "Export to multiple formats",
-      "Theme sharing",
+      "Everything in Team (5 seats)",
+      "10 transferable licenses",
+      "Priority support with 24hr response",
+      "Custom theme consultation",
+      "Volume licensing available",
     ],
     limitations: [],
-    cta: "Start Free Trial",
-    ctaLink: "/sign-up?plan=pro",
-    highlighted: true,
-    badge: "Most Popular",
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    description: "For large organizations",
-    features: [
-      "Everything in Pro",
-      "Custom branding",
-      "SSO integration",
-      "API access",
-      "Dedicated support",
-      "SLA guarantee",
-      "Custom integrations",
-      "Team collaboration",
-    ],
-    limitations: [],
-    cta: "Contact Sales",
-    ctaLink: "/contact-sales",
+    cta: "Get Enterprise Access",
+    ctaLink: "/checkout?plan=team-10",
     highlighted: false,
   },
 ];
@@ -76,7 +68,7 @@ export default function PricingPage() {
             Simple, transparent pricing
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Choose the perfect plan for your Power BI theming needs. Upgrade or downgrade anytime.
+            One-time purchase. Lifetime access. No subscriptions.
           </p>
         </div>
 
@@ -102,9 +94,7 @@ export default function PricingPage() {
                   <p className="text-gray-600 mt-1">{plan.description}</p>
                   <div className="mt-4">
                     <span className="text-4xl font-bold">{plan.price}</span>
-                    {plan.period && (
-                      <span className="text-gray-600 ml-2">{plan.period}</span>
-                    )}
+                    <span className="text-gray-600 ml-2">one-time</span>
                   </div>
                 </div>
 
@@ -148,21 +138,21 @@ export default function PricingPage() {
           <h2 className="text-2xl font-bold mb-4">Frequently asked questions</h2>
           <div className="max-w-2xl mx-auto space-y-6 text-left">
             <div>
-              <h3 className="font-semibold mb-2">Can I change plans anytime?</h3>
+              <h3 className="font-semibold mb-2">Is this really lifetime access?</h3>
               <p className="text-muted-foreground">
-                Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.
+                Yes. One payment gets you lifetime access to PowerUI plus all future updates and new resources we add.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">What happens to my themes if I downgrade?</h3>
+              <h3 className="font-semibold mb-2">Can I use this for client work?</h3>
               <p className="text-muted-foreground">
-                Your existing themes remain accessible. You just won&apos;t be able to create new ones beyond the plan limit.
+                Absolutely. PowerUI includes commercial usage rights for unlimited personal and client projects.
               </p>
             </div>
             <div>
               <h3 className="font-semibold mb-2">Do you offer refunds?</h3>
               <p className="text-muted-foreground">
-                We offer a 14-day money-back guarantee for all paid plans. No questions asked.
+                We offer a 30-day money-back guarantee for all plans. No questions asked.
               </p>
             </div>
           </div>
