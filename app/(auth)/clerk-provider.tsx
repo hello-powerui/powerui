@@ -7,7 +7,6 @@ export function AuthClerkProvider({ children }: { children: React.ReactNode }) {
     <ClerkProvider
       signInFallbackRedirectUrl="/dashboard"
       signUpFallbackRedirectUrl="/dashboard"
-      signOutFallbackRedirectUrl="/"
     >
       {children}
     </ClerkProvider>
