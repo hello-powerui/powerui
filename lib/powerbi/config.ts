@@ -4,8 +4,8 @@
 
 export const powerBIConfig = {
   // Workspace and report details (can be overridden via env vars)
-  workspaceId: process.env.POWERBI_WORKSPACE_ID || 'C8456667-05B9-4A77-838D-5EA89DC3F083',
-  reportId: process.env.POWERBI_REPORT_ID || 'd2f6a004-6932-417c-a6c3-2467738fe03e',
+  workspaceId: process.env.POWER_BI_EMBEDDED_WORKSPACE_ID || 'C8456667-05B9-4A77-838D-5EA89DC3F083',
+  reportId: process.env.POWER_BI_EMBEDDED_REPORT_ID || 'd2f6a004-6932-417c-a6c3-2467738fe03e',
   
   // Azure AD details
   tenantId: process.env.POWERBI_TENANT_ID || '96860899-aa83-4db7-a71b-2aa296c28235',
