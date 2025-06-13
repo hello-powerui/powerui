@@ -3,9 +3,8 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
 
 // Icons
 const PlusIcon = () => (
@@ -89,13 +88,16 @@ function getRelativeTime(date: string) {
 
 export default function DashboardPage() {
   const { isLoaded, isSignedIn } = useUser();
+  const router = useRouter();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Redirect to sign-in if not authenticated
-  if (isLoaded && !isSignedIn) {
-    redirect('/sign-in');
-  }
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in');
+    }
+  }, [isLoaded, isSignedIn, router]);
 
   useEffect(() => {
     fetchThemes();
@@ -115,6 +117,18 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+
+  // Show loading state while checking authentication
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2 text-sm text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

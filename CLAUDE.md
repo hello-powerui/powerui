@@ -1,0 +1,1 @@
+- dont run npm build without permission

@@ -10,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { usePaletteStore } from '@/lib/stores/palette-store';
 import { Palette, Grid3x3, Plus } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
 
 export default function PalettesPage() {
   const { isLoaded, isSignedIn } = useUser();

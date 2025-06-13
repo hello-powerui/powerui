@@ -1,14 +1,8 @@
 'use client'
 
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
-import { usePathname } from 'next/navigation'
 
 export function AppHeader() {
-  const pathname = usePathname()
-  const isHomePage = pathname === '/'
-
-  if (isHomePage) return null
-
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

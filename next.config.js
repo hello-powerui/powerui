@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  serverExternalPackages: ['@clerk/nextjs'],
+  experimental: {
+    serverActions: true,
+  },
 }
 
 module.exports = nextConfig

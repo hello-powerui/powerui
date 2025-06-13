@@ -1,14 +1,13 @@
 import Link from 'next/link'
 
-export const dynamic = 'force-dynamic'
 
-export default function TermsPage() {
+export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Terms of Service</h1>
+        <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
         <div className="bg-white rounded-lg border border-gray-200 p-8">
-          <p className="text-gray-600 mb-4">Terms of service content coming soon...</p>
+          <p className="text-gray-600 mb-4">Privacy policy content coming soon...</p>
           <Link 
             href="/"
             className="text-gray-900 hover:underline"
