@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
 import { UnifiedPaletteManager } from '@/components/theme-studio/palette/UnifiedPaletteManager';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,9 +11,15 @@ import { usePaletteStore } from '@/lib/stores/palette-store';
 import { Palette, Grid3x3, Plus } from 'lucide-react';
 
 export default function PalettesPage() {
+  const { isLoaded, isSignedIn } = useUser();
   const [showManager, setShowManager] = useState(false);
   const [managerType, setManagerType] = useState<'color' | 'neutral' | 'both'>('both');
   const { colorPalettes, neutralPalettes } = usePaletteStore();
+  
+  // Redirect to sign-in if not authenticated
+  if (isLoaded && !isSignedIn) {
+    redirect('/sign-in');
+  }
 
   return (
     <div className="container mx-auto py-8 px-4">

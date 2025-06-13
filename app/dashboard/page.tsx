@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
 
 // Icons
 const PlusIcon = () => (
@@ -84,8 +86,14 @@ function getRelativeTime(date: string) {
 }
 
 export default function DashboardPage() {
+  const { isLoaded, isSignedIn } = useUser();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Redirect to sign-in if not authenticated
+  if (isLoaded && !isSignedIn) {
+    redirect('/sign-in');
+  }
 
   useEffect(() => {
     fetchThemes();

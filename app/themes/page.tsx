@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
 
 interface Theme {
   id: string;
@@ -39,9 +40,15 @@ const MoreIcon = () => (
 
 export default function ThemesPage() {
   const router = useRouter();
+  const { isLoaded, isSignedIn } = useUser();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  
+  // Redirect to sign-in if not authenticated
+  if (isLoaded && !isSignedIn) {
+    redirect('/sign-in');
+  }
 
   useEffect(() => {
     fetchThemes();
