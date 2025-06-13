@@ -1,6 +1,3 @@
-'use client';
-
-import { useUser } from "@clerk/nextjs";
 import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -58,8 +55,6 @@ const plans = [
 ];
 
 export default function PricingPage() {
-  const { user } = useUser();
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-16">
@@ -120,7 +115,7 @@ export default function PricingPage() {
                 )}
 
                 <Link 
-                  href={user ? plan.ctaLink.replace('/sign-up', '/checkout') : plan.ctaLink}
+                  href={plan.ctaLink}
                   className={`block w-full text-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     plan.highlighted 
                       ? "bg-primary text-white hover:bg-primary/90" 
