@@ -5,7 +5,7 @@ export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
-  console.log('[EMBED-TOKEN] POST request received');
+  console.log('[EMBED-TOKEN] POST request received - v2');
   console.log('[EMBED-TOKEN] URL:', request.url);
   console.log('[EMBED-TOKEN] Headers:', Object.fromEntries(request.headers.entries()));
   
