@@ -90,8 +90,8 @@ function UnifiedThemeStudioContent() {
   // Studio editor states
   const [selectedSection, setSelectedSection] = useState<'global' | 'properties' | 'visuals'>('visuals');
   const [selectedProperty, setSelectedProperty] = useState<string>('');
-  const [schemaLoader] = useState(() => SchemaLoader.getInstance());
-  const hasStateDrivenProperties = selectedVisual && schemaLoader.visualHasStateDrivenProperties(selectedVisual);
+  const [schemaLoader, setSchemaLoader] = useState<SchemaLoader | null>(null);
+  const hasStateDrivenProperties = selectedVisual && schemaLoader?.visualHasStateDrivenProperties(selectedVisual);
   const [schemaLoaded, setSchemaLoaded] = useState(false);
   const [visualTypes, setVisualTypes] = useState<string[]>([]);
   const [canvasTypes, setCanvasTypes] = useState<string[]>([]);
@@ -102,6 +102,13 @@ function UnifiedThemeStudioContent() {
   // Sidebar states
   const [showFoundation, setShowFoundation] = useState(true);
   const [showVisualStyles, setShowVisualStyles] = useState(false);
+  
+  // Track mounted state to avoid hydration issues with Sets
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   // Use individual selectors to avoid creating new objects on every render
   const clearChanges = useThemeChanges(state => state.clearChanges);
@@ -135,8 +142,15 @@ function UnifiedThemeStudioContent() {
   
   // Theme mode is now automatically synced in the unified store
   
+  // Initialize SchemaLoader in useEffect to avoid hydration mismatch
+  useEffect(() => {
+    setSchemaLoader(SchemaLoader.getInstance());
+  }, []);
+  
   // Load schema on mount
   useEffect(() => {
+    if (!schemaLoader) return;
+    
     const loadSchema = async () => {
       try {
       await schemaLoader.loadSchema();
@@ -447,7 +461,7 @@ function UnifiedThemeStudioContent() {
                   placeholder="Untitled Theme"
                 />
               </div>
-              {changedPaths.size > 0 && (
+              {isMounted && changedPaths.size > 0 && (
                 <div className="ml-3 flex items-center gap-1.5 text-sm text-gray-600">
                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
                   <span>{changedPaths.size} unsaved {changedPaths.size === 1 ? 'change' : 'changes'}</span>
@@ -475,7 +489,7 @@ function UnifiedThemeStudioContent() {
                 </svg>
                 Export
               </button>
-              {changedPaths.size > 0 && (
+              {isMounted && changedPaths.size > 0 && (
                 <button
                   onClick={handleReset}
                   className="px-3 py-1.5 text-gray-600 bg-white border border-gray-200 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-1.5 text-sm font-medium"
@@ -767,14 +781,14 @@ function UnifiedThemeStudioContent() {
               )}
               
               {/* Report Canvas */}
-              {schemaLoaded && canvasTypes.includes('report') && (
+              {schemaLoaded && schemaLoader && canvasTypes.includes('report') && (
                 <CollapsibleSection
                   title="Report Canvas"
                   tooltip="Controls the overall report appearance and behavior"
                   defaultOpen={false}
                 >
                   <SchemaForm
-                    schema={schemaLoader.getVisualSchema('report')?.properties?.['*'] || {}}
+                    schema={schemaLoader?.getVisualSchema('report')?.properties?.['*'] || {}}
                     value={visualSettings.report?.['*'] || {}}
                     onChange={(value) => {
                       const updatedVisualSettings = {
@@ -788,21 +802,21 @@ function UnifiedThemeStudioContent() {
                       
                       // Visual styles are automatically synced in the unified store
                     }}
-                    schemaLoader={schemaLoader}
+                    schemaLoader={schemaLoader!}
                     path={['visualStyles', 'report', '*']}
                   />
                 </CollapsibleSection>
               )}
               
               {/* Page Settings */}
-              {schemaLoaded && canvasTypes.includes('page') && (
+              {schemaLoaded && schemaLoader && canvasTypes.includes('page') && (
                 <CollapsibleSection
                   title="Page Settings"
                   tooltip="Configure page backgrounds, size, and layout options"
                   defaultOpen={false}
                 >
                   <SchemaForm
-                    schema={schemaLoader.getVisualSchema('page')?.properties?.['*'] || {}}
+                    schema={schemaLoader?.getVisualSchema('page')?.properties?.['*'] || {}}
                     value={visualSettings.page?.['*'] || {}}
                     onChange={(value) => {
                       const updatedVisualSettings = {
@@ -816,21 +830,21 @@ function UnifiedThemeStudioContent() {
                       
                       // Visual styles are automatically synced in the unified store
                     }}
-                    schemaLoader={schemaLoader}
+                    schemaLoader={schemaLoader!}
                     path={['visualStyles', 'page', '*']}
                   />
                 </CollapsibleSection>
               )}
               
               {/* Filter Pane */}
-              {schemaLoaded && canvasTypes.includes('filter') && (
+              {schemaLoaded && schemaLoader && canvasTypes.includes('filter') && (
                 <CollapsibleSection
                   title="Filter Pane"
                   tooltip="Customize the appearance of filter panes and cards"
                   defaultOpen={false}
                 >
                   <SchemaForm
-                    schema={schemaLoader.getVisualSchema('filter')?.properties?.['*'] || {}}
+                    schema={schemaLoader?.getVisualSchema('filter')?.properties?.['*'] || {}}
                     value={visualSettings.filter?.['*'] || {}}
                     onChange={(value) => {
                       const updatedVisualSettings = {
@@ -844,7 +858,7 @@ function UnifiedThemeStudioContent() {
                       
                       // Visual styles are automatically synced in the unified store
                     }}
-                    schemaLoader={schemaLoader}
+                    schemaLoader={schemaLoader!}
                     path={['visualStyles', 'filter', '*']}
                   />
                 </CollapsibleSection>
@@ -985,6 +999,19 @@ function UnifiedThemeStudioContent() {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {/* Focus Mode Toggle - only show for specific visual types */}
+                {selectedVisual !== '*' && (
+                  <div className="mt-3 flex items-center gap-2 px-1">
+                    <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span className="text-xs text-gray-600">
+                      Focus mode automatically activates to highlight {selectedVisual} visuals
+                    </span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1075,9 +1102,10 @@ function UnifiedThemeStudioContent() {
                   )}
                   
                   {/* SchemaForm renders its own tabs with collapsible sections */}
+                  {schemaLoader && (
                   <SchemaForm
                     schema={
-                      schemaLoader.getPropertySchema(['visualStyles', selectedVisual]) ||
+                      schemaLoader?.getPropertySchema(['visualStyles', selectedVisual]) ||
                       { type: 'object' }
                     }
                     value={{ '*': visualSettings[selectedVisual]?.[selectedVariant] || {} }}
@@ -1099,9 +1127,10 @@ function UnifiedThemeStudioContent() {
                       // Also update studio theme store
                       // Visual styles are automatically synced in the unified store
                     }}
-                    schemaLoader={schemaLoader}
-                    path={[]}
+                    schemaLoader={schemaLoader!}
+                    path={['visualStyles', selectedVisual, selectedVariant]}
                   />
+                  )}
                 </>
               ) : selectedSection === 'global' ? (
                 <>
@@ -1118,26 +1147,8 @@ function UnifiedThemeStudioContent() {
                   </div>
                   
                   {/* Global Settings Property Selector */}
+                  {schemaLoader && (
                   <GlobalPropertySelector
-                    value={visualSettings['*']?.['*']?.['*'] || [{}]}
-                    onChange={(value) => {
-                      // Update visual settings directly
-                      const updatedVisualSettings = {
-                        ...visualSettings,
-                        '*': {
-                          ...visualSettings['*'],
-                          '*': {
-                            ...visualSettings['*']?.['*'],
-                            '*': value
-                          }
-                        }
-                      };
-                      setVisualSettings(updatedVisualSettings);
-                      trackChange(['visualStyles', '*']);
-                      
-                      // Also update studio theme store
-                      // Visual styles are automatically synced in the unified store
-                    }}
                     visualStyles={visualSettings}
                     onVisualStylesChange={(newVisualStyles) => {
                       // Update visual settings directly
@@ -1151,8 +1162,9 @@ function UnifiedThemeStudioContent() {
                       };
                       setTheme(newTheme);
                     }}
-                    schemaLoader={schemaLoader}
+                    schemaLoader={schemaLoader!}
                   />
+                  )}
                 </>
               ) : (
                 <div className="text-center py-12 text-gray-500">
@@ -1233,8 +1245,8 @@ function UnifiedThemeStudioContent() {
               userId: 'temp',
               description: 'Imported from theme',
               isBuiltIn: false,
-              createdAt: new Date(),
-              updatedAt: new Date()
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
             });
           }
           

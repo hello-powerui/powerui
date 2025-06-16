@@ -82,26 +82,93 @@ export function UnifiedColorPicker({
 }: UnifiedColorPickerProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [selectedTab, setSelectedTab] = React.useState('custom');
-  const [selectedThemeColor, setSelectedThemeColor] = React.useState<number | null>(null);
-  const [selectedShade, setSelectedShade] = React.useState(0);
-
-  // Extract display value based on format
-  const getDisplayValue = (): string => {
+  
+  // Initialize tab based on current value
+  const getInitialTab = () => {
+    const displayValue = getDisplayValueInternal();
+    if (displayValue.startsWith('@') && enableTokens) return 'tokens';
+    if (displayValue.startsWith('Theme') && enableThemeColors) return 'theme';
+    return 'custom';
+  };
+  
+  const [selectedTab, setSelectedTab] = React.useState(() => getInitialTab());
+  
+  // Initialize theme color selection based on current value
+  const getInitialThemeColor = (): number | null => {
+    if (!value) return null;
+    
+    if (typeof value === 'object' && 'solid' in value && value.solid) {
+      const color = value.solid.color;
+      if (typeof color === 'object' && color.expr?.ThemeDataColor?.ColorId !== undefined) {
+        return color.expr.ThemeDataColor.ColorId;
+      }
+    } else if (typeof value === 'object' && 'themeColor' in value && value.themeColor) {
+      return value.themeColor.id;
+    }
+    return null;
+  };
+  
+  const getInitialShade = (): number => {
+    if (!value) return 0;
+    
+    if (typeof value === 'object' && 'themeColor' in value && value.themeColor) {
+      return value.themeColor.shade || 0;
+    }
+    return 0;
+  };
+  
+  const [selectedThemeColor, setSelectedThemeColor] = React.useState<number | null>(() => getInitialThemeColor());
+  const [selectedShade, setSelectedShade] = React.useState(() => getInitialShade());
+  
+  // Helper function to get display value (internal use before component functions are defined)
+  function getDisplayValueInternal(): string {
     if (!value) return '';
     
     if (typeof value === 'string') {
       return value;
-    } else if ('solid' in value && value.solid?.color) {
+    } else if (typeof value === 'object' && 'solid' in value && value.solid) {
       const color = value.solid.color;
+      if (!color) return '';
       if (typeof color === 'string') return color;
-      if (color.expr?.ThemeDataColor?.ColorId !== undefined) {
+      if (typeof color === 'object' && color.expr?.ThemeDataColor?.ColorId !== undefined) {
         const themeColor = THEME_COLORS[color.expr.ThemeDataColor.ColorId];
         return themeColor ? `Theme ${themeColor.name}` : '';
       }
-    } else if ('color' in value && value.color) {
+      return '';
+    } else if (typeof value === 'object' && 'color' in value && value.color) {
       return value.color;
-    } else if ('themeColor' in value && value.themeColor) {
+    } else if (typeof value === 'object' && 'themeColor' in value && value.themeColor) {
+      const themeColor = THEME_COLORS[value.themeColor.id];
+      const shade = value.themeColor.shade || 0;
+      return themeColor ? `Theme ${themeColor.name}${shade !== 0 ? ` (${shade > 0 ? '+' : ''}${shade * 100}%)` : ''}` : '';
+    }
+    return '';
+  }
+
+  // Extract display value based on format
+  const getDisplayValue = (): string => {
+    if (!value) {
+      return '';
+    }
+    
+    if (typeof value === 'string') {
+      return value;
+    } else if (typeof value === 'object' && 'solid' in value && value.solid) {
+      const color = value.solid.color;
+      if (color === undefined || color === null || color === '') return '';
+      if (typeof color === 'string') return color;
+      if (typeof color === 'object' && color.expr?.ThemeDataColor?.ColorId !== undefined) {
+        const themeColor = THEME_COLORS[color.expr.ThemeDataColor.ColorId];
+        return themeColor ? `Theme ${themeColor.name}` : '';
+      }
+      // Handle other object formats
+      if (typeof color === 'object' && 'color' in color) {
+        return color.color || '';
+      }
+      return '';
+    } else if (typeof value === 'object' && 'color' in value && value.color) {
+      return value.color;
+    } else if (typeof value === 'object' && 'themeColor' in value && value.themeColor) {
       const themeColor = THEME_COLORS[value.themeColor.id];
       const shade = value.themeColor.shade || 0;
       return themeColor ? `Theme ${themeColor.name}${shade !== 0 ? ` (${shade > 0 ? '+' : ''}${shade * 100}%)` : ''}` : '';
@@ -112,6 +179,16 @@ export function UnifiedColorPicker({
   // Get preview color
   const getPreviewColor = (): string => {
     const displayValue = getDisplayValue();
+    if (!displayValue) {
+      // Try to extract color directly from value if display value is empty
+      if (value && typeof value === 'object' && 'solid' in value && value.solid?.color) {
+        const color = value.solid.color;
+        if (typeof color === 'string' && color.startsWith('#')) {
+          return color;
+        }
+      }
+      return '#E5E7EB'; // Light gray for empty/undefined
+    }
     if (displayValue.startsWith('#')) return displayValue;
     if (displayValue.startsWith('@')) {
       const neutralObj = neutralPalette ? Object.fromEntries(neutralPalette.map((color, i) => [String(i * 100), color])) : {};
@@ -125,7 +202,7 @@ export function UnifiedColorPicker({
         return THEME_COLORS[colorIndex]?.preview || '#000000';
       }
     }
-    return '#000000';
+    return '#E5E7EB'; // Light gray as fallback
   };
 
   // Format value based on format prop
@@ -212,6 +289,37 @@ export function UnifiedColorPicker({
       setSelectedTab(availableTabs[0]);
     }
   }, [availableTabs, selectedTab]);
+  
+  // Update selected theme color and tab when value changes
+  React.useEffect(() => {
+    const displayValue = getDisplayValue();
+    
+    // Update tab based on new value
+    if (displayValue.startsWith('@') && enableTokens) {
+      setSelectedTab('tokens');
+    } else if (displayValue.startsWith('Theme') && enableThemeColors) {
+      setSelectedTab('theme');
+      
+      // Extract theme color ID from display value
+      const match = displayValue.match(/Color (\d+)/);
+      if (match) {
+        const colorId = parseInt(match[1]) - 1;
+        setSelectedThemeColor(colorId);
+      }
+    } else if (displayValue.startsWith('#')) {
+      setSelectedTab('custom');
+    }
+    
+    // Update theme color selection
+    const themeColorId = getInitialThemeColor();
+    if (themeColorId !== null) {
+      setSelectedThemeColor(themeColorId);
+    }
+    
+    // Update shade
+    const shade = getInitialShade();
+    setSelectedShade(shade);
+  }, [value, enableTokens, enableThemeColors]);
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -231,6 +339,7 @@ export function UnifiedColorPicker({
             role="combobox"
             aria-expanded={open}
             className="w-full justify-between font-normal"
+            suppressHydrationWarning
           >
             <div className="flex items-center gap-2">
               <div
@@ -302,14 +411,20 @@ export function UnifiedColorPicker({
                 <div className="flex gap-2">
                   <Input
                     type="color"
-                    value={getDisplayValue().startsWith('#') ? getDisplayValue() : '#000000'}
+                    value={(() => {
+                      const display = getDisplayValue();
+                      return display.startsWith('#') ? display : '#000000';
+                    })()}
                     onChange={(e) => handleColorChange(e.target.value)}
                     className="w-16 h-9 p-1 cursor-pointer"
                   />
                   <Input
                     type="text"
                     placeholder="#000000"
-                    value={getDisplayValue().startsWith('#') ? getDisplayValue() : ''}
+                    value={(() => {
+                      const display = getDisplayValue();
+                      return display.startsWith('#') ? display : '';
+                    })()}
                     onChange={(e) => {
                       const value = e.target.value;
                       if (value.match(/^#[0-9A-Fa-f]{0,6}$/)) {

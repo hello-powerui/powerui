@@ -23,11 +23,14 @@ export function FillControl({
   const currentTheme = useThemeStudioStore((state) => state.currentTheme);
   const neutralPalette = useThemeStudioStore((state) => state.theme.neutralPalette);
   
+  // Ensure we have a valid PowerBI color format
+  const colorValue = value || { solid: { color: '' } };
+  
   return (
     <UnifiedColorPicker
       label={label}
       description={description}
-      value={value}
+      value={colorValue}
       onChange={onChange}
       format="powerbi"
       enableTokens={true}

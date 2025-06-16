@@ -1,13 +1,15 @@
 'use client';
 
 import { PowerBIEmbed } from 'powerbi-client-react';
-import { models, Report } from 'powerbi-client';
+import { models, Report, Page, VisualDescriptor } from 'powerbi-client';
 import { useEffect, useState, useRef } from 'react';
 import { powerBIConfig } from '@/lib/powerbi/config';
 import { PowerBIService } from '@/lib/powerbi/service';
+import { generateFocusedVisualLayout, generateDefaultLayout, VisualInfo } from '@/lib/powerbi/visual-focus-utils';
 
 interface SimplePowerBIEmbedProps {
   generatedTheme?: any;
+  selectedVisualType?: string;
 }
 
 declare global {
@@ -16,7 +18,7 @@ declare global {
   }
 }
 
-export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbedProps) {
+export default function SimplePowerBIEmbed({ generatedTheme, selectedVisualType = '*' }: SimplePowerBIEmbedProps) {
   const [embedConfig, setEmbedConfig] = useState<models.IReportEmbedConfiguration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +26,9 @@ export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbe
   const powerBIService = PowerBIService.getInstance();
   const isInitialLoad = useRef(true);
   const isReportLoaded = useRef(false);
+  const [focusMode, setFocusMode] = useState(false);
+  const [visuals, setVisuals] = useState<VisualInfo[]>([]);
+  const currentPageRef = useRef<Page | null>(null);
 
   // Load report when theme is available
   useEffect(() => {
@@ -134,10 +139,99 @@ export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbe
     }
   }, [generatedTheme]);
 
+  // Discover visuals in the report
+  const discoverVisuals = async () => {
+    if (!reportRef.current || !isReportLoaded.current) return;
+    
+    try {
+      const pages = await reportRef.current.getPages();
+      if (pages.length === 0) return;
+      
+      // Get the active page
+      const activePage = pages.find(p => p.isActive) || pages[0];
+      if (!activePage) return;
+      
+      currentPageRef.current = activePage;
+      const pageVisuals = await activePage.getVisuals();
+      
+      const visualInfos: VisualInfo[] = pageVisuals.map((visual: VisualDescriptor) => ({
+        name: visual.name,
+        title: visual.title || visual.name,
+        type: visual.type,
+        layout: {
+          x: visual.layout.x || 0,
+          y: visual.layout.y || 0,
+          z: visual.layout.z,
+          width: visual.layout.width || 300,
+          height: visual.layout.height || 300
+        }
+      }));
+      
+      setVisuals(visualInfos);
+      console.log('Discovered visuals:', visualInfos);
+    } catch (error) {
+      console.error('Error discovering visuals:', error);
+    }
+  };
+
+  // Apply focus mode layout
+  const applyFocusMode = async () => {
+    if (!reportRef.current || !currentPageRef.current) return;
+    
+    try {
+      const pageId = currentPageRef.current.name;
+      const pageSize = currentPageRef.current.defaultSize || { width: 1280, height: 720 };
+      
+      if (focusMode && selectedVisualType !== '*') {
+        // Apply focused layout
+        const focusLayout = generateFocusedVisualLayout(
+          visuals,
+          selectedVisualType,
+          pageId,
+          pageSize
+        );
+        
+        await reportRef.current.updateSettings(focusLayout);
+        console.log('Applied focus mode for:', selectedVisualType);
+      } else {
+        // Restore default layout
+        const defaultLayout = generateDefaultLayout(pageId);
+        await reportRef.current.updateSettings(defaultLayout);
+        console.log('Restored default layout');
+      }
+    } catch (error) {
+      console.error('Error applying focus mode:', error);
+    }
+  };
+
+  // Effect to discover visuals when report loads
+  useEffect(() => {
+    if (isReportLoaded.current && reportRef.current) {
+      discoverVisuals();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Effect to apply focus mode when selected visual type changes
+  useEffect(() => {
+    if (isReportLoaded.current && visuals.length > 0) {
+      // Enable focus mode for specific visual types, disable for '*'
+      setFocusMode(selectedVisualType !== '*');
+    }
+  }, [selectedVisualType, visuals]);
+
+  // Effect to apply/remove focus mode
+  useEffect(() => {
+    if (isReportLoaded.current && visuals.length > 0) {
+      applyFocusMode();
+    }
+  }, [focusMode, selectedVisualType, visuals]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const eventHandlers = new Map([
     ['loaded', function () {
       console.log('Report loaded');
       isReportLoaded.current = true;
+      // Discover visuals after report loads
+      setTimeout(discoverVisuals, 1000);
     }],
     ['rendered', function () {
       console.log('Report rendered');
@@ -148,6 +242,11 @@ export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbe
       if (event?.detail?.message) {
         setError(event.detail.message);
       }
+    }],
+    ['pageChanged', function () {
+      console.log('Page changed');
+      // Re-discover visuals on page change
+      discoverVisuals();
     }]
   ]);
 
@@ -196,6 +295,17 @@ export default function SimplePowerBIEmbed({ generatedTheme }: SimplePowerBIEmbe
 
   return (
     <div className="w-full h-full relative">
+      {/* Focus mode indicator */}
+      {focusMode && selectedVisualType !== '*' && (
+        <div className="absolute top-2 left-2 z-10 bg-blue-500 text-white px-3 py-1 rounded-md shadow-md text-sm flex items-center gap-2">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          <span>Focus Mode: {selectedVisualType}</span>
+        </div>
+      )}
+      
       {/* Reload button - appears on hover */}
       <button
         onClick={() => {

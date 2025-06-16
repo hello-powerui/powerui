@@ -25,5 +25,5 @@ interface PowerBIPreviewProps {
 }
 
 export function PowerBIPreview({ generatedTheme, selectedVisualType = '*' }: PowerBIPreviewProps) {
-  return <SimplePowerBIEmbed generatedTheme={generatedTheme} />;
+  return <SimplePowerBIEmbed generatedTheme={generatedTheme} selectedVisualType={selectedVisualType} />;
 }

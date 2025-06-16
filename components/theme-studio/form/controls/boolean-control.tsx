@@ -23,6 +23,13 @@ export function BooleanControl({
   inheritanceIndicator,
   onReset,
 }: BooleanControlProps) {
+  // Ensure value is a boolean
+  const isChecked = Boolean(value);
+  
+  const handleToggle = () => {
+    onChange(!isChecked);
+  };
+  
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -50,17 +57,17 @@ export function BooleanControl({
           id={path.join('-')}
           type="button"
           role="switch"
-          aria-checked={value}
-          onClick={() => onChange(!value)}
+          aria-checked={isChecked}
+          onClick={handleToggle}
           className={`
             relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-            ${value ? 'bg-gray-900' : 'bg-gray-200'}
+            ${isChecked ? 'bg-gray-900' : 'bg-gray-200'}
           `}
         >
           <span
             className={`
               inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm
-              ${value ? 'translate-x-6' : 'translate-x-1'}
+              ${isChecked ? 'translate-x-6' : 'translate-x-1'}
             `}
           />
           </button>
