@@ -91,7 +91,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
               }
               return p;
             }).filter((p: any) => 
-              p.id && p.name && Array.isArray(p.colors) && p.colors.length === 14
+              p.id && p.name && Array.isArray(p.colors) && p.colors.length === 12
             );
           } catch (err) {
             // console.error('Error parsing neutral palettes response:', err);

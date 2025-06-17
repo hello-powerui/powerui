@@ -25,12 +25,12 @@ export function PropertyWithInheritance({
   visualType,
   variant,
 }: PropertyWithInheritanceProps) {
-  const { currentTheme } = useThemeStudioStore();
+  const theme = useThemeStudioStore((state) => state.theme);
   const schemaLoader = SchemaLoader.getInstance();
 
   // Get values from different inheritance levels
   // For global values, we need just the property name since they're stored flat
-  const globalValue = schemaLoader.getGlobalPropertyValue(currentTheme, [propertyName]);
+  const globalValue = schemaLoader.getGlobalPropertyValue(theme, [propertyName]);
   
   // Navigate through the visual structure to find values
   const getValueFromVisualSection = (section: any) => {
@@ -54,11 +54,11 @@ export function PropertyWithInheritance({
   };
   
   const visualDefaultValue = visualType && visualType !== '*' 
-    ? getValueFromVisualSection(currentTheme.visualStyles?.[visualType]?.['*'])
+    ? getValueFromVisualSection(theme.visualStyles?.[visualType]?.['*'])
     : undefined;
     
   const variantValue = visualType && variant && variant !== '*'
-    ? getValueFromVisualSection(currentTheme.visualStyles?.[visualType]?.[variant])
+    ? getValueFromVisualSection(theme.visualStyles?.[visualType]?.[variant])
     : undefined;
 
   // Determine where the current value is coming from

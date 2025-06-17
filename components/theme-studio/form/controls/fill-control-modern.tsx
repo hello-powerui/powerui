@@ -20,8 +20,8 @@ export function FillControl({
   required,
   path,
 }: FillControlProps) {
-  const currentTheme = useThemeStudioStore((state) => state.currentTheme);
-  const neutralPalette = useThemeStudioStore((state) => state.theme.neutralPalette);
+  const theme = useThemeStudioStore((state) => state.theme);
+  const neutralPalette = useThemeStudioStore((state) => state.resolved.neutralPalette);
   
   // Ensure we have a valid PowerBI color format
   const colorValue = value || { solid: { color: '' } };
@@ -35,7 +35,7 @@ export function FillControl({
       format="powerbi"
       enableTokens={true}
       enableThemeColors={true}
-      mode={currentTheme.mode || 'light'}
+      mode={theme.mode || 'light'}
       neutralPalette={Object.values(neutralPalette?.shades || {}) as string[]}
     />
   );

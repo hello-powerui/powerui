@@ -29,7 +29,7 @@ export interface ColorPalette extends BasePalette {
  * Used for backgrounds, borders, text, etc.
  */
 export interface NeutralPalette extends BasePalette {
-  colors: string[]; // Array of 14 hex colors from light to dark
+  colors: string[]; // Array of 12 hex colors from light to dark
 }
 
 /**
@@ -59,8 +59,8 @@ export type PaletteType = 'color' | 'neutral';
  * Standard neutral palette shade keys
  */
 export const NEUTRAL_SHADE_KEYS = [
-  '0', '25', '50', '75', '100', '200', '300', 
-  '400', '500', '600', '700', '800', '900', '1000'
+  '25', '50', '100', '200', '300', '400', 
+  '500', '600', '700', '800', '900', '950'
 ] as const;
 
 /**
@@ -78,8 +78,10 @@ export function neutralColorsToShadeMap(colors: string[]): Record<string, string
 
 /**
  * Helper function to convert shade map to neutral colors array
+ * Handles both old database format and new standardized format
  */
 export function shadeMapToNeutralColors(shadeMap: Record<string, string>): string[] {
+  // Standard format using Tailwind shades: ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950']
   return NEUTRAL_SHADE_KEYS.map(key => shadeMap[key] || '#000000');
 }
 
@@ -102,6 +104,6 @@ export function isNeutralPalette(palette: any): palette is NeutralPalette {
     typeof palette.id === 'string' &&
     typeof palette.name === 'string' &&
     Array.isArray(palette.colors) &&
-    palette.colors.length === 14 &&
+    palette.colors.length === 12 &&
     palette.colors.every((c: any) => typeof c === 'string');
 }

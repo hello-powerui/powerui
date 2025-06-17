@@ -33,6 +33,7 @@ export function useThemeStudioPalettes() {
     // Resolve neutral palette
     const neutralPalette = neutralPalettes.find(p => p.id === theme.neutralPaletteId) || AZURE_NEUTRAL_PALETTE;
 
+
     setResolvedPalettes(colorPalette, neutralPalette);
   }, [
     theme.colorPaletteId, 

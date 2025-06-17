@@ -17,14 +17,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { Plus, Trash2, Download, Upload, AlertCircle, Loader2, Palette, Sparkles, Copy, Check } from 'lucide-react';
 import { usePaletteStore } from '@/lib/stores/palette-store';
-import type { ColorPalette, NeutralPalette } from '@/lib/types/palette';
+import type { ColorPalette, NeutralPalette, neutralColorsToShadeMap } from '@/lib/types/unified-palette';
 
 interface ModernPaletteEditorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   type: 'color' | 'neutral';
   palette?: ColorPalette | NeutralPalette;
-  onSave?: () => void;
+  onSave?: (savedPalette?: ColorPalette | NeutralPalette) => void;
 }
 
 const NEUTRAL_SHADES = ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
@@ -65,7 +65,13 @@ export function ModernPaletteEditor({
       if (type === 'color' && 'colors' in palette) {
         setDescription(palette.description || '');
         setColors(palette.colors);
+      } else if (type === 'neutral' && 'colors' in palette) {
+        // Convert colors array to shades format for the editor
+        const shades = neutralColorsToShadeMap(palette.colors);
+        setNeutralShades(shades);
+        setBaseColor(shades['500'] || '#6B7280');
       } else if (type === 'neutral' && 'shades' in palette) {
+        // Handle legacy shades format
         setNeutralShades(palette.shades);
         setBaseColor(palette.shades['500'] || '#6B7280');
       }
@@ -187,6 +193,8 @@ export function ModernPaletteEditor({
     setError('');
 
     try {
+      let savedPalette;
+      
       if (type === 'color') {
         const colorPalette = {
           name: name.trim(),
@@ -196,23 +204,25 @@ export function ModernPaletteEditor({
 
         if (palette && 'id' in palette) {
           await updateColorPalette(palette.id, colorPalette);
+          savedPalette = { ...palette, ...colorPalette };
         } else {
-          await createColorPalette(colorPalette);
+          savedPalette = await createColorPalette(colorPalette);
         }
       } else {
         const neutralPalette = {
           name: name.trim(),
-          shades: neutralShades,
+          colors: NEUTRAL_SHADES.map(shade => neutralShades[shade] || '#000000'),
         };
 
         if (palette && 'id' in palette) {
           await updateNeutralPalette(palette.id, neutralPalette);
+          savedPalette = { ...palette, ...neutralPalette };
         } else {
-          await createNeutralPalette(neutralPalette);
+          savedPalette = await createNeutralPalette(neutralPalette);
         }
       }
 
-      onSave?.();
+      onSave?.(savedPalette);
       onOpenChange(false);
     } catch (err) {
       setError('Failed to save palette');
@@ -451,13 +461,13 @@ export function ModernPaletteEditor({
                 {Object.keys(neutralShades).length > 0 && (
                   <div className="space-y-3">
                     <Label className="text-xs font-medium text-gray-700">Generated Scale</Label>
-                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                    <div className="grid grid-cols-6 md:grid-cols-12 gap-1.5">
                       {NEUTRAL_SHADES.map((shade) => (
                         <div key={shade} className="text-center">
                           <div
                             className={cn(
-                              "aspect-square rounded-md border-2 transition-all",
-                              neutralShades[shade] ? "border-gray-200" : "border-gray-100 bg-gray-50"
+                              "h-12 w-full rounded border transition-all",
+                              neutralShades[shade] ? "border-gray-200 shadow-sm" : "border-gray-100 bg-gray-50"
                             )}
                             style={{ 
                               backgroundColor: neutralShades[shade] || undefined 

@@ -32,7 +32,6 @@ function ThemeStudioContent() {
   const [showTextClassesEditor, setShowTextClassesEditor] = useState(false);
   const [showPaletteManager, setShowPaletteManager] = useState(false);
   const [showNeutralPaletteManager, setShowNeutralPaletteManager] = useState(false);
-  const [paletteManagerMode, setPaletteManagerMode] = useState<'select' | 'manage'>('select');
   
   // Visual styles local state - sync with theme
   const [visualSettings, setVisualSettings] = useState<Record<string, any>>(themeStudio.theme.visualStyles || {});
@@ -48,8 +47,9 @@ function ThemeStudioContent() {
     if (themeId) {
       loadTheme(themeId);
     } else {
-      // New theme
-      setThemeName(themeStudio.theme.name);
+      // New theme - create a fresh one
+      themeStudio.createNewTheme();
+      setThemeName('Untitled Theme');
     }
   }, [searchParams]);
   
@@ -68,6 +68,12 @@ function ThemeStudioContent() {
       const apiResponse = await response.json();
       themeStudio.loadTheme(apiResponse);
       setThemeName(apiResponse.name || themeStudio.theme.name);
+      
+      // If theme has visual styles, show the visual styles panel
+      const themeData = apiResponse.themeData || {};
+      if (themeData.visualStyles && Object.keys(themeData.visualStyles).length > 0) {
+        setShowVisualStyles(true);
+      }
       
       toast.success('Theme loaded successfully');
     } catch (error) {
@@ -114,8 +120,7 @@ function ThemeStudioContent() {
     toast.success('Theme exported');
   };
   
-  const handleShowPaletteManager = (mode: 'select' | 'manage', type: 'color' | 'neutral') => {
-    setPaletteManagerMode(mode);
+  const handleShowPaletteManager = (type: 'color' | 'neutral') => {
     if (type === 'color') {
       setShowPaletteManager(true);
     } else {
@@ -142,7 +147,15 @@ function ThemeStudioContent() {
             {/* Left side: Back button and theme name */}
             <div className="flex items-center">
               <button
-                onClick={() => router.push('/themes')}
+                onClick={() => {
+                  if (themeStudio.isDirty) {
+                    if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
+                      router.push('/themes');
+                    }
+                  } else {
+                    router.push('/themes');
+                  }
+                }}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                 aria-label="Back to themes"
               >
@@ -284,22 +297,22 @@ function ThemeStudioContent() {
       <UnifiedPaletteManager
         open={showPaletteManager}
         onOpenChange={setShowPaletteManager}
-        mode={paletteManagerMode}
         paletteType="color"
         selectedColorPaletteId={themeStudio.theme.colorPaletteId}
         onSelectColorPalette={(palette) => {
           themeStudio.setColorPaletteId(palette.id);
+          setShowPaletteManager(false);
         }}
       />
 
       <UnifiedPaletteManager
         open={showNeutralPaletteManager}
         onOpenChange={setShowNeutralPaletteManager}
-        mode={paletteManagerMode}
         paletteType="neutral"
         selectedNeutralPaletteId={themeStudio.theme.neutralPaletteId}
         onSelectNeutralPalette={(palette) => {
           themeStudio.setNeutralPaletteId(palette.id);
+          setShowNeutralPaletteManager(false);
         }}
       />
 

@@ -29,7 +29,7 @@ interface FoundationPanelProps {
   onStructuralColorsChange: (colors: any) => void;
   onStructuralColorsModeChange: (mode: 'auto' | 'custom') => void;
   onTextClassesChange: (textClasses: any) => void;
-  onShowPaletteManager: (mode: 'select' | 'manage', type: 'color' | 'neutral') => void;
+  onShowPaletteManager: (type: 'color' | 'neutral') => void;
   onShowTextClassesEditor: () => void;
   isVisible: boolean;
   onToggleVisibility: (visible: boolean) => void;
@@ -117,32 +117,33 @@ export function FoundationPanel({
                 </div>
                 <p className="text-xs text-gray-600 mt-0.5">{colorPalette?.name || 'Custom'} • {colorPalette?.colors?.length || 0} colors</p>
               </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => onShowPaletteManager('manage', 'color')}
-                  className="text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors"
-                >
-                  Manage
-                </button>
-                <button
-                  onClick={() => onShowPaletteManager('select', 'color')}
-                  className="text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors"
-                >
-                  Change
-                </button>
-              </div>
+              <button
+                onClick={() => onShowPaletteManager('color')}
+                className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 px-3 py-1.5 rounded-md transition-colors font-medium"
+              >
+                Browse & Select
+              </button>
             </div>
             
-            {/* Compact color grid */}
-            <div className="grid grid-cols-8 gap-1">
-              {(colorPalette?.colors || []).map((color: string, i: number) => (
+            {/* Overlapping color circles */}
+            <div className="flex items-center">
+              {(colorPalette?.colors || []).slice(0, 8).map((color: string, i: number) => (
                 <div
                   key={i}
-                  className="aspect-square rounded-md border border-gray-200 hover:scale-110 transition-transform cursor-pointer"
-                  style={{ backgroundColor: color }}
+                  className="w-6 h-6 rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer relative"
+                  style={{ 
+                    backgroundColor: color,
+                    marginLeft: i === 0 ? 0 : '-8px',
+                    zIndex: i
+                  }}
                   title={color}
                 />
               ))}
+              {(colorPalette?.colors || []).length > 8 && (
+                <div className="ml-2 text-xs text-gray-500">
+                  +{(colorPalette?.colors || []).length - 8}
+                </div>
+              )}
             </div>
           </div>
 
@@ -200,16 +201,10 @@ export function FoundationPanel({
                   {showNeutralPreview ? 'Hide' : 'Show'} Details
                 </button>
                 <button
-                  onClick={() => onShowPaletteManager('manage', 'neutral')}
-                  className="text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors"
+                  onClick={() => onShowPaletteManager('neutral')}
+                  className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 px-3 py-1.5 rounded-md transition-colors font-medium"
                 >
-                  Manage
-                </button>
-                <button
-                  onClick={() => onShowPaletteManager('select', 'neutral')}
-                  className="text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors"
-                >
-                  Change
+                  Browse & Select
                 </button>
               </div>
             </div>

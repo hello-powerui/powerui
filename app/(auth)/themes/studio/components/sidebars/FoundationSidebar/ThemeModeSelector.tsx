@@ -2,10 +2,11 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Monitor, Moon } from 'lucide-react';
-import { useFoundationStore } from '@/lib/stores/foundation-store';
+import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 
 export function ThemeModeSelector() {
-  const { themeMode, setThemeMode } = useFoundationStore();
+  const themeMode = useThemeStudioStore((state) => state.theme.mode);
+  const setThemeMode = useThemeStudioStore((state) => state.setThemeMode);
 
   return (
     <div className="space-y-2">

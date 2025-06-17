@@ -2,14 +2,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Copy, Check } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { neutralColorsToShadeMap, NEUTRAL_SHADE_KEYS } from '@/lib/types/unified-palette';
+import { Check } from 'lucide-react';
 
 interface ModernNeutralPaletteDisplayProps {
   shades?: Record<string, string>;
@@ -19,107 +12,60 @@ interface ModernNeutralPaletteDisplayProps {
   onClick?: () => void;
 }
 
-const SHADE_ORDER = ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
-
 export function ModernNeutralPaletteDisplay({
-  shades: shadesInput,
   colors,
   name,
   isSelected = false,
   onClick,
 }: ModernNeutralPaletteDisplayProps) {
-  const [copiedShade, setCopiedShade] = useState<string | null>(null);
+  const [copiedColor, setCopiedColor] = useState<string | null>(null);
 
-  // Convert colors array to shades map if needed
-  const shades = colors ? neutralColorsToShadeMap(colors) : shadesInput || {};
-
-  const handleCopyColor = (e: React.MouseEvent, shade: string, color: string) => {
+  const handleCopyColor = (e: React.MouseEvent, color: string) => {
     e.stopPropagation();
     navigator.clipboard.writeText(color);
-    setCopiedShade(shade);
-    setTimeout(() => setCopiedShade(null), 2000);
+    setCopiedColor(color);
+    setTimeout(() => setCopiedColor(null), 1500);
   };
-
-  const sortedShades = Object.entries(shades)
-    .sort(([a], [b]) => {
-      const indexA = SHADE_ORDER.indexOf(a);
-      const indexB = SHADE_ORDER.indexOf(b);
-      if (indexA === -1 && indexB === -1) return parseInt(a) - parseInt(b);
-      if (indexA === -1) return 1;
-      if (indexB === -1) return -1;
-      return indexA - indexB;
-    });
 
   return (
     <div
       className={cn(
-        "p-4 rounded-lg border-2 cursor-pointer transition-all",
+        "group relative p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm",
         isSelected 
-          ? "border-gray-900 shadow-sm bg-gray-50/50" 
+          ? "border-gray-900 bg-gray-50 ring-1 ring-gray-900/10" 
           : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
       )}
       onClick={onClick}
     >
-      <div className="space-y-3">
+      {/* Selection indicator */}
+      {isSelected && (
+        <div className="absolute top-2 right-2 w-5 h-5 bg-gray-900 rounded-full flex items-center justify-center">
+          <Check className="w-3 h-3 text-white" />
+        </div>
+      )}
+      
+      <div className="space-y-2.5">
+        {/* Palette name */}
         <h4 className="font-medium text-sm text-gray-900">{name}</h4>
         
-        {/* Display first 6 shades in a row for preview */}
-        <div className="flex gap-1">
-          {sortedShades.slice(0, 6).map(([shade, color]) => (
+        {/* Compact color strip */}
+        <div className="h-6 rounded-md overflow-hidden flex border border-gray-200">
+          {(colors || []).map((color, index) => (
             <div
-              key={shade}
-              className="flex-1 h-8 rounded-md border border-gray-200"
+              key={index}
+              className="flex-1 relative group/color transition-all hover:scale-110 hover:z-10 hover:shadow-sm"
               style={{ backgroundColor: color }}
-              title={`${shade}: ${color}`}
-            />
+              onClick={(e) => handleCopyColor(e, color)}
+              title={`${color} • Click to copy`}
+            >
+              {/* Copy feedback */}
+              {copiedColor === color && (
+                <div className="absolute inset-0 bg-gray-900/80 flex items-center justify-center">
+                  <Check className="w-3 h-3 text-white" />
+                </div>
+              )}
+            </div>
           ))}
-        </div>
-
-        {/* Full palette grid on hover/selection */}
-        <div className="grid grid-cols-6 gap-2">
-          <TooltipProvider>
-            {sortedShades.map(([shade, color]) => (
-              <Tooltip key={shade} delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <div className="group relative">
-                    <div
-                      className={cn(
-                        "aspect-square rounded-md border transition-all",
-                        shade === '50' || shade === '100' || shade === '200' 
-                          ? "border-gray-300" 
-                          : "border-gray-200"
-                      )}
-                      style={{ backgroundColor: color }}
-                    >
-                      <button
-                        onClick={(e) => handleCopyColor(e, shade, color)}
-                        className={cn(
-                          "absolute inset-0 rounded-md flex items-center justify-center",
-                          "opacity-0 group-hover:opacity-100 transition-opacity",
-                          "bg-black/20 hover:bg-black/30"
-                        )}
-                      >
-                        {copiedShade === shade ? (
-                          <Check className="h-3 w-3 text-white" />
-                        ) : (
-                          <Copy className="h-3 w-3 text-white" />
-                        )}
-                      </button>
-                    </div>
-                    <span className="text-xs text-gray-500 text-center mt-1 block font-mono">
-                      {shade}
-                    </span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="text-xs">
-                  <div className="space-y-1">
-                    <div className="font-mono">{color}</div>
-                    <div className="text-gray-400">Click to copy</div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            ))}
-          </TooltipProvider>
         </div>
       </div>
     </div>

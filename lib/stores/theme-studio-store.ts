@@ -101,6 +101,7 @@ interface ThemeStudioState {
   saveTheme: () => Promise<void>;
   loadTheme: (themeData: any) => void;
   resetTheme: () => void;
+  createNewTheme: () => void;
   exportTheme: () => StudioTheme;
 }
 
@@ -419,7 +420,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           name: loadedTheme.name || themeData.name || 'Untitled Theme',
           description: loadedTheme.description || themeData.description || '',
           colorPaletteId: loadedTheme.colorPaletteId || loadedTheme.paletteReference?.colorPaletteId || loadedTheme.paletteId || DEFAULT_COLOR_PALETTE.id,
-          neutralPaletteId: loadedTheme.neutralPaletteId || loadedTheme.paletteReference?.neutralPaletteId || loadedTheme.neutralPaletteId || AZURE_NEUTRAL_PALETTE.id,
+          neutralPaletteId: loadedTheme.neutralPaletteId || loadedTheme.paletteReference?.neutralPaletteId || AZURE_NEUTRAL_PALETTE.id,
           mode: loadedTheme.mode || 'light',
           fontFamily: loadedTheme.fontFamily || 'Segoe UI',
           structuralColorsMode: loadedTheme.structuralColorsMode || 'auto',
@@ -448,6 +449,26 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           isDirty: false,
           validationErrors: [],
           history: [{ ...defaultStudioTheme }],
+          historyIndex: 0,
+        });
+      },
+
+      createNewTheme: () => {
+        // Create a fresh theme without any ID
+        const newTheme = { ...defaultStudioTheme };
+        delete newTheme.id; // Explicitly remove any ID
+        
+        set({
+          theme: newTheme,
+          resolved: { ...defaultResolvedData },
+          selectedVisual: '',
+          selectedVariant: '*',
+          selectedState: 'default',
+          selectedSection: 'properties',
+          expandedPanels: [],
+          isDirty: false,
+          validationErrors: [],
+          history: [newTheme],
           historyIndex: 0,
         });
       },

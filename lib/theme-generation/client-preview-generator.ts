@@ -4,6 +4,7 @@ import { createUnifiedTokenResolver } from './shared-token-resolver';
 import { replaceTokens } from './utils';
 import { mapNeutralPaletteToTheme } from './neutral-mapper';
 import { createEmptyTheme } from './empty-theme';
+import { neutralColorsToShadeMap } from '@/lib/types/unified-palette';
 
 /**
  * Client-side theme generator for preview purposes.
@@ -20,7 +21,9 @@ export class ClientPreviewGenerator {
     
     // Prepare color palettes
     const palettes: ColorPalettes = {
-      neutral: input.neutralPalette as Record<string, string>,
+      neutral: Array.isArray(input.neutralPalette) 
+        ? neutralColorsToShadeMap(input.neutralPalette)
+        : input.neutralPalette as Record<string, string>,
       dataColors: input.dataColors
     };
     
@@ -30,7 +33,9 @@ export class ClientPreviewGenerator {
         {
           id: 'preview',
           name: 'Preview',
-          shades: input.neutralPalette as Record<string, string>,
+          colors: Array.isArray(input.neutralPalette) 
+            ? input.neutralPalette 
+            : Object.values(input.neutralPalette),
           userId: 'preview',
           isBuiltIn: false,
           createdAt: new Date(),

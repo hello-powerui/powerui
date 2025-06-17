@@ -111,7 +111,10 @@ export default function ThemesPage() {
               </div>
             </div>
             <button 
-              onClick={() => router.push('/themes/studio')}
+              onClick={() => {
+                // Navigate to studio without themeId to create new theme
+                router.push('/themes/studio');
+              }}
               className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-md transition-colors text-sm font-medium"
             >
               Create New Theme

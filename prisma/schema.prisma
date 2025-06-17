@@ -43,7 +43,7 @@ model NeutralPalette {
   id          String   @id @default(uuid())
   userId      String?  // Nullable for built-in palettes
   name        String
-  colors      Json     // Array of 14 hex colors from light to dark
+  colors      Json     // Array of 12 hex colors from light to dark (Tailwind shades 25-950)
   isBuiltIn   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

@@ -54,6 +54,12 @@ export function useThemeStudio() {
     clearChanges();
   };
   
+  // Create new theme with change clearing
+  const createNewTheme = () => {
+    store.createNewTheme();
+    clearChanges();
+  };
+  
   return {
     // Theme data
     theme: store.theme,
@@ -132,6 +138,7 @@ export function useThemeStudio() {
     saveTheme,
     loadTheme: store.loadTheme,
     resetTheme,
+    createNewTheme,
     exportTheme: store.exportTheme,
   };
 }
