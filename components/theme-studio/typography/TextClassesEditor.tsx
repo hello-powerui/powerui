@@ -126,7 +126,8 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
   
   const textClasses = theme.textClasses;
   const fontFamily = theme.fontFamily;
-  const dataColors = theme.palette.colors;
+  // TODO: Get colors from resolved palette instead of theme
+  const dataColors = ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56', '#3498DB', '#A66999'];
 
   useEffect(() => {
     const initialClasses = { ...DEFAULT_TEXT_CLASSES };

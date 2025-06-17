@@ -77,7 +77,7 @@ export function useThemeStudio() {
     
     // Change tracking
     isDirty: store.isDirty || hasChanges(),
-    changedPaths,
+    changedPaths: changedPaths || new Set(),
     
     // Theme actions
     updateTheme,

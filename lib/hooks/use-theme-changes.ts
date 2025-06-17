@@ -9,7 +9,7 @@ interface ThemeChangesState {
   // Actions
   trackChange: (path: string[]) => void;
   clearChanges: () => void;
-  hasChanges: (path: string[]) => boolean;
+  hasChanges: (path?: string[]) => boolean;
   hasChangesInSection: (sectionPath: string[]) => boolean;
   setOriginalTheme: (theme: any) => void;
   getChangedPropertiesCount: (sectionPath: string[]) => number;
@@ -30,7 +30,10 @@ export const useThemeChanges = create<ThemeChangesState>((set, get) => ({
     set({ changedPaths: new Set() });
   },
   
-  hasChanges: (path: string[]) => {
+  hasChanges: (path?: string[]) => {
+    if (!path) {
+      return get().changedPaths.size > 0;
+    }
     const pathString = path.join('.');
     return get().changedPaths.has(pathString);
   },
