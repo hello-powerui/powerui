@@ -40,7 +40,7 @@ export function mapNeutralPaletteToTheme(
 ): Partial<ThemeColorMapping['light']> {
   // Defensive check: if palette is invalid, use Azure default
   if (!palette || !palette.shades || typeof palette.shades !== 'object') {
-    console.warn('Invalid neutral palette provided, falling back to Azure default');
+    
     palette = AZURE_NEUTRAL_PALETTE as NeutralPalette;
   }
   

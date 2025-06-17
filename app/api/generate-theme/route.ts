@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(theme);
   } catch (error) {
-    console.error('Error generating theme:', error);
+    // console.error('Error generating theme:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to generate theme' },
       { status: 500 }

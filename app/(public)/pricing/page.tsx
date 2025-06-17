@@ -1,7 +1,6 @@
 import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 
-
 const plans = [
   {
     name: "Pro",

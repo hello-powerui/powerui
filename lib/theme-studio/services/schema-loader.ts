@@ -61,7 +61,7 @@ export class SchemaLoader {
       const defName = ref.replace('#/definitions/', '');
       const resolved = this.definitions.get(defName);
       if (!resolved) {
-        console.warn(`Failed to resolve definition: ${defName}. Available definitions:`, Array.from(this.definitions.keys()));
+        return null;
       }
       return resolved;
     }
@@ -174,7 +174,6 @@ export class SchemaLoader {
     return schemas.some(schema => this.supportsStates(schema));
   }
 
-
   // Get global property value from theme
   getGlobalPropertyValue(theme: any, propertyPath: string[]): any {
     try {
@@ -233,7 +232,7 @@ export class SchemaLoader {
       
       return false;
     } catch (error) {
-      console.error('Error checking state-driven properties:', error);
+      // console.error('Error checking state-driven properties:', error);
       return false;
     }
   }
@@ -268,7 +267,7 @@ export class SchemaLoader {
         properties: generalProps
       };
     } catch (error) {
-      console.error('Error getting general properties schema:', error);
+      // console.error('Error getting general properties schema:', error);
       return undefined;
     }
   }
@@ -284,7 +283,7 @@ export async function loadVisualSchema(visualType: string): Promise<any> {
   // Get the visual definition
   const visualDef = loader.getDefinition(`visual-${visualType}`);
   if (!visualDef) {
-    console.warn(`No schema definition found for visual: ${visualType}`);
+    
     return null;
   }
   

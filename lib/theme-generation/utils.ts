@@ -8,15 +8,23 @@ export function validateNeutralPalette(palette: any): palette is ColorPalette {
     return false;
   }
   
+  // Check if palette has a shades property (neutral palette structure)
+  const shadesToCheck = palette.shades || palette;
+  
+  // Check if shades object exists
+  if (typeof shadesToCheck !== 'object' || shadesToCheck === null) {
+    return false;
+  }
+  
   // Check all required shades exist
-  const missing = requiredShades.filter(shade => !(shade in palette));
+  const missing = requiredShades.filter(shade => !(shade in shadesToCheck));
   if (missing.length > 0) {
     // Neutral palette missing required shades
     return false;
   }
   
   // Validate hex codes
-  for (const [shade, color] of Object.entries(palette)) {
+  for (const [shade, color] of Object.entries(shadesToCheck)) {
     if (typeof color !== 'string' || !color.startsWith('#') || (color.length !== 4 && color.length !== 7)) {
       // Invalid hex code for shade
       return false;
@@ -103,7 +111,7 @@ export function getThemeValue(theme: any, path: string): any {
     }
     return current;
   } catch (error) {
-    console.error(`Error getting value at path ${path}:`, error);
+    // console.error(`Error getting value at path ${path}:`, error);
     return null;
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -55,7 +55,17 @@ export function UnifiedPaletteManager({
     neutralPalettes,
     deleteColorPalette,
     deleteNeutralPalette,
+    loadPalettes,
+    isLoading,
+    error,
   } = usePaletteStore();
+
+  // Load palettes when the modal opens
+  useEffect(() => {
+    if (open) {
+      loadPalettes();
+    }
+  }, [open, loadPalettes]);
 
   const handleColorPaletteClick = (palette: ColorPalette) => {
     if (mode === 'select') {
@@ -87,114 +97,293 @@ export function UnifiedPaletteManager({
     }
   };
 
-  const renderColorPalettes = () => (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between px-1">
-        <h3 className="text-sm font-medium text-muted-foreground">Color Palettes</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCreatingType('color')}
-          className="h-8"
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          New
-        </Button>
-      </div>
-      <ScrollArea className="h-[400px]">
-        <div className="grid gap-2 pr-4">
-          {colorPalettes.map((palette) => (
-            <Card
-              key={palette.id}
-              className={cn(
-                "p-3 cursor-pointer transition-all hover:shadow-md",
-                selectedColorPaletteId === palette.id && "ring-2 ring-primary"
-              )}
-              onClick={() => handleColorPaletteClick({
-                ...palette,
-                colors: palette.colors as string[]
-              })}
+  const renderColorPalettes = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+            <p className="text-sm text-muted-foreground">Loading palettes...</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="flex items-center justify-center h-[400px]">
+          <div className="text-center text-muted-foreground">
+            <p className="text-sm mb-2">Failed to load palettes</p>
+            <p className="text-xs">{error}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => loadPalettes()}
+              className="mt-3"
             >
+              Retry
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    const builtInPalettes = colorPalettes.filter(p => p.isBuiltIn);
+    const userPalettes = colorPalettes.filter(p => !p.isBuiltIn);
+
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-sm font-medium text-muted-foreground">Color Palettes</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setCreatingType('color')}
+            className="h-8"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            New
+          </Button>
+        </div>
+        <ScrollArea className="h-[400px]">
+          <div className="space-y-4 pr-4">
+            {/* Built-in Palettes */}
+            {builtInPalettes.length > 0 && (
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-sm">{palette.name}</h4>
-                  {palette.isBuiltIn && (
-                    <Badge variant="secondary" className="text-xs">Built-in</Badge>
-                  )}
-                </div>
-                <div className="flex gap-1">
-                  {(palette.colors as string[]).map((color, index) => (
-                    <div
-                      key={index}
-                      className="h-6 w-6 rounded border border-gray-200"
-                      style={{ backgroundColor: color }}
-                      title={color}
-                    />
+                <h4 className="text-xs font-medium text-muted-foreground px-1">Built-in Palettes</h4>
+                <div className="grid gap-2">
+                  {builtInPalettes.map((palette) => (
+                    <Card
+                      key={palette.id}
+                      className={cn(
+                        "p-3 cursor-pointer transition-all hover:shadow-md",
+                        selectedColorPaletteId === palette.id && "ring-2 ring-primary"
+                      )}
+                      onClick={() => handleColorPaletteClick({
+                        ...palette,
+                        colors: palette.colors as string[]
+                      })}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-sm">{palette.name}</h4>
+                          <Badge variant="secondary" className="text-xs">Built-in</Badge>
+                        </div>
+                        <div className="flex gap-1">
+                          {(palette.colors as string[]).map((color, index) => (
+                            <div
+                              key={index}
+                              className="h-6 w-6 rounded border border-gray-200"
+                              style={{ backgroundColor: color }}
+                              title={color}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </Card>
                   ))}
                 </div>
               </div>
-            </Card>
-          ))}
-        </div>
-      </ScrollArea>
-    </div>
-  );
+            )}
 
-  const renderNeutralPalettes = () => (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between px-1">
-        <h3 className="text-sm font-medium text-muted-foreground">Neutral Palettes</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCreatingType('neutral')}
-          className="h-8"
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          New
-        </Button>
-      </div>
-      <ScrollArea className="h-[400px]">
-        <div className="grid gap-2 pr-4">
-          {neutralPalettes.map((palette) => (
-            <Card
-              key={palette.id}
-              className={cn(
-                "p-3 cursor-pointer transition-all hover:shadow-md",
-                selectedNeutralPaletteId === palette.id && "ring-2 ring-primary"
-              )}
-              onClick={() => handleNeutralPaletteClick({
-                ...palette,
-                shades: palette.shades as Record<string, string>
-              })}
-            >
+            {/* User Palettes */}
+            {userPalettes.length > 0 ? (
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-sm">{palette.name}</h4>
-                  {palette.isBuiltIn && (
-                    <Badge variant="secondary" className="text-xs">Built-in</Badge>
-                  )}
-                </div>
-                <div className="flex gap-0.5">
-                  {Object.entries(palette.shades as Record<string, string>)
-                    .sort(([a], [b]) => parseInt(a) - parseInt(b))
-                    .slice(0, 8)
-                    .map(([shade, color]) => (
-                      <div
-                        key={shade}
-                        className="h-6 w-3 first:rounded-l last:rounded-r"
-                        style={{ backgroundColor: color }}
-                        title={`${shade}: ${color}`}
-                      />
-                    ))}
+                <h4 className="text-xs font-medium text-muted-foreground px-1">Your Palettes</h4>
+                <div className="grid gap-2">
+                  {userPalettes.map((palette) => (
+                    <Card
+                      key={palette.id}
+                      className={cn(
+                        "p-3 cursor-pointer transition-all hover:shadow-md",
+                        selectedColorPaletteId === palette.id && "ring-2 ring-primary"
+                      )}
+                      onClick={() => handleColorPaletteClick({
+                        ...palette,
+                        colors: palette.colors as string[]
+                      })}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-sm">{palette.name}</h4>
+                        </div>
+                        <div className="flex gap-1">
+                          {(palette.colors as string[]).map((color, index) => (
+                            <div
+                              key={index}
+                              className="h-6 w-6 rounded border border-gray-200"
+                              style={{ backgroundColor: color }}
+                              title={color}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
                 </div>
               </div>
-            </Card>
-          ))}
+            ) : (
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-muted-foreground px-1">Your Palettes</h4>
+                <div className="text-center py-8 px-4 text-muted-foreground">
+                  <Palette className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm mb-1">No custom palettes yet</p>
+                  <p className="text-xs">Click "New" to create your first color palette</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  };
+
+  const renderNeutralPalettes = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+            <p className="text-sm text-muted-foreground">Loading palettes...</p>
+          </div>
         </div>
-      </ScrollArea>
-    </div>
-  );
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="flex items-center justify-center h-[400px]">
+          <div className="text-center text-muted-foreground">
+            <p className="text-sm mb-2">Failed to load palettes</p>
+            <p className="text-xs">{error}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => loadPalettes()}
+              className="mt-3"
+            >
+              Retry
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    const builtInPalettes = neutralPalettes.filter(p => p.isBuiltIn);
+    const userPalettes = neutralPalettes.filter(p => !p.isBuiltIn);
+
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-sm font-medium text-muted-foreground">Neutral Palettes</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setCreatingType('neutral')}
+            className="h-8"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            New
+          </Button>
+        </div>
+        <ScrollArea className="h-[400px]">
+          <div className="space-y-4 pr-4">
+            {/* Built-in Palettes */}
+            {builtInPalettes.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-muted-foreground px-1">Built-in Palettes</h4>
+                <div className="grid gap-2">
+                  {builtInPalettes.map((palette) => (
+                    <Card
+                      key={palette.id}
+                      className={cn(
+                        "p-3 cursor-pointer transition-all hover:shadow-md",
+                        selectedNeutralPaletteId === palette.id && "ring-2 ring-primary"
+                      )}
+                      onClick={() => handleNeutralPaletteClick({
+                        ...palette,
+                        shades: palette.shades as Record<string, string>
+                      })}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-sm">{palette.name}</h4>
+                          <Badge variant="secondary" className="text-xs">Built-in</Badge>
+                        </div>
+                        <div className="flex gap-0.5">
+                          {Object.entries(palette.shades as Record<string, string>)
+                            .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                            .slice(0, 8)
+                            .map(([shade, color]) => (
+                              <div
+                                key={shade}
+                                className="h-6 w-3 first:rounded-l last:rounded-r"
+                                style={{ backgroundColor: color }}
+                                title={`${shade}: ${color}`}
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* User Palettes */}
+            {userPalettes.length > 0 ? (
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-muted-foreground px-1">Your Palettes</h4>
+                <div className="grid gap-2">
+                  {userPalettes.map((palette) => (
+                    <Card
+                      key={palette.id}
+                      className={cn(
+                        "p-3 cursor-pointer transition-all hover:shadow-md",
+                        selectedNeutralPaletteId === palette.id && "ring-2 ring-primary"
+                      )}
+                      onClick={() => handleNeutralPaletteClick({
+                        ...palette,
+                        shades: palette.shades as Record<string, string>
+                      })}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-sm">{palette.name}</h4>
+                        </div>
+                        <div className="flex gap-0.5">
+                          {Object.entries(palette.shades as Record<string, string>)
+                            .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                            .slice(0, 8)
+                            .map(([shade, color]) => (
+                              <div
+                                key={shade}
+                                className="h-6 w-3 first:rounded-l last:rounded-r"
+                                style={{ backgroundColor: color }}
+                                title={`${shade}: ${color}`}
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-muted-foreground px-1">Your Palettes</h4>
+                <div className="text-center py-8 px-4 text-muted-foreground">
+                  <Grid3x3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm mb-1">No custom palettes yet</p>
+                  <p className="text-xs">Click "New" to create your first neutral palette</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  };
 
   return (
     <>

@@ -3,86 +3,117 @@ import { auth } from '@clerk/nextjs/server';
 import { PaletteService } from '@/lib/db/services/palette-service';
 import { UserService } from '@/lib/db/services/user-service';
 
+// Define built-in palettes that are always available
+const BUILT_IN_COLOR_PALETTES = [
+  {
+    id: 'power-ui',
+    name: 'Power UI',
+    colors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56', '#3498DB', '#A66999'],
+    isBuiltIn: true,
+    userId: 'system',
+    description: 'Default Power UI color palette with vibrant, modern colors',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'vibrant',
+    name: 'Vibrant',
+    colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#DDA0DD', '#FF8B94', '#B4A7D6'],
+    isBuiltIn: true,
+    userId: 'system',
+    description: 'Bright and energetic colors for dynamic visualizations',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'pastel',
+    name: 'Pastel Dreams',
+    colors: ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF', '#E8D5FF', '#FFC9DE', '#D4A5A5'],
+    isBuiltIn: true,
+    userId: 'system',
+    description: 'Soft pastel colors for a gentle, calming effect',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'corporate',
+    name: 'Corporate Blue',
+    colors: ['#003F5C', '#2F4B7C', '#665191', '#A05195', '#D45087', '#F95D6A', '#FF7C43', '#FFA600'],
+    isBuiltIn: true,
+    userId: 'system',
+    description: 'Professional palette transitioning from deep blues to warm accents',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'nature',
+    name: 'Natural Earth',
+    colors: ['#264653', '#2A9D8F', '#E9C46A', '#F4A261', '#E76F51', '#84A98C', '#52796F', '#354F52'],
+    isBuiltIn: true,
+    userId: 'system',
+    description: 'Earth-inspired tones for organic, natural visualizations',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'sunset',
+    name: 'Sunset Glow',
+    colors: ['#780116', '#C32F27', '#D8572A', '#F7B538', '#DB7C26', '#D8B863', '#C17767', '#B55239'],
+    isBuiltIn: true,
+    userId: 'system',
+    description: 'Warm sunset colors from deep reds to golden yellows',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+];
+
 export async function GET(request: NextRequest) {
-  console.log('[Palette API] GET request received');
-  
+
   try {
     let userId: string | null = null;
     
     try {
       const authResult = await auth();
-      console.log('[Palette API] Auth result:', authResult);
+      
       userId = authResult?.userId || null;
     } catch (authError) {
-      console.error('[Palette API] Auth error:', authError);
+      // console.error('[Palette API] Auth error:', authError);
       // Continue without authentication
     }
-    
-    console.log('[Palette API] User ID:', userId);
-    
+
     if (!userId) {
-      // Return default palettes for unauthenticated users
-      const defaultPalettes = [
-        {
-          id: 'default-1',
-          name: 'Power UI Default',
-          colors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56'],
-          isBuiltIn: true,
-          userId: null,
-          description: 'Default color palette',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          id: 'default-2',
-          name: 'Vibrant',
-          colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#DDA0DD'],
-          isBuiltIn: true,
-          userId: null,
-          description: 'Vibrant color palette',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      ];
-      return NextResponse.json({ palettes: defaultPalettes });
+      // Return built-in palettes for unauthenticated users
+      return NextResponse.json({ palettes: BUILT_IN_COLOR_PALETTES });
     }
 
-    console.log('[Palette API] Ensuring user exists...');
     const dbUserId = await UserService.ensureUserExists(userId);
-    console.log('[Palette API] DB User ID:', dbUserId);
-    
+
     // Get both user palettes and built-in palettes
-    console.log('[Palette API] Fetching palettes...');
-    const [userPalettes, builtInPalettes] = await Promise.all([
-      PaletteService.getUserColorPalettes(dbUserId),
-      PaletteService.getBuiltInColorPalettes()
-    ]);
     
-    console.log('[Palette API] User palettes:', userPalettes.length);
-    console.log('[Palette API] Built-in palettes:', builtInPalettes.length);
+    let userPalettes = [];
+    let builtInPalettes = [];
+    
+    try {
+      [userPalettes, builtInPalettes] = await Promise.all([
+        PaletteService.getUserColorPalettes(dbUserId),
+        PaletteService.getBuiltInColorPalettes()
+      ]);
+
+    } catch (dbError) {
+      // console.error('[Palette API] Database error:', dbError);
+      // Continue with fallback palettes
+    }
+    
+    // If no built-in palettes from DB, use our hardcoded ones
+    if (builtInPalettes.length === 0) {
+      builtInPalettes = BUILT_IN_COLOR_PALETTES;
+    }
     
     const palettes = [...builtInPalettes, ...userPalettes];
     
-    // If no palettes exist, return defaults
-    if (palettes.length === 0) {
-      const defaultPalettes = [
-        {
-          id: 'default-1',
-          name: 'Power UI Default',
-          colors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56'],
-          isBuiltIn: true,
-          userId: null,
-          description: 'Default color palette',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      ];
-      return NextResponse.json({ palettes: defaultPalettes });
-    }
-    
     return NextResponse.json({ palettes });
   } catch (error) {
-    console.error('Error fetching color palettes:', error);
+    // console.error('Error fetching color palettes:', error);
     return NextResponse.json(
       { error: 'Failed to fetch palettes', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -143,7 +174,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ palette }, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating color palette:', error);
+    // console.error('Error creating color palette:', error);
     
     // Check for unique constraint violation (duplicate name)
     if (error?.code === 'P2002') {

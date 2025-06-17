@@ -157,6 +157,9 @@ export default function Home() {
                 <Link href="#resources" className="text-gray-600 hover:text-gray-900 text-sm">
                   Resources
                 </Link>
+                <Link href="/blog" className="text-gray-600 hover:text-gray-900 text-sm">
+                  Blog
+                </Link>
                 <Link href="/pricing" className="text-gray-600 hover:text-gray-900 text-sm">
                   Pricing
                 </Link>

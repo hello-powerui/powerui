@@ -37,11 +37,11 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
       // Load both color and neutral palettes with better error handling
       const [colorResponse, neutralResponse] = await Promise.allSettled([
         fetch('/api/palettes/color').catch(err => {
-          console.error('Network error fetching color palettes:', err);
+          // console.error('Network error fetching color palettes:', err);
           return null;
         }),
         fetch('/api/palettes/neutral').catch(err => {
-          console.error('Network error fetching neutral palettes:', err);
+          // console.error('Network error fetching neutral palettes:', err);
           return null;
         })
       ]);
@@ -57,10 +57,10 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
               p.id && p.name && Array.isArray(p.colors) && p.colors.length > 0
             );
           } catch (err) {
-            console.error('Error parsing color palettes response:', err);
+            // console.error('Error parsing color palettes response:', err);
           }
         } else {
-          console.error('Failed to load color palettes:', response.status);
+          // console.error('Failed to load color palettes:', response.status);
         }
       }
       
@@ -89,10 +89,10 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
               p.id && p.name && p.shades && typeof p.shades === 'object'
             ) : [];
           } catch (err) {
-            console.error('Error parsing neutral palettes response:', err);
+            // console.error('Error parsing neutral palettes response:', err);
           }
         } else {
-          console.error('Failed to load neutral palettes:', response.status);
+          // console.error('Failed to load neutral palettes:', response.status);
         }
       }
       
@@ -108,7 +108,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         isLoading: false 
       });
     } catch (error) {
-      console.error('Failed to load palettes:', error);
+      // console.error('Failed to load palettes:', error);
       const { AZURE_NEUTRAL_PALETTE } = await import('@/lib/defaults/palettes');
       set({ 
         error: error instanceof Error ? error.message : 'Failed to load palettes', 
@@ -140,7 +140,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Failed to create palette:', response.status, errorData);
+        // console.error('Failed to create palette:', response.status, errorData);
         throw new Error(errorData.error || 'Failed to create palette');
       }
       
@@ -210,7 +210,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Failed to create neutral palette:', response.status, errorData);
+        // console.error('Failed to create neutral palette:', response.status, errorData);
         throw new Error(errorData.error || 'Failed to create neutral palette');
       }
       

@@ -34,13 +34,8 @@ export interface ThemeGenerationInput {
   mode: 'light' | 'dark';
   neutralPalette: string | Record<string, string>;
   fontFamily: string;
-  borderRadius: number;
   dataColors: string[];
   name: string;
-  bgStyle?: string;
-  borderStyle?: string;
-  paddingStyle?: string;
-  showBorders?: boolean;
   
   // Extended typography
   fontSize?: number;

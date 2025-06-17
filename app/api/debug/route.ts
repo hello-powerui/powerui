@@ -4,8 +4,7 @@ export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  console.log('[DEBUG API] GET request received');
-  
+
   const headers = Object.fromEntries(request.headers.entries());
   const url = new URL(request.url);
   
@@ -34,7 +33,7 @@ export async function GET(request: NextRequest) {
     message: 'Debug API route is working correctly!',
   };
   
-  console.log('[DEBUG API] Sending response:', JSON.stringify(debugInfo, null, 2));
+  );
   
   return NextResponse.json(debugInfo, {
     status: 200,
@@ -46,13 +45,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('[DEBUG API] POST request received');
-  
+
   let body = null;
   try {
     body = await request.json();
   } catch (error) {
-    console.log('[DEBUG API] Failed to parse body:', error);
+    
   }
   
   const headers = Object.fromEntries(request.headers.entries());
@@ -82,7 +80,7 @@ export async function POST(request: NextRequest) {
     message: 'Debug API route POST is working correctly!',
   };
   
-  console.log('[DEBUG API] Sending POST response:', JSON.stringify(debugInfo, null, 2));
+  );
   
   return NextResponse.json(debugInfo, {
     status: 200,

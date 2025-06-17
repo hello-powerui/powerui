@@ -9,10 +9,20 @@ const isPublicRoute = createRouteMatcher([
   '/examples',
   '/privacy',
   '/terms',
+  '/checkout',
   '/api/webhooks(.*)',
+  '/api/checkout',
+  '/upgrade',
+  '/blog(.*)',
+  '/themes(.*)',
 ])
 
 export default clerkMiddleware(async (auth, req) => {
+  // Block test-stripe page in production
+  if (process.env.NODE_ENV === 'production' && req.nextUrl.pathname === '/test-stripe') {
+    return Response.redirect(new URL('/404', req.url))
+  }
+  
   if (!isPublicRoute(req)) {
     await auth.protect()
   }

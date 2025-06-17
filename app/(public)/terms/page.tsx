@@ -1,6 +1,5 @@
 import Link from 'next/link'
 
-
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4">

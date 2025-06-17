@@ -4,7 +4,6 @@ import { useRouter, redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 
-
 interface Theme {
   id: string;
   name: string;
@@ -63,7 +62,7 @@ export default function ThemesPage() {
         setThemes(data);
       }
     } catch (error) {
-      console.error('Failed to fetch themes:', error);
+      // console.error('Failed to fetch themes:', error);
     } finally {
       setLoading(false);
     }
@@ -86,7 +85,7 @@ export default function ThemesPage() {
         alert('Failed to delete theme');
       }
     } catch (error) {
-      console.error('Failed to delete theme:', error);
+      // console.error('Failed to delete theme:', error);
       alert('Failed to delete theme');
     } finally {
       setDeletingId(null);
@@ -217,7 +216,7 @@ export default function ThemesPage() {
                 {/* Actions - more compact */}
                 <div className="flex gap-2">
                   <button 
-                    onClick={() => router.push(`/themes/${theme.id}`)}
+                    onClick={() => router.push(`/themes/studio?themeId=${theme.id}`)}
                     className="flex-1 px-3 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     Edit

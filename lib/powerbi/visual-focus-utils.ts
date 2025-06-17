@@ -193,6 +193,8 @@ export function generateFocusedVisualLayout(
 }
 
 export function generateDefaultLayout(pageId: string): FocusLayoutConfig {
+  // Reset to original layout by using Master layout type
+  // This tells Power BI to use the report's default layout
   return {
     layoutType: models.LayoutType.Master,
     customLayout: {
@@ -202,7 +204,16 @@ export function generateDefaultLayout(pageId: string): FocusLayoutConfig {
         height: 720
       },
       displayOption: models.DisplayOption.FitToPage,
-      pagesLayout: {}
+      pagesLayout: {
+        [pageId]: {
+          defaultLayout: {
+            displayState: {
+              mode: models.VisualContainerDisplayMode.Visible
+            }
+          },
+          visualsLayout: {}
+        }
+      }
     },
     panes: {
       filters: {

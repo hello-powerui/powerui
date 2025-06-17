@@ -376,7 +376,7 @@ export function VisualCustomizer({
           className="w-full"
           onClick={() => {
             // TODO: Open studio editor for this visual
-            console.log('Open studio editor for', visualType);
+            
           }}
         >
           <Palette className="w-4 h-4 mr-2" />

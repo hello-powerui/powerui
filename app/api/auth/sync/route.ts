@@ -42,7 +42,7 @@ export async function GET() {
       }
     });
   } catch (error) {
-    console.error('Error syncing user:', error);
+    // console.error('Error syncing user:', error);
     return NextResponse.json(
       { error: 'Failed to sync user', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

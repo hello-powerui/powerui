@@ -86,6 +86,7 @@ function UnifiedThemeStudioContent() {
   const [themeName, setThemeName] = useState('My Power BI Theme');
   const [isSaving, setIsSaving] = useState(false);
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
+  const [isInitialThemeLoading, setIsInitialThemeLoading] = useState(true);
   
   // Studio editor states
   const [selectedSection, setSelectedSection] = useState<'global' | 'properties' | 'visuals'>('visuals');
@@ -191,8 +192,37 @@ function UnifiedThemeStudioContent() {
               setPalette(savedTheme.palette);
             }
             
-            if (savedTheme.neutralPalette) {
+            // Load neutral palette - check if we should load by ID first
+            if (savedTheme.neutralPaletteId) {
+              // Try to load the neutral palette from the palette store
+              try {
+                const response = await fetch(`/api/palettes/neutral/${savedTheme.neutralPaletteId}`);
+                if (response.ok) {
+                  const paletteData = await response.json();
+                  setNeutralPalette(paletteData);
+                } else {
+                  // Fallback to saved neutral palette data
+                  if (savedTheme.neutralPalette) {
+                    setNeutralPalette(savedTheme.neutralPalette);
+                  } else {
+                    // Fallback to Azure default
+                    setNeutralPalette(AZURE_NEUTRAL_PALETTE);
+                  }
+                }
+              } catch (error) {
+                // Fallback to saved neutral palette data
+                if (savedTheme.neutralPalette) {
+                  setNeutralPalette(savedTheme.neutralPalette);
+                } else {
+                  // Fallback to Azure default
+                  setNeutralPalette(AZURE_NEUTRAL_PALETTE);
+                }
+              }
+            } else if (savedTheme.neutralPalette) {
               setNeutralPalette(savedTheme.neutralPalette);
+            } else {
+              // Ensure we always have a neutral palette
+              setNeutralPalette(AZURE_NEUTRAL_PALETTE);
             }
             
             // Store palette references if available
@@ -228,7 +258,7 @@ function UnifiedThemeStudioContent() {
               // Check for unknown tokens
               const unknownTokens = findUnknownTokens(savedTheme.visualStyles);
               if (unknownTokens.length > 0) {
-                console.warn('Unknown tokens found:', unknownTokens);
+                
                 toast.warning(`Theme loaded with ${unknownTokens.length} unknown token(s). They have been replaced with defaults.`);
               }
               
@@ -253,14 +283,26 @@ function UnifiedThemeStudioContent() {
               description: savedTheme.description || apiResponse.description 
             });
             
-            // Initialize change tracking
-            setOriginalTheme(savedTheme);
+            // Initialize change tracking with complete theme data
+            const originalThemeState = {
+              ...savedTheme,
+              id: themeId,
+              paletteId: savedTheme.paletteId,
+              neutralPaletteId: savedTheme.neutralPaletteId
+            };
+            setOriginalTheme(originalThemeState);
             setIsThemeLoaded(true);
+            
+            // Mark initial loading complete after a brief delay to ensure theme generation
+            setTimeout(() => {
+              setIsInitialThemeLoading(false);
+            }, 100);
             
             toast.success('Theme loaded successfully');
           } catch (error) {
             toast.error('Failed to load theme');
             setIsThemeLoaded(true);
+            setIsInitialThemeLoading(false);
           }
         };
         
@@ -273,6 +315,7 @@ function UnifiedThemeStudioContent() {
         };
         setOriginalTheme(defaultThemeState);
         setIsThemeLoaded(true);
+        setIsInitialThemeLoading(false);
       }
     }
   }, [schemaLoaded, isThemeLoaded, searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -313,32 +356,37 @@ function UnifiedThemeStudioContent() {
     trackChange(['textClasses']);
   };
 
-  // Debounced values for preview generation
-  const debouncedTheme = useDebounce(theme, 300);
-  const debouncedVisualSettings = useDebounce(visualSettings, 300);
+  // Debounced values for preview generation - skip initial debounce for faster load
+  const debouncedTheme = useDebounce(theme, 300, isInitialThemeLoading);
+  const debouncedVisualSettings = useDebounce(visualSettings, 300, isInitialThemeLoading);
   
   // Generate theme for preview (with resolved tokens) - using client-side generation
   useEffect(() => {
+    // Use non-debounced values for initial load
+    const themeToUse = isInitialThemeLoading ? theme : debouncedTheme;
+    const visualSettingsToUse = isInitialThemeLoading ? visualSettings : debouncedVisualSettings;
+    
+    // Generate theme immediately if we have the required data
+    if (!themeToUse.palette?.colors || !themeToUse.neutralPalette?.shades) {
+      return;
+    }
+    
     const themeInput = {
-      name: debouncedTheme.name,
-      mode: debouncedTheme.mode,
-      dataColors: (Array.isArray(debouncedTheme.palette.colors)) ? debouncedTheme.palette.colors as string[] : [],
-      neutralPalette: (debouncedTheme.neutralPalette?.shades && typeof debouncedTheme.neutralPalette.shades === 'object' && !Array.isArray(debouncedTheme.neutralPalette.shades)) ? debouncedTheme.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
-      fontFamily: debouncedTheme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
-      borderRadius: 4,
-      bgStyle: 'default',
-      borderStyle: 'default',
-      paddingStyle: 'default',
-      visualStyles: debouncedVisualSettings,
-      structuralColors: debouncedTheme.structuralColorsMode === 'custom' ? debouncedTheme.structuralColors : undefined,
-      textClasses: debouncedTheme.textClasses && Object.keys(debouncedTheme.textClasses).length > 0 ? debouncedTheme.textClasses : undefined
+      name: themeToUse.name,
+      mode: themeToUse.mode,
+      dataColors: (Array.isArray(themeToUse.palette.colors)) ? themeToUse.palette.colors as string[] : [],
+      neutralPalette: (themeToUse.neutralPalette?.shades && typeof themeToUse.neutralPalette.shades === 'object' && !Array.isArray(themeToUse.neutralPalette.shades)) ? themeToUse.neutralPalette.shades as Record<string, string> : AZURE_NEUTRAL_PALETTE.shades,
+      fontFamily: themeToUse.fontFamily.toLowerCase().replace(/\s+/g, '-'),
+      visualStyles: visualSettingsToUse,
+      structuralColors: themeToUse.structuralColorsMode === 'custom' ? themeToUse.structuralColors : undefined,
+      textClasses: themeToUse.textClasses && Object.keys(themeToUse.textClasses).length > 0 ? themeToUse.textClasses : undefined
     };
     
     // Use client-side preview generator for instant updates
     const previewGenerator = getPreviewGenerator();
     const previewTheme = previewGenerator.generatePreview(themeInput);
     setGeneratedTheme(previewTheme);
-  }, [debouncedTheme, debouncedVisualSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [theme, visualSettings, debouncedTheme, debouncedVisualSettings, isInitialThemeLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -350,7 +398,9 @@ function UnifiedThemeStudioContent() {
       const savedThemeState = {
         ...theme,
         name: themeName,
-        visualStyles: visualSettings
+        visualStyles: visualSettings,
+        neutralPalette: theme.neutralPalette,
+        neutralPaletteId: theme.neutralPaletteId
       };
       setOriginalTheme(savedThemeState);
       
@@ -898,7 +948,6 @@ function UnifiedThemeStudioContent() {
               </Select>
             </div>
 
-
             </div>
           </div>
         </div>
@@ -1000,16 +1049,24 @@ function UnifiedThemeStudioContent() {
                   </Select>
                 </div>
                 
-                {/* Focus Mode Toggle - only show for specific visual types */}
-                {selectedVisual !== '*' && (
-                  <div className="mt-3 flex items-center gap-2 px-1">
-                    <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <span className="text-xs text-gray-600">
-                      Focus mode automatically activates to highlight {selectedVisual} visuals
-                    </span>
+                {/* Focus Mode Info and Reset Button */}
+                {selectedVisual && selectedVisual !== '*' && (
+                  <div className="mt-3 space-y-2">
+                    <div className="flex items-center gap-2 px-1">
+                      <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span className="text-xs text-gray-600">
+                        Focus mode automatically activates to highlight {selectedVisual} visuals
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setSelectedVisual('')}
+                      className="w-full px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors border border-gray-200"
+                    >
+                      ← Back to All Visuals
+                    </button>
                   </div>
                 )}
               </div>
@@ -1017,7 +1074,22 @@ function UnifiedThemeStudioContent() {
 
             {/* Form Section */}
             <div className="p-4">
-              {selectedSection === 'visuals' && selectedVisual ? (
+              {selectedSection === 'visuals' && !selectedVisual ? (
+                <div className="flex flex-col items-center justify-center h-full py-16">
+                  <div className="mb-4">
+                    <svg className="w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Visual to Customize</h3>
+                  <p className="text-sm text-gray-600 text-center max-w-sm">
+                    Choose a visual type from the dropdown above to customize its styling, create variants, and configure state-specific properties.
+                  </p>
+                  <p className="text-xs text-gray-500 text-center max-w-sm mt-2">
+                    Visual styles allow you to define how different types of charts, cards, and other elements appear in your reports.
+                  </p>
+                </div>
+              ) : selectedSection === 'visuals' && selectedVisual ? (
                 <>
                   <div className="mb-4">
                     <h2 className="text-lg font-semibold">
@@ -1198,7 +1270,10 @@ function UnifiedThemeStudioContent() {
       <div className="flex-1 overflow-hidden h-full">
         <PowerBIPreview 
           generatedTheme={generatedTheme}
-          selectedVisualType={selectedVisual} 
+          selectedVisualType={selectedVisual}
+          selectedVariant={selectedVariant}
+          onExitFocusMode={() => setSelectedVisual('*')}
+          onVariantChange={setSelectedVariant}
         />
       </div>
       </div>
@@ -1225,7 +1300,7 @@ function UnifiedThemeStudioContent() {
           if (palette && typeof palette === 'object' && 'shades' in palette && palette.shades) {
             setNeutralPaletteWithTracking(palette);
           } else {
-            console.warn('Invalid palette selected, falling back to Azure:', palette);
+            
             setNeutralPaletteWithTracking(AZURE_NEUTRAL_PALETTE);
           }
         }}

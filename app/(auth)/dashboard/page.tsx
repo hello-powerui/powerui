@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-
+import { useRouter, useSearchParams } from 'next/navigation';
+import { WelcomeModal } from '@/components/ui/welcome-modal';
 
 // Icons
 const PlusIcon = () => (
@@ -49,6 +49,11 @@ interface Theme {
   colorMode: string;
   borders: string;
   themeData: any;
+  organizationId?: string;
+  organization?: {
+    id: string;
+    name: string;
+  };
 }
 
 const mockAssets = [
@@ -89,8 +94,23 @@ function getRelativeTime(date: string) {
 export default function DashboardPage() {
   const { isLoaded, isSignedIn } = useUser();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [themes, setThemes] = useState<Theme[]>([]);
+  const [teamThemes, setTeamThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasTeamAccess, setHasTeamAccess] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(false);
+  
+  // Check for successful payment redirect
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const sessionId = searchParams.get('session_id');
+    
+    if (success === 'true' && sessionId) {
+      // Redirect to success page
+      router.replace(`/success?success=true&session_id=${sessionId}`);
+    }
+  }, [searchParams, router]);
   
   // Redirect to sign-in if not authenticated
   useEffect(() => {
@@ -108,11 +128,26 @@ export default function DashboardPage() {
       const response = await fetch('/api/themes');
       if (response.ok) {
         const data = await response.json();
-        // Only show the first 3 themes
-        setThemes(data.slice(0, 3));
+        // Separate personal and team themes
+        const personalThemes = data.filter((t: Theme) => !t.organizationId);
+        const orgThemes = data.filter((t: Theme) => t.organizationId);
+        
+        // Only show the first 3 personal themes
+        setThemes(personalThemes.slice(0, 3));
+        // Show team themes
+        setTeamThemes(orgThemes.slice(0, 3));
+        
+        if (orgThemes.length > 0) {
+          setHasTeamAccess(true);
+        }
+        
+        // Check if user is new (no themes created)
+        if (data.length === 0) {
+          setIsNewUser(true);
+        }
       }
     } catch (error) {
-      console.error('Failed to fetch themes:', error);
+      // console.error('Failed to fetch themes:', error);
     } finally {
       setLoading(false);
     }
@@ -132,6 +167,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <WelcomeModal isNewUser={isNewUser} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">Welcome to Power UI</h1>
@@ -173,7 +209,7 @@ export default function DashboardPage() {
             ) : (
               // Show actual themes
               themes.map((theme) => (
-                <Link key={theme.id} href={`/themes/${theme.id}`} className="bg-white p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all group">
+                <Link key={theme.id} href={`/themes/studio?themeId=${theme.id}`} className="bg-white p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all group">
                   <h3 className="font-medium text-gray-900 mb-1 group-hover:text-gray-700">{theme.name}</h3>
                   <p className="text-sm text-gray-500 mb-3">{getRelativeTime(theme.updatedAt)}</p>
                   
@@ -226,14 +262,69 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2 mb-4">
             <TeamIcon />
             <h2 className="text-lg font-medium text-gray-900">Team Themes</h2>
-            <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded">Beta</span>
           </div>
           
-          <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
-            <TeamIcon />
-            <p className="mt-2 text-sm text-gray-600">No team themes available yet</p>
-            <p className="text-xs text-gray-500 mt-1">Team collaboration features coming soon</p>
-          </div>
+          {!hasTeamAccess ? (
+            <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+              <TeamIcon />
+              <p className="mt-2 text-sm text-gray-600">No team access</p>
+              <p className="text-xs text-gray-500 mt-1">Join a team to access shared themes</p>
+            </div>
+          ) : teamThemes.length === 0 ? (
+            <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+              <p className="text-sm text-gray-600">No team themes shared yet</p>
+              <p className="text-xs text-gray-500 mt-1">Share themes with your team from the theme editor</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {teamThemes.map((theme) => (
+                <Link key={theme.id} href={`/themes/studio?themeId=${theme.id}`} className="bg-white p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all group">
+                  <h3 className="font-medium text-gray-900 mb-1 group-hover:text-gray-700">{theme.name}</h3>
+                  <p className="text-sm text-gray-500 mb-1">{theme.organization?.name}</p>
+                  <p className="text-sm text-gray-500 mb-3">{getRelativeTime(theme.updatedAt)}</p>
+                  
+                  {/* Color dots */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1">
+                      {theme.themeData?.dataColors ? (
+                        <>
+                          {theme.themeData.dataColors.slice(0, 5).map((color: string, i: number) => (
+                            <div
+                              key={i}
+                              className="w-4 h-4 rounded-full border border-gray-200"
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                          {theme.themeData.dataColors.length > 5 && (
+                            <div className="w-4 h-4 rounded-full border border-gray-200 bg-gray-100 text-[10px] flex items-center justify-center text-gray-600">
+                              +{theme.themeData.dataColors.length - 5}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        // Fallback colors if no themeData
+                        <>
+                          {['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C'].map((color, i) => (
+                            <div
+                              key={i}
+                              className="w-4 h-4 rounded-full border border-gray-200"
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                        </>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-500">{theme.colorMode}</span>
+                  </div>
+                </Link>
+              ))}
+              {teamThemes.length > 0 && (
+                <Link href="/themes?filter=team" className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all flex items-center justify-center text-sm text-gray-600 hover:text-gray-900">
+                  View all team themes →
+                </Link>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Power UI Assets */}

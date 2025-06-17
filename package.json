@@ -12,7 +12,9 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "tsx scripts/init-db.ts"
+    "db:seed": "tsx scripts/init-db.ts",
+    "dev:stripe": "./scripts/dev-stripe.sh",
+    "stripe:setup": "tsx scripts/setup-stripe-products.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +22,7 @@
   "description": "",
   "dependencies": {
     "@clerk/nextjs": "^6.21.0",
+    "@next/mdx": "^15.3.3",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-collapsible": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.14",
@@ -33,9 +36,11 @@
     "@radix-ui/react-switch": "^1.2.5",
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
+    "@stripe/stripe-js": "^7.3.1",
     "@types/lodash": "^4.17.17",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "gray-matter": "^4.0.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.513.0",
     "next": "^15.3.3",
@@ -43,7 +48,9 @@
     "powerbi-client-react": "^2.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "reading-time": "^1.5.0",
     "sonner": "^2.0.5",
+    "stripe": "^18.2.1",
     "svix": "^1.67.0",
     "tailwind-merge": "^3.3.0",
     "zustand": "^5.0.5"
@@ -54,6 +61,7 @@
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
     "autoprefixer": "^10.4.21",
+    "dotenv": "^16.5.0",
     "eslint": "^9.28.0",
     "eslint-config-next": "^15.3.3",
     "postcss": "^8.5.4",

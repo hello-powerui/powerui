@@ -31,7 +31,7 @@ export function parseCoolorsUrl(url: string): string[] | null {
 
     return colors.length > 0 ? colors : null;
   } catch (error) {
-    console.error('Error parsing Coolors URL:', error);
+    // console.error('Error parsing Coolors URL:', error);
     return null;
   }
 }

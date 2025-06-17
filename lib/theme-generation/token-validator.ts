@@ -47,7 +47,7 @@ function validateColorValue(colorObj: any): any {
     if (typeof colorValue === 'string' && colorValue.startsWith('@')) {
       const isValid = TOKEN_REGISTRY[colorValue] !== undefined;
       if (!isValid) {
-        console.warn(`Unknown token reference: ${colorValue}, using fallback`);
+        
         // Replace with a fallback token
         return { solid: { color: '@text-primary' } };
       }
@@ -59,7 +59,7 @@ function validateColorValue(colorObj: any): any {
     // Hex color - validate format
     else if (typeof colorValue === 'string' && colorValue.startsWith('#')) {
       if (!/^#[0-9A-Fa-f]{6}$/.test(colorValue)) {
-        console.warn(`Invalid hex color: ${colorValue}, using fallback`);
+        
         return { solid: { color: '#000000' } };
       }
     }

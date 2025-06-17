@@ -23,8 +23,7 @@ export async function POST(req: NextRequest) {
       const result = await generateNeutralPalette(data);
       return NextResponse.json(result);
     } catch (apiError) {
-      console.warn('Failed to generate palette using API, falling back to offline generation:', apiError);
-      
+
       // Fallback to offline generation
       const palette = generateNeutralPaletteOffline(data.hexColor);
       return NextResponse.json({
@@ -33,7 +32,7 @@ export async function POST(req: NextRequest) {
       });
     }
   } catch (error) {
-    console.error('Error generating neutral palette:', error);
+    // console.error('Error generating neutral palette:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to generate neutral palette' },
       { status: 500 }

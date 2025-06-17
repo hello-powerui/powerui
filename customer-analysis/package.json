@@ -1,0 +1,28 @@
+{
+  "name": "customer-analysis",
+  "version": "1.0.0",
+  "description": "Customer data consolidation and financial analysis",
+  "main": "scripts/run-analysis.ts",
+  "scripts": {
+    "analyze": "tsx scripts/run-analysis.ts",
+    "parse:gumroad": "tsx scripts/parse-gumroad.ts",
+    "parse:lemonsqueezy": "tsx scripts/parse-lemonsqueezy.ts",
+    "parse:memberstack": "tsx scripts/parse-memberstack.ts",
+    "parse:loops": "tsx scripts/parse-loops.ts",
+    "fetch:stripe": "tsx scripts/fetch-stripe-data.ts",
+    "consolidate": "tsx scripts/consolidate-customers.ts && tsx scripts/consolidate-transactions.ts",
+    "export": "tsx scripts/export-data.ts"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.6",
+    "csv-stringify": "^6.5.1",
+    "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "stripe": "^14.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  }
+}

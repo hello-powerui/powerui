@@ -1,0 +1,489 @@
+id,email,platform,date,product,gross_amount,refund_amount,tax_amount,platform_fee,processor_fee,total_fees,net_amount,status
+gumroad_-79IBAmNcLx0De9qZ3Gizw==,kjelly@microsoft.com,gumroad,2023-08-07,Power UI - Power BI Design System,$0.00,$0.00,$0.00,$0.00,$0.30,$0.30,$0.00,completed
+gumroad_sdYC6_lvrU65RD89Q_zICQ==,kevindutcher12@gmail.com,gumroad,2023-08-19,Power UI - Power BI Design System,$49.99,$0.00,$0.00,$5.00,$1.75,$6.75,$43.24,completed
+gumroad_EYdwd1TY20lzffcZwHX77A==,mitchell.telatnik@gmail.com,gumroad,2023-08-21,Power UI - Power BI Design System,$49.99,$0.00,$0.00,$5.00,$1.75,$6.75,$43.24,completed
+gumroad__Xv7s9K4v5289aVIyAmNtg==,pravinspace@outlook.com,gumroad,2023-08-23,Power UI - Power BI Design System,$49.99,$0.00,$0.00,$5.00,$1.75,$6.75,$43.24,completed
+gumroad_JGRrewrpHGbJY2oQOn7yLg==,maximoivanmg@gmail.com,gumroad,2023-08-23,Power UI - Power BI Design System,$49.99,$0.00,$0.00,$5.00,$1.75,$6.75,$43.24,completed
+gumroad_GjNvYf4nJLbqRr5lyykFIQ==,tyree.smith@smith-analytics.com,gumroad,2023-08-24,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_sFRQYWrxMF72ob7nPSj4PQ==,matt.parkinson@vinters.com,gumroad,2023-09-01,Power UI - Power BI Design System,$249.99,$0.00,$0.00,$25.00,$7.55,$32.55,$217.44,completed
+gumroad_0IZSLKmG1ADuqxnLXadgIw==,afaneh@live.com,gumroad,2023-09-01,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad__-BkB0UqQE6l7JiMopIhOw==,emil@thecrmteam.com,gumroad,2023-09-04,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_beSZnt-XquL9ICHkcjkjCA==,norahltamimi@gmail.com,gumroad,2023-09-06,Power UI - Power BI Design System,$49.99,$0.00,$0.00,$5.00,$1.75,$6.75,$43.24,completed
+gumroad_IM8R5_X4NdlIcGnND-ihEQ==,james.reeves@dataquality.ltd,gumroad,2023-09-07,Power UI - Power BI Design System,$69.99,$69.99,$0.00,$7.00,$2.33,$9.33,$60.66,refunded
+gumroad_HSUlu6fU6NOzL4MW-EDUgg==,naz.oussama@gmail.com,gumroad,2023-09-07,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad__wvH_ezx0Egg3HX-lf53pw==,anneetaylor75@gmail.com,gumroad,2023-09-07,Power UI - Power BI Design System,$69.99,$0.00,$0.00,$7.00,$2.33,$9.33,$60.66,completed
+gumroad_1uV0o0HVCD1KhDOzHltwIg==,javierguifarrorivera@gmail.com,gumroad,2023-09-08,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_luD_lbPbO0hadyr-eMafxg==,vahid.ibrovic@gmail.com,gumroad,2023-09-08,Power UI - Power BI Design System,$89.99,$0.00,$0.00,$9.00,$2.91,$11.91,$78.08,completed
+gumroad_i4HLibRLPrHa-GwM1PAdwQ==,max.vangenderen@vintus.nl,gumroad,2023-09-11,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_ve6KUEHDNbnW2IBu5IJYWw==,horstmankm@gmail.com,gumroad,2023-09-11,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_B24SfRj2HHSYM0XLjYiRtA==,jgandertonjr@comcast.net,gumroad,2023-09-13,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_H9veAqx3YXf3_zFyvh4Pvw==,gvenkatesh482@gmail.com,gumroad,2023-09-14,Power UI - Power BI Design System,$89.99,$0.00,$0.00,$9.00,$2.91,$11.91,$78.08,completed
+gumroad_VdPRGdDmb-jDUxGw1e64zg==,yianno@lovejoes.co.uk,gumroad,2023-09-15,Power UI - Power BI Design System,$69.99,$0.00,$0.00,$7.00,$2.33,$9.33,$60.66,completed
+gumroad_h0KoMepihRwTo52qMljeNg==,lawrence.gee@acumenci.com,gumroad,2023-09-19,Power UI - Power BI Design System,$249.99,$0.00,$0.00,$25.00,$7.55,$32.55,$217.44,completed
+gumroad_2bRqixk7DO1-dvEkuYx00g==,thumu.rajesh@gmail.com,gumroad,2023-09-21,Power UI - Power BI Design System,$99.99,$99.99,$0.00,$10.00,$3.20,$13.20,$86.79,refunded
+gumroad_UbqllbQVedDBihznNkUBjw==,steve@datalytix.co.uk,gumroad,2023-10-01,Power UI - Power BI Design System,$89.99,$0.00,$0.00,$9.00,$2.91,$11.91,$78.08,completed
+gumroad_hkd0Lms1mA59TVV5jw5nQQ==,vitoriaurci@gmail.com,gumroad,2023-10-06,Power UI - Power BI Design System,$69.99,$0.00,$0.00,$7.00,$2.33,$9.33,$60.66,completed
+gumroad_BrY_oNRanCMxhzrS_xV9nQ==,jordan.berry@interloopdata.com,gumroad,2023-10-10,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_TAJcZ8vnWVkMHC7vhg9fDg==,mosorio@qualfon.com,gumroad,2023-10-10,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_Iks6jOoTMznLsb7HtpKLgw==,shafferanalytics@outlook.com,gumroad,2023-10-14,Power UI - Power BI Design System,$99.99,$99.99,$0.00,$10.00,$3.20,$13.20,$86.79,refunded
+gumroad_5xauP4JZ_BoCjPbxy47vng==,mohith.k@compareandconnect.com.au,gumroad,2023-10-18,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_vPllYZpiQ9Yq-_56bZew_w==,pwillans@structuralgroup.com,gumroad,2023-10-18,Power UI - Power BI Design System,$249.99,$0.00,$0.00,$25.00,$7.55,$32.55,$217.44,completed
+gumroad_-ErPjoxywveebM_8lFIbtw==,admin@nocnok.com,gumroad,2023-10-18,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_hyLdKQTQwOb47NnhD0_jzA==,abd7731@hotmail.com,gumroad,2023-10-19,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_0efsuGOsg6W8OghX-2WA2w==,alireza_taheri92@hotmail.com,gumroad,2023-10-22,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_v05NgamMVGLjJXA988tRgQ==,spencer.w.hoyle@gmail.com,gumroad,2023-10-23,Power UI - Power BI Design System,$99.99,$99.99,$0.00,$10.00,$3.20,$13.20,$86.79,refunded
+gumroad_W6uWboJvsohnEJBPG-Z6Fg==,dutill.jr@gmail.com,gumroad,2023-10-23,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_pfAKlNbEPtEtMgCXf-U6gA==,nheitzman@allegion.com,gumroad,2023-10-25,Power UI - Power BI Design System,$224.99,$0.00,$0.00,$22.50,$6.82,$29.32,$195.67,completed
+gumroad_8DENhP5jzYYNP7C0tVi4bw==,rvarghese@outlook.com,gumroad,2023-10-26,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_5PyELHoAkUD6_x2DYWQuFg==,saraalbloshi1@hotmail.com,gumroad,2023-10-28,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_OuQF6GqhU3mVjx8MrCrL-A==,afornara@gessi.it,gumroad,2023-11-02,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_qifFabVQUJggB3covC7FZA==,marcin@andrzejewski.me,gumroad,2023-11-07,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_OdY56xz2IZlX2yF3Zs9c9Q==,rayyan.alyahya@gmail.com,gumroad,2023-11-10,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_qhqmNnVSh_D82IVFwkR5Uw==,elmer.enicky@kainos.com,gumroad,2023-11-15,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_gwqW8C_zJyy0mWZaB6QwjQ==,ciaran.clifford@kaefer.com,gumroad,2023-11-16,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_j9HI2e89eZwzZYR2SFKGUA==,cb.vdbrg@gmail.com,gumroad,2023-11-16,Power UI - Power BI Design System,$249.99,$0.00,$0.00,$25.00,$7.55,$32.55,$217.44,completed
+gumroad_0pb0LmnKq35TKkSKYoe3dg==,alexandre_roy990@hotmail.com,gumroad,2023-11-19,Power UI - Power BI Design System,$99.99,$99.99,$0.00,$10.00,$3.20,$13.20,$86.79,refunded
+gumroad_642DFryJiwtZvoJsnLf2Zw==,moses.chiwaligo@crdbbank.co.tz,gumroad,2023-11-28,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_mIyLY44IY8jN6pfJ3FCJMA==,yendh501@gmail.com,gumroad,2023-11-30,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_6LHRX_gCUb91OlvpjJarmA==,nicholas.winn@aes.com,gumroad,2023-12-05,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_swDWn01wzsuzy8kOlFuozw==,tobie@epx.co.za,gumroad,2023-12-06,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_RU_EtAGg8zk-hKU0YVzAnA==,bushra.asseri@gmail.com,gumroad,2023-12-14,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_hJ-rHtem-ECvWuDtHgKPrg==,rachel.land@swiftmedical.com,gumroad,2023-12-22,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_USesScsqnBttYWmocgEbbQ==,robertjj@outlook.com,gumroad,2023-12-26,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_FJDahKESXgs6677UPMFRoA==,kjelly@microsoft.com,gumroad,2024-01-05,Power UI - Power BI Design System,$0.00,$0.00,$0.00,$0.00,$0.30,$0.30,$0.00,completed
+gumroad_Uw03TK4bbQerGW-NOaLBkQ==,marijnallaert@hotmail.com,gumroad,2024-01-14,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_vlogqC_EpQQdRipYQs953A==,ahmedmmohey@hotmail.com,gumroad,2024-01-30,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_CCPp8lSevMRx0pjzuMZwpw==,ian@greenspan.co.za,gumroad,2024-01-31,Power UI - Power BI Design System,$99.99,$30.00,$0.00,$10.00,$3.20,$13.20,$86.79,partial_refund
+gumroad_ZAska3fRxjuw3MKeTmIOgw==,mashaelalmarzooqi@gmail.com,gumroad,2024-02-12,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_rxnAKMYo5pMMXCt1Xgj5lg==,sara.garciamartinez@stryker.com,gumroad,2024-02-14,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_OwRGsdwyzosu8lmga4RY3w==,analytics@darnitsa.ua,gumroad,2024-02-22,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_FtKs34nL-HSd2Yn9N-HcpA==,robert.derby@dallasopera.org,gumroad,2024-02-26,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_WTdT5lfLfXEl7wg6IGYsew==,asam1989@gmail.com,gumroad,2024-02-28,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_hgGgBh_wlOKIvvhSCKSizA==,ooitraceyy@gmail.com,gumroad,2024-02-28,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_jKmEbJ4-fmQ2ggScpVpXuQ==,nurmaryamnasir@gmail.com,gumroad,2024-02-29,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_5HtvaT3_V5E8wRYvjnPCwg==,matheusazzilacerda@gmail.com,gumroad,2024-03-04,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_dSLOVX8RUZ5-BaWKfSh8UQ==,andrew.c.smith91@gmail.com,gumroad,2024-03-05,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_8fK_LVk417wtwyZx5SfKng==,rtalsania@gmail.com,gumroad,2024-03-08,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_M7NvcQfOURuj_KuDCdeonw==,miguelsancheeez@gmail.com,gumroad,2024-03-13,Power UI - Power BI Design System,$249.99,$0.00,$0.00,$25.00,$7.55,$32.55,$217.44,completed
+gumroad_ZvxwLAnPsQU9dM6VHV4V7A==,victoriallegge54@gmail.com,gumroad,2024-03-14,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad__4mGdgWweA8zpguGkIKz5Q==,rayshrestha5@gmail.com,gumroad,2024-03-19,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_DAox1UZkoc1Mq4vHERSErA==,kieran.whelan97@gmail.com,gumroad,2024-03-24,Power UI - Power BI Design System,$69.99,$0.00,$0.00,$7.00,$2.33,$9.33,$60.66,completed
+gumroad_WNfruxR_Vp5nKHXAO053eA==,robertorizzi@babyone.de,gumroad,2024-03-27,Power UI - Power BI Design System,$249.99,$0.00,$0.00,$25.00,$7.55,$32.55,$217.44,completed
+gumroad_Sws4B34UFSfiUU_BcSN5fw==,guillaume.des.rosiers@ridgebase.com,gumroad,2024-03-27,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_t9SG8QU1J35Yl6NE5edQTg==,avouk@bladetop.com,gumroad,2024-03-29,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_JYVzp_qFHJlberC-J66KCQ==,v.quang92@gmail.com,gumroad,2024-04-04,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad__tsvmc2Nq33jqn0Z9VeAmA==,nicolacatena93@gmail.com,gumroad,2024-04-04,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$0.00,$3.20,$3.20,$96.79,completed
+gumroad_YUchjyK7rpLqRZXz7YfkQg==,sujatha.sarathy@rsmus.com,gumroad,2024-04-09,Power UI - Power BI Design System,$249.99,$0.00,$0.00,$25.00,$7.55,$32.55,$217.44,completed
+gumroad_0eUePPHCY7nJsJB42bKZfA==,niklas.koch@miinto.com,gumroad,2024-04-10,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_0pAurJr70Le-9_XxZmRmFA==,arta@three6ixtyfinance.com,gumroad,2024-04-23,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_EHaMtf_vVGBuvo_TozO9oQ==,admin@welnch.co,gumroad,2024-04-24,Power UI - Power BI Design System,$99.99,$0.00,$0.00,$10.00,$3.20,$13.20,$86.79,completed
+gumroad_ch6roy5QLHqHMOrU3XaggA==,mike.skinner@actionlink.com,gumroad,2024-05-03,Power UI - Power BI Design System,$249.99,$0.00,$0.00,$25.00,$7.55,$32.55,$217.44,completed
+gumroad_vFTj07krslEFes9HxcC20w==,jonescordell2@gmail.com,gumroad,2024-05-07,Power UI - Power BI Design System,$249.99,$0.00,$0.00,$25.00,$7.55,$32.55,$217.44,completed
+lemonsqueezy_847251_4d316e4c-d8d0-4643-a51a-8a7ca05b8247,huertakelvin1@gmail.com,lemonsqueezy,2024-05-10,Power UI - Power BI UI Kit & Design System,$99.99,$0.00,$0.00,$0.00,$0.00,$0.00,$99.99,completed
+lemonsqueezy_847252_9bf06154-7e09-418a-a252-bee2bedad896,blnickel@iupui.edu,lemonsqueezy,2024-05-11,Power UI - Power BI UI Kit & Design System,$106.99,$0.00,$700.00,$0.00,$0.00,$0.00,-$593.01,completed
+lemonsqueezy_847253_5342ebce-36cf-4eee-8c00-83d570b8897d,clooqh@gmail.com,lemonsqueezy,2024-05-12,Power UI - Power BI UI Kit & Design System,$99.99,$0.00,$0.00,$0.00,$0.00,$0.00,$99.99,completed
+lemonsqueezy_847254_39787889-185a-416b-9e5e-0eeb7ff0319c,bkwhitetx@gmail.com,lemonsqueezy,2024-05-12,Power UI - Power BI UI Kit & Design System,$108.24,$0.00,$825.00,$0.00,$0.00,$0.00,-$716.76,completed
+lemonsqueezy_847255_28b4c3e8-52f9-49c2-9faa-bc39c5ddf18e,elbry1907@outlook.com,lemonsqueezy,2024-05-12,Power UI - Power BI UI Kit & Design System,$99.99,$0.00,$0.00,$0.00,$0.00,$0.00,$99.99,completed
+lemonsqueezy_847256_8f178240-1053-4187-95b7-b6452daa20c1,john@wemakedataflow.co.uk,lemonsqueezy,2024-05-13,Power UI - Power BI UI Kit & Design System,$99.99,$0.00,$0.00,$0.00,$0.00,$0.00,$99.99,completed
+lemonsqueezy_847257_7eb66547-afef-4109-99e4-6369a419cbf2,ehamouda@gmail.com,lemonsqueezy,2024-05-13,Power UI - Power BI UI Kit & Design System,$99.99,$0.00,$0.00,$0.00,$0.00,$0.00,$99.99,completed
+lemonsqueezy_847258_229714f9-22ad-40ce-9130-615e47806bde,406785256@qq.com,lemonsqueezy,2024-05-14,Power UI - Power BI UI Kit & Design System,$99.99,$0.00,$0.00,$0.00,$0.00,$0.00,$99.99,completed
+lemonsqueezy_847259_6851b0aa-76f3-4300-ae70-f18f7cbcd68e,subscriptions@droppoint.com.au,lemonsqueezy,2024-05-23,Power UI - Power BI UI Kit & Design System,$109.99,$0.00,"$1,000.00",$0.00,$0.00,$0.00,-$890.01,completed
+lemonsqueezy_8472510_5e009fec-c900-4819-b9d6-99de76dd042f,ah.shamrani@gmail.com,lemonsqueezy,2024-05-27,Power UI - Power BI UI Kit & Design System,$99.99,$0.00,$0.00,$0.00,$0.00,$0.00,$99.99,completed
+lemonsqueezy_8472511_7eaa3492-74a7-4647-bf1c-7c28ee1c0f7c,eclaus@renewreit.com,lemonsqueezy,2024-05-28,Power UI - Power BI UI Kit & Design System,$99.99,$0.00,$0.00,$0.00,$0.00,$0.00,$99.99,completed
+lemonsqueezy_8472512_ec508229-fa91-40e5-adca-49bd226951bf,chandlerhterrell@gmail.com,lemonsqueezy,2024-05-30,Power UI - Power BI UI Kit & Design System,$86.39,$0.00,$640.00,$0.00,$0.00,$0.00,-$553.61,completed
+lemonsqueezy_8472513_1bc64776-5894-4f04-9fc8-7771352128e0,robert.hawlor@outlook.com,lemonsqueezy,2024-06-01,Power UI - Power BI UI Kit & Design System,$95.99,$0.00,"$1,600.00",$0.00,$0.00,$0.00,"-$1,504.01",completed
+lemonsqueezy_8472516_d6aed490-8778-438f-8f1c-c1949f89f33b,cjelliott2@googlemail.com,lemonsqueezy,2024-06-06,Power UI - Power BI UI Kit & Design System,$95.99,$0.00,"$1,600.00",$0.00,$0.00,$0.00,"-$1,504.01",completed
+lemonsqueezy_8472517_c25edfbf-e11c-4cac-858a-08b4224f0df2,nicollasamsantos@gmail.com,lemonsqueezy,2024-06-06,Power UI - Power BI UI Kit & Design System,$79.99,$0.00,$0.00,$0.00,$0.00,$0.00,$79.99,completed
+lemonsqueezy_8472518_94641eb6-b174-46c1-8153-25feaffc6617,mohussainworkspace@gmail.com,lemonsqueezy,2024-06-08,Power UI - Power BI UI Kit & Design System,$9.00,$0.00,$0.00,$0.00,$0.00,$0.00,$9.00,completed
+lemonsqueezy_8472519_08e6323d-55f3-414b-8368-51b63f3823d0,leo-castel@hotmail.fr,lemonsqueezy,2024-06-08,Power UI - Power BI UI Kit & Design System,$9.00,$0.00,$0.00,$0.00,$0.00,$0.00,$9.00,completed
+lemonsqueezy_8472520_fe9e6023-7726-4e7a-8bbc-30007abc7178,jdeary.jd@googlemail.com,lemonsqueezy,2024-06-09,Power UI - Power BI UI Kit & Design System,$10.80,$0.00,$180.00,$0.00,$0.00,$0.00,-$169.20,completed
+lemonsqueezy_8472521_677f3fb1-3098-4e5d-af94-4f85582c4812,sansonbar@hotmail.com,lemonsqueezy,2024-06-09,Power UI - Power BI UI Kit & Design System,$9.00,$0.00,$0.00,$0.00,$0.00,$0.00,$9.00,completed
+lemonsqueezy_8472522_4709df93-a279-488e-8107-dbc4c1dc01f9,arekchr@gmail.com,lemonsqueezy,2024-06-09,Power UI - Power BI UI Kit & Design System,$11.07,$0.00,$207.00,$0.00,$0.00,$0.00,-$195.93,completed
+lemonsqueezy_8472523_e744fa4b-cfcd-4b2c-a337-0211ab06715d,connortapp@icloud.com,lemonsqueezy,2024-06-10,Power UI - Power BI UI Kit & Design System,$10.80,$0.00,$180.00,$0.00,$0.00,$0.00,-$169.20,completed
+lemonsqueezy_8472524_ddae2e92-68fc-4125-916c-ec6cd0992f0b,evan.mccoy@kone.com,lemonsqueezy,2024-06-10,Power UI - Power BI UI Kit & Design System,$19.00,$0.00,$0.00,$0.00,$0.00,$0.00,$19.00,completed
+lemonsqueezy_8472525_e4f8bfc1-2efb-4a12-b6e4-1b16153479a1,amandianeze@gmail.com,lemonsqueezy,2024-06-11,Power UI - Power BI UI Kit & Design System,$19.00,$0.00,$0.00,$0.00,$0.00,$0.00,$19.00,completed
+lemonsqueezy_8472526_07bd01dd-7f03-450a-99af-5e8a0bd4465f,javgarchz@gmail.com,lemonsqueezy,2024-06-11,Power UI - Power BI UI Kit & Design System,$11.40,$0.00,$0.00,$0.00,$0.00,$0.00,$11.40,completed
+lemonsqueezy_8472527_2b8c18dd-6215-4b4b-b539-c849c5766c88,spencer.howard@aircommunities.com,lemonsqueezy,2024-06-11,Power UI - Power BI UI Kit & Design System,$19.00,$0.00,$0.00,$0.00,$0.00,$0.00,$19.00,completed
+lemonsqueezy_8472528_9e3c7352-a15c-46cb-bf09-3e70ee3ad65b,cwnoll@pcls-us.com,lemonsqueezy,2024-06-12,Power UI - Power BI UI Kit & Design System,$25.92,$0.00,$192.00,$0.00,$0.00,$0.00,-$166.08,completed
+lemonsqueezy_8472529_d52048ed-a372-44b8-88dd-c2622e570adc,zcurry.dev@gmail.com,lemonsqueezy,2024-06-12,Power UI - Power BI UI Kit & Design System,$25.92,$0.00,$192.00,$0.00,$0.00,$0.00,-$166.08,completed
+lemonsqueezy_8472530_e1cc3e90-6cff-49b5-85aa-07b2aca9a73a,shantanilbagchi@gmail.com,lemonsqueezy,2024-06-12,Power UI - Power BI UI Kit & Design System,$25.20,$0.00,$120.00,$0.00,$0.00,$0.00,-$94.80,completed
+lemonsqueezy_8472531_cc0d4657-9c8d-45fb-981b-ec3ed5c31cf3,xelork@icloud.com,lemonsqueezy,2024-06-12,Power UI - Power BI UI Kit & Design System,$24.00,$0.00,$0.00,$0.00,$0.00,$0.00,$24.00,completed
+lemonsqueezy_8472532_b07114a9-5b51-4f28-8ad2-d613947c75db,neix744@gmail.com,lemonsqueezy,2024-06-12,Power UI - Power BI UI Kit & Design System,$14.40,$0.00,$0.00,$0.00,$0.00,$0.00,$14.40,completed
+lemonsqueezy_8472533_d3e35b3a-f79a-4a6a-890f-38e28bd6698b,thehaajar.sch@gmail.com,lemonsqueezy,2024-06-12,Power UI - Power BI UI Kit & Design System,$12.00,$0.00,$0.00,$0.00,$0.00,$0.00,$12.00,completed
+lemonsqueezy_8472534_f6c19d98-3506-4a20-8c9e-148a19ab0265,bartek.gestwa@gmail.com,lemonsqueezy,2024-06-12,Power UI - Power BI UI Kit & Design System,$14.76,$0.00,$276.00,$0.00,$0.00,$0.00,-$261.24,completed
+lemonsqueezy_8472535_7db34b28-3b78-4cba-8f85-5a9c4cf2c3f1,benjamin.steurer@blochergroup.de,lemonsqueezy,2024-06-12,Power UI - Power BI UI Kit & Design System,$19.20,$0.00,$0.00,$0.00,$0.00,$0.00,$19.20,completed
+lemonsqueezy_8472536_b656e34f-b74d-40f6-ac3c-a76762514657,cfeichtner13@gmail.com,lemonsqueezy,2024-06-12,Power UI - Power BI UI Kit & Design System,$32.00,$0.00,$0.00,$0.00,$0.00,$0.00,$32.00,completed
+lemonsqueezy_8472537_7bead876-a073-4199-b4d2-e448fa86bab6,graeme.hay@gmail.com,lemonsqueezy,2024-06-13,Power UI - Power BI UI Kit & Design System,$35.20,$0.00,$320.00,$0.00,$0.00,$0.00,-$284.80,completed
+lemonsqueezy_8472538_ee2aa9bb-4e68-4977-86df-951a0dd9c5a6,arles.barr@gmail.com,lemonsqueezy,2024-06-13,Power UI - Power BI UI Kit & Design System,$19.04,$0.00,$304.00,$0.00,$0.00,$0.00,-$284.96,completed
+lemonsqueezy_8472539_7f499618-2424-4ceb-81c1-1b9a6cfe748e,alexjordanpain@gmail.com,lemonsqueezy,2024-06-13,Power UI - Power BI UI Kit & Design System,$38.40,$0.00,$640.00,$0.00,$0.00,$0.00,-$601.60,completed
+lemonsqueezy_8472540_e4dfca0a-3d31-4c24-9cc6-3d1e1d2df5b6,jarretl@asebp.ca,lemonsqueezy,2024-06-13,Power UI - Power BI UI Kit & Design System,$33.60,$0.00,$160.00,$0.00,$0.00,$0.00,-$126.40,completed
+lemonsqueezy_8472541_aa1989f4-b6b7-4fbe-89ad-0d8e95355a59,joeward@outlook.com,lemonsqueezy,2024-06-13,Power UI - Power BI UI Kit & Design System,$32.00,$0.00,$0.00,$0.00,$0.00,$0.00,$32.00,completed
+lemonsqueezy_8472542_24761528-3b9e-4e7d-948a-32c87d734720,mitchell@securemetrics.io,lemonsqueezy,2024-06-14,Power UI - Power BI UI Kit & Design System,$34.75,$0.00,$275.00,$0.00,$0.00,$0.00,-$240.25,completed
+lemonsqueezy_8472543_99ebe1fa-7a94-49e7-980f-ea391d68e835,miroslav.negovan@me.com,lemonsqueezy,2024-06-14,Power UI - Power BI UI Kit & Design System,$51.84,$0.00,$864.00,$0.00,$0.00,$0.00,-$812.16,completed
+lemonsqueezy_8472544_76bbef31-3ef8-41c9-81ea-0f5f497472df,truenroeng@armstrongceilings.com,lemonsqueezy,2024-06-14,Power UI - Power BI UI Kit & Design System,$57.24,$0.00,$324.00,$0.00,$0.00,$0.00,-$266.76,completed
+lemonsqueezy_8472545_484f4723-6471-4d9b-8e6c-0a76a104703e,dstoltz.11@gmail.com,lemonsqueezy,2024-06-16,Power UI - Power BI UI Kit & Design System,$58.19,$0.00,$419.00,$0.00,$0.00,$0.00,-$360.81,completed
+lemonsqueezy_8472546_8de415e4-f93d-4d03-a1c2-955157cb11ea,k0239934@hotmail.com,lemonsqueezy,2024-06-18,Power UI - Power BI UI Kit & Design System,$99.00,$0.00,$0.00,$0.00,$0.00,$0.00,$99.00,completed
+lemonsqueezy_8472547_bf9172e1-a3f1-4409-9f8b-137f0c59c4e1,ryanlenzora@gmail.com,lemonsqueezy,2024-06-19,Power UI - Power BI UI Kit & Design System,$54.00,$0.00,$0.00,$0.00,$0.00,$0.00,$54.00,completed
+lemonsqueezy_8472548_3dae114b-564b-4951-b59a-530deef62e03,hadi.abouchaaban@gmail.com,lemonsqueezy,2024-06-20,Power UI - Power BI UI Kit & Design System,$39.69,$0.00,$189.00,$0.00,$0.00,$0.00,-$149.31,completed
+lemonsqueezy_8472549_2697115e-3bf3-4d4a-b304-9a0b8f1a1c09,gregsipe@gmail.com,lemonsqueezy,2024-06-20,Power UI - Power BI UI Kit & Design System,$40.45,$0.00,$265.00,$0.00,$0.00,$0.00,-$224.55,completed
+lemonsqueezy_8472550_bce92707-15c4-4d37-adec-8d7913267f14,sanoonan@deloitte.com,lemonsqueezy,2024-06-21,Power UI - Power BI UI Kit & Design System,$54.00,$0.00,$0.00,$0.00,$0.00,$0.00,$54.00,completed
+lemonsqueezy_8472551_7bdb5c14-46cb-409f-82c9-9552fbce293c,fab.hbarbosa@gmail.com,lemonsqueezy,2024-06-21,Power UI - Power BI UI Kit & Design System,$32.40,$0.00,$0.00,$0.00,$0.00,$0.00,$32.40,completed
+lemonsqueezy_8472552_08d1cc1d-78ee-4485-bef3-00ba5ae24fa9,tobias.partridge@outlook.com.au,lemonsqueezy,2024-06-22,Power UI - Power BI UI Kit & Design System,$59.40,$0.00,$540.00,$0.00,$0.00,$0.00,-$480.60,completed
+lemonsqueezy_8472553_b3a78e9c-0281-46c4-b16d-440489043445,irena.gorse-koren@comtradegaming.com,lemonsqueezy,2024-06-24,Power UI - Power BI UI Kit & Design System,$99.00,$0.00,$0.00,$0.00,$0.00,$0.00,$99.00,completed
+lemonsqueezy_8472554_25b3192f-26f8-485f-8bbe-7cec3a49b0bf,linoska.scc@gmail.com,lemonsqueezy,2024-06-25,Power UI - Power BI UI Kit & Design System,$27.00,$0.00,$0.00,$0.00,$0.00,$0.00,$27.00,completed
+lemonsqueezy_8472555_b923061d-1fc3-4973-b0b4-dd8a5c03ff33,ppierorazio@bhsonline.com,lemonsqueezy,2024-06-26,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_8472556_3ebb4153-8828-4d56-b4cd-5e6e9ceebe91,rhee.chris.yw@gmail.com,lemonsqueezy,2024-06-26,Power UI - Power BI UI Kit & Design System,$59.40,$0.00,$540.00,$0.00,$0.00,$0.00,-$480.60,completed
+lemonsqueezy_8472557_3b1e22dc-6087-4ef2-bd06-6c1f770d9149,markwelfare@leightons.co.uk,lemonsqueezy,2024-06-27,Power UI - Power BI UI Kit & Design System,$117.60,$0.00,"$1,960.00",$0.00,$0.00,$0.00,"-$1,842.40",completed
+lemonsqueezy_8472558_fe94d415-182d-4ddc-8226-f9a1f6fc9d56,samialihameed01@gmail.com,lemonsqueezy,2024-06-27,Power UI - Power BI UI Kit & Design System,$105.84,$0.00,$784.00,$0.00,$0.00,$0.00,-$678.16,completed
+lemonsqueezy_8472559_39403ccf-2462-41b8-81c1-4502d4f7438d,cstringham@greatservice.com,lemonsqueezy,2024-06-28,Power UI - Power BI UI Kit & Design System,$376.05,$0.00,"$2,705.00",$0.00,$0.00,$0.00,"-$2,328.95",completed
+lemonsqueezy_8472560_82b38c7b-47b9-45c0-8497-79396c7ea070,alex@bonnevilleandson.com,lemonsqueezy,2024-07-02,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_8472561_b380845b-ca63-4a75-9e13-211b0f475e55,ahmed.hamed.m@hotmail.com,lemonsqueezy,2024-07-02,Power UI - Power BI UI Kit & Design System,$58.80,$0.00,$0.00,$0.00,$0.00,$0.00,$58.80,completed
+lemonsqueezy_8472562_149a7225-9b82-4a2d-a9b2-bb6c8f7cef6a,christopher.jereb@1h1.ch,lemonsqueezy,2024-07-03,Power UI - Power BI UI Kit & Design System,$52.97,$0.00,$397.00,$0.00,$0.00,$0.00,-$344.03,completed
+lemonsqueezy_8472563_78d12f8c-aa51-4639-b444-fc8690d40578,louis-g-taylor@outlook.com,lemonsqueezy,2024-07-03,Power UI - Power BI UI Kit & Design System,$117.60,$0.00,"$1,960.00",$0.00,$0.00,$0.00,"-$1,842.40",completed
+lemonsqueezy_8472564_6d39282d-43d2-48b4-a13b-2800dc57c2ed,damlequang157@gmail.com,lemonsqueezy,2024-07-03,Power UI - Power BI UI Kit & Design System,$53.90,$0.00,$490.00,$0.00,$0.00,$0.00,-$436.10,completed
+lemonsqueezy_8472565_2737f886-baff-4298-83f0-178acf0d82ca,riexavi@gmail.com,lemonsqueezy,2024-07-04,Power UI - Power BI UI Kit & Design System,$39.20,$0.00,$0.00,$0.00,$0.00,$0.00,$39.20,completed
+lemonsqueezy_8472566_aea9808f-987c-4b0d-993a-350277ff70a4,radhames2106@gmail.com,lemonsqueezy,2024-07-08,Power UI - Power BI UI Kit & Design System,$49.00,$0.00,$0.00,$0.00,$0.00,$0.00,$49.00,completed
+lemonsqueezy_8472567_7e8adfd6-774a-4957-9ddd-076ecad4b90e,ingmarlopez@gmail.com,lemonsqueezy,2024-07-08,Power UI - Power BI UI Kit & Design System,$68.60,$0.00,$0.00,$0.00,$0.00,$0.00,$68.60,completed
+lemonsqueezy_84725142_303c8a57-dd47-4171-9c5e-8828e223c2a2,trungle@prepedu.com,lemonsqueezy,2024-07-09,Power UI - Power BI UI Kit & Design System,$174.50,$0.00,$0.00,$0.00,$0.00,$0.00,$174.50,completed
+lemonsqueezy_84725143_b3e88848-2918-4998-b67b-acd0b2dcb46a,fahe@bitcoinsuisse.com,lemonsqueezy,2024-07-09,Power UI - Power BI UI Kit & Design System,$105.94,$0.00,$794.00,$0.00,$0.00,$0.00,-$688.06,completed
+lemonsqueezy_84725144_48fcf34d-eb5d-40e9-8756-b6565bc10209,claudiablock@att.net,lemonsqueezy,2024-07-09,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725145_aa4ad6c8-9529-49b2-8a17-e4d340a4b5c3,joe@the-hollidays.co.uk,lemonsqueezy,2024-07-10,Power UI - Power BI UI Kit & Design System,$117.60,$0.00,"$1,960.00",$0.00,$0.00,$0.00,"-$1,842.40",completed
+lemonsqueezy_84725146_461098cb-9986-45c4-9def-933966b4c661,rdoris@getreba.com,lemonsqueezy,2024-07-11,Power UI - Power BI UI Kit & Design System,$349.00,$0.00,$0.00,$0.00,$0.00,$0.00,$349.00,completed
+lemonsqueezy_84725147_a198163d-2de5-48da-b1d7-fc314bd4a943,wes@itnoms.net,lemonsqueezy,2024-07-11,Power UI - Power BI UI Kit & Design System,$107.11,$0.00,$911.00,$0.00,$0.00,$0.00,-$803.89,completed
+lemonsqueezy_84725148_b8fb530f-ea54-4ac6-b8ce-076ec13b0192,nunoppeixoto@gmail.com,lemonsqueezy,2024-07-11,Power UI - Power BI UI Kit & Design System,$58.80,$0.00,$0.00,$0.00,$0.00,$0.00,$58.80,completed
+lemonsqueezy_84725149_c9679f21-679b-4a8c-b902-09a617f344a9,titusb16@gmail.com,lemonsqueezy,2024-07-11,Power UI - Power BI UI Kit & Design System,$373.43,$0.00,"$2,443.00",$0.00,$0.00,$0.00,"-$2,069.57",completed
+lemonsqueezy_84725150_c6079318-9c4c-4338-af58-42069375d4fb,max@ritchmeyer.ca,lemonsqueezy,2024-07-11,Power UI - Power BI UI Kit & Design System,$110.74,$0.00,"$1,274.00",$0.00,$0.00,$0.00,"-$1,163.26",completed
+lemonsqueezy_84725151_b4b1fde3-be0e-4745-9d10-c8675b349434,jp.sengersilva@gmail.com,lemonsqueezy,2024-07-12,Power UI - Power BI UI Kit & Design System,$58.80,$0.00,$0.00,$0.00,$0.00,$0.00,$58.80,completed
+lemonsqueezy_84725152_dd6c23fb-1cf9-4f3c-927c-2f5b2b1eb795,emma@soter.co.nz,lemonsqueezy,2024-07-12,Power UI - Power BI UI Kit & Design System,$112.70,$0.00,"$1,470.00",$0.00,$0.00,$0.00,"-$1,357.30",completed
+lemonsqueezy_84725153_2ca23d10-7c66-4e83-b0c2-864caf18c9f9,ygor.grodrigues@icloud.com,lemonsqueezy,2024-07-12,Power UI - Power BI UI Kit & Design System,$58.80,$0.00,$0.00,$0.00,$0.00,$0.00,$58.80,completed
+lemonsqueezy_84725154_6fc87aa1-cb9f-4f9f-9cf3-7d5f1b80e85d,pmjdupont@gmail.com,lemonsqueezy,2024-07-12,Power UI - Power BI UI Kit & Design System,$39.20,$0.00,$0.00,$0.00,$0.00,$0.00,$39.20,completed
+lemonsqueezy_84725155_7ceb5df1-a36b-4215-bc4e-e317bed4ca3b,phii@fairwind.com,lemonsqueezy,2024-07-15,Power UI - Power BI UI Kit & Design System,$61.25,$0.00,"$1,225.00",$0.00,$0.00,$0.00,"-$1,163.75",completed
+lemonsqueezy_84725156_7ddfea78-1e26-4a65-9d7f-52cdb3a5fd41,analytics.services@atg-nexus.com,lemonsqueezy,2024-07-15,Power UI - Power BI UI Kit & Design System,$49.00,$0.00,$0.00,$0.00,$0.00,$0.00,$49.00,completed
+lemonsqueezy_84725157_ca8aa688-3ca5-4cee-8248-b88b181ab571,abcz1234@hotmail.nl,lemonsqueezy,2024-07-16,Power UI - Power BI UI Kit & Design System,$118.58,$0.00,"$2,058.00",$0.00,$0.00,$0.00,"-$1,939.42",completed
+lemonsqueezy_84725158_2e70eaee-cdef-4087-9bea-fcb4afc5258a,nlaurila@afphq.org,lemonsqueezy,2024-07-16,Power UI - Power BI UI Kit & Design System,$349.00,$0.00,$0.00,$0.00,$0.00,$0.00,$349.00,completed
+lemonsqueezy_84725159_0e4f9e04-bf46-42f6-b5de-50e7a63a449b,mshatch@gmail.com,lemonsqueezy,2024-07-17,Power UI - Power BI UI Kit & Design System,$105.60,$0.00,$760.00,$0.00,$0.00,$0.00,-$654.40,completed
+lemonsqueezy_84725160_e11d1765-3639-42f9-ac1a-7192665d4ef4,mcc@kyraly.com,lemonsqueezy,2024-07-17,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725161_92c5e6cd-b320-4cd3-8f4b-2ac808f5f3c0,ian.vu1715@gmail.com,lemonsqueezy,2024-07-18,Power UI - Power BI UI Kit & Design System,$75.46,$0.00,$686.00,$0.00,$0.00,$0.00,-$610.54,completed
+lemonsqueezy_84725162_d9213a11-15a0-4b90-9766-dbd6afcef2f1,maxanatsko@gmail.com,lemonsqueezy,2024-07-18,Power UI - Power BI UI Kit & Design System,$39.20,$0.00,$0.00,$0.00,$0.00,$0.00,$39.20,completed
+lemonsqueezy_84725163_0686b19f-0ca6-4320-9e8c-c54a587174ec,nicole.sear@hotmail.co.nz,lemonsqueezy,2024-07-19,Power UI - Power BI UI Kit & Design System,$112.70,$0.00,"$1,470.00",$0.00,$0.00,$0.00,"-$1,357.30",completed
+lemonsqueezy_84725164_269aa626-870a-4d7e-b0a2-7a023513fe03,rmirabile@goorin.com,lemonsqueezy,2024-07-19,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725165_04bd2d1b-5431-4f0d-a6a7-508e912c5fc1,martin_bengtsson@bose.com,lemonsqueezy,2024-07-20,Power UI - Power BI UI Kit & Design System,$349.00,$0.00,$0.00,$0.00,$0.00,$0.00,$349.00,completed
+lemonsqueezy_84725166_a5735e23-d910-4130-a2bc-5a02fa8ca550,djunaedimikael88@gmail.com,lemonsqueezy,2024-07-22,Power UI - Power BI UI Kit & Design System,$54.39,$0.00,$539.00,$0.00,$0.00,$0.00,-$484.61,completed
+lemonsqueezy_84725167_a17cec47-df38-4cda-b3eb-e3ab53faa3df,nimatoguntoke@gmail.com,lemonsqueezy,2024-07-22,Power UI - Power BI UI Kit & Design System,$110.74,$0.00,"$1,274.00",$0.00,$0.00,$0.00,"-$1,163.26",completed
+lemonsqueezy_84725168_470004e9-ba85-4be9-b7a9-78cd0a2dab8e,bbakas@gmail.com,lemonsqueezy,2024-07-23,Power UI - Power BI UI Kit & Design System,$58.80,$0.00,$0.00,$0.00,$0.00,$0.00,$58.80,completed
+lemonsqueezy_84725169_7d7e3f2c-4e2b-4cd7-bb8c-8750e3ece858,friedduc@gmail.com,lemonsqueezy,2024-07-24,Power UI - Power BI UI Kit & Design System,$105.84,$0.00,$784.00,$0.00,$0.00,$0.00,-$678.16,completed
+lemonsqueezy_84725170_a34399ac-addf-4c60-9182-13a1d1dc6592,carolyn.h.nevins@gmail.com,lemonsqueezy,2024-07-24,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725171_8460e06a-994a-48a0-9c02-0d2a7e5d9ecf,giulio@outlook.dk,lemonsqueezy,2024-07-25,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725172_fe87379f-52a3-4526-9911-900088943222,manarallnasser@gmail.com,lemonsqueezy,2024-07-31,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725173_31d7e4ef-ce64-4769-94e0-afc31e83c091,codename062@gmail.com,lemonsqueezy,2024-08-01,Power UI - Power BI UI Kit & Design System,$110.74,$0.00,"$1,274.00",$0.00,$0.00,$0.00,"-$1,163.26",completed
+lemonsqueezy_84725174_9d867169-ab43-4ae4-947b-28ecdd5a2033,k.shahbic@manateq.qa,lemonsqueezy,2024-08-06,Power UI - Power BI UI Kit & Design System,$349.00,$0.00,$0.00,$0.00,$0.00,$0.00,$349.00,completed
+lemonsqueezy_84725175_9bd6a21e-514b-41ad-be0e-fd40c07547a0,landon.wilson@lcef.org,lemonsqueezy,2024-08-07,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725176_d157e956-1120-49cc-b69e-828bb3341428,335368@kao.com,lemonsqueezy,2024-08-08,Power UI - Power BI UI Kit & Design System,$75.46,$0.00,$686.00,$0.00,$0.00,$0.00,-$610.54,completed
+lemonsqueezy_84725177_4144ca02-13c3-4c7f-a54e-cee145ccd62a,ahrionmgallegos@gmail.com,lemonsqueezy,2024-08-10,Power UI - Power BI UI Kit & Design System,$105.84,$0.00,$784.00,$0.00,$0.00,$0.00,-$678.16,completed
+lemonsqueezy_84725178_636c99d2-d2f4-4b13-a0d1-2d40abafc048,nazaaf@mahajanagroup.com,lemonsqueezy,2024-08-11,Power UI - Power BI UI Kit & Design System,$39.20,$0.00,$0.00,$0.00,$0.00,$0.00,$39.20,completed
+lemonsqueezy_84725179_2f8452fe-5a0d-4291-a423-efeb9c4c57f1,andrew.tegroen@theinsightscompany.co.nz,lemonsqueezy,2024-08-15,Power UI - Power BI UI Kit & Design System,$112.70,$0.00,"$1,470.00",$0.00,$0.00,$0.00,"-$1,357.30",completed
+lemonsqueezy_84725180_0117c87a-a8d0-4a7f-b8bd-1cff56e54554,kasper.fellkjaer@gmail.com,lemonsqueezy,2024-08-15,Power UI - Power BI UI Kit & Design System,$122.50,$0.00,"$2,450.00",$0.00,$0.00,$0.00,"-$2,327.50",completed
+lemonsqueezy_84725181_da781fa1-2e0c-457d-b9f6-749fadef5d79,erik.bjorkberger@gmail.com,lemonsqueezy,2024-08-16,Power UI - Power BI UI Kit & Design System,$122.50,$0.00,"$2,450.00",$0.00,$0.00,$0.00,"-$2,327.50",completed
+lemonsqueezy_84725182_e3f2a9aa-4c81-4dc8-b66b-1aa53bbe8467,sebastianantonio.perez@outlook.com,lemonsqueezy,2024-08-18,Power UI - Power BI UI Kit & Design System,$58.80,$0.00,$0.00,$0.00,$0.00,$0.00,$58.80,completed
+lemonsqueezy_84725183_78b25ece-0551-49d6-9f48-435b6170a6cc,lcampbell@dandeeint.com,lemonsqueezy,2024-08-18,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725184_33c4343a-50e6-4414-9902-54049226bbd2,adamfinley72701@gmail.com,lemonsqueezy,2024-08-19,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725185_36629a18-f0fa-4121-b82e-7d43a57d0de4,taylorzacharyd@outlook.com,lemonsqueezy,2024-08-20,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725186_8741041f-a7b3-46f4-9efd-42b46cb2d59b,bp-rsalin@hotmail.com,lemonsqueezy,2024-08-20,Power UI - Power BI UI Kit & Design System,$58.80,$0.00,$0.00,$0.00,$0.00,$0.00,$58.80,completed
+lemonsqueezy_84725187_2e2bdc46-bc61-456c-931c-1b5e9c6cd53a,moses.chiwaligo@crdbbank.co.tz,lemonsqueezy,2024-08-21,Power UI - Power BI UI Kit & Design System,$57.82,$0.00,$882.00,$0.00,$0.00,$0.00,-$824.18,completed
+lemonsqueezy_84725188_77f80091-4ee3-4b55-9554-b16286fc7b65,macaron@live.com.sg,lemonsqueezy,2024-08-21,Power UI - Power BI UI Kit & Design System,$85.46,$0.00,$706.00,$0.00,$0.00,$0.00,-$620.54,completed
+lemonsqueezy_84725189_ce850ad6-e155-4414-8588-dc9880ee9b7a,william.doyle@raildiary.com,lemonsqueezy,2024-08-21,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725190_0de1c0e4-43af-4245-aa1c-201a78a8893f,james@bedrockdata.uk,lemonsqueezy,2024-08-22,Power UI - Power BI UI Kit & Design System,$49.00,$0.00,$0.00,$0.00,$0.00,$0.00,$49.00,completed
+lemonsqueezy_84725192_e6dead36-2e33-4aa7-ba09-a6b3471509fc,zachary-boland@outlook.com,lemonsqueezy,2024-08-23,Power UI - Power BI UI Kit & Design System,$92.61,$0.00,$441.00,$0.00,$0.00,$0.00,-$348.39,completed
+lemonsqueezy_84725193_6d815572-e5ef-4fc5-ae37-62b040fbe6c1,biju2jose@gmail.com,lemonsqueezy,2024-08-23,Power UI - Power BI UI Kit & Design System,$72.03,$0.00,$343.00,$0.00,$0.00,$0.00,-$270.97,completed
+lemonsqueezy_84725194_d44dd257-f2a8-4607-8a78-9782b9d27081,michellemarie200@gmail.com,lemonsqueezy,2024-08-23,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725195_dfa93d28-7603-4498-b708-9a4f491d0218,issy@insight24.co.uk,lemonsqueezy,2024-08-25,Power UI - Power BI UI Kit & Design System,$117.60,$0.00,"$1,960.00",$0.00,$0.00,$0.00,"-$1,842.40",completed
+lemonsqueezy_84725196_58066cfe-ac1f-494f-9790-f1804e1395e3,yvives@orvital.mx,lemonsqueezy,2024-08-26,Power UI - Power BI UI Kit & Design System,$58.80,$0.00,$0.00,$0.00,$0.00,$0.00,$58.80,completed
+lemonsqueezy_84725197_cfc9c14e-c8e7-4c68-8fa2-aa022b627634,zik.saric@gmail.com,lemonsqueezy,2024-08-28,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725198_6f0bdb6e-9048-4a51-84e5-cccc75af01e8,serrato_monique@yahoo.com,lemonsqueezy,2024-08-29,Power UI - Power BI UI Kit & Design System,$88.20,$0.00,$0.00,$0.00,$0.00,$0.00,$88.20,completed
+lemonsqueezy_84725199_6801b7a3-b286-4b4a-b960-6474ba7ada76,nikulsdesai@gmail.com,lemonsqueezy,2024-08-30,Power UI - Power BI UI Kit & Design System,$78.40,$0.00,$0.00,$0.00,$0.00,$0.00,$78.40,completed
+lemonsqueezy_84725200_530d1ff6-2a0a-4194-ad81-bf8c39c22876,marcio.evangelista@live.com,lemonsqueezy,2024-08-30,Power UI - Power BI UI Kit & Design System,$58.80,$0.00,$0.00,$0.00,$0.00,$0.00,$58.80,completed
+lemonsqueezy_84725201_e25ebc67-8cbc-4f53-ae06-4cae3ae7f65a,johsti03@protiviti.com,lemonsqueezy,2024-08-30,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725202_21add066-f71a-4260-b5a5-885e62da08ce,janischick8@gmail.com,lemonsqueezy,2024-09-02,Power UI - Power BI UI Kit & Design System,$97.02,$0.00,$882.00,$0.00,$0.00,$0.00,-$784.98,completed
+lemonsqueezy_84725203_9b9380bc-4c8e-4bfc-b7e9-cc2e05f69977,farheen.gazanfar@ghostdinners.com,lemonsqueezy,2024-09-05,Power UI - Power BI UI Kit & Design System,$105.84,$0.00,"$1,764.00",$0.00,$0.00,$0.00,"-$1,658.16",completed
+lemonsqueezy_84725204_5fce5455-d4d0-4945-a875-7ca04f971a8a,desi_echevarria@yahoo.com,lemonsqueezy,2024-09-06,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725205_8237c2b6-6465-4761-9db1-bec0817c3255,lauracwill@gmail.com,lemonsqueezy,2024-09-06,Power UI - Power BI UI Kit & Design System,$105.84,$0.00,$784.00,$0.00,$0.00,$0.00,-$678.16,completed
+lemonsqueezy_84725206_7f8ee7d5-5a8e-420c-8c8c-7994c0b1f93e,michaeldeanlindsay@gmail.com,lemonsqueezy,2024-09-06,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725207_05a79860-3e8e-42b3-ac4e-ed3cc92dc934,joel.schuler@femoran.com,lemonsqueezy,2024-09-09,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725208_59febe50-87d3-40b9-bbf9-90f0acbc92ef,jrodriguez@quantium.com.do,lemonsqueezy,2024-09-09,Power UI - Power BI UI Kit & Design System,$49.00,$0.00,$0.00,$0.00,$0.00,$0.00,$49.00,completed
+lemonsqueezy_84725209_81588c7e-cbea-42b6-9258-940ca5cd1382,isak.rossa@gmail.com,lemonsqueezy,2024-09-19,Power UI - Power BI UI Kit & Design System,$122.50,$0.00,"$2,450.00",$0.00,$0.00,$0.00,"-$2,327.50",completed
+lemonsqueezy_84725210_a365db51-8473-4537-9a0d-20aeb687cf90,success@ootconsulting.com,lemonsqueezy,2024-09-19,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725211_38ee2c47-e654-44bc-a240-25fc917fa850,tyler.yates@digitalmeld.io,lemonsqueezy,2024-09-19,Power UI - Power BI UI Kit & Design System,$376.92,$0.00,"$2,792.00",$0.00,$0.00,$0.00,"-$2,415.08",completed
+lemonsqueezy_84725212_fc1d0d9a-177e-482d-9e47-92fbda0491db,zhibang.jiang@gmail.com,lemonsqueezy,2024-09-20,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725213_2560782e-4ab9-44ec-84ce-5751fdfedde8,scottmjewett@gmail.com,lemonsqueezy,2024-09-21,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725214_c7e5d6c0-1087-46dc-8fbe-9d956f8b0538,reese.g.osborne.civ@army.mil,lemonsqueezy,2024-09-25,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725215_f9ba159e-fef7-4e66-bef2-5a6331118b27,johnnywinns@gmail.com,lemonsqueezy,2024-09-25,Power UI - Power BI UI Kit & Design System,$105.84,$0.00,$784.00,$0.00,$0.00,$0.00,-$678.16,completed
+lemonsqueezy_84725216_111d3fe6-7745-4613-8eb8-ae9d5329fe36,dave@cubdigital.co.nz,lemonsqueezy,2024-09-29,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725217_a73dae52-7e6e-4009-86bd-6f3dbaafbb7d,carol.otero@hotmail.com,lemonsqueezy,2024-10-01,Power UI - Power BI UI Kit & Design System,$49.00,$0.00,$0.00,$0.00,$0.00,$0.00,$49.00,completed
+lemonsqueezy_84725218_40793f6c-c44c-4897-a103-4cc433814832,irtiqayousuf786@gmail.com,lemonsqueezy,2024-10-02,Power UI - Power BI UI Kit & Design System,$115.64,$0.00,"$1,764.00",$0.00,$0.00,$0.00,"-$1,648.36",completed
+lemonsqueezy_84725219_09639d10-8cb8-4af7-8ec1-cde7af4ef39f,swati@atomic.supply,lemonsqueezy,2024-10-03,Power UI - Power BI UI Kit & Design System,$105.64,$0.00,$764.00,$0.00,$0.00,$0.00,-$658.36,completed
+lemonsqueezy_84725220_e78a0ed2-1d50-4881-ae50-22ef3e6c0ad3,austinjdonahue@gmail.com,lemonsqueezy,2024-10-04,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725221_6c5e3ec8-42ad-43cf-8a76-1ba1643cd06f,toby@grapefruit-solutions.com,lemonsqueezy,2024-10-07,Power UI - Power BI UI Kit & Design System,$117.60,$0.00,"$1,960.00",$0.00,$0.00,$0.00,"-$1,842.40",completed
+lemonsqueezy_84725222_efd2845e-2922-475e-a25d-8fa134edb9a4,jgprososki@gmail.com,lemonsqueezy,2024-10-10,Power UI - Power BI UI Kit & Design System,$105.60,$0.00,$760.00,$0.00,$0.00,$0.00,-$654.40,completed
+lemonsqueezy_84725223_34eab361-a2ab-4221-b9fb-706a9f4bb29c,dwight.roberson3@me.com,lemonsqueezy,2024-10-13,Power UI - Power BI UI Kit & Design System,$104.86,$0.00,$686.00,$0.00,$0.00,$0.00,-$581.14,completed
+lemonsqueezy_84725224_5554cbef-0da0-4cb2-9e30-e4d82209f596,devapps.bi@gmail.com,lemonsqueezy,2024-10-14,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725225_4ad0b517-b097-4f4a-ac69-4817cf55de58,elbry1907@outlook.com,lemonsqueezy,2024-10-15,Power UI - Power BI UI Kit & Design System,$112.70,$0.00,"$1,470.00",$0.00,$0.00,$0.00,"-$1,357.30",completed
+lemonsqueezy_84725226_44c68963-f49b-4ef9-b3fc-76282ab32428,0210as@gmail.com,lemonsqueezy,2024-10-15,Power UI - Power BI UI Kit & Design System,$98.00,$0.00,$0.00,$0.00,$0.00,$0.00,$98.00,completed
+lemonsqueezy_84725227_10ce44bd-4311-4af4-b17f-d0ca273621bf,jgoldman@agron.com,lemonsqueezy,2024-10-16,Power UI - Power BI UI Kit & Design System,$349.00,$0.00,$0.00,$0.00,$0.00,$0.00,$349.00,completed
+lemonsqueezy_84725228_f666819b-d612-41d4-aeb2-0ea728f5165c,vto470@uowmail.edu.au,lemonsqueezy,2024-10-16,Power UI - Power BI UI Kit & Design System,$107.80,$0.00,$980.00,$0.00,$0.00,$0.00,-$872.20,completed
+stripe_pi_3QAiwfK9BN589qeI0Vjg8AFi,triogoo@gmail.com,stripe,2024-10-17,PRO,$98.00,$0.00,$0.00,$2.94,$8.53,$11.47,$86.53,completed
+stripe_pi_3QAkA6K9BN589qeI1nwF9d5o,data-team@jungtalents.com,stripe,2024-10-17,PRO,$78.40,$0.00,$0.00,$2.35,$7.67,$10.02,$68.38,completed
+stripe_pi_3QAkb7K9BN589qeI1nC1qACm,minh.ndcr@gmail.com,stripe,2024-10-17,PRO,$78.40,$0.00,$0.00,$2.35,$7.67,$10.02,$68.38,completed
+lemonsqueezy_84725229_14339ccc-8fe4-4288-9baa-acedeb991418,michael@mjdn.dev,lemonsqueezy,2024-10-17,Power UI - Power BI UI Kit & Design System,$95.26,$0.00,$706.00,$0.00,$0.00,$0.00,-$610.74,completed
+stripe_pi_3QCrsOK9BN589qeI1MHCoJu6,dori@thenightventures.com,stripe,2024-10-22,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QCx3WK9BN589qeI1DFoXxzI,clayton.okada@gmail.com,stripe,2024-10-23,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QDM7xK9BN589qeI0udQ0wLe,aalshehhi@dfm.ae,stripe,2024-10-24,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QDzKFK9BN589qeI01kedEDU,julie.ng180@gmail.com,stripe,2024-10-26,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QEhE8K9BN589qeI01VC5AgR,rmaharjan@thiess.com,stripe,2024-10-28,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QEtdpK9BN589qeI1Qqsczf7,natebv24@gmail.com,stripe,2024-10-28,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QEv2oK9BN589qeI0YGQK39x,jesusemmendoza@gmail.com,stripe,2024-10-28,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QG15uK9BN589qeI0sXID6Md,nina.gallo@anheuser-busch.com,stripe,2024-10-31,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QG1LTK9BN589qeI04lLYHEd,aroberts025@gmail.com,stripe,2024-10-31,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QGJh6K9BN589qeI08aieAEc,reece.ferrer@hotmail.co.uk,stripe,2024-11-01,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QGKIHK9BN589qeI1q6YruIs,andreas@vean-it.dk,stripe,2024-11-01,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QHL9rK9BN589qeI1IP8wi5g,atajelil93@gmail.com,stripe,2024-11-04,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QHMalK9BN589qeI16B03p2V,serhiivoi@pro-esupplies.com,stripe,2024-11-04,Pro-108,$54.00,$0.00,$0.00,$1.62,$7.00,$8.62,$45.38,completed
+stripe_pi_3QHN71K9BN589qeI0nzwcIPp,bergen.helms@encoway.de,stripe,2024-11-04,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QHpFnK9BN589qeI1Tjl07eq,brandon17parra@hotmail.com,stripe,2024-11-05,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QHpVPK9BN589qeI05Fq08Uh,lisavo16@gmail.com,stripe,2024-11-05,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QICg7K9BN589qeI0U1Qu9Su,rob.stover@enverus.com,stripe,2024-11-06,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QIYuYK9BN589qeI0zH4rv9Z,kurzashane@gmail.com,stripe,2024-11-07,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QIseFK9BN589qeI1EMxQUdx,adam.abenius@makenius.se,stripe,2024-11-08,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QJe6eK9BN589qeI0s9LdtuO,justin.ryan.cook@gmail.com,stripe,2024-11-10,Pro-108,$86.40,$0.00,$0.00,$2.59,$7.13,$9.72,$76.68,completed
+stripe_pi_3QJlWPK9BN589qeI1ABqjTDq,naweed.anjum91@gmail.com,stripe,2024-11-11,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QJteQK9BN589qeI0zYdN0sp,nthaovy11@gmail.com,stripe,2024-11-11,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QKMN3K9BN589qeI1l8bvc09,d.rhoads@bridgeraerospace.com,stripe,2024-11-12,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QKjW8K9BN589qeI1cU2CHbn,jochen@peacock-ia.nl,stripe,2024-11-13,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QKvJ5K9BN589qeI1VGzwVqG,quang-vinh.le@signaturefloors.com.au,stripe,2024-11-14,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QL5emK9BN589qeI1VbPfTjl,muellner.sandra@gmail.com,stripe,2024-11-14,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QL8bnK9BN589qeI0IcKr5TZ,skurza@chromalloy.com,stripe,2024-11-14,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QLSEaK9BN589qeI00FopfrE,hind.a.abokhodair@gmail.com,stripe,2024-11-15,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QLWwFK9BN589qeI1aySTALd,smithbster@gmail.com,stripe,2024-11-15,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QLZj3K9BN589qeI0Z2H7Cwe,sergiocalmon@gmail.com,stripe,2024-11-16,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QLohgK9BN589qeI1RHXHFEn,robert@datanote.nl,stripe,2024-11-16,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QM1egK9BN589qeI1FkChNKc,fedepastor21@outlook.com,stripe,2024-11-17,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QMF0LK9BN589qeI0gTpdJAt,xpdnt1@gmail.com,stripe,2024-11-17,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QMM3AK9BN589qeI1zD6w1d8,pkakouros@gmail.com,stripe,2024-11-18,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QMTBNK9BN589qeI0eN0IUdC,kaiser@northstar.uk.com,stripe,2024-11-18,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QMWE7K9BN589qeI0TuTfzjS,omar.foughali@datafluent.fr,stripe,2024-11-18,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QMYFdK9BN589qeI10cIFPQY,kabindragyanwali@gmail.com,stripe,2024-11-18,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QMb05K9BN589qeI0Lgi8Fos,datatect@betco.com,stripe,2024-11-18,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QMtM8K9BN589qeI0pM8r43A,goofvissers@gmail.com,stripe,2024-11-19,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QMtufK9BN589qeI01zmCBVM,daniele.loliva@gmail.com,stripe,2024-11-19,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QN049K9BN589qeI0cxDMbTP,gustavobavia@gmail.com,stripe,2024-11-19,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QNhebK9BN589qeI0nVJ168K,marcus_a_brown@rl.gov,stripe,2024-11-21,team-5-seats,$359.00,$0.00,$0.00,$10.77,$25.07,$35.84,$323.16,completed
+stripe_pi_3QNqc2K9BN589qeI091avjP0,yuichi.yokoi@omron.com,stripe,2024-11-22,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QNsbTK9BN589qeI0MYxuWJS,dir.dato@grupogarden.com,stripe,2024-11-22,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QNz58K9BN589qeI0rYzHk9y,vildanlatypovv@gmail.com,stripe,2024-11-22,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QOqWbK9BN589qeI0BbeTgyZ,diego.henriques@live.com,stripe,2024-11-25,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QP35TK9BN589qeI14XDMDTg,aliaksandr.letsko@altoros.com,stripe,2024-11-25,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QPWkLK9BN589qeI1JOvysQy,vilauehara@gmail.com,stripe,2024-11-26,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QPWq3K9BN589qeI09lUIrYc,misu.suta@gmail.com,stripe,2024-11-26,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QPYCiK9BN589qeI1cRjDMQJ,adil@bitechsol.com,stripe,2024-11-26,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QPpSqK9BN589qeI1TuLBY8u,bassemkhozam@gmail.com,stripe,2024-11-27,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QPx0aK9BN589qeI17yYMbcY,support@businesspromoted.com,stripe,2024-11-28,Pro-108,$65.00,$0.00,$0.00,$1.95,$6.51,$8.46,$56.54,completed
+stripe_pi_3QQNArK9BN589qeI014tlFdP,deepak@parallelconnect.com,stripe,2024-11-29,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QQPcnK9BN589qeI1HUKDray,bradleyb297@gmail.com,stripe,2024-11-29,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QQb5KK9BN589qeI055brnZx,anthony.paterson@insightfactory.ai,stripe,2024-11-29,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QQf7nK9BN589qeI0cLK08nA,gabriel.fach@outlook.com,stripe,2024-11-30,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QQg7OK9BN589qeI1GIxF9Zq,ohabib@wiigroup.com,stripe,2024-11-30,team-5-seats,$179.50,$0.00,$0.00,$5.39,$22.56,$27.95,$151.56,completed
+stripe_pi_3QQkOzK9BN589qeI1bZhFv2m,javier@datdata.com,stripe,2024-11-30,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QRjk1K9BN589qeI0WpolaLk,sullivan.bart@gmail.com,stripe,2024-12-03,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QS28YK9BN589qeI1A0pk5x2,yannick.um@insightsunlocker.com,stripe,2024-12-03,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QT00ZK9BN589qeI0H6ErSV8,l.pjecha@gmail.com,stripe,2024-12-06,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QT260K9BN589qeI07udXIxE,az7@live.com,stripe,2024-12-06,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QT3sZK9BN589qeI1PypNzdy,sam.woodward@wooditc.co.uk,stripe,2024-12-06,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QTPsRK9BN589qeI1dlpw0tr,daviejoe@hotmail.com,stripe,2024-12-07,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QTVh3K9BN589qeI1D0oo3CF,amanzholovdaniyar1@gmail.com,stripe,2024-12-07,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QTZUSK9BN589qeI03F3Z65E,ryanasavio@gmail.com,stripe,2024-12-08,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QTZoaK9BN589qeI0uvnb8KD,davidsjobinbox@gmail.com,stripe,2024-12-08,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QTo6KK9BN589qeI0jO9u8PL,lisamoschkau@twins.com,stripe,2024-12-08,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QU2HsK9BN589qeI0KkKwVub,satwikshenoy@gmail.com,stripe,2024-12-09,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QU3lVK9BN589qeI1hRvOby8,rawanmm@gmail.com,stripe,2024-12-09,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QUBX3K9BN589qeI0hecgvos,dennisians.delacruz@gmail.com,stripe,2024-12-09,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QUDYKK9BN589qeI03A7Lbsk,pcavatore@gmail.com,stripe,2024-12-09,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QUUWaK9BN589qeI07oteW3t,jon@weirdfish.co.uk,stripe,2024-12-10,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QUmBdK9BN589qeI1U6JDXh3,malus@yunduo.pro,stripe,2024-12-11,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QUnaoK9BN589qeI1NOkxDmd,ross.curry@datagoat.co.uk,stripe,2024-12-11,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QUqlcK9BN589qeI0MvZfa4h,fciscomr@gmail.com,stripe,2024-12-11,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QUs8pK9BN589qeI11uQp1mf,drewhoward23@yahoo.com,stripe,2024-12-11,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QV0AXK9BN589qeI0czNPH5q,sumesh2201@gmail.com,stripe,2024-12-12,Pro-108,$65.00,$0.00,$0.00,$1.95,$7.48,$9.43,$55.57,completed
+stripe_pi_3QVDYuK9BN589qeI0erXewiP,jason.boyer@amentum.com,stripe,2024-12-12,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QVP4lK9BN589qeI1evklbpC,sophiamciccone@gmail.com,stripe,2024-12-13,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QVP5RK9BN589qeI0pOPZyun,giangbui762002@gmail.com,stripe,2024-12-13,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QVTBuK9BN589qeI0Lb7qxz4,andre.gysbers@wink.de,stripe,2024-12-13,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QX0RPK9BN589qeI0ZeWplbl,innovationuk@mazars.co.uk,stripe,2024-12-17,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QXLplK9BN589qeI0rgPQ3E6,lucas.nebot@outlook.de,stripe,2024-12-18,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QXhqkK9BN589qeI17Qg6FA9,morgan.harries@dyfed-powys.police.uk,stripe,2024-12-19,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QXij0K9BN589qeI0r27zpBk,nrowell@outlook.com,stripe,2024-12-19,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QYyUQK9BN589qeI0zovdrKI,huy@cbt29.com,stripe,2024-12-22,Pro-108,$86.40,$0.00,$0.00,$2.59,$7.13,$9.72,$76.68,completed
+stripe_pi_3QZAJXK9BN589qeI1XpUMlia,nuno.nogueira@swell.com.pt,stripe,2024-12-23,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QZzZ8K9BN589qeI1MIuriO0,nmaasiri@gmail.com,stripe,2024-12-25,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QaI6KK9BN589qeI1razAdGt,susanne.haenni@startbahn29.ch,stripe,2024-12-26,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QaKIjK9BN589qeI01wEDcNC,jmdilena@projectedpoint.com,stripe,2024-12-26,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QbrjaK9BN589qeI0yHSWAuV,katelyn.hong@bingoindustries.com.au,stripe,2024-12-30,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3Qcos2K9BN589qeI0ZOd3OUr,chrisespin15@gmail.com,stripe,2025-01-02,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QcsNQK9BN589qeI0idIQtWx,elizabeth.below@gmail.com,stripe,2025-01-02,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QeIGUK9BN589qeI0TEU56la,rosalin.fincapes@gmail.com,stripe,2025-01-06,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3Qew1QK9BN589qeI0MQNQYmL,atewogboye.t@gmail.com,stripe,2025-01-08,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QewzeK9BN589qeI1FEcnc1l,gauthamboppana@gmail.com,stripe,2025-01-08,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3Qfn7lK9BN589qeI1ChdNxjP,marc@bigedirect.com,stripe,2025-01-10,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3Qg45dK9BN589qeI1kBNSMb2,2918diy@gmail.com,stripe,2025-01-11,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QgSDaK9BN589qeI1jwp4bl2,admin@thefirmexp.com,stripe,2025-01-12,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QgysFK9BN589qeI1bpOZs61,skylarsenning@gmail.com,stripe,2025-01-14,Pro-108,$86.40,$0.00,$0.00,$2.59,$7.13,$9.72,$76.68,completed
+stripe_pi_3Qh0kNK9BN589qeI1LQp0CGX,minh.dinh@riotinto.com,stripe,2025-01-14,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QhJ2LK9BN589qeI0zvDkB08,medina.galup@outlook.com,stripe,2025-01-14,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3QhZXDK9BN589qeI1LWLnuET,noskovvladislav@outlook.com,stripe,2025-01-15,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QhuQ5K9BN589qeI1UZzHbvs,rhemshrodt@gmail.com,stripe,2025-01-16,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3Qi1OIK9BN589qeI1292tysO,kuldeep.vik.singh@gmail.com,stripe,2025-01-16,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3Qi6cTK9BN589qeI0VaDPtiW,powerui.com.happily184@passmail.net,stripe,2025-01-17,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QiRc4K9BN589qeI0dO1fV89,kkramer@aberdeenadv.com,stripe,2025-01-18,team-5-seats,$359.00,$0.00,$0.00,$10.77,$25.07,$35.84,$323.16,completed
+stripe_pi_3QirTGK9BN589qeI12nKBNij,jamaljones@me.com,stripe,2025-01-19,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3Qjf46K9BN589qeI0G63vbk1,olgadobovaya@yandex.ru,stripe,2025-01-21,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3Qk5rTK9BN589qeI0FR8Rkm8,costasamara132@gmail.com,stripe,2025-01-22,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QkLUvK9BN589qeI1pptPiMs,dupreezs@gmail.com,stripe,2025-01-23,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QkVx3K9BN589qeI1yTrNa3p,j@nspielvogel.de,stripe,2025-01-23,Pro-108,$86.40,$0.00,$0.00,$2.59,$8.42,$11.01,$75.39,completed
+stripe_pi_3QkrUQK9BN589qeI1Fr8lSTb,miklos.tak@gmail.com,stripe,2025-01-24,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QlExxK9BN589qeI0p8XGIG0,tracey@simplesuccessinc.com,stripe,2025-01-25,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3Qltt5K9BN589qeI1SYlHiDc,lee.walters@tetratech.com,stripe,2025-01-27,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QmF0gK9BN589qeI1dkC645j,fabio.limbaecher@icloud.com,stripe,2025-01-28,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QmnWGK9BN589qeI0AjeLKul,danipv95@hotmail.com,stripe,2025-01-30,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QmpSIK9BN589qeI0sQY3dpw,isayevshemistan@gmail.com,stripe,2025-01-30,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QoS1AK9BN589qeI066yle7z,jamiebrau@gmail.com,stripe,2025-02-03,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.75,$10.99,$97.01,completed
+stripe_pi_3Qoo2jK9BN589qeI0HtQuyEz,amanda@sphereone.io,stripe,2025-02-04,Pro-108,$108.00,$0.00,$0.00,$3.24,$9.37,$12.61,$95.39,completed
+stripe_pi_3QpnUAK9BN589qeI1BkQbTea,henrique.heck@jti.com,stripe,2025-02-07,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3QprD5K9BN589qeI0fXJ3OXe,pawel@bpmriders.com,stripe,2025-02-07,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3QpvRBK9BN589qeI0rtvofZk,alcantro@wellbeingnutrition.com,stripe,2025-02-07,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3QqcWiK9BN589qeI1xVbDjDZ,dslima.dj@gmail.com,stripe,2025-02-09,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3QqyTyK9BN589qeI0MW2YGKT,guillaume@dumati.ca,stripe,2025-02-10,Pro-108,$86.40,$0.00,$0.00,$2.59,$6.26,$8.85,$77.55,completed
+stripe_pi_3QrFEEK9BN589qeI1iL1biNi,ops.public@hesung.com,stripe,2025-02-11,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3Qriu1K9BN589qeI0eI4cnCn,sandip.badwal2@rolls-royce.com,stripe,2025-02-12,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3Qs6wuK9BN589qeI0hpJmp0g,esraozkan98@gmail.com,stripe,2025-02-13,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3QsBRtK9BN589qeI15kx7ucZ,r.heerze@heerzenieland.nl,stripe,2025-02-13,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3QsrsZK9BN589qeI0P7hLdbG,nayarahellen12@gmail.com,stripe,2025-02-15,Pro-108,$86.40,$0.00,$0.00,$2.59,$6.26,$8.85,$77.55,completed
+stripe_pi_3Qt4atK9BN589qeI0NhOP2s0,valimammadov2@gmail.com,stripe,2025-02-16,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3QtvZWK9BN589qeI1AbonXov,mjasser13@gmail.com,stripe,2025-02-18,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3QuVR8K9BN589qeI1QoJlu9B,rutger_92_@hotmail.com,stripe,2025-02-20,Pro-108,$104.54,$0.00,$0.00,$3.14,$7.06,$10.20,$94.34,completed
+stripe_pi_3QultxK9BN589qeI16MUK9Sn,connor.mcgarry@gmail.com,stripe,2025-02-21,Pro-108,$108.00,$0.00,$0.00,$3.24,$5.59,$8.83,$99.17,completed
+stripe_pi_3Qur40K9BN589qeI1KzmzQHA,mariomeloni823@gmail.com,stripe,2025-02-21,Pro-108,$105.41,$0.00,$0.00,$3.16,$7.10,$10.26,$95.15,completed
+stripe_pi_3QvEH3K9BN589qeI0qpFiUlf,d.peeters@hyteps.nl,stripe,2025-02-22,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3Qw1RRK9BN589qeI10Pb1Sju,enzo.de_matos@icloud.com,stripe,2025-02-24,Pro-108,$129.60,$0.00,$0.00,$3.89,$8.16,$12.05,$117.55,completed
+stripe_pi_3QwOnTK9BN589qeI010jUvfR,ryan6487@gmail.com,stripe,2025-02-25,Pro-108,$108.00,$0.00,$0.00,$3.24,$5.59,$8.83,$99.17,completed
+stripe_pi_3Qx0IvK9BN589qeI1sp2xPBY,ntawasil@neuplan.com.au,stripe,2025-02-27,Pro-108,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3QxVu6K9BN589qeI0FIAusjf,abdelaal.hassanin@gmail.com,stripe,2025-02-28,Pro-119,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3QxcQCK9BN589qeI15XlNrlk,david@thewalkeradvisors.com,stripe,2025-02-28,team-5-399-new,$399.00,$0.00,$0.00,$11.97,$19.85,$31.82,$367.18,completed
+stripe_pi_3Qxr3GK9BN589qeI0yldfUkv,jurica.kuzmic.posao@gmail.com,stripe,2025-03-01,Pro-119,$148.75,$0.00,$0.00,$4.46,$9.23,$13.69,$135.06,completed
+stripe_pi_3QyeLAK9BN589qeI0VWrtXVo,mcampsteyn@datapanda.eu,stripe,2025-03-03,Pro-119,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3QyoShK9BN589qeI1JTdsjLB,mmiller@gsms.us,stripe,2025-03-04,team-5-399-new,$399.00,$0.00,$0.00,$11.97,$19.85,$31.82,$367.18,completed
+stripe_pi_3QysTxK9BN589qeI0XU9UOYt,t.koldeweij@szmk.nl,stripe,2025-03-04,Pro-119,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3QyzEyK9BN589qeI1Y8OBrPe,afadhli@kufpec.com,stripe,2025-03-04,Pro-119,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3QzFFOK9BN589qeI1ctDIzmM,paloma.fonseca@upra-ies.ao,stripe,2025-03-05,Pro-119,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3QzK2yK9BN589qeI1FaMjtYV,lhel.farias@gmail.com,stripe,2025-03-05,Pro-119,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3QzK5LK9BN589qeI0DVvgpZ7,stephen.beer@bridgeall.com,stripe,2025-03-05,team-10-699,$699.00,$0.00,$0.00,$20.97,$45.04,$66.01,$632.99,completed
+stripe_pi_3QzL7BK9BN589qeI1ojQTFZG,design@highlandsolutions.com,stripe,2025-03-05,Pro-119,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3QzwX4K9BN589qeI0qTj579b,vbacon@mephys-conseil.com,stripe,2025-03-07,Pro-119,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3R0nc3K9BN589qeI1SgEMGmS,info@romankocian.sk,stripe,2025-03-09,Pay Once,$141.61,$0.00,$0.00,$4.25,$8.91,$13.16,$128.45,completed
+stripe_pi_3R18YuK9BN589qeI1TxPBc2N,ajay_gajree@yahoo.co.uk,stripe,2025-03-10,Pay Once,$142.80,$0.00,$0.00,$4.28,$8.96,$13.24,$129.56,completed
+stripe_pi_3R1bAbK9BN589qeI1oyJqok2,michael@vitamail.com,stripe,2025-03-11,Pay Once,$399.00,$0.00,$0.00,$11.97,$19.85,$31.82,$367.18,completed
+stripe_pi_3R1uLGK9BN589qeI1oZGM4lw,revanth.baskar@bmo.com,stripe,2025-03-12,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3R2Hi2K9BN589qeI0UfYxRvM,tjamieson23@gmail.com,stripe,2025-03-13,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3R2VsDK9BN589qeI1mxwMmyM,chrisbilsoe@me.com,stripe,2025-03-14,Pay Once,$148.75,$0.00,$0.00,$4.46,$9.23,$13.69,$135.06,completed
+stripe_pi_3R2WvuK9BN589qeI062FShLu,palefield@icloud.com,stripe,2025-03-14,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3R2cnFK9BN589qeI1jt3LcIt,ronaldocortes860@gmail.com,stripe,2025-03-14,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3R3ODCK9BN589qeI1RH0XJhS,bruce@powerfulbi.co.uk,stripe,2025-03-16,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3R3UOUK9BN589qeI00pP9Cbs,li.dmitry19@gmail.com,stripe,2025-03-17,Subscription creation,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3R3VwyK9BN589qeI0yYioxTa,gunaganesh@gmail.com,stripe,2025-03-17,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3R3WWXK9BN589qeI19tnYNCX,junshun.ng@wtwco.com,stripe,2025-03-17,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3R3d2GK9BN589qeI08hAtmHv,tim.dekker1991@gmail.com,stripe,2025-03-17,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3R42i9K9BN589qeI1YXxsceN,damion.isaac@nourishcare.com,stripe,2025-03-18,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3R4ORUK9BN589qeI14VT3zt2,licences@apexenergies.fr,stripe,2025-03-19,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3R4lJOK9BN589qeI10CpxJO9,joedepedicepuis@gmail.com,stripe,2025-03-20,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3R4vjZK9BN589qeI1viXIt4a,stephen.jenkins@au.imshealth.com,stripe,2025-03-21,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3R4yYJK9BN589qeI00zTkwMW,cardozab81@yahoo.com,stripe,2025-03-21,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3R53vVK9BN589qeI1aHuyIbH,austin@epochonline.com,stripe,2025-03-21,Subscription creation,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3R59juK9BN589qeI1MEU4DXZ,schoskeaf@yahoo.com,stripe,2025-03-21,Subscription creation,$108.00,$0.00,$0.00,$3.24,$5.59,$8.83,$99.17,completed
+stripe_pi_3R6DDpK9BN589qeI01v5RCXE,daniel.shai@twoday.com,stripe,2025-03-24,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3R6MTZK9BN589qeI09iRP1qU,will.khan@epigramhub.com,stripe,2025-03-25,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3R6OObK9BN589qeI19qu8OrF,lalumiere.mike@rcgt.com,stripe,2025-03-25,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3R6YMkK9BN589qeI0SriLpYO,djpicton@msn.com,stripe,2025-03-25,Pay Once,$142.80,$0.00,$0.00,$4.28,$8.96,$13.24,$129.56,completed
+stripe_pi_3R6ePXK9BN589qeI19Fu4Iqw,info@ivoboerdam.nl,stripe,2025-03-25,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3R8pZzK9BN589qeI1tKvhUQC,eamon@eamalytiks.com,stripe,2025-03-31,Pay Once,$142.80,$0.00,$0.00,$4.28,$8.96,$13.24,$129.56,completed
+lemonsqueezy_84725747_58e4ef6f-1b0c-4196-9201-61f3f35c4c05,hendrik.schwan@schwan-regiofruit.de,lemonsqueezy,2025-03-31,Power UI - Power BI UI Kit & Design System,$88.20,$0.00,$0.00,$0.00,$0.00,$0.00,$88.20,completed
+stripe_pi_3R97VhK9BN589qeI1dwepnvf,cody.shea@inclineanalytics.com,stripe,2025-04-01,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3R9N6lK9BN589qeI1NcESPz6,marketing@datacrafters.io,stripe,2025-04-02,Subscription creation,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3R9PzKK9BN589qeI0QeHrkf3,kieso.jan@outlook.com,stripe,2025-04-02,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3R9cBEK9BN589qeI1gV4yQuZ,arielh15.ah@gmail.com,stripe,2025-04-03,Pay Once,$95.20,$0.00,$0.00,$2.86,$5.44,$8.30,$86.90,completed
+stripe_pi_3R9inyK9BN589qeI0d4YLASq,pol.canaleta@kintai.com,stripe,2025-04-03,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3R9riVK9BN589qeI07IQSkVh,ippokun55@gmail.com,stripe,2025-04-03,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3R9xOSK9BN589qeI1mjbDiL0,nicoleflloyd@gmail.com,stripe,2025-04-03,Subscription creation,$108.00,$0.00,$0.00,$3.24,$5.59,$8.83,$99.17,completed
+stripe_pi_3RACimK9BN589qeI1gI6EgTn,danny.ragland@harpercollins.com,stripe,2025-04-04,Pay Once,$399.00,$0.00,$0.00,$11.97,$19.85,$31.82,$367.18,completed
+stripe_pi_3RAH2DK9BN589qeI06Mb3WMV,bkpearcy@gmail.com,stripe,2025-04-04,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RAekSK9BN589qeI0HL3jabY,phillippat18@me.com,stripe,2025-04-05,Subscription creation,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3RBOC8K9BN589qeI05f9askl,israakurnus@gmail.com,stripe,2025-04-07,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RBUGIK9BN589qeI0MKs73oJ,chiemcungtien8696@gmail.com,stripe,2025-04-08,Pay Once,$95.20,$0.00,$0.00,$2.86,$6.87,$9.73,$85.47,completed
+stripe_pi_3RCL2SK9BN589qeI00pJtDrr,anna@insighttech.au,stripe,2025-04-10,Subscription creation,$99.00,$0.00,$0.00,$2.97,$6.64,$9.61,$89.39,completed
+stripe_pi_3RCZPhK9BN589qeI0PYamcG9,stacey.pringle@candeladata.com.au,stripe,2025-04-11,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RCZsoK9BN589qeI1sngXqfT,davidkofodhanna@gmail.com,stripe,2025-04-11,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RCbg0K9BN589qeI0P9oFxdG,joshua@kynection.com,stripe,2025-04-11,Subscription creation,$359.00,$0.00,$0.00,$10.77,$23.28,$34.05,$324.95,completed
+stripe_pi_3RD5OSK9BN589qeI0VkECHAw,791580972@qq.com,stripe,2025-04-12,Pay Once,$95.20,$0.00,$0.00,$2.86,$6.87,$9.73,$85.47,completed
+stripe_pi_3RDt2yK9BN589qeI0vgfhFez,kayla.isaak@gmail.com,stripe,2025-04-14,Pay Once,$102.82,$0.00,$0.00,$3.08,$5.66,$8.74,$94.08,completed
+stripe_pi_3RErhMK9BN589qeI1a5epRDN,marcolandiego@gmail.com,stripe,2025-04-17,Subscription creation,$108.00,$0.00,$0.00,$3.24,$7.21,$10.45,$97.55,completed
+stripe_pi_3RFIRNK9BN589qeI01lkQKk5,damion.isaac@nourishcare.com,stripe,2025-04-18,Subscription update,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RGBSXK9BN589qeI0cLUGlXm,stephen.jenkins@au.imshealth.com,stripe,2025-04-21,Subscription update,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RGJecK9BN589qeI0rukQZhX,austin@epochonline.com,stripe,2025-04-21,Subscription update,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3RGk76K9BN589qeI1mHnWbQT,jaclbark50@gmail.com,stripe,2025-04-22,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RGpNsK9BN589qeI0GBuxvqx,nmadhusudhan85@gmail.com,stripe,2025-04-22,Subscription creation,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3RH5ziK9BN589qeI13PRYCLp,charlie.bell@appvault.com,stripe,2025-04-23,Subscription creation,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3RHJzAK9BN589qeI1Y7Nmjim,fredeapi3@gmail.com,stripe,2025-04-24,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RHPQfK9BN589qeI0YR5nxDB,designer@arctik.eu,stripe,2025-04-24,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RHQaaK9BN589qeI1cYyeYfa,filip.kopanovski@seg.mk,stripe,2025-04-24,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RI3Z4K9BN589qeI0r8vtz5I,fernan@solutionsabroad.co.uk,stripe,2025-04-26,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RIiwBK9BN589qeI1OhqTHGh,mkrz09@gmail.com,stripe,2025-04-28,Subscription creation,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RJ4kKK9BN589qeI0E7ImaKw,chrisarg726@gmail.com,stripe,2025-04-29,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RJDFcK9BN589qeI1DE3vBcF,jmj@ascendit.dk,stripe,2025-04-29,Pay Once,$399.00,$0.00,$0.00,$11.97,$25.84,$37.81,$361.19,completed
+stripe_pi_3RJXzlK9BN589qeI0LEe1W5s,cristianprifti@micrandata.com,stripe,2025-04-30,Pay Once,$399.00,$0.00,$0.00,$11.97,$25.84,$37.81,$361.19,completed
+stripe_pi_3RK1EwK9BN589qeI15nUmXl1,alex.lindberg@eliteaiautomations.com,stripe,2025-05-01,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RK3tcK9BN589qeI1n567ZKa,jonny24249@gmail.com,stripe,2025-05-01,Pay Once,$142.80,$0.00,$0.00,$4.28,$8.96,$13.24,$129.56,completed
+stripe_pi_3RKGLeK9BN589qeI1CssRZQ8,marketing@datacrafters.io,stripe,2025-05-02,Subscription update,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3RKc3YK9BN589qeI0BOBZ6WU,pol.canaleta@kintai.com,stripe,2025-05-03,Subscription update,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RKi7MK9BN589qeI0yrcPxcG,philipecampagnaro@gmail.com,stripe,2025-05-03,Pay Once,$141.61,$0.00,$0.00,$4.25,$8.91,$13.16,$128.45,completed
+stripe_pi_3RLD3KK9BN589qeI1nPyC7yL,joel@jms-analytics.com,stripe,2025-05-05,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RLY08K9BN589qeI1tZP9av2,phillippat18@me.com,stripe,2025-05-05,Subscription update,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3RLjhCK9BN589qeI1UkiJNZd,joostromijn@kasparov-bi.nl,stripe,2025-05-06,Pay Once,$399.00,$0.00,$0.00,$11.97,$25.84,$37.81,$361.19,completed
+stripe_pi_3RM0C8K9BN589qeI0dQCrnml,nwelsh@ringtank.com.au,stripe,2025-05-07,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RMWbvK9BN589qeI1O661drj,mchancellor@cotality.com,stripe,2025-05-08,Pay Once,$128.52,$0.00,$0.00,$3.86,$6.41,$10.27,$118.25,completed
+stripe_pi_3RMYkYK9BN589qeI0YLTxjWP,tlai@shiseidoca.com,stripe,2025-05-08,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RMZurK9BN589qeI1I2GcaPA,ryan.johnson@regency-living.com,stripe,2025-05-08,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RMi0WK9BN589qeI11UBcbyy,petros@restaurantsystemsfl.com,stripe,2025-05-09,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RNRcaK9BN589qeI0ddauiRL,daniel.davis@fullsteam.com,stripe,2025-05-11,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3ROJlEK9BN589qeI1M699EEL,zoewintonjones@posturite.co.uk,stripe,2025-05-13,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3ROpRqK9BN589qeI04nTGYRV,taylor@navigatorcre.com,stripe,2025-05-15,Pay Once,$399.00,$0.00,$0.00,$11.97,$19.85,$31.82,$367.18,completed
+stripe_pi_3RP1Q4K9BN589qeI1cTAIxBf,konstantin.volke@hermes-ws.com,stripe,2025-05-15,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RQGAvK9BN589qeI17uWSNAa,morganj@relybank.com,stripe,2025-05-18,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RQYewK9BN589qeI0yoKtXY2,aldail.hamad@gmail.com,stripe,2025-05-19,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RQrfFK9BN589qeI08FnPxe9,taha.saqib.nadeem@pwc.com,stripe,2025-05-20,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RRBIkK9BN589qeI01gXGwJu,a.knor@fidenum.at,stripe,2025-05-21,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RRBxjK9BN589qeI0yQdRZE8,austin@epochonline.com,stripe,2025-05-21,Subscription update,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3RRDnEK9BN589qeI0bFXH5oZ,jsand84@gmail.com,stripe,2025-05-21,Pay Once,$128.52,$0.00,$0.00,$3.86,$6.41,$10.27,$118.25,completed
+stripe_pi_3RRYlYK9BN589qeI06PCAM18,willij42@erau.edu,stripe,2025-05-22,Pay Once,$399.00,$0.00,$0.00,$11.97,$19.85,$31.82,$367.18,completed
+stripe_pi_3RRdveK9BN589qeI1UeAf4hd,stephen.englandsw@gmail.com,stripe,2025-05-22,Pay Once,$128.52,$0.00,$0.00,$3.86,$6.41,$10.27,$118.25,completed
+stripe_pi_3RRfxkK9BN589qeI0K05kKQ6,swaroopmedis@gmail.com,stripe,2025-05-22,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RRgkBK9BN589qeI0Ksqruzi,massimo.antoniazzi.tv@gmail.com,stripe,2025-05-22,Pay Once,$116.14,$0.00,$0.00,$3.48,$7.79,$11.27,$104.87,completed
+stripe_pi_3RRzFzK9BN589qeI1V8v103d,charlie.bell@appvault.com,stripe,2025-05-23,Subscription update,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3RSIgGK9BN589qeI0UJuGWbs,designer@arctik.eu,stripe,2025-05-24,Subscription update,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RTcBYK9BN589qeI158ZDQ2U,mkrz09@gmail.com,stripe,2025-05-28,Subscription update,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RUVQYK9BN589qeI0Buiuobq,asadighian@niagarawater.com,stripe,2025-05-30,Pay Once,$699.00,$0.00,$0.00,$20.97,$34.55,$55.52,$643.48,completed
+stripe_pi_3RVFzRK9BN589qeI1aqojx04,justingermain@gmail.com,stripe,2025-06-01,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RVaW2K9BN589qeI0t9bAFqw,helyjp@gmail.com,stripe,2025-06-02,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RVbLGK9BN589qeI13HE4TMc,jburke@tenzingconsulting.com,stripe,2025-06-02,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RVc4AK9BN589qeI03XDqUJ8,kls@gmaconsulting.com,stripe,2025-06-02,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RVqpGK9BN589qeI0LhZ1itK,pol.canaleta@kintai.com,stripe,2025-06-03,Subscription update,$29.00,$0.00,$0.00,$0.87,$2.16,$3.03,$25.97,completed
+stripe_pi_3RWmm5K9BN589qeI06hu4ncU,phillippat18@me.com,stripe,2025-06-05,Subscription update,$29.00,$0.00,$0.00,$0.87,$1.72,$2.59,$26.41,completed
+stripe_pi_3RXN4hK9BN589qeI0gPwPCGI,eppd@protonmail.com,stripe,2025-06-07,Pay Once,$145.18,$0.00,$0.00,$4.36,$9.07,$13.43,$131.75,completed
+stripe_pi_3RYM6DK9BN589qeI0wDYovAc,salehtl@icloud.com,stripe,2025-06-10,Pay Once,$119.00,$0.00,$0.00,$3.57,$7.92,$11.49,$107.51,completed
+stripe_pi_3RYphJK9BN589qeI0M5caRT1,virangmpatel@cloud.com,stripe,2025-06-11,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed
+stripe_pi_3RYvqrK9BN589qeI0yNrQjVO,michael.debolt@sagehospitalitygroup.com,stripe,2025-06-11,Pay Once,$119.00,$0.00,$0.00,$3.57,$6.13,$9.70,$109.30,completed

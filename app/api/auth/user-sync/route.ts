@@ -27,7 +27,7 @@ export async function GET() {
       }
     });
   } catch (error) {
-    console.error('User sync error:', error);
+    // console.error('User sync error:', error);
     return NextResponse.json({ synced: false, error: 'Sync failed' });
   }
 }

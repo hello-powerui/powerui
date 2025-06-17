@@ -33,7 +33,7 @@ export async function PUT(
     
     return NextResponse.json({ palette });
   } catch (error) {
-    console.error('Error updating color palette:', error);
+    // console.error('Error updating color palette:', error);
     return NextResponse.json(
       { error: 'Failed to update palette' },
       { status: 500 }
@@ -63,7 +63,7 @@ export async function DELETE(
         : 'Palette deleted successfully.'
     });
   } catch (error) {
-    console.error('Error deleting color palette:', error);
+    // console.error('Error deleting color palette:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to delete palette' },
       { status: 500 }

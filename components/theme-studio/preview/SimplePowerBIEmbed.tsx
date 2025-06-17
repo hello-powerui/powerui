@@ -2,14 +2,26 @@
 
 import { PowerBIEmbed } from 'powerbi-client-react';
 import { models, Report, Page, VisualDescriptor } from 'powerbi-client';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { powerBIConfig } from '@/lib/powerbi/config';
 import { PowerBIService } from '@/lib/powerbi/service';
 import { generateFocusedVisualLayout, generateDefaultLayout, VisualInfo } from '@/lib/powerbi/visual-focus-utils';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { X, Maximize2 } from 'lucide-react';
 
 interface SimplePowerBIEmbedProps {
   generatedTheme?: any;
   selectedVisualType?: string;
+  selectedVariant?: string;
+  onExitFocusMode?: () => void;
+  onVariantChange?: (variant: string) => void;
 }
 
 declare global {
@@ -18,33 +30,92 @@ declare global {
   }
 }
 
-export default function SimplePowerBIEmbed({ generatedTheme, selectedVisualType = '*' }: SimplePowerBIEmbedProps) {
+export default function SimplePowerBIEmbed({ 
+  generatedTheme, 
+  selectedVisualType = '*',
+  selectedVariant = '*',
+  onExitFocusMode,
+  onVariantChange
+}: SimplePowerBIEmbedProps) {
   const [embedConfig, setEmbedConfig] = useState<models.IReportEmbedConfiguration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const reportRef = useRef<Report | null>(null);
   const powerBIService = PowerBIService.getInstance();
-  const isInitialLoad = useRef(true);
-  const isReportLoaded = useRef(false);
   const [focusMode, setFocusMode] = useState(false);
   const [visuals, setVisuals] = useState<VisualInfo[]>([]);
   const currentPageRef = useRef<Page | null>(null);
+  const [isReportReady, setIsReportReady] = useState(false);
+  const isInitialLoad = useRef(true);
 
-  // Load report when theme is available
+  // Generate theme with selected variant as default
+  const variantPreviewTheme = useMemo(() => {
+    if (!generatedTheme || selectedVisualType === '*' || selectedVariant === '*') {
+      return generatedTheme;
+    }
+
+    // Check if the visual type and variant exist in the theme
+    const visualStyles = generatedTheme?.visualStyles?.[selectedVisualType];
+    if (!visualStyles || !visualStyles[selectedVariant]) {
+      return generatedTheme;
+    }
+
+    // Create a modified theme where the selected variant becomes the default (*)
+    return {
+      ...generatedTheme,
+      visualStyles: {
+        ...generatedTheme.visualStyles,
+        [selectedVisualType]: {
+          ...visualStyles,
+          '*': visualStyles[selectedVariant] // Make selected variant the default
+        }
+      }
+    };
+  }, [generatedTheme, selectedVisualType, selectedVariant]);
+
+
+  // Extract available variants for the selected visual type
+  const availableVariants = useMemo(() => {
+    if (!generatedTheme || selectedVisualType === '*') {
+      return [];
+    }
+
+    const visualStyles = generatedTheme?.visualStyles?.[selectedVisualType];
+    if (!visualStyles) {
+      return [];
+    }
+
+    return Object.keys(visualStyles).sort((a, b) => {
+      // Put default (*) first
+      if (a === '*') return -1;
+      if (b === '*') return 1;
+      return a.localeCompare(b);
+    });
+  }, [generatedTheme, selectedVisualType]);
+
+  // Load report only when theme is ready - one time only
   useEffect(() => {
+    // Only load once when we first get a valid theme
+    if (!variantPreviewTheme || embedConfig) {
+      return;
+    }
+
     const loadReport = async () => {
       try {
         setIsLoading(true);
         setError(null);
         
-        // Get embed configuration with theme
+        // Get embed configuration
         const config = await powerBIService.getEmbedConfigWithTheme(
           powerBIConfig.reportId,
           powerBIConfig.workspaceId,
-          generatedTheme
+          variantPreviewTheme
         );
         
-        // Convert to Power BI embed configuration
+        // Clean theme for embedding
+        const themeToEmbed = { ...variantPreviewTheme };
+        delete themeToEmbed.reportPage;
+        
         const embedConfiguration: models.IReportEmbedConfiguration = {
           type: 'report',
           id: config.id,
@@ -61,7 +132,6 @@ export default function SimplePowerBIEmbed({ generatedTheme, selectedVisualType 
                 position: models.PageNavigationPosition.Bottom
               }
             },
-            // Let the theme control the background
             layoutType: models.LayoutType.Custom,
             customLayout: {
               displayOption: models.DisplayOption.FitToPage
@@ -72,11 +142,10 @@ export default function SimplePowerBIEmbed({ generatedTheme, selectedVisualType 
               }
             }
           },
-          theme: generatedTheme ? { themeJson: generatedTheme } : undefined
+          theme: { themeJson: themeToEmbed }
         };
 
         setEmbedConfig(embedConfiguration);
-        isInitialLoad.current = false;
       } catch (err) {
         console.error('Error loading Power BI report:', err);
         setError(err instanceof Error ? err.message : 'Failed to load Power BI report');
@@ -85,63 +154,37 @@ export default function SimplePowerBIEmbed({ generatedTheme, selectedVisualType 
       }
     };
 
-    // Wait for theme before loading the report
-    if (isInitialLoad.current && generatedTheme) {
-      loadReport();
-    }
-  }, [generatedTheme, powerBIService]); // Include required dependencies
+    loadReport();
+  }, [variantPreviewTheme, powerBIService, embedConfig]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Apply theme when it changes (with debounce to prevent rapid updates)
+  // Apply theme when it changes after initial load
   useEffect(() => {
-    if (reportRef.current && generatedTheme && !isInitialLoad.current && isReportLoaded.current) {
+    if (isReportReady && reportRef.current && variantPreviewTheme) {
       const timeoutId = setTimeout(async () => {
         try {
-          console.log('Applying theme update...');
-          
-          // Ensure the theme is valid JSON
-          if (typeof generatedTheme !== 'object' || generatedTheme === null) {
-            console.error('Invalid theme format - must be an object');
+          // Verify report is still valid and has applyTheme method
+          if (!reportRef.current || typeof reportRef.current.applyTheme !== 'function') {
             return;
           }
           
-          // Create a clean theme object without reportPage for now
-          // as it might be causing issues with applyTheme
-          const themeToApply = { ...generatedTheme };
+          const themeToApply = { ...variantPreviewTheme };
           delete themeToApply.reportPage;
-          
-          console.log('Theme being applied (without reportPage):', JSON.stringify(themeToApply, null, 2));
-          
-          // Apply the theme
-          if (reportRef.current) {
-            await reportRef.current.applyTheme({ themeJson: themeToApply });
+          await reportRef.current.applyTheme({ themeJson: themeToApply });
+        } catch (err) {
+          // Only log if it's not a "report not ready" error
+          if (err && err.message && !err.message.includes('not ready')) {
+            console.error('Error applying theme update:', err.message);
           }
-          console.log('Theme applied successfully');
-        } catch (err: any) {
-          console.error('Error applying theme:', err);
-          console.error('Error details:', {
-            message: err?.message,
-            stack: err?.stack,
-            detail: err?.detail,
-            body: err?.body,
-            toString: err?.toString()
-          });
-          
-          // Check if it's a specific Power BI error
-          if (err?.body?.error) {
-            console.error('Power BI error:', err.body.error);
-          }
-          
-          // Don't throw - just log the error
         }
-      }, 500); // Increased debounce to 500ms
+      }, 500);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [generatedTheme]);
+  }, [variantPreviewTheme, isReportReady]);
 
   // Discover visuals in the report
   const discoverVisuals = async () => {
-    if (!reportRef.current || !isReportLoaded.current) return;
+    if (!reportRef.current) return;
     
     try {
       const pages = await reportRef.current.getPages();
@@ -168,9 +211,9 @@ export default function SimplePowerBIEmbed({ generatedTheme, selectedVisualType 
       }));
       
       setVisuals(visualInfos);
-      console.log('Discovered visuals:', visualInfos);
+      
     } catch (error) {
-      console.error('Error discovering visuals:', error);
+      // console.error('Error discovering visuals:', error);
     }
   };
 
@@ -192,70 +235,67 @@ export default function SimplePowerBIEmbed({ generatedTheme, selectedVisualType 
         );
         
         await reportRef.current.updateSettings(focusLayout);
-        console.log('Applied focus mode for:', selectedVisualType);
+        
       } else {
         // Restore default layout
         const defaultLayout = generateDefaultLayout(pageId);
         await reportRef.current.updateSettings(defaultLayout);
-        console.log('Restored default layout');
+        
       }
     } catch (error) {
-      console.error('Error applying focus mode:', error);
+      // console.error('Error applying focus mode:', error);
     }
   };
 
-  // Effect to discover visuals when report loads
-  useEffect(() => {
-    if (isReportLoaded.current && reportRef.current) {
-      discoverVisuals();
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Effect to apply focus mode when selected visual type changes
   useEffect(() => {
-    if (isReportLoaded.current && visuals.length > 0) {
+    if (reportRef.current && visuals.length > 0) {
       // Enable focus mode for specific visual types, disable for '*'
       setFocusMode(selectedVisualType !== '*');
+    } else if (reportRef.current && selectedVisualType !== '*' && isReportReady) {
+      // If visuals haven't been discovered yet, try to discover them
+      discoverVisuals();
     }
-  }, [selectedVisualType, visuals]);
+  }, [selectedVisualType, visuals, isReportReady]);
 
   // Effect to apply/remove focus mode
   useEffect(() => {
-    if (isReportLoaded.current && visuals.length > 0) {
+    if (reportRef.current && visuals.length > 0) {
       applyFocusMode();
     }
   }, [focusMode, selectedVisualType, visuals]); // eslint-disable-line react-hooks/exhaustive-deps
 
+
   const eventHandlers = new Map([
     ['loaded', function () {
-      console.log('Report loaded');
-      isReportLoaded.current = true;
-      // Discover visuals after report loads
-      setTimeout(discoverVisuals, 1000);
+      setIsReportReady(true);
+      // Discover visuals immediately after report loads
+      discoverVisuals();
     }],
-    ['rendered', function () {
-      console.log('Report rendered');
-      isReportLoaded.current = true;
+    ['rendered', function() {
+      // Ensure report is marked as ready on render too
+      setIsReportReady(true);
     }],
     ['error', function (event: any) {
-      console.error('Power BI Error:', event?.detail);
       if (event?.detail?.message) {
         setError(event.detail.message);
       }
     }],
     ['pageChanged', function () {
-      console.log('Page changed');
       // Re-discover visuals on page change
       discoverVisuals();
     }]
   ]);
 
-  if (isLoading) {
+  if (!variantPreviewTheme || isLoading) {
     return (
       <div className="flex items-center justify-center h-full bg-gray-50 rounded-lg">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-sm text-gray-600">Loading Power BI preview...</p>
+          <p className="text-sm text-gray-600">
+            {!variantPreviewTheme ? 'Preparing theme...' : 'Loading Power BI preview...'}
+          </p>
         </div>
       </div>
     );
@@ -295,14 +335,53 @@ export default function SimplePowerBIEmbed({ generatedTheme, selectedVisualType 
 
   return (
     <div className="w-full h-full relative">
-      {/* Focus mode indicator */}
+      {/* Focus Mode Controls */}
       {focusMode && selectedVisualType !== '*' && (
-        <div className="absolute top-2 left-2 z-10 bg-blue-500 text-white px-3 py-1 rounded-md shadow-md text-sm flex items-center gap-2">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
-          <span>Focus Mode: {selectedVisualType}</span>
+        <div className="absolute top-2 left-2 z-50 flex items-center gap-2 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
+          {/* Exit Focus Mode Button */}
+          <Button
+            onClick={onExitFocusMode}
+            variant="outline"
+            size="sm"
+            className="text-xs"
+          >
+            <Maximize2 className="w-3 h-3 mr-1" />
+            Exit Focus Mode
+          </Button>
+
+          {/* Focus mode indicator */}
+          <div className="flex items-center gap-2 px-2 text-xs text-gray-600">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span>{selectedVisualType}</span>
+          </div>
+
+          {/* Variant Selector */}
+          {availableVariants.length > 0 && (
+            <>
+              <div className="w-px h-6 bg-gray-300" /> {/* Divider */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600">Style:</span>
+                <Select
+                  value={selectedVariant}
+                  onValueChange={onVariantChange}
+                >
+                  <SelectTrigger className="w-[120px] h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableVariants.map(variant => (
+                      <SelectItem key={variant} value={variant}>
+                        {variant === '*' ? 'Default' : variant}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          )}
         </div>
       )}
       
@@ -318,7 +397,7 @@ export default function SimplePowerBIEmbed({ generatedTheme, selectedVisualType 
                 const config = await powerBIService.getEmbedConfigWithTheme(
                   powerBIConfig.reportId,
                   powerBIConfig.workspaceId,
-                  generatedTheme
+                  variantPreviewTheme
                 );
                 
                 const embedConfiguration: models.IReportEmbedConfiguration = {
@@ -339,13 +418,13 @@ export default function SimplePowerBIEmbed({ generatedTheme, selectedVisualType 
                     customLayout: { displayOption: models.DisplayOption.FitToPage },
                     bars: { actionBar: { visible: false } }
                   },
-                  theme: generatedTheme ? { themeJson: generatedTheme } : undefined
+                  theme: variantPreviewTheme ? { themeJson: variantPreviewTheme } : undefined
                 };
 
                 setEmbedConfig(embedConfiguration);
                 isInitialLoad.current = false;
               } catch (err) {
-                console.error('Error reloading report:', err);
+                // console.error('Error reloading report:', err);
                 setError(err instanceof Error ? err.message : 'Failed to reload report');
               } finally {
                 setIsLoading(false);

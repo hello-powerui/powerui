@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { UnifiedPaletteManager } from '@/components/theme-studio/palette/UnifiedPaletteManager';
@@ -10,16 +10,54 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { usePaletteStore } from '@/lib/stores/palette-store';
 import { Palette, Grid3x3, Plus } from 'lucide-react';
 
-
 export default function PalettesPage() {
   const { isLoaded, isSignedIn } = useUser();
   const [showManager, setShowManager] = useState(false);
   const [managerType, setManagerType] = useState<'color' | 'neutral' | 'both'>('both');
-  const { colorPalettes, neutralPalettes } = usePaletteStore();
+  const { colorPalettes, neutralPalettes, loadPalettes, isLoading, error } = usePaletteStore();
+  
+  // Load palettes on mount
+  useEffect(() => {
+    loadPalettes();
+  }, [loadPalettes]);
   
   // Redirect to sign-in if not authenticated
   if (isLoaded && !isSignedIn) {
     redirect('/sign-in');
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex items-center justify-center h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+            <p className="text-sm text-muted-foreground">Loading palettes...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex items-center justify-center h-[400px]">
+          <div className="text-center text-muted-foreground">
+            <p className="text-sm mb-2">Failed to load palettes</p>
+            <p className="text-xs">{error}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => loadPalettes()}
+              className="mt-3"
+            >
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

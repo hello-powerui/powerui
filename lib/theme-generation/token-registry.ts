@@ -368,7 +368,7 @@ export function resolveToken(
   try {
     return definition[mode](palettes);
   } catch (error) {
-    console.warn(`Failed to resolve token ${token}:`, error);
+    
     return mode === 'light' ? '#000000' : '#FFFFFF';
   }
 }

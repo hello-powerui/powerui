@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { UnifiedColorPicker } from '@/components/ui/unified-color-picker';
@@ -25,34 +24,100 @@ interface TextClassesEditorProps {
   onUpdateTextClasses?: (textClasses: Record<string, TextClass>) => void;
 }
 
-const TEXT_CLASS_NAMES = [
-  'title',
-  'header',
-  'label',
-  'callout',
-  'largeLabel',
-  'smallLabel',
-  'largeTitle',
-  'largeHeader',
-  'banner',
-  'hero',
-  'footnote',
-  'reference'
-] as const;
+interface TextClassInfo {
+  name: string;
+  description: string;
+  usage: string;
+}
+
+const TEXT_CLASS_INFO: TextClassInfo[] = [
+  {
+    name: 'title',
+    description: 'Main titles for sections and axes',
+    usage: 'Category axis title, Value axis title, Multi-row card title, Slicer header'
+  },
+  {
+    name: 'label',
+    description: 'Standard text for data and headers',
+    usage: 'Table and matrix column/row headers, grid values'
+  },
+  {
+    name: 'callout',
+    description: 'Large, prominent text for emphasis',
+    usage: 'Card data labels, KPI indicators'
+  },
+  {
+    name: 'header',
+    description: 'Section headers and important text',
+    usage: 'Key influencers headers'
+  },
+  {
+    name: 'largeTitle',
+    description: 'Extra large titles for major sections',
+    usage: 'Report titles, Dashboard headers'
+  },
+  {
+    name: 'dataTitle',
+    description: 'Titles for data-focused elements',
+    usage: 'Data card titles, Metric headers'
+  },
+  {
+    name: 'boldLabel',
+    description: 'Bold version of standard labels',
+    usage: 'Matrix subtotals, Table totals, Important values'
+  },
+  {
+    name: 'largeLabel',
+    description: 'Larger version of standard labels',
+    usage: 'Multi-row card data labels'
+  },
+  {
+    name: 'largeLightLabel',
+    description: 'Large, light-weight text',
+    usage: 'Secondary large text, Subtitle elements'
+  },
+  {
+    name: 'lightLabel',
+    description: 'Light-weight version of standard labels',
+    usage: 'Legend text, Button text, Category axis labels'
+  },
+  {
+    name: 'semiboldLabel',
+    description: 'Semi-bold text for moderate emphasis',
+    usage: 'Key influencers profile text'
+  },
+  {
+    name: 'smallLabel',
+    description: 'Smaller text for secondary information',
+    usage: 'Reference line labels, Slicer date range labels'
+  },
+  {
+    name: 'smallLightLabel',
+    description: 'Small, light-weight text',
+    usage: 'Tertiary information, Subtle labels'
+  },
+  {
+    name: 'smallDataLabel',
+    description: 'Small text for data values',
+    usage: 'Compact data displays, Small metrics'
+  }
+];
 
 const DEFAULT_TEXT_CLASSES: Record<string, TextClass> = {
-  title: { fontSize: 16, bold: true },
-  header: { fontSize: 14, bold: true },
-  label: { fontSize: 12 },
-  callout: { fontSize: 14 },
-  largeLabel: { fontSize: 14 },
-  smallLabel: { fontSize: 10 },
+  title: { fontSize: 12, bold: true },
+  label: { fontSize: 10 },
+  callout: { fontSize: 45, bold: true },
+  header: { fontSize: 12, bold: true },
   largeTitle: { fontSize: 20, bold: true },
-  largeHeader: { fontSize: 18, bold: true },
-  banner: { fontSize: 24, bold: true },
-  hero: { fontSize: 28, bold: true },
-  footnote: { fontSize: 10 },
-  reference: { fontSize: 11 }
+  dataTitle: { fontSize: 14, bold: true },
+  boldLabel: { fontSize: 10, bold: true },
+  largeLabel: { fontSize: 12 },
+  largeLightLabel: { fontSize: 12 },
+  lightLabel: { fontSize: 10 },
+  semiboldLabel: { fontSize: 10, bold: true },
+  smallLabel: { fontSize: 9 },
+  smallLightLabel: { fontSize: 9 },
+  smallDataLabel: { fontSize: 9 }
 };
 
 export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: TextClassesEditorProps) {
@@ -70,7 +135,7 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
     if (textClasses) {
       Object.entries(textClasses).forEach(([key, value]) => {
         if (key in initialClasses) {
-          initialClasses[key] = { ...initialClasses[key], ...value };
+          initialClasses[key] = { ...initialClasses[key], ...(value as TextClass) };
         }
       });
     }
@@ -93,12 +158,39 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
     }
   };
 
-  const handleFontColorChange = (className: string, value: string) => {
+  const handleFontColorChange = (className: string, value: any) => {
+    // Handle the different formats that UnifiedColorPicker might return
+    let fontColor: ThemeDataColor;
+    
+    if (typeof value === 'string') {
+      // Simple color string
+      fontColor = value;
+    } else if (value?.solid?.color) {
+      // PowerBI format - extract the color
+      const solidColor = value.solid.color;
+      if (typeof solidColor === 'string') {
+        fontColor = solidColor;
+      } else if (solidColor?.expr?.ThemeDataColor?.ColorId !== undefined) {
+        // Theme color reference
+        fontColor = { dataColorIndex: solidColor.expr.ThemeDataColor.ColorId };
+      } else {
+        fontColor = '#000000';
+      }
+    } else if (value?.color) {
+      // Theme studio format
+      fontColor = value.color;
+    } else if (value?.themeColor?.id !== undefined) {
+      // Theme color with id
+      fontColor = { dataColorIndex: value.themeColor.id };
+    } else {
+      fontColor = value || '#000000';
+    }
+    
     setLocalTextClasses(prev => ({
       ...prev,
       [className]: { 
         ...prev[className], 
-        fontColor: { color: value }
+        fontColor
       }
     }));
   };
@@ -107,17 +199,6 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
     setLocalTextClasses(prev => ({
       ...prev,
       [className]: { ...prev[className], bold: checked }
-    }));
-  };
-
-  const handleDataColorSelect = (className: string, colorIndex: string) => {
-    const index = parseInt(colorIndex);
-    setLocalTextClasses(prev => ({
-      ...prev,
-      [className]: { 
-        ...prev[className], 
-        fontColor: { dataColorIndex: index }
-      }
     }));
   };
 
@@ -143,6 +224,12 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
     
     // If it's a string, return it directly
     if (typeof fontColor === 'string') {
+      // Check if it's a token (starts with @)
+      if (fontColor.startsWith('@')) {
+        // For now, return a default color for tokens
+        // In a real implementation, this would resolve the token
+        return '#666666';
+      }
       return fontColor;
     }
     
@@ -151,7 +238,7 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
       return fontColor.color;
     }
     
-    // If it's an object with dataColorIndex property
+    // If it's an object with dataColorIndex property (theme color reference)
     if (typeof fontColor === 'object' && 'dataColorIndex' in fontColor && fontColor.dataColorIndex !== undefined) {
       return (dataColors && Array.isArray(dataColors)) ? (dataColors[fontColor.dataColorIndex] as string) || '#000000' : '#000000';
     }
@@ -159,139 +246,107 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
     return '#000000';
   };
 
-  const isDataColor = (fontColor?: ThemeDataColor): boolean => {
-    if (!fontColor || typeof fontColor !== 'object') return false;
-    return 'dataColorIndex' in fontColor;
-  };
-
-  const getDataColorIndex = (fontColor?: ThemeDataColor): number => {
-    if (fontColor && typeof fontColor === 'object' && 'dataColorIndex' in fontColor) {
-      return fontColor.dataColorIndex;
-    }
-    return 0;
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Text Classes Configuration</DialogTitle>
+          <DialogTitle>Typography & Text Classes</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6 mt-4">
           <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              Configure text styles for different elements in your reports
-            </p>
-            <Button variant="outline" size="sm" onClick={handleReset}>
-              Reset to Defaults
+            <div>
+              <p className="text-sm text-gray-700">
+                Configure text styles for different elements in your Power BI reports
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                These styles will be applied consistently across all visuals that use text classes
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleReset}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              Reset All
             </Button>
           </div>
           
-          <div className="grid gap-4">
-            {TEXT_CLASS_NAMES.map(className => {
-              const textClass = localTextClasses[className] || {};
+          <div className="space-y-3">
+            {TEXT_CLASS_INFO.map(({ name, description, usage }) => {
+              const textClass = localTextClasses[name] || {};
               const colorValue = getColorValue(textClass.fontColor);
-              const useDataColor = isDataColor(textClass.fontColor);
               
               return (
-                <div key={className} className="border rounded-lg p-4 space-y-3">
-                  <h4 className="font-medium capitalize">{className}</h4>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor={`${className}-size`}>Font Size</Label>
-                      <Input
-                        id={`${className}-size`}
-                        type="number"
-                        min="8"
-                        max="48"
-                        value={textClass.fontSize || 12}
-                        onChange={(e) => handleFontSizeChange(className, e.target.value)}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor={`${className}-color`}>Color</Label>
-                      {useDataColor ? (
-                        <Select
-                          value={getDataColorIndex(textClass.fontColor).toString()}
-                          onValueChange={(value) => handleDataColorSelect(className, value)}
-                        >
-                          <SelectTrigger id={`${className}-color`}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="custom">Custom Color</SelectItem>
-                            {(dataColors && Array.isArray(dataColors) ? dataColors as string[] : []).map((color: string, index: number) => (
-                              <SelectItem key={index} value={index.toString()}>
-                                <div className="flex items-center gap-2">
-                                  <div 
-                                    className="w-4 h-4 rounded" 
-                                    style={{ backgroundColor: color }}
-                                  />
-                                  Data Color {index + 1}
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <div className="flex gap-2">
-                          <UnifiedColorPicker
-                            value={colorValue}
-                            onChange={(color) => handleFontColorChange(className, typeof color === 'string' ? color : '#000000')}
-                            format="simple"
-                            enableTokens={false}
-                            enableThemeColors={false}
-                          />
-                          <Select
-                            value="custom"
-                            onValueChange={(value) => {
-                              if (value !== 'custom') {
-                                handleDataColorSelect(className, value);
-                              }
-                            }}
-                          >
-                            <SelectTrigger className="w-24">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="custom">Custom</SelectItem>
-                              {(dataColors && Array.isArray(dataColors) ? dataColors as string[] : []).map((_: string, index: number) => (
-                                <SelectItem key={index} value={index.toString()}>
-                                  DC{index + 1}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor={`${className}-bold`}>Bold</Label>
-                      <div className="flex items-center h-10">
-                        <Switch
-                          id={`${className}-bold`}
-                          checked={textClass.bold || false}
-                          onCheckedChange={(checked) => handleBoldChange(className, checked)}
-                        />
+                <div key={name} className="bg-white rounded-md border border-gray-200 hover:border-gray-300 transition-colors">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 capitalize">{name}</h4>
+                        <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+                        <p className="text-xs text-gray-400 mt-1">Used in: {usage}</p>
                       </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Preview</Label>
                       <div
-                        className="h-10 flex items-center px-2 border rounded"
+                        className="px-3 py-1 rounded-md border border-gray-200 bg-gray-50"
                         style={{
-                          fontSize: `${textClass.fontSize || 12}px`,
+                          fontSize: `${Math.min(textClass.fontSize || 12, 16)}px`,
                           color: colorValue,
                           fontWeight: textClass.bold ? 'bold' : 'normal',
                           fontFamily: fontFamily
                         }}
                       >
-                        Sample Text
+                        Aa
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="px-4 py-3 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor={`${name}-size`} className="text-sm font-medium text-gray-700">
+                          Font Size
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id={`${name}-size`}
+                            type="number"
+                            min="8"
+                            max="72"
+                            value={textClass.fontSize || 12}
+                            onChange={(e) => handleFontSizeChange(name, e.target.value)}
+                            className="w-20"
+                          />
+                          <span className="text-xs text-gray-500">pt</span>
+                        </div>
+                      </div>
+                    
+                      <div className="space-y-2">
+                        <UnifiedColorPicker
+                          label="Color"
+                          value={textClass.fontColor || '#000000'}
+                          onChange={(value) => handleFontColorChange(name, value)}
+                          format="simple"
+                          enableTokens={true}
+                          enableThemeColors={true}
+                          enableShades={false}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700">Style</Label>
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              id={`${name}-bold`}
+                              checked={textClass.bold || false}
+                              onCheckedChange={(checked) => handleBoldChange(name, checked)}
+                            />
+                            <Label htmlFor={`${name}-bold`} className="text-sm text-gray-600 cursor-pointer">
+                              Bold
+                            </Label>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -300,13 +355,18 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
             })}
           </div>
           
-          <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>
-              Save Changes
-            </Button>
+          <div className="flex justify-between items-center pt-4 border-t">
+            <p className="text-xs text-gray-500">
+              Font family is inherited from theme settings: <span className="font-medium">{fontFamily || 'Default'}</span>
+            </p>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave}>
+                Save Changes
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>

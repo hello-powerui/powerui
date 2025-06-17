@@ -1,0 +1,37 @@
+# Customer Analysis Cleanup Manifest
+# This file lists all files and directories created for the customer analysis project
+# To remove everything, delete the entire customer-analysis directory
+
+DIRECTORIES:
+- /customer-analysis/
+- /customer-analysis/scripts/
+- /customer-analysis/lib/
+- /customer-analysis/output/
+
+FILES:
+- /customer-analysis/CLEANUP-MANIFEST.txt
+- /customer-analysis/README.md
+- /customer-analysis/package.json
+- /customer-analysis/tsconfig.json
+- /customer-analysis/lib/types.ts
+- /customer-analysis/lib/utils.ts
+- /customer-analysis/lib/fee-calculator.ts
+- /customer-analysis/scripts/parse-gumroad.ts
+- /customer-analysis/scripts/parse-lemonsqueezy.ts
+- /customer-analysis/scripts/parse-memberstack.ts
+- /customer-analysis/scripts/parse-loops.ts
+- /customer-analysis/scripts/fetch-stripe-data.ts
+- /customer-analysis/scripts/consolidate-customers.ts
+- /customer-analysis/scripts/consolidate-transactions.ts
+- /customer-analysis/scripts/export-data.ts
+- /customer-analysis/scripts/run-analysis.ts
+
+OUTPUT FILES (generated):
+- /customer-analysis/output/consolidated-customers.csv
+- /customer-analysis/output/consolidated-transactions.csv
+- /customer-analysis/output/loops-updates.csv
+- /customer-analysis/output/clerk-migration.csv
+- /customer-analysis/output/financial-summary.json
+
+CLEANUP COMMAND:
+rm -rf /Users/jonsandmann/Library/Mobile\ Documents/com~apple~CloudDocs/Projects/powerui/customer-analysis

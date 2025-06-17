@@ -178,7 +178,11 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         
       setNeutralPalette: (neutralPalette) =>
         set((state) => ({
-          theme: { ...state.theme, neutralPalette },
+          theme: { 
+            ...state.theme, 
+            neutralPalette,
+            neutralPaletteId: neutralPalette.id || state.theme.neutralPaletteId
+          },
           isDirty: true,
         })),
         

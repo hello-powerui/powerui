@@ -3,25 +3,63 @@ import type { Theme, Prisma } from '@/lib/generated/prisma'
 
 export class ThemeService {
   /**
-   * Get all themes for a user
+   * Get all themes for a user (including organization themes)
    */
   static async getUserThemes(userId: string): Promise<Theme[]> {
-    return prisma.theme.findMany({
+    // Get user's organization memberships
+    const memberships = await prisma.organizationMember.findMany({
       where: { userId },
+      select: { organizationId: true },
+    });
+    
+    const organizationIds = memberships.map(m => m.organizationId);
+    
+    return prisma.theme.findMany({
+      where: {
+        OR: [
+          { userId }, // User's own themes
+          { 
+            visibility: 'ORGANIZATION',
+            organizationId: { in: organizationIds }
+          }, // Organization themes
+        ],
+      },
       orderBy: { createdAt: 'desc' },
+      include: {
+        organization: true,
+      },
     })
   }
 
   /**
-   * Get a single theme by ID
+   * Get a single theme by ID (with access check)
    */
   static async getThemeById(themeId: string, userId: string): Promise<Theme | null> {
-    return prisma.theme.findFirst({
-      where: {
-        id: themeId,
-        userId,
+    const theme = await prisma.theme.findUnique({
+      where: { id: themeId },
+      include: {
+        organization: true,
       },
-    })
+    });
+    
+    if (!theme) return null;
+    
+    // Check access
+    if (theme.userId === userId) return theme; // Owner
+    if (theme.visibility === 'PUBLIC') return theme; // Public
+    
+    // Check organization access
+    if (theme.visibility === 'ORGANIZATION' && theme.organizationId) {
+      const membership = await prisma.organizationMember.findFirst({
+        where: {
+          organizationId: theme.organizationId,
+          userId,
+        },
+      });
+      if (membership) return theme;
+    }
+    
+    return null;
   }
 
   /**
@@ -96,6 +134,42 @@ export class ThemeService {
         },
       }),
     ])
+  }
+
+  /**
+   * Get organization themes
+   */
+  static async getOrganizationThemes(organizationId: string): Promise<Theme[]> {
+    return prisma.theme.findMany({
+      where: {
+        organizationId,
+        visibility: 'ORGANIZATION',
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: true,
+      },
+    })
+  }
+
+  /**
+   * Share theme with organization
+   */
+  static async shareThemeWithOrganization(
+    themeId: string,
+    userId: string,
+    organizationId: string
+  ): Promise<Theme> {
+    return prisma.theme.update({
+      where: {
+        id: themeId,
+        userId, // Ensure user owns the theme
+      },
+      data: {
+        visibility: 'ORGANIZATION',
+        organizationId,
+      },
+    })
   }
 
   /**

@@ -60,7 +60,7 @@ export function VisualStylesPanel({
       try {
         await schemaLoader.loadSchema();
       } catch (error) {
-        console.error('Failed to initialize schema loader:', error);
+        // console.error('Failed to initialize schema loader:', error);
       }
     };
     initSchemaLoader();
@@ -94,7 +94,7 @@ export function VisualStylesPanel({
           setVariants(['*']);
         }
       } catch (error) {
-        console.error('Failed to load visual schema:', error);
+        // console.error('Failed to load visual schema:', error);
       } finally {
         setLoading(false);
       }

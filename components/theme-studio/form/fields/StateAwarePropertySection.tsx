@@ -32,8 +32,7 @@ export function StateAwarePropertySection({
   const trackChangeRef = useThemeChanges(state => state.trackChange);
   
   const arrayValue = Array.isArray(value) ? value : [{}];
-  
-  
+
   // Check if this is a fill property for shape or actionButton visuals
   const isFillProperty = path && path.length >= 2 && path[path.length - 1] === 'fill' && 
     (path.includes('shape') || path.includes('actionButton'));
@@ -103,13 +102,10 @@ export function StateAwarePropertySection({
   if (!stateItem) {
     stateItem = { $id: globalSelectedState };
   }
-  
-  
-  
+
   const handleStateItemChange = (updates: any) => {
     let workingArray = [...arrayValue];
-    
-    
+
     // For fill/text properties, ensure clean structure
     if (isFillProperty || isTextProperty) {
       // Remove any duplicate show objects
@@ -234,13 +230,9 @@ export function StateAwarePropertySection({
     
     // Debug final result for text properties
     if (isTextProperty) {
-      console.log('handleStateItemChange - Final result:', {
-        workingArray,
-        path
-      });
+      
     }
-    
-    
+
     onChange(workingArray);
   };
   
@@ -261,14 +253,12 @@ export function StateAwarePropertySection({
       <div className="space-y-4">
         {(() => {
           const sorted = sortPropertiesWithShowFirst(schema.items?.properties || {});
-          
-          
+
           return sorted
             .filter(([propName]) => propName !== '$id')
             .map(([propName, propSchema]) => {
               const contextualTitle = getContextualTitle(propSchema, propName);
-              
-              
+
               return (
                 <SchemaForm
                   key={`${globalSelectedState}-${propName}`}

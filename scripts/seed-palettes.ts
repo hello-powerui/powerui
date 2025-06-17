@@ -1,25 +1,31 @@
-#!/usr/bin/env tsx
-
 import { PaletteService } from '@/lib/db/services/palette-service';
+import { prisma } from '@/lib/db/prisma';
 
-async function main() {
+async function seedPalettes() {
+  console.log('🎨 Starting palette seeding...');
+  
   try {
-    console.log('🌱 Seeding built-in palettes...');
-    
     await PaletteService.seedBuiltInPalettes();
-    
     console.log('✅ Built-in palettes seeded successfully!');
-    console.log('📝 This includes:');
-    console.log('   - PowerUI Default color palette');
-    console.log('   - Azure neutral palette (default)');
-    console.log('   - Cool neutral palette');
-    console.log('   - Neutral palette');
     
-    process.exit(0);
+    // Verify the palettes were created
+    const colorPalettes = await prisma.colorPalette.findMany({
+      where: { isBuiltIn: true }
+    });
+    console.log(`📊 Created ${colorPalettes.length} built-in color palettes`);
+    
+    const neutralPalettes = await prisma.neutralPalette.findMany({
+      where: { isBuiltIn: true }
+    });
+    console.log(`📊 Created ${neutralPalettes.length} built-in neutral palettes`);
+    
   } catch (error) {
     console.error('❌ Error seeding palettes:', error);
     process.exit(1);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
-main();
+// Run the seeding
+seedPalettes();

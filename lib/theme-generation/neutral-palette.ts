@@ -68,7 +68,7 @@ export async function generateNeutralPalette(
       palette
     };
   } catch (error) {
-    console.error('Error generating neutral palette:', error);
+    // console.error('Error generating neutral palette:', error);
     throw new Error(`Failed to generate palette: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

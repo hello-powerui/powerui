@@ -13,7 +13,9 @@ export function AppHeaderWrapper() {
   // Check if we're in an authenticated route
   const isAuthRoute = pathname.startsWith('/dashboard') || 
                      pathname.startsWith('/themes') || 
-                     pathname.startsWith('/palettes')
+                     pathname.startsWith('/palettes') ||
+                     pathname.startsWith('/authenticated') ||
+                     pathname === '/team-setup'
   
   // Only render AppHeader in auth routes where ClerkProvider is available
   if (isAuthRoute) {

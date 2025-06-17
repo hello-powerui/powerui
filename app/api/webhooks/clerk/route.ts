@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { Webhook } from 'svix'
 import { WebhookEvent } from '@clerk/nextjs/server'
 import { UserService } from '@/lib/db/services/user-service'
+import { prisma } from '@/lib/db/prisma'
 
 export async function POST(req: Request) {
   // Get the headers
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
       "svix-signature": svix_signature,
     }) as WebhookEvent
   } catch (err) {
-    console.error('Error verifying webhook:', err)
+    // console.error('Error verifying webhook:', err)
     return NextResponse.json(
       { error: 'Invalid signature' },
       { status: 400 }
@@ -53,9 +54,9 @@ export async function POST(req: Request) {
     if (primaryEmail) {
       try {
         await UserService.upsertUser(id, primaryEmail.email_address)
-        console.log(`User ${id} synced to database`)
+        
       } catch (error) {
-        console.error('Error syncing user to database:', error)
+        // console.error('Error syncing user to database:', error)
         return NextResponse.json(
           { error: 'Failed to sync user' },
           { status: 500 }
@@ -67,9 +68,146 @@ export async function POST(req: Request) {
   if (eventType === 'user.deleted') {
     try {
       await UserService.deleteUser(evt.data.id!)
-      console.log(`User ${evt.data.id} deleted from database`)
+      
     } catch (error) {
-      console.error('Error deleting user from database:', error)
+      // console.error('Error deleting user from database:', error)
+    }
+  }
+
+  // Handle organization creation
+  if (eventType === 'organization.created') {
+    const orgData = evt.data as any
+    
+    try {
+      // Get the user who created the organization
+      const creatorId = orgData.created_by
+      
+      if (creatorId) {
+        // Check if user has a team purchase
+        const purchase = await prisma.purchase.findFirst({
+          where: {
+            userId: creatorId,
+            status: "COMPLETED",
+            plan: {
+              in: ["TEAM_5", "TEAM_10"],
+            },
+            organizationId: null,
+          },
+        })
+
+        if (purchase) {
+          // Create organization in our database
+          const organization = await prisma.organization.create({
+            data: {
+              clerkOrgId: orgData.id,
+              name: orgData.name,
+              seats: purchase.seats || 5,
+              purchase: {
+                connect: {
+                  id: purchase.id,
+                },
+              },
+            },
+          })
+
+          // Update user's plan to TEAM
+          await prisma.user.update({
+            where: { id: creatorId },
+            data: { plan: "TEAM" },
+          })
+
+          // Update organization in Clerk with max allowed members
+          // This ensures Clerk enforces the seat limit
+          try {
+            const clerkClient = await import('@clerk/nextjs/server').then(m => m.clerkClient)
+            const client = await clerkClient()
+            await client.organizations.updateOrganization(orgData.id, {
+              maxAllowedMemberships: purchase.seats || 5,
+            })
+          } catch (error) {
+            // console.error('Error updating Clerk organization limits:', error)
+          }
+
+        }
+      }
+    } catch (error) {
+      // console.error('Error handling organization created:', error)
+    }
+  }
+
+  // Handle organization member events
+  if (eventType === 'organizationMembership.created') {
+    const membershipData = evt.data as any
+    const { organization, public_user_data } = membershipData
+    
+    try {
+      // Check if this organization has a purchase in our system
+      const org = await prisma.organization.findUnique({
+        where: { clerkOrgId: organization.id },
+      })
+
+      if (org && public_user_data?.user_id) {
+        // Ensure user exists in our database
+        await UserService.upsertUser(
+          public_user_data.user_id,
+          public_user_data.identifier || `user-${public_user_data.user_id}@org.com`
+        )
+
+        // Grant user TEAM plan access
+        await prisma.user.update({
+          where: { id: public_user_data.user_id },
+          data: { plan: "TEAM" },
+        })
+        
+        // Add user to organization members table
+        await prisma.organizationMember.upsert({
+          where: {
+            userId_organizationId: {
+              userId: public_user_data.user_id,
+              organizationId: org.id,
+            },
+          },
+          update: {
+            role: membershipData.role || "member",
+          },
+          create: {
+            userId: public_user_data.user_id,
+            organizationId: org.id,
+            role: membershipData.role || "member",
+          },
+        })
+
+      }
+    } catch (error) {
+      // console.error('Error handling organization membership created:', error)
+    }
+  }
+
+  if (eventType === 'organizationMembership.deleted') {
+    const membershipData = evt.data as any
+    const { public_user_data } = membershipData
+    
+    try {
+      if (public_user_data?.user_id) {
+        // Check if user has their own purchase
+        const personalPurchase = await prisma.purchase.findFirst({
+          where: {
+            userId: public_user_data.user_id,
+            status: "COMPLETED",
+          },
+        })
+
+        // If no personal purchase, revert to PRO plan
+        if (!personalPurchase) {
+          await prisma.user.update({
+            where: { id: public_user_data.user_id },
+            data: { plan: "PRO" },
+          })
+
+        }
+      }
+    } catch (error) {
+      // console.error('Error handling organization membership deleted:', error)
     }
   }
 
