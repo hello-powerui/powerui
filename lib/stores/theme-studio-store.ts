@@ -244,8 +244,8 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         
         try {
           // Create a single, complete theme data object
+          // NOTE: Do not include 'id' in theme data to avoid confusion with database ID
           const completeThemeData = {
-            id: theme.id,
             name: name || theme.name,
             description: theme.description,
             mode: theme.mode,
@@ -503,7 +503,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       resetTheme: () => {
         set({
           currentTheme: { ...defaultTheme },
-          theme: defaultUnifiedTheme,
+          theme: { ...defaultUnifiedTheme, id: undefined }, // Reset id to undefined
           themeMetadata: {
             name: 'Untitled Theme',
             schemaVersion: '2.143',

@@ -2,6 +2,13 @@ import { getBlogBySlug, getBlogSlugs } from '@/lib/blog'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { marked } from 'marked'
+
+// Configure marked options for better rendering
+marked.setOptions({
+  breaks: true, // Enable line breaks
+  gfm: true, // Enable GitHub Flavored Markdown
+})
 
 // MDX component mappings for custom rendering
 const components = {
@@ -48,43 +55,6 @@ export async function generateStaticParams() {
   }))
 }
 
-// Simple markdown to HTML converter
-function convertMarkdownToHtml(markdown: string): string {
-  let html = markdown
-  
-  // Convert headers
-  html = html.replace(/^### (.*$)/gim, '<h3 className="text-xl font-semibold mt-8 mb-4">$1</h3>')
-  html = html.replace(/^## (.*$)/gim, '<h2 className="text-2xl font-semibold mt-8 mb-4">$1</h2>')
-  html = html.replace(/^# (.*$)/gim, '<h1 className="text-3xl font-bold mt-8 mb-4">$1</h1>')
-  
-  // Convert bold and italic
-  html = html.replace(/\*\*\*(.*)\*\*\*/g, '<strong><em>$1</em></strong>')
-  html = html.replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
-  html = html.replace(/\*(.*)\*/g, '<em>$1</em>')
-  
-  // Convert links
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">$1</a>')
-  
-  // Convert images
-  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" className="my-8 rounded-lg w-full" />')
-  
-  // Convert code blocks
-  html = html.replace(/```json\n([\s\S]*?)```/g, '<pre className="bg-muted p-4 rounded-lg overflow-x-auto my-6"><code>$1</code></pre>')
-  html = html.replace(/```([\s\S]*?)```/g, '<pre className="bg-muted p-4 rounded-lg overflow-x-auto my-6"><code>$1</code></pre>')
-  
-  // Convert inline code
-  html = html.replace(/`([^`]+)`/g, '<code className="bg-muted px-1.5 py-0.5 rounded text-sm">$1</code>')
-  
-  // Convert paragraphs
-  html = html.split('\n\n').map(paragraph => {
-    if (paragraph.trim() && !paragraph.startsWith('<')) {
-      return `<p className="mb-4">${paragraph}</p>`
-    }
-    return paragraph
-  }).join('\n\n')
-  
-  return html
-}
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = getBlogBySlug(params.slug)
@@ -93,7 +63,8 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     notFound()
   }
   
-  const htmlContent = convertMarkdownToHtml(post.content)
+  // Use marked to convert markdown to HTML
+  const htmlContent = marked(post.content)
   
   return (
     <article className="container mx-auto px-4 py-16 max-w-4xl">
@@ -135,18 +106,22 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       </header>
       
       <div 
-        className="prose prose-lg max-w-none
-          prose-headings:font-bold
-          prose-h1:text-3xl prose-h1:mt-8 prose-h1:mb-4
-          prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4
-          prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
-          prose-p:mb-4 prose-p:leading-relaxed
-          prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-          prose-img:rounded-lg prose-img:my-8
-          prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto
-          prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-          prose-strong:font-semibold
-          prose-em:italic"
+        className="prose prose-lg max-w-none dark:prose-invert
+          prose-headings:font-bold prose-headings:tracking-tight
+          prose-h1:text-4xl prose-h1:mt-8 prose-h1:mb-4
+          prose-h2:text-3xl prose-h2:mt-8 prose-h2:mb-4
+          prose-h3:text-2xl prose-h3:mt-6 prose-h3:mb-3
+          prose-p:mb-6 prose-p:leading-relaxed prose-p:text-muted-foreground
+          prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline
+          prose-img:rounded-lg prose-img:my-8 prose-img:shadow-md
+          prose-pre:bg-muted prose-pre:border prose-pre:border-border
+          prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
+          prose-strong:font-semibold prose-strong:text-foreground
+          prose-em:italic
+          prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic
+          prose-ul:list-disc prose-ul:pl-6
+          prose-ol:list-decimal prose-ol:pl-6
+          prose-li:mb-2"
         dangerouslySetInnerHTML={{ __html: htmlContent }}
       />
     </article>

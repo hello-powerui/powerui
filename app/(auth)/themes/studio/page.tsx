@@ -45,7 +45,7 @@ import { CollapsibleSection } from '@/components/theme-studio/ui/collapsible-sec
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 import { ChangeIndicator } from '@/components/theme-studio/ui/change-indicator';
 import { PowerBITheme } from '@/lib/theme-studio/types';
-import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
+import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
 
 // Icons
 const BackIcon = () => (
@@ -71,6 +71,20 @@ const GlobalIcon = () => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
+
+// Default theme structure for new themes
+const defaultUnifiedTheme = {
+  name: 'My Power BI Theme',
+  mode: 'light' as const,
+  palette: DEFAULT_COLOR_PALETTE,
+  neutralPalette: AZURE_NEUTRAL_PALETTE,
+  fontFamily: 'Segoe UI',
+  structuralColorsMode: 'auto' as const,
+  structuralColors: {},
+  textClasses: {},
+  paletteId: DEFAULT_COLOR_PALETTE.id,
+  neutralPaletteId: AZURE_NEUTRAL_PALETTE.id,
+};
 
 function UnifiedThemeStudioContent() {
   const router = useRouter();
@@ -138,7 +152,8 @@ function UnifiedThemeStudioContent() {
     updateThemeProperty,
     getVisualVariants,
     createVariant,
-    deleteVariant
+    deleteVariant,
+    resetTheme
   } = useThemeStudioStore();
   
   // Theme mode is now automatically synced in the unified store
@@ -187,39 +202,85 @@ function UnifiedThemeStudioContent() {
             // Get the complete theme data
             const savedTheme = apiResponse.themeData || {};
             
-            // Load foundation settings
-            if (savedTheme.palette) {
+            // Load palettes from the palette store first
+            await usePaletteStore.getState().loadPalettes();
+            
+            // Load color palette - check if we should load by ID first
+            if (savedTheme.paletteId) {
+              // Try to find the palette in the store
+              const { colorPalettes } = usePaletteStore.getState();
+              const foundPalette = colorPalettes.find(p => p.id === savedTheme.paletteId);
+              
+              if (foundPalette) {
+                setPalette(foundPalette);
+                // Ensure the theme state also has the palette ID
+                setTheme(prevTheme => ({ 
+                  ...prevTheme, 
+                  paletteId: foundPalette.id 
+                }));
+              } else if (savedTheme.palette) {
+                // Fallback to embedded palette data if palette not found
+                setPalette(savedTheme.palette);
+                // Ensure the embedded palette has its ID preserved
+                if (savedTheme.palette.id) {
+                  setTheme(prevTheme => ({ 
+                    ...prevTheme, 
+                    paletteId: savedTheme.palette.id 
+                  }));
+                }
+              }
+            } else if (savedTheme.palette) {
+              // No paletteId, use embedded palette data
               setPalette(savedTheme.palette);
+              // Try to preserve the palette ID if it exists
+              if (savedTheme.palette.id) {
+                setTheme(prevTheme => ({ 
+                  ...prevTheme, 
+                  paletteId: savedTheme.palette.id 
+                }));
+              }
             }
             
             // Load neutral palette - check if we should load by ID first
             if (savedTheme.neutralPaletteId) {
-              // Try to load the neutral palette from the palette store
-              try {
-                const response = await fetch(`/api/palettes/neutral/${savedTheme.neutralPaletteId}`);
-                if (response.ok) {
-                  const paletteData = await response.json();
-                  setNeutralPalette(paletteData);
-                } else {
-                  // Fallback to saved neutral palette data
-                  if (savedTheme.neutralPalette) {
-                    setNeutralPalette(savedTheme.neutralPalette);
-                  } else {
-                    // Fallback to Azure default
-                    setNeutralPalette(AZURE_NEUTRAL_PALETTE);
-                  }
+              // Try to find the palette in the store
+              const { neutralPalettes } = usePaletteStore.getState();
+              const foundNeutralPalette = neutralPalettes.find(p => p.id === savedTheme.neutralPaletteId);
+              
+              if (foundNeutralPalette) {
+                setNeutralPalette(foundNeutralPalette);
+                // Ensure the theme state also has the neutral palette ID
+                setTheme(prevTheme => ({ 
+                  ...prevTheme, 
+                  neutralPaletteId: foundNeutralPalette.id 
+                }));
+              } else if (savedTheme.neutralPalette) {
+                // Fallback to embedded neutral palette data if palette not found
+                setNeutralPalette(savedTheme.neutralPalette);
+                // Ensure the embedded palette has its ID preserved
+                if (savedTheme.neutralPalette.id) {
+                  setTheme(prevTheme => ({ 
+                    ...prevTheme, 
+                    neutralPaletteId: savedTheme.neutralPalette.id 
+                  }));
                 }
-              } catch (error) {
-                // Fallback to saved neutral palette data
-                if (savedTheme.neutralPalette) {
-                  setNeutralPalette(savedTheme.neutralPalette);
-                } else {
-                  // Fallback to Azure default
-                  setNeutralPalette(AZURE_NEUTRAL_PALETTE);
-                }
+              } else {
+                // Fallback to Azure default
+                setNeutralPalette(AZURE_NEUTRAL_PALETTE);
+                setTheme(prevTheme => ({ 
+                  ...prevTheme, 
+                  neutralPaletteId: AZURE_NEUTRAL_PALETTE.id 
+                }));
               }
             } else if (savedTheme.neutralPalette) {
               setNeutralPalette(savedTheme.neutralPalette);
+              // Try to preserve the neutral palette ID if it exists
+              if (savedTheme.neutralPalette.id) {
+                setTheme(prevTheme => ({ 
+                  ...prevTheme, 
+                  neutralPaletteId: savedTheme.neutralPalette.id 
+                }));
+              }
             } else {
               // Ensure we always have a neutral palette
               setNeutralPalette(AZURE_NEUTRAL_PALETTE);
@@ -275,10 +336,10 @@ function UnifiedThemeStudioContent() {
               }
             }
             
-            // Set theme metadata
+            // Set theme metadata - CRITICAL: Use the database ID, not the themeData.id
             setThemeName(savedTheme.name || apiResponse.name || 'My Theme');
             setTheme({ 
-              id: themeId, 
+              id: apiResponse.id, // Use the actual database ID from the API response
               name: savedTheme.name || apiResponse.name,
               description: savedTheme.description || apiResponse.description 
             });
@@ -286,7 +347,7 @@ function UnifiedThemeStudioContent() {
             // Initialize change tracking with complete theme data
             const originalThemeState = {
               ...savedTheme,
-              id: themeId,
+              id: apiResponse.id, // Use the actual database ID
               paletteId: savedTheme.paletteId,
               neutralPaletteId: savedTheme.neutralPaletteId
             };
@@ -308,9 +369,24 @@ function UnifiedThemeStudioContent() {
         
         loadThemeFromAPI();
       } else {
-        // New theme - initialize with defaults
+        // New theme - reset the store to ensure clean state
+        console.log('[ThemeStudio] Creating new theme - resetting store');
+        
+        // Reset the theme store to clear any previous theme data
+        useThemeStudioStore.getState().resetTheme();
+        
+        // Reset the unified theme state
+        setTheme({
+          ...defaultUnifiedTheme,
+          id: undefined, // Ensure no ID is set for new themes
+          name: 'My Power BI Theme',
+          description: ''
+        });
+        
+        // Initialize with defaults
         const defaultThemeState = {
-          ...theme,
+          ...defaultUnifiedTheme,
+          id: undefined,
           visualStyles: {}
         };
         setOriginalTheme(defaultThemeState);
@@ -323,11 +399,21 @@ function UnifiedThemeStudioContent() {
   // Wrapper functions that track changes for foundation settings
   const setPaletteWithTracking = (palette: any) => {
     setPalette(palette);
+    // Also update the paletteId reference in the theme
+    setTheme(prevTheme => ({ 
+      ...prevTheme, 
+      paletteId: palette.id 
+    }));
     trackChange(['palette']);
   };
 
   const setNeutralPaletteWithTracking = (palette: any) => {
     setNeutralPalette(palette);
+    // Also update the neutralPaletteId reference in the theme
+    setTheme(prevTheme => ({ 
+      ...prevTheme, 
+      neutralPaletteId: palette.id 
+    }));
     trackChange(['neutralPalette']);
   };
 

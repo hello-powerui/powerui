@@ -11,12 +11,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Plus, Palette, Grid3x3 } from 'lucide-react';
 import { usePaletteStore } from '@/lib/stores/palette-store';
-import { UnifiedPaletteEditor } from './UnifiedPaletteEditor';
+import { ModernPaletteEditor } from './ModernPaletteEditor';
+import { ModernNeutralPaletteDisplay } from './ModernNeutralPaletteDisplay';
 import type { ColorPalette, NeutralPalette } from '@/lib/types/palette';
 
 interface UnifiedPaletteManagerProps {
@@ -153,11 +153,13 @@ export function UnifiedPaletteManager({
                 <h4 className="text-xs font-medium text-muted-foreground px-1">Built-in Palettes</h4>
                 <div className="grid gap-2">
                   {builtInPalettes.map((palette) => (
-                    <Card
+                    <div
                       key={palette.id}
                       className={cn(
-                        "p-3 cursor-pointer transition-all hover:shadow-md",
-                        selectedColorPaletteId === palette.id && "ring-2 ring-primary"
+                        "p-4 rounded-lg border-2 cursor-pointer transition-all",
+                        selectedColorPaletteId === palette.id 
+                          ? "border-gray-900 shadow-sm bg-gray-50/50" 
+                          : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
                       )}
                       onClick={() => handleColorPaletteClick({
                         ...palette,
@@ -166,21 +168,21 @@ export function UnifiedPaletteManager({
                     >
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-sm">{palette.name}</h4>
-                          <Badge variant="secondary" className="text-xs">Built-in</Badge>
+                          <h4 className="font-medium text-sm text-gray-900">{palette.name}</h4>
+                          <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600 border-0">Built-in</Badge>
                         </div>
                         <div className="flex gap-1">
                           {(palette.colors as string[]).map((color, index) => (
                             <div
                               key={index}
-                              className="h-6 w-6 rounded border border-gray-200"
+                              className="h-6 w-6 rounded-md border-2 border-gray-200 shadow-sm"
                               style={{ backgroundColor: color }}
                               title={color}
                             />
                           ))}
                         </div>
                       </div>
-                    </Card>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -192,11 +194,13 @@ export function UnifiedPaletteManager({
                 <h4 className="text-xs font-medium text-muted-foreground px-1">Your Palettes</h4>
                 <div className="grid gap-2">
                   {userPalettes.map((palette) => (
-                    <Card
+                    <div
                       key={palette.id}
                       className={cn(
-                        "p-3 cursor-pointer transition-all hover:shadow-md",
-                        selectedColorPaletteId === palette.id && "ring-2 ring-primary"
+                        "p-4 rounded-lg border-2 cursor-pointer transition-all",
+                        selectedColorPaletteId === palette.id 
+                          ? "border-gray-900 shadow-sm bg-gray-50/50" 
+                          : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
                       )}
                       onClick={() => handleColorPaletteClick({
                         ...palette,
@@ -211,14 +215,14 @@ export function UnifiedPaletteManager({
                           {(palette.colors as string[]).map((color, index) => (
                             <div
                               key={index}
-                              className="h-6 w-6 rounded border border-gray-200"
+                              className="h-6 w-6 rounded-md border-2 border-gray-200 shadow-sm"
                               style={{ backgroundColor: color }}
                               title={color}
                             />
                           ))}
                         </div>
                       </div>
-                    </Card>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -294,37 +298,23 @@ export function UnifiedPaletteManager({
                 <h4 className="text-xs font-medium text-muted-foreground px-1">Built-in Palettes</h4>
                 <div className="grid gap-2">
                   {builtInPalettes.map((palette) => (
-                    <Card
-                      key={palette.id}
-                      className={cn(
-                        "p-3 cursor-pointer transition-all hover:shadow-md",
-                        selectedNeutralPaletteId === palette.id && "ring-2 ring-primary"
-                      )}
-                      onClick={() => handleNeutralPaletteClick({
-                        ...palette,
-                        shades: palette.shades as Record<string, string>
-                      })}
-                    >
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-sm">{palette.name}</h4>
-                          <Badge variant="secondary" className="text-xs">Built-in</Badge>
-                        </div>
-                        <div className="flex gap-0.5">
-                          {Object.entries(palette.shades as Record<string, string>)
-                            .sort(([a], [b]) => parseInt(a) - parseInt(b))
-                            .slice(0, 8)
-                            .map(([shade, color]) => (
-                              <div
-                                key={shade}
-                                className="h-6 w-3 first:rounded-l last:rounded-r"
-                                style={{ backgroundColor: color }}
-                                title={`${shade}: ${color}`}
-                              />
-                            ))}
-                        </div>
-                      </div>
-                    </Card>
+                    <div key={palette.id} className="relative">
+                      <ModernNeutralPaletteDisplay
+                        shades={palette.shades as Record<string, string>}
+                        name={palette.name}
+                        isSelected={selectedNeutralPaletteId === palette.id}
+                        onClick={() => handleNeutralPaletteClick({
+                          ...palette,
+                          shades: palette.shades as Record<string, string>
+                        })}
+                      />
+                      <Badge 
+                        variant="secondary" 
+                        className="absolute top-4 right-4 text-xs bg-gray-100 text-gray-600 border-0"
+                      >
+                        Built-in
+                      </Badge>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -336,36 +326,16 @@ export function UnifiedPaletteManager({
                 <h4 className="text-xs font-medium text-muted-foreground px-1">Your Palettes</h4>
                 <div className="grid gap-2">
                   {userPalettes.map((palette) => (
-                    <Card
+                    <ModernNeutralPaletteDisplay
                       key={palette.id}
-                      className={cn(
-                        "p-3 cursor-pointer transition-all hover:shadow-md",
-                        selectedNeutralPaletteId === palette.id && "ring-2 ring-primary"
-                      )}
+                      shades={palette.shades as Record<string, string>}
+                      name={palette.name}
+                      isSelected={selectedNeutralPaletteId === palette.id}
                       onClick={() => handleNeutralPaletteClick({
                         ...palette,
                         shades: palette.shades as Record<string, string>
                       })}
-                    >
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-sm">{palette.name}</h4>
-                        </div>
-                        <div className="flex gap-0.5">
-                          {Object.entries(palette.shades as Record<string, string>)
-                            .sort(([a], [b]) => parseInt(a) - parseInt(b))
-                            .slice(0, 8)
-                            .map(([shade, color]) => (
-                              <div
-                                key={shade}
-                                className="h-6 w-3 first:rounded-l last:rounded-r"
-                                style={{ backgroundColor: color }}
-                                title={`${shade}: ${color}`}
-                              />
-                            ))}
-                        </div>
-                      </div>
-                    </Card>
+                    />
                   ))}
                 </div>
               </div>
@@ -429,7 +399,7 @@ export function UnifiedPaletteManager({
 
       {/* Editor Dialog */}
       {(editingPalette || creatingType) && (
-        <UnifiedPaletteEditor
+        <ModernPaletteEditor
           open={true}
           onOpenChange={(open) => {
             if (!open) {
