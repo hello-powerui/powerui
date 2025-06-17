@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useThemeStudio } from '@/lib/hooks/use-theme-studio';
 import { FoundationPanel } from './components/FoundationPanel';
+import { VisualStylesPanel } from './components/VisualStylesPanel';
 import { PowerBIPreview } from '@/components/theme-studio/preview/PowerBIPreview';
 import { UnifiedPaletteManager } from '@/components/theme-studio/palette/UnifiedPaletteManager';
 import { TextClassesEditor } from '@/components/theme-studio/typography/TextClassesEditor';
@@ -32,6 +33,14 @@ function ThemeStudioContent() {
   const [showPaletteManager, setShowPaletteManager] = useState(false);
   const [showNeutralPaletteManager, setShowNeutralPaletteManager] = useState(false);
   const [paletteManagerMode, setPaletteManagerMode] = useState<'select' | 'manage'>('select');
+  
+  // Visual styles local state - sync with theme
+  const [visualSettings, setVisualSettings] = useState<Record<string, any>>(themeStudio.theme.visualStyles || {});
+  
+  // Sync visual settings with theme
+  useEffect(() => {
+    setVisualSettings(themeStudio.theme.visualStyles || {});
+  }, [themeStudio.theme.visualStyles]);
   
   // Load theme on mount
   useEffect(() => {
@@ -112,6 +121,16 @@ function ThemeStudioContent() {
     } else {
       setShowNeutralPaletteManager(true);
     }
+  };
+  
+  const handleVisualSettingsChange = (newVisualSettings: Record<string, any>) => {
+    setVisualSettings(newVisualSettings);
+    // Update the theme with new visual styles
+    themeStudio.updateTheme({ visualStyles: newVisualSettings });
+  };
+  
+  const handleVisualStyleChange = (visual: string, variant: string, value: any) => {
+    themeStudio.updateVisualStyle(visual, variant, value);
   };
   
   return (
@@ -218,21 +237,35 @@ function ThemeStudioContent() {
           />
         </div>
 
-        {/* Visual Styles Sidebar - TODO: Extract to component */}
+        {/* Visual Styles Sidebar */}
         <div className={cn(
           "border-r bg-gray-50 transition-all duration-300",
           showVisualStyles ? "w-[400px]" : "w-12"
         )}>
-          {/* Visual styles panel will go here */}
-          <div className="h-full flex flex-col items-center py-6">
-            <button
-              onClick={() => setShowVisualStyles(!showVisualStyles)}
-              className="mb-4 p-2 hover:bg-gray-200 rounded"
-            >
-              {showVisualStyles ? '←' : '→'}
-            </button>
-            <span className="writing-mode-vertical text-xs text-gray-600">Visual Styles</span>
-          </div>
+          <VisualStylesPanel
+            theme={themeStudio.theme}
+            visualSettings={visualSettings}
+            selectedVisual={themeStudio.selectedVisual}
+            selectedVariant={themeStudio.selectedVariant}
+            selectedState={themeStudio.selectedState}
+            selectedSection={themeStudio.selectedSection}
+            onVisualSettingsChange={handleVisualSettingsChange}
+            onVisualStyleChange={handleVisualStyleChange}
+            onSelectedVisualChange={themeStudio.setSelectedVisual}
+            onSelectedVariantChange={themeStudio.setSelectedVariant}
+            onSelectedStateChange={themeStudio.setSelectedState}
+            onSelectedSectionChange={themeStudio.setSelectedSection}
+            onCreateVariant={themeStudio.createVariant}
+            onDeleteVariant={themeStudio.deleteVariant}
+            getVisualVariants={themeStudio.getVisualVariants}
+            trackChange={(path) => {
+              // Track the change using the theme studio's change tracking
+              const pathStr = path.join('.');
+              themeStudio.changedPaths.add(pathStr);
+            }}
+            isVisible={showVisualStyles}
+            onToggleVisibility={setShowVisualStyles}
+          />
         </div>
 
         {/* Preview Panel */}
