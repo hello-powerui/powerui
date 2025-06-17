@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { ColorPalette, NeutralPalette } from '@/lib/generated/prisma'
+import { ColorPalette, NeutralPalette, shadeMapToNeutralColors, neutralColorsToShadeMap } from '@/lib/types/unified-palette'
+import { DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes'
 
 interface PaletteStore {
   colorPalettes: ColorPalette[]
@@ -66,16 +67,8 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
       
       // Add default palette if no palettes exist
       if (validColorPalettes.length === 0) {
-        validColorPalettes.push({
-          id: 'default',
-          name: 'Default Palette',
-          colors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56'],
-          isBuiltIn: true,
-          userId: 'system',
-          description: 'Default color palette',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        });
+        const { DEFAULT_COLOR_PALETTE } = await import('@/lib/defaults/palettes');
+        validColorPalettes.push(DEFAULT_COLOR_PALETTE);
       }
       
       // Handle neutral palettes
@@ -85,9 +78,21 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         if (response.ok) {
           try {
             const neutralData = await response.json();
-            validNeutralPalettes = Array.isArray(neutralData) ? neutralData.filter((p: any) => 
-              p.id && p.name && p.shades && typeof p.shades === 'object'
-            ) : [];
+            // Convert old shades format to new colors array format if needed
+            const rawPalettes = Array.isArray(neutralData) ? neutralData : [];
+            validNeutralPalettes = rawPalettes.map((p: any) => {
+              if (p.shades && typeof p.shades === 'object' && !p.colors) {
+                // Old format with shades - convert to colors array
+                return {
+                  ...p,
+                  colors: shadeMapToNeutralColors(p.shades),
+                  shades: undefined // Remove old format
+                };
+              }
+              return p;
+            }).filter((p: any) => 
+              p.id && p.name && Array.isArray(p.colors) && p.colors.length === 14
+            );
           } catch (err) {
             // console.error('Error parsing neutral palettes response:', err);
           }
@@ -113,17 +118,8 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
       set({ 
         error: error instanceof Error ? error.message : 'Failed to load palettes', 
         isLoading: false,
-        // Set a default palette on error
-        colorPalettes: [{
-          id: 'fallback',
-          name: 'Fallback Palette',
-          colors: ['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C', '#2ACF56'],
-          isBuiltIn: true,
-          userId: 'system',
-          description: 'Fallback color palette',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }],
+        // Set default palettes on error
+        colorPalettes: [DEFAULT_COLOR_PALETTE],
         neutralPalettes: [AZURE_NEUTRAL_PALETTE]
       });
     }

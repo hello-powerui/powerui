@@ -32,14 +32,18 @@ export function useThemePersistence() {
       const endpoint = themeId ? `/api/themes/${themeId}` : '/api/themes';
       const method = themeId ? 'PUT' : 'POST';
       
+      const payload = {
+        name: themeName,
+        description: description,
+        themeData: themeData
+      };
+      
+      console.log('Saving theme with data:', JSON.stringify(payload, null, 2));
+      
       const response = await fetch(endpoint, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: themeName,
-          description: description,
-          themeData: themeData
-        })
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
@@ -50,6 +54,7 @@ export function useThemePersistence() {
       const savedTheme = await response.json();
       
       // Update the original theme to reset change tracking
+      // Make sure to store the complete theme data with palettes
       setOriginalTheme(themeData);
       
       toast.success(themeId ? 'Theme updated successfully' : 'Theme created successfully');

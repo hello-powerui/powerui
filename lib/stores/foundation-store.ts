@@ -5,6 +5,10 @@ import { StructuralColors, TextClasses } from '@/lib/theme-generation/types';
 import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
 
 interface FoundationState {
+  // Theme metadata
+  themeName: string;
+  description: string;
+  
   // Color settings
   palette: ColorPalette;
   neutralPalette: NeutralPalette;
@@ -23,6 +27,8 @@ interface FoundationState {
   themeMode: 'light' | 'dark';
   
   // Actions
+  setThemeName: (name: string) => void;
+  setDescription: (description: string) => void;
   setPalette: (palette: ColorPalette, paletteId?: string) => void;
   setNeutralPalette: (palette: NeutralPalette, neutralPaletteId?: string) => void;
   setFontFamily: (fontFamily: string) => void;
@@ -36,6 +42,8 @@ interface FoundationState {
 }
 
 const defaultFoundation = {
+  themeName: 'Untitled Theme',
+  description: '',
   palette: DEFAULT_COLOR_PALETTE,
   neutralPalette: AZURE_NEUTRAL_PALETTE,
   fontFamily: 'wf_standard-font, helvetica, arial, sans-serif',
@@ -50,6 +58,10 @@ export const useFoundationStore = create<FoundationState>()(
       ...defaultFoundation,
 
       // Actions
+      setThemeName: (themeName) => set({ themeName }),
+      
+      setDescription: (description) => set({ description }),
+      
       setPalette: (palette, paletteId) => set({ 
         palette, 
         paletteId,

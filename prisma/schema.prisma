@@ -43,7 +43,7 @@ model NeutralPalette {
   id          String   @id @default(uuid())
   userId      String?  // Nullable for built-in palettes
   name        String
-  shades      Json     // Object with shade values {"25": "#FAFAFA", "50": "#F5F5F5", ...}
+  colors      Json     // Array of 14 hex colors from light to dark
   isBuiltIn   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

@@ -44,18 +44,18 @@ export default function ThemeStudioRefactored() {
   } = useUIState();
 
   // Store hooks
-  const { themeData, setThemeData, updateThemeDataField } = useThemeDataStore();
+  const { currentTheme: themeData, loadTheme, updateThemeProperty } = useThemeDataStore();
+  const foundationStore = useFoundationStore();
   const { 
     themeName, 
     description, 
-    dataColors, 
-    neutralColors,
+    palette,
+    neutralPalette,
     structuralColors,
-    canvasLayout,
     textClasses,
     setThemeName,
     setDescription,
-  } = useFoundationStore();
+  } = foundationStore;
   const { 
     selectedVisualType,
     selectedVariant,
@@ -72,26 +72,79 @@ export default function ThemeStudioRefactored() {
 
   // Handlers
   const handleSaveTheme = () => {
+    // Combine foundation data with theme data
+    const completeThemeData = {
+      ...themeData,
+      name: themeName,
+      description,
+      general: {
+        ...themeData.general,
+        palette: {
+          dataColors: palette.colors,
+          neutralColors: neutralPalette
+        },
+        textClasses,
+      },
+      structuralColors,
+    };
+    
     handleSave({
       themeId: themeIdFromUrl,
       themeName,
       description,
-      themeData,
+      themeData: completeThemeData,
     });
   };
 
   const handleExportTheme = () => {
-    handleExport(themeName, themeData);
+    // Combine foundation data with theme data for export
+    const completeThemeData = {
+      ...themeData,
+      name: themeName,
+      description,
+      general: {
+        ...themeData.general,
+        palette: {
+          dataColors: palette.colors,
+          neutralColors: neutralPalette
+        },
+        textClasses,
+      },
+      structuralColors,
+    };
+    
+    handleExport(themeName, completeThemeData);
   };
 
   const handleResetTheme = () => {
-    handleReset(originalTheme, setThemeData);
+    // Reset should also restore foundation data
+    if (originalTheme) {
+      // Need to create a proper theme object for loadTheme
+      loadTheme({ theme: originalTheme } as any);
+      
+      // Reset foundation data from original theme
+      if (originalTheme.general?.palette?.dataColors) {
+        const colors = originalTheme.general.palette.dataColors;
+        const colorArray = Array.isArray(colors) 
+          ? colors 
+          : Object.values(colors).filter((v): v is string => typeof v === 'string');
+        foundationStore.setPalette({ colors: colorArray } as any);
+      }
+      
+      if (originalTheme.general?.palette?.neutralColors) {
+        foundationStore.setNeutralPalette(originalTheme.general.palette.neutralColors);
+      }
+      
+      if (originalTheme.general?.textClasses) {
+        foundationStore.setTextClasses(originalTheme.general.textClasses);
+      }
+    }
   };
 
   const handleImportFile = async (file: File) => {
     try {
       const importedTheme = await handleImport(file);
-      setThemeData(importedTheme);
+      loadTheme({ theme: importedTheme } as any);
       toggleImportModal();
     } catch (error) {
       // Error handled in hook
@@ -148,15 +201,15 @@ export default function ThemeStudioRefactored() {
           <FoundationSidebar
             description={description}
             onDescriptionChange={setDescription}
-            dataColors={dataColors}
-            neutralColors={neutralColors}
+            dataColors={palette.colors}
+            neutralColors={neutralPalette}
             structuralColors={structuralColors}
-            canvasLayout={canvasLayout}
+            canvasLayout={themeData?.general?.canvasLayout}
             textClasses={textClasses}
             onTogglePaletteManager={togglePaletteManager}
             onToggleNeutralPaletteManager={toggleNeutralPaletteManager}
             onToggleTextClassesEditor={toggleTextClassesEditor}
-            updateThemeDataField={updateThemeDataField}
+            updateThemeDataField={(path, value) => updateThemeProperty(path.split('.'), value)}
           />
         )}
 

@@ -131,12 +131,17 @@ export class PaletteService {
     userId: string,
     data: {
       name: string
-      shades: Record<string, string>
+      colors?: string[]
+      shades?: Record<string, string> // For backward compatibility
     }
   ): Promise<NeutralPalette> {
+    // Convert shades to colors if needed
+    const colors = data.colors || (data.shades ? Object.values(data.shades) : []);
+    
     return prisma.neutralPalette.create({
       data: {
-        ...data,
+        name: data.name,
+        colors,
         user: {
           connect: { id: userId },
         },
@@ -152,15 +157,24 @@ export class PaletteService {
     userId: string,
     data: {
       name?: string
-      shades?: Record<string, string>
+      colors?: string[]
+      shades?: Record<string, string> // For backward compatibility
     }
   ): Promise<NeutralPalette> {
+    // Convert shades to colors if needed
+    const updateData: any = { name: data.name };
+    if (data.colors) {
+      updateData.colors = data.colors;
+    } else if (data.shades) {
+      updateData.colors = Object.values(data.shades);
+    }
+    
     return prisma.neutralPalette.update({
       where: {
         id: paletteId,
         userId,
       },
-      data,
+      data: updateData,
     })
   }
 

@@ -1,9 +1,10 @@
-import { ThemeGenerationInput, ColorPalette } from './types';
+import { ThemeGenerationInput } from './types';
 import { ColorPalettes } from './token-registry';
 import { validateNeutralPalette, replaceTokens } from './utils';
 import { createEmptyTheme } from './empty-theme';
 import { mapNeutralPaletteToTheme } from './neutral-mapper';
 import { createUnifiedTokenResolver } from './shared-token-resolver';
+import { neutralColorsToShadeMap } from '@/lib/types/unified-palette';
 
 export class SimpleThemeGenerator {
   
@@ -11,14 +12,21 @@ export class SimpleThemeGenerator {
     // Validate input
     this.validateInput(input);
     
-    // Ensure neutral palette is an object
+    // Convert neutral palette to expected format
+    let neutralPaletteShades: Record<string, string>;
     if (typeof input.neutralPalette === 'string') {
-      throw new Error('Neutral palette must be provided as a ColorPalette object');
+      throw new Error('Neutral palette must be provided as an object');
+    } else if (Array.isArray(input.neutralPalette)) {
+      // New format: array of colors
+      neutralPaletteShades = neutralColorsToShadeMap(input.neutralPalette);
+    } else {
+      // Already in shade map format
+      neutralPaletteShades = input.neutralPalette;
     }
     
     // Prepare color palettes
     const palettes: ColorPalettes = {
-      neutral: input.neutralPalette,
+      neutral: neutralPaletteShades,
       dataColors: input.dataColors
     };
     
@@ -69,7 +77,7 @@ export class SimpleThemeGenerator {
         { 
           id: 'custom',
           name: 'Custom',
-          shades: input.neutralPalette,
+          shades: neutralPaletteShades,
           userId: 'temp',
           isBuiltIn: false,
           createdAt: new Date(),
@@ -98,7 +106,7 @@ export class SimpleThemeGenerator {
   
   private validateInput(input: ThemeGenerationInput): void {
     const requiredFields: (keyof ThemeGenerationInput)[] = [
-      'mode', 'neutralPalette', 'fontFamily', 'borderRadius', 'dataColors', 'name'
+      'mode', 'neutralPalette', 'fontFamily', 'dataColors', 'name'
     ];
     
     const missing = requiredFields.filter(field => !(field in input));

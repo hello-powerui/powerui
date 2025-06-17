@@ -91,8 +91,7 @@ export async function POST(req: Request) {
         });
 
         if (process.env.NODE_ENV === "development") {
-
-           / 100).toFixed(2)}`);
+          console.log(`Payment successful: ${paymentIntent.id} - Amount: $${(session.amount_total! / 100).toFixed(2)}`);
         }
         break;
       }

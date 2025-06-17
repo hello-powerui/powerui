@@ -13,11 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Plus, Palette, Grid3x3 } from 'lucide-react';
+import { Plus, Palette, Grid3x3, Trash2 } from 'lucide-react';
 import { usePaletteStore } from '@/lib/stores/palette-store';
 import { ModernPaletteEditor } from './ModernPaletteEditor';
 import { ModernNeutralPaletteDisplay } from './ModernNeutralPaletteDisplay';
-import type { ColorPalette, NeutralPalette } from '@/lib/types/palette';
+import type { ColorPalette, NeutralPalette } from '@/lib/types/unified-palette';
+import { toast } from 'sonner';
 
 interface UnifiedPaletteManagerProps {
   open: boolean;
@@ -84,16 +85,10 @@ export function UnifiedPaletteManager({
 
   const handleNeutralPaletteClick = (palette: NeutralPalette) => {
     if (mode === 'select') {
-      onSelectNeutralPalette?.({
-        ...palette,
-        shades: palette.shades as Record<string, string>
-      });
+      onSelectNeutralPalette?.(palette);
       onOpenChange(false);
     } else {
-      setEditingPalette({ type: 'neutral', palette: {
-        ...palette,
-        shades: palette.shades as Record<string, string>
-      } });
+      setEditingPalette({ type: 'neutral', palette });
     }
   };
 
@@ -197,19 +192,45 @@ export function UnifiedPaletteManager({
                     <div
                       key={palette.id}
                       className={cn(
-                        "p-4 rounded-lg border-2 cursor-pointer transition-all",
+                        "p-4 rounded-lg border-2 transition-all group relative",
                         selectedColorPaletteId === palette.id 
                           ? "border-gray-900 shadow-sm bg-gray-50/50" 
                           : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
                       )}
-                      onClick={() => handleColorPaletteClick({
-                        ...palette,
-                        colors: palette.colors as string[]
-                      })}
                     >
-                      <div className="space-y-2">
+                      <div 
+                        className="space-y-2 cursor-pointer"
+                        onClick={() => handleColorPaletteClick({
+                          ...palette,
+                          colors: palette.colors as string[]
+                        })}
+                      >
                         <div className="flex items-center justify-between">
                           <h4 className="font-medium text-sm">{palette.name}</h4>
+                          {mode === 'manage' && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 p-0"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                if (confirm(`Delete palette "${palette.name}"? This cannot be undone.`)) {
+                                  try {
+                                    await deleteColorPalette(palette.id);
+                                    toast.success('Palette deleted', {
+                                      description: `"${palette.name}" has been removed`
+                                    });
+                                  } catch (error) {
+                                    toast.error('Failed to delete palette', {
+                                      description: error instanceof Error ? error.message : 'Unknown error'
+                                    });
+                                  }
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-3.5 w-3.5 text-red-600" />
+                            </Button>
+                          )}
                         </div>
                         <div className="flex gap-1">
                           {(palette.colors as string[]).map((color, index) => (
@@ -300,13 +321,10 @@ export function UnifiedPaletteManager({
                   {builtInPalettes.map((palette) => (
                     <div key={palette.id} className="relative">
                       <ModernNeutralPaletteDisplay
-                        shades={palette.shades as Record<string, string>}
+                        colors={palette.colors}
                         name={palette.name}
                         isSelected={selectedNeutralPaletteId === palette.id}
-                        onClick={() => handleNeutralPaletteClick({
-                          ...palette,
-                          shades: palette.shades as Record<string, string>
-                        })}
+                        onClick={() => handleNeutralPaletteClick(palette)}
                       />
                       <Badge 
                         variant="secondary" 
@@ -326,16 +344,38 @@ export function UnifiedPaletteManager({
                 <h4 className="text-xs font-medium text-muted-foreground px-1">Your Palettes</h4>
                 <div className="grid gap-2">
                   {userPalettes.map((palette) => (
-                    <ModernNeutralPaletteDisplay
-                      key={palette.id}
-                      shades={palette.shades as Record<string, string>}
-                      name={palette.name}
-                      isSelected={selectedNeutralPaletteId === palette.id}
-                      onClick={() => handleNeutralPaletteClick({
-                        ...palette,
-                        shades: palette.shades as Record<string, string>
-                      })}
-                    />
+                    <div key={palette.id} className="relative group">
+                      <ModernNeutralPaletteDisplay
+                        colors={palette.colors}
+                        name={palette.name}
+                        isSelected={selectedNeutralPaletteId === palette.id}
+                        onClick={() => handleNeutralPaletteClick(palette)}
+                      />
+                      {mode === 'manage' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 p-0 bg-white/80 hover:bg-white"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (confirm(`Delete palette "${palette.name}"? This cannot be undone.`)) {
+                              try {
+                                await deleteNeutralPalette(palette.id);
+                                toast.success('Palette deleted', {
+                                  description: `"${palette.name}" has been removed`
+                                });
+                              } catch (error) {
+                                toast.error('Failed to delete palette', {
+                                  description: error instanceof Error ? error.message : 'Unknown error'
+                                });
+                              }
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-red-600" />
+                        </Button>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>

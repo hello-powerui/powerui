@@ -16,12 +16,10 @@ export function useThemeLoader(themeId: string | null) {
   const [error, setError] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme | null>(null);
 
-  const { setThemeData } = useThemeDataStore();
+  const { loadTheme: setThemeData } = useThemeDataStore();
   const { 
     setThemeName, 
     setDescription, 
-    setDataColors, 
-    setNeutralColors,
     setTextClasses 
   } = useFoundationStore();
   const { setVariantsFromTheme } = useThemeVisualStore();
@@ -46,34 +44,44 @@ export function useThemeLoader(themeId: string | null) {
         const result = await response.json();
         // Handle the API response structure { data: theme }
         const loadedTheme = result.data || result;
+        console.log('Loaded theme from API:', JSON.stringify(loadedTheme, null, 2));
         setTheme(loadedTheme);
 
         // Initialize stores with theme data
-        setThemeData(loadedTheme.theme);
+        const themeData = loadedTheme.themeData || loadedTheme.theme;
+        console.log('Theme data to set:', JSON.stringify(themeData, null, 2));
+        
+        // The loadTheme function expects a StudioThemeData object
+        setThemeData({
+          id: loadedTheme.id,
+          name: loadedTheme.name,
+          description: loadedTheme.description,
+          theme: themeData,
+          schemaVersion: '2.143'
+        });
+        
         setThemeName(loadedTheme.name);
         setDescription(loadedTheme.description || '');
-        setOriginalTheme(loadedTheme.theme);
+        setOriginalTheme(themeData);
 
-        // Extract and set foundation data
-        if (loadedTheme.theme?.general?.palette?.dataColors) {
-          const colors = loadedTheme.theme.general.palette.dataColors;
-          const colorArray = Array.isArray(colors) 
-            ? colors 
-            : Object.values(colors).filter((v): v is string => typeof v === 'string');
-          setDataColors(colorArray);
+        // Don't set palettes here - let the main page handle palette loading
+        // The main page has logic to load palettes by ID and handle fallbacks properly
+        
+        // Just log what we found for debugging
+        if (themeData?.general?.palette?.dataColors) {
+          console.log('Found data colors in theme:', themeData.general.palette.dataColors);
+        }
+        if (themeData?.general?.palette?.neutralColors) {
+          console.log('Found neutral colors in theme:', themeData.general.palette.neutralColors);
         }
 
-        if (loadedTheme.theme?.general?.palette?.neutralColors) {
-          setNeutralColors(loadedTheme.theme.general.palette.neutralColors);
-        }
-
-        if (loadedTheme.theme?.general?.textClasses) {
-          setTextClasses(loadedTheme.theme.general.textClasses);
+        if (themeData?.general?.textClasses) {
+          setTextClasses(themeData.general.textClasses);
         }
 
         // Initialize visual variants
-        if (loadedTheme.theme?.visualTypes) {
-          setVariantsFromTheme(loadedTheme.theme.visualTypes);
+        if (themeData?.visualTypes) {
+          setVariantsFromTheme(themeData.visualTypes);
         }
 
       } catch (err) {
@@ -85,8 +93,8 @@ export function useThemeLoader(themeId: string | null) {
     };
 
     loadTheme();
-  }, [themeId, setThemeData, setThemeName, setDescription, setDataColors, 
-      setNeutralColors, setTextClasses, setVariantsFromTheme, setOriginalTheme]);
+  }, [themeId, setThemeData, setThemeName, setDescription, 
+      setTextClasses, setVariantsFromTheme, setOriginalTheme]);
 
   return { isLoading, error, theme };
 }

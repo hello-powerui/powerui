@@ -32,7 +32,7 @@ export interface TextClasses {
 
 export interface ThemeGenerationInput {
   mode: 'light' | 'dark';
-  neutralPalette: string | Record<string, string>;
+  neutralPalette: string | Record<string, string> | string[]; // Support array format
   fontFamily: string;
   dataColors: string[];
   name: string;

@@ -1,4 +1,4 @@
-import { NeutralPalette } from '@/lib/generated/prisma';
+import { NeutralPalette, neutralColorsToShadeMap } from '@/lib/types/unified-palette';
 import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 
 interface ThemeColorMapping {
@@ -35,16 +35,22 @@ interface ThemeColorMapping {
  * Based on the semantic color hierarchy in elements.json
  */
 export function mapNeutralPaletteToTheme(
-  palette: NeutralPalette,
+  palette: NeutralPalette | { shades: Record<string, string> },
   mode: 'light' | 'dark'
 ): Partial<ThemeColorMapping['light']> {
-  // Defensive check: if palette is invalid, use Azure default
-  if (!palette || !palette.shades || typeof palette.shades !== 'object') {
-    
-    palette = AZURE_NEUTRAL_PALETTE as NeutralPalette;
-  }
+  // Handle both new format (colors array) and old format (shades object)
+  let shades: Record<string, string>;
   
-  const shades = palette.shades as Record<string, string>;
+  if ('colors' in palette && Array.isArray(palette.colors)) {
+    // New format with colors array
+    shades = neutralColorsToShadeMap(palette.colors);
+  } else if ('shades' in palette && palette.shades && typeof palette.shades === 'object') {
+    // Old format with shades object
+    shades = palette.shades as Record<string, string>;
+  } else {
+    // Fallback to Azure default
+    shades = neutralColorsToShadeMap(AZURE_NEUTRAL_PALETTE.colors);
+  }
   
   if (mode === 'light') {
     return {
