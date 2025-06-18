@@ -36,9 +36,11 @@ export function useThemeStudio() {
   const updateTheme = (updates: Parameters<typeof store.updateTheme>[0]) => {
     store.updateTheme(updates);
     
-    // Track changes for the updated keys
+    // Track changes for the updated keys, but skip visualStyles as it's tracked at a more specific level
     Object.keys(updates).forEach(key => {
-      trackChange([key]);
+      if (key !== 'visualStyles') {
+        trackChange([key]);
+      }
     });
   };
   

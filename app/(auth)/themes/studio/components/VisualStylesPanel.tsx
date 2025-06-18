@@ -365,10 +365,7 @@ export function VisualStylesPanel({
               {schemaLoader && (
                 <GlobalPropertySelector
                   visualStyles={visualSettings}
-                  onVisualStylesChange={(newVisualStyles) => {
-                    onVisualSettingsChange(newVisualStyles);
-                    trackChange(['visualStyles']);
-                  }}
+                  onVisualStylesChange={onVisualSettingsChange}
                   schemaLoader={schemaLoader!}
                 />
               )}

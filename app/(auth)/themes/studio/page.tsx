@@ -259,10 +259,8 @@ function ThemeStudioContent() {
             onCreateVariant={themeStudio.createVariant}
             onDeleteVariant={themeStudio.deleteVariant}
             getVisualVariants={themeStudio.getVisualVariants}
-            trackChange={(path) => {
-              // Track the change using the theme studio's change tracking
-              const pathStr = path.join('.');
-              themeStudio.changedPaths.add(pathStr);
+            trackChange={() => {
+              // Change tracking is handled by the updateTheme and updateVisualStyle methods
             }}
             isVisible={showVisualStyles}
             onToggleVisibility={setShowVisualStyles}
