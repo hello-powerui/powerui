@@ -2,7 +2,6 @@ import { ThemeGenerationInput } from './types';
 import { ColorPalettes } from './token-registry';
 import { validateNeutralPalette, replaceTokens } from './utils';
 import { createEmptyTheme } from './empty-theme';
-import { mapNeutralPaletteToTheme } from './neutral-mapper';
 import { createUnifiedTokenResolver } from './shared-token-resolver';
 import { neutralColorsToShadeMap } from '@/lib/types/unified-palette';
 
@@ -71,28 +70,13 @@ export class SimpleThemeGenerator {
       visualStyles: {}
     });
     
-    // Apply neutral palette mapping for hierarchy colors
-    if (input.neutralPalette) {
-      const neutralMapping = mapNeutralPaletteToTheme(
-        { 
-          id: 'custom',
-          name: 'Custom',
-          shades: neutralPaletteShades,
-          userId: 'temp',
-          isBuiltIn: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }, 
-        input.mode
-      );
-      
-      // Apply the mapped colors to the theme
-      Object.assign(theme, neutralMapping);
-    }
+    // No automatic neutral palette mapping - structural colors are handled explicitly
     
-    // Apply custom structural colors if provided
+    // Apply custom structural colors with token resolution
     if (input.structuralColors && Object.keys(input.structuralColors).length > 0) {
-      Object.assign(theme, input.structuralColors);
+      // Resolve tokens in structural colors
+      const resolvedStructuralColors = replaceTokens(input.structuralColors, resolveToken, input.dataColors);
+      Object.assign(theme, resolvedStructuralColors);
     }
     
     // Apply custom text classes if provided

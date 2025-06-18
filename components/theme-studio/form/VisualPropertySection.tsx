@@ -3,6 +3,7 @@
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { CollapsibleSection } from '../ui/collapsible-section';
+import { ConnectedProperty } from '../ui/connected-property';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 import { getContextualTitle } from '@/lib/theme-studio/utils/schema-form-utils';
@@ -76,7 +77,7 @@ export function VisualPropertySection({
         </div>
       }
     >
-      <div className="space-y-4">
+      <div className="space-y-2">
         {/* Show state indicator if this section has state support */}
         {sectionSchema.items?.properties?.$id && (
           <div className="flex items-center gap-2 mb-2">
@@ -93,50 +94,58 @@ export function VisualPropertySection({
         {/* Check if this section has state support */}
         {sectionSchema.items?.properties?.$id ? (
           // This is a state-driven property - pass the entire schema
-          <SchemaForm
-            schema={sectionSchema}
-            value={value[name]}
-            onChange={(newValue: any) => {
-              onChange({ ...value, [name]: newValue });
-            }}
-            schemaLoader={schemaLoader}
-            path={[...path, name]}
-            level={level + 1}
-            hideTitle={true}
-          />
+          <ConnectedProperty isLast={true}>
+            <SchemaForm
+              schema={sectionSchema}
+              value={value[name]}
+              onChange={(newValue: any) => {
+                onChange({ ...value, [name]: newValue });
+              }}
+              schemaLoader={schemaLoader}
+              path={[...path, name]}
+              level={level + 1}
+              hideTitle={true}
+            />
+          </ConnectedProperty>
         ) : (
           // Regular properties - render them individually
           sectionSchema.items?.properties && (
-            <div className="space-y-4">
-              {Object.entries(sectionSchema.items.properties)
+            <div className="space-y-2">
+              {(() => {
+                const entries = Object.entries(sectionSchema.items.properties)
                   .filter(([propName, propSchema]) => {
                     // Filter out properties with complex/mixed types that are confusing
                     if ((propName === 'end' || propName === 'start') && Array.isArray(propSchema.type)) {
                       return false;
                     }
                     return true;
-                  })
-                  .map(([propName, propSchema]) => {
-                    const contextualTitle = getContextualTitle(propSchema, propName);
+                  });
+                  
+                return entries.map(([propName, propSchema], index) => {
+                    const fullPath = [...path, name, '0', propName];
+                    const contextualTitle = getContextualTitle(propSchema, propName, fullPath);
+                    const isLast = index === entries.length - 1;
                     
                     return (
-                      <SchemaForm
-                        key={propName}
-                        schema={{ ...propSchema, title: contextualTitle }}
-                        value={itemValue[propName]}
-                        onChange={(newValue: any) => {
-                          const newItemValue = { ...itemValue, [propName]: newValue };
-                          onChange({ ...value, [name]: [newItemValue] });
-                          // Also track this specific change
-                          trackChangeRef([...path, name, '0', propName]);
-                        }}
-                        schemaLoader={schemaLoader}
-                        path={[...path, name, '0', propName]}
-                        level={level + 2}
-                        hideTitle={false}
-                      />
+                      <ConnectedProperty key={propName} isLast={isLast}>
+                        <SchemaForm
+                          schema={{ ...propSchema, title: contextualTitle }}
+                          value={itemValue[propName]}
+                          onChange={(newValue: any) => {
+                            const newItemValue = { ...itemValue, [propName]: newValue };
+                            onChange({ ...value, [name]: [newItemValue] });
+                            // Also track this specific change
+                            trackChangeRef(fullPath);
+                          }}
+                          schemaLoader={schemaLoader}
+                          path={fullPath}
+                          level={level + 2}
+                          hideTitle={false}
+                        />
+                      </ConnectedProperty>
                     );
-                  })}
+                  });
+              })()}
             </div>
           )
         )}

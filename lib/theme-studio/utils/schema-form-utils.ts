@@ -16,6 +16,20 @@ export const formatPropertyName = (name: string): string => {
     'bold': 'Bold',
     'italic': 'Italic',
     'underline': 'Underline',
+    // Add more contextual names for common properties
+    'titleText': 'Title Text',
+    'titleFontSize': 'Title Font Size',
+    'titleFontFamily': 'Title Font Family',
+    'titleFontColor': 'Title Font Color',
+    'show': 'Show',
+    'position': 'Position',
+    'alignment': 'Alignment',
+    'showTitle': 'Show Title',
+    'showDataLabel': 'Show Data Label',
+    'labelText': 'Label Text',
+    'labelFontSize': 'Label Font Size',
+    'labelFontFamily': 'Label Font Family',
+    'labelColor': 'Label Color',
   };
   
   if (specialCases[name]) {
@@ -133,11 +147,29 @@ export const getImportantSections = (): string[] => {
 // Check if property is a percentage
 export const isPercentageProperty = (schema: SchemaProperty): boolean => {
   return schema.title?.toLowerCase().includes('transparency') ||
-         (schema.minimum === 0 && schema.maximum === 1);
+         schema.title?.toLowerCase().includes('percent') ||
+         (schema.minimum === 0 && schema.maximum === 100);
 };
 
 // Add contextual title for known references
-export const getContextualTitle = (schema: SchemaProperty, propertyName: string): string => {
+export const getContextualTitle = (schema: SchemaProperty, propertyName: string, path?: string[]): string => {
+  // Check if we're in a visual property section (like legend, labels, etc.)
+  const isInVisualSection = path && path.length >= 4 && path[0] === 'visualStyles';
+  
+  // List of generic titles that should be replaced with property names in sections
+  const genericTitles = [
+    'Title', 'Show', 'Color', 'Size', 'Font Size', 'Font Family', 
+    'Bold', 'Italic', 'Position', 'Text', 'Alignment', 'Style',
+    'Width', 'Height', 'Visible', 'Enable', 'Disable', 'Value',
+    'Label', 'Name', 'Description', 'Underline'
+  ];
+  
+  // If we have a title but it's generic and we're in a visual section, prefer the property name
+  if (isInVisualSection && schema.title && genericTitles.includes(schema.title)) {
+    // Format the property name for better readability
+    return formatPropertyName(propertyName);
+  }
+  
   let contextualTitle = schema.title || formatPropertyName(propertyName);
   
   if (schema.$ref) {

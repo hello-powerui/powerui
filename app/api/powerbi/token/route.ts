@@ -31,10 +31,6 @@ export async function POST(request: NextRequest) {
     // Get access token from Azure AD
     const tokenUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`;
     
-     + '...',
-      scope: powerBIConfig.scope,
-    });
-    
     const tokenResponse = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
@@ -45,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const error = await tokenResponse.text();
-      // console.error('[TOKEN] Failed to get access token:', {
+      console.error('[TOKEN] Failed to get access token:', {
         status: tokenResponse.status,
         error,
         tenantId,

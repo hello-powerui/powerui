@@ -140,14 +140,14 @@ export function VisualPropertiesPanel({
   const generalSections = sortedSections.filter(s => s.isCommon);
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Tab navigation */}
-      <div className="bg-gray-100 p-1 rounded-md">
-        <nav className="flex space-x-1" aria-label="Tabs">
+      <div className="bg-gray-100 p-0.5 rounded-md">
+        <nav className="flex space-x-0.5" aria-label="Tabs">
           <button
             onClick={() => setActiveTab(TAB_TYPES.SPECIFIC)}
             className={`
-              flex-1 whitespace-nowrap py-2 px-3 rounded-md font-medium text-sm transition-all
+              flex-1 whitespace-nowrap py-1 px-2 rounded font-medium text-[11px] transition-all
               ${activeTab === TAB_TYPES.SPECIFIC
                 ? 'bg-gray-900 text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
@@ -156,7 +156,7 @@ export function VisualPropertiesPanel({
           >
             Visual Properties
             {specificSections.length > 0 && (
-              <span className={`ml-2 text-xs ${activeTab === TAB_TYPES.SPECIFIC ? 'text-gray-300' : 'text-gray-500'}`}>
+              <span className={`ml-1.5 text-[10px] ${activeTab === TAB_TYPES.SPECIFIC ? 'text-gray-300' : 'text-gray-500'}`}>
                 ({specificSections.length})
               </span>
             )}
@@ -164,7 +164,7 @@ export function VisualPropertiesPanel({
           <button
             onClick={() => setActiveTab(TAB_TYPES.GENERAL)}
             className={`
-              flex-1 whitespace-nowrap py-2 px-3 rounded-md font-medium text-sm transition-all
+              flex-1 whitespace-nowrap py-1 px-2 rounded font-medium text-[11px] transition-all
               ${activeTab === TAB_TYPES.GENERAL
                 ? 'bg-gray-900 text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
@@ -173,7 +173,7 @@ export function VisualPropertiesPanel({
           >
             General Properties
             {generalSections.length > 0 && (
-              <span className={`ml-2 text-xs ${activeTab === TAB_TYPES.GENERAL ? 'text-gray-300' : 'text-gray-500'}`}>
+              <span className={`ml-1.5 text-[10px] ${activeTab === TAB_TYPES.GENERAL ? 'text-gray-300' : 'text-gray-500'}`}>
                 ({generalSections.length})
               </span>
             )}
@@ -182,7 +182,7 @@ export function VisualPropertiesPanel({
       </div>
       
       {/* Tab content */}
-      <div className="mt-4">
+      <div className="mt-2">
         {activeTab === TAB_TYPES.SPECIFIC ? (
           <div className="space-y-1">
             {specificSections.length > 0 ? (

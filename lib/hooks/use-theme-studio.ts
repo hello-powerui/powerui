@@ -109,10 +109,6 @@ export function useThemeStudio() {
       store.setStructuralColors(colors);
       trackChange(['structuralColors']);
     },
-    setStructuralColorsMode: (mode: 'auto' | 'custom') => {
-      store.setStructuralColorsMode(mode);
-      trackChange(['structuralColorsMode']);
-    },
     setTextClasses: (textClasses: any) => {
       store.setTextClasses(textClasses);
       trackChange(['textClasses']);

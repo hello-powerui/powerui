@@ -56,34 +56,36 @@ export function FontSizeField({ schema, value, onChange, path }: FontSizeFieldPr
       label={schema.title || 'Font Size'} 
       path={path}
       description={schema.description}
+      inline={true}
     >
-      <div className="space-y-2">
+      <div className="flex items-center gap-2 flex-1">
         {!isCustom ? (
           <Select 
             value={String(currentValue)} 
             onValueChange={handlePresetChange}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full h-6 text-[11px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {PRESET_SIZES.map(size => (
-                <SelectItem key={size.value} value={String(size.value)}>
+                <SelectItem key={size.value} value={String(size.value)} className="text-xs">
                   {size.label}
                 </SelectItem>
               ))}
-              <SelectItem value="custom">Custom...</SelectItem>
+              <SelectItem value="custom" className="text-xs">Custom...</SelectItem>
             </SelectContent>
           </Select>
         ) : (
-          <div className="flex gap-2">
+          <div className="flex gap-1 flex-1">
             <Input
               type="number"
               min="1"
               max="100"
               value={currentValue}
               onChange={handleCustomChange}
-              className="flex-1"
+              className="flex-1 h-6 text-[11px] px-2"
+              title={`${currentValue}pt (${pixelValue}px)`}
             />
             <Button
               variant="outline"
@@ -96,14 +98,15 @@ export function FontSizeField({ schema, value, onChange, path }: FontSizeFieldPr
                 );
                 onChange(closest.value);
               }}
+              className="h-6 px-2 text-[11px]"
             >
               Presets
             </Button>
           </div>
         )}
-        <p className="text-xs text-muted-foreground">
-          {currentValue}pt ({pixelValue}px)
-        </p>
+        <span className="text-[10px] text-gray-500 flex-shrink-0">
+          {pixelValue}px
+        </span>
       </div>
     </PropertyWrapper>
   );

@@ -35,19 +35,20 @@ export function FontWeightField({ schema, value, onChange, path, fontFamily = 'S
       label={schema.title || 'Font Weight'} 
       path={path}
       description={schema.description}
+      inline={true}
     >
       <Select 
         value={isValidWeight ? currentValue : availableWeights.includes('400') ? '400' : availableWeights[0]} 
         onValueChange={onChange}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full h-6 text-[11px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
           {FONT_WEIGHTS.filter(weight => 
             availableWeights.includes(weight.value)
           ).map(weight => (
-            <SelectItem key={weight.value} value={weight.value}>
+            <SelectItem key={weight.value} value={weight.value} className="text-xs">
               {weight.label} ({weight.value})
             </SelectItem>
           ))}

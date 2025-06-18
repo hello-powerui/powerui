@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { PropertyInput } from './property-input';
+import { PropertyWrapper } from './property-wrapper';
 import { Card } from '@/components/ui/card';
 import { FillControl } from './controls';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
@@ -121,6 +122,7 @@ export function SchemaForm({
           description={schema.description}
           required={schema.required?.includes(path[path.length - 1])}
           path={path}
+          inline={true}
         />
       );
     }
@@ -144,9 +146,9 @@ export function SchemaForm({
     // If this is an image object, wrap it in a card for better visual grouping
     if (isImageRef && resolvedSchema.properties?.name && resolvedSchema.properties?.url) {
       return (
-        <Card className="p-4 border-l-4 border-l-blue-500">
-          <div className="space-y-4">
-            <h5 className="text-sm font-medium text-gray-700 mb-3">Image Settings</h5>
+        <Card className="p-3 border-l-2 border-l-blue-500">
+          <div className="space-y-2">
+            <h5 className="text-xs font-semibold text-gray-700 mb-2">Image Settings</h5>
             <SchemaForm
               schema={mergedSchema}
               value={value}
@@ -212,6 +214,42 @@ export function SchemaForm({
     );
   }
 
+  // Handle oneOf with const values (enum-like pattern for non-string types)
+  if (schema.oneOf && schema.type && schema.type !== 'string') {
+    // Check if all options have const values (enum-like behavior)
+    const allHaveConst = schema.oneOf.every(option => 'const' in option);
+    
+    if (allHaveConst) {
+      // This is an enum-like oneOf, render as a select
+      if (schema.type === 'integer' || schema.type === 'number') {
+        // Render inline select for numeric enums
+        return (
+          <PropertyWrapper label={schema.title || ''} path={path} inline={true}>
+            <select
+              value={value !== null && value !== undefined ? value : ''}
+              onChange={(e) => {
+                const newValue = e.target.value;
+                // Convert to number for integer/number types
+                handleChange(newValue === '' ? null : Number(newValue));
+              }}
+              className="w-full h-6 rounded border border-gray-200 bg-white px-2 py-0 text-[11px] focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              title={schema.description}
+            >
+              {!schema.required?.includes(path[path.length - 1]) && (
+                <option value="">Select...</option>
+              )}
+              {schema.oneOf.map((option: any) => (
+                <option key={option.const} value={option.const}>
+                  {option.title || option.const}
+                </option>
+              ))}
+            </select>
+          </PropertyWrapper>
+        );
+      }
+    }
+  }
+
   // Handle oneOf - but not for simple string enums (those are handled in the string type section)
   if (schema.oneOf && schema.type !== 'string') {
     // Determine which schema to use based on the current value
@@ -234,12 +272,12 @@ export function SchemaForm({
     
     // Show a selector for oneOf options
     return (
-      <div className="space-y-2">
+      <div className="space-y-1">
         {!hideTitle && schema.title && (
-          <h4 className="text-sm font-medium text-gray-700">{schema.title}</h4>
+          <h4 className="text-xs font-semibold text-gray-700">{schema.title}</h4>
         )}
         {schema.description && (
-          <p className="text-xs text-gray-500">{schema.description}</p>
+          <p className="text-[10px] text-gray-500 leading-relaxed">{schema.description}</p>
         )}
         <PropertyInput
           type="select"
@@ -306,12 +344,12 @@ export function SchemaForm({
       new Set(schema.anyOf.map(s => s.type)).size > 1;
     
     return (
-      <div className="space-y-2">
+      <div className="space-y-1">
         {!hideTitle && schema.title && (
-          <h4 className="text-sm font-medium text-gray-700">{schema.title}</h4>
+          <h4 className="text-xs font-semibold text-gray-700">{schema.title}</h4>
         )}
         {schema.description && (
-          <p className="text-xs text-gray-500">{schema.description}</p>
+          <p className="text-[10px] text-gray-500 leading-relaxed">{schema.description}</p>
         )}
         {hasMultipleTypes && (
           <PropertyInput
@@ -396,6 +434,7 @@ export function SchemaForm({
         value={value}
         onChange={handleChange}
         path={path}
+        inline={true}
       />
     );
   }
@@ -453,6 +492,7 @@ export function SchemaForm({
         value={value}
         onChange={handleChange}
         path={path}
+        inline={true}
       />
     );
   }
@@ -465,6 +505,7 @@ export function SchemaForm({
         onChange={handleChange}
         path={path}
         hideTitle={hideTitle}
+        inline={true}
       />
     );
   }
@@ -477,6 +518,7 @@ export function SchemaForm({
         onChange={handleChange}
         path={path}
         hideTitle={hideTitle}
+        inline={true}
       />
     );
   }

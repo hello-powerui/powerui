@@ -15,9 +15,8 @@ interface NumberControlProps {
   path: string[];
   // For percentage values
   isPercentage?: boolean;
-  // For inheritance
-  inheritanceIndicator?: React.ReactNode;
-  onReset?: () => void;
+  // For inline layout
+  inline?: boolean;
 }
 
 export function NumberControl({
@@ -31,53 +30,61 @@ export function NumberControl({
   step = 1,
   path,
   isPercentage = false,
-  inheritanceIndicator,
-  onReset,
+  inline = false,
 }: NumberControlProps) {
   const handleChange = (newValue: string) => {
     const parsed = parseFloat(newValue);
     if (!isNaN(parsed)) {
-      if (isPercentage) {
-        // Convert percentage to decimal (0-100 -> 0-1)
-        onChange(parsed / 100);
-      } else {
-        onChange(parsed);
-      }
+      // Always pass the literal value entered by the user
+      onChange(parsed);
     }
   };
 
-  const displayValue = isPercentage ? (value * 100).toFixed(0) : value?.toString() || '0';
+  const displayValue = value?.toString() || '0';
 
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Label htmlFor={path.join('-')} className="text-sm font-medium">
-            {label}
-          </Label>
-          {required && (
-            <span className="text-xs text-red-500">*</span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {inheritanceIndicator}
-          {onReset && (
-            <button
-              type="button"
-              onClick={onReset}
-              className="text-xs text-gray-600 hover:text-gray-900"
-            >
-              Reset
-            </button>
+  if (inline) {
+    return (
+      <div className="flex items-center gap-3">
+        <Label htmlFor={path.join('-')} className="text-[11px] font-medium text-gray-700 w-[110px] flex-shrink-0">
+          {label}
+          {required && <span className="text-[10px] text-red-500 ml-0.5">*</span>}
+        </Label>
+        <div className="flex items-center gap-1 flex-1">
+          <Input
+            id={path.join('-')}
+            type="number"
+            value={displayValue}
+            onChange={(e) => handleChange(e.target.value)}
+            min={isPercentage ? 0 : min}
+            max={isPercentage ? 100 : max}
+            step={isPercentage ? 1 : step}
+            className="h-6 text-[11px] px-2"
+            title={description}
+          />
+          {isPercentage && (
+            <span className="text-[11px] text-gray-600">%</span>
           )}
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center gap-1">
+        <Label htmlFor={path.join('-')} className="text-[11px] font-medium text-gray-700">
+          {label}
+        </Label>
+        {required && (
+          <span className="text-[10px] text-red-500">*</span>
+        )}
+      </div>
 
       {description && (
-        <p className="text-xs text-gray-500">{description}</p>
+        <p className="text-[10px] text-gray-500 leading-relaxed">{description}</p>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <Input
           id={path.join('-')}
           type="number"
@@ -86,10 +93,10 @@ export function NumberControl({
           min={isPercentage ? 0 : min}
           max={isPercentage ? 100 : max}
           step={isPercentage ? 1 : step}
-          className="flex-1"
+          className="flex-1 h-6 text-[11px] px-2"
         />
         {isPercentage && (
-          <span className="text-sm text-gray-600">%</span>
+          <span className="text-[11px] text-gray-600">%</span>
         )}
       </div>
 
@@ -97,12 +104,12 @@ export function NumberControl({
       {min !== undefined && max !== undefined && (
         <input
           type="range"
-          value={isPercentage ? value * 100 : value}
+          value={value}
           onChange={(e) => handleChange(e.target.value)}
           min={isPercentage ? 0 : min}
           max={isPercentage ? 100 : max}
           step={isPercentage ? 1 : step}
-          className="w-full"
+          className="w-full h-1"
         />
       )}
     </div>

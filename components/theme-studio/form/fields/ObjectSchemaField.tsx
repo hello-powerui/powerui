@@ -104,9 +104,10 @@ export function ObjectSchemaField({
   
   // Render fields function
   const renderFields = () => (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {Object.entries(schema.properties || {}).map(([propName, propSchema]) => {
-        const contextualTitle = getContextualTitle(propSchema, propName);
+        const fullPath = [...path, propName];
+        const contextualTitle = getContextualTitle(propSchema, propName, fullPath);
         
         return (
           <SchemaForm
@@ -117,7 +118,7 @@ export function ObjectSchemaField({
               onChange({ ...objectValue, [propName]: newValue });
             }}
             schemaLoader={schemaLoader}
-            path={[...path, propName]}
+            path={fullPath}
             level={level + 1}
             hideTitle={false}
           />
@@ -134,10 +135,10 @@ export function ObjectSchemaField({
   // If this needs visual grouping, wrap in a card
   if (needsVisualGrouping && !hideTitle) {
     return (
-      <Card className="p-4 border-l-4 border-l-blue-500">
-        <div className="space-y-4">
+      <Card className="p-3 border-l-2 border-l-blue-500">
+        <div className="space-y-2">
           {schema.title && (
-            <h5 className="text-sm font-medium text-gray-700 mb-3">{schema.title}</h5>
+            <h5 className="text-xs font-semibold text-gray-700 mb-2">{schema.title}</h5>
           )}
           {renderFields()}
         </div>

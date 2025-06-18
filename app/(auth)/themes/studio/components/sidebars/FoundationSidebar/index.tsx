@@ -39,7 +39,7 @@ export function FoundationSidebar({
   updateThemeDataField,
 }: FoundationSidebarProps) {
   return (
-    <Card className="w-96 border-r rounded-none h-full flex flex-col">
+    <Card className="w-72 border-r rounded-none h-full flex flex-col">
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold">Foundation</h2>
         <p className="text-sm text-muted-foreground mt-1">

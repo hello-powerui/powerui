@@ -25,6 +25,8 @@ interface PowerBIPreviewProps {
   selectedVariant?: string;
   onExitFocusMode?: () => void;
   onVariantChange?: (variant: string) => void;
+  onReportReset?: (resetFn: () => void) => void;
+  enterFocusMode?: boolean;
 }
 
 export function PowerBIPreview({ 
@@ -32,7 +34,9 @@ export function PowerBIPreview({
   selectedVisualType = '*',
   selectedVariant = '*',
   onExitFocusMode,
-  onVariantChange
+  onVariantChange,
+  onReportReset,
+  enterFocusMode
 }: PowerBIPreviewProps) {
   // Convert empty string to '*' for consistency with focus mode logic
   const normalizedVisualType = selectedVisualType || '*';
@@ -56,6 +60,8 @@ export function PowerBIPreview({
       selectedVariant={selectedVariant}
       onExitFocusMode={onExitFocusMode}
       onVariantChange={onVariantChange}
+      onReportReset={onReportReset}
+      enterFocusMode={enterFocusMode}
     />
   );
 }

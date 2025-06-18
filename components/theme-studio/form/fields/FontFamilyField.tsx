@@ -20,14 +20,15 @@ export function FontFamilyField({ schema, value, onChange, path }: FontFamilyFie
       label={schema.title || 'Font Family'} 
       path={path}
       description={schema.description}
+      inline={true}
     >
       <Select value={value || 'Segoe UI'} onValueChange={onChange}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full h-6 text-[11px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
           {FONT_FAMILIES.map(font => (
-            <SelectItem key={font} value={font}>
+            <SelectItem key={font} value={font} className="text-xs">
               {font}
             </SelectItem>
           ))}

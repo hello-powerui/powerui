@@ -34,6 +34,7 @@ export interface UnifiedColorPickerProps {
   enableShades?: boolean;
   mode?: 'light' | 'dark';
   neutralPalette?: string[];
+  themeColors?: string[];
   className?: string;
   placeholder?: string;
 }
@@ -46,15 +47,15 @@ const PRESET_COLORS = [
   '#6366F1', '#8B5CF6', '#A855F7', '#D946EF', '#EC4899', '#F43F5E',
 ];
 
-const THEME_COLORS = [
-  { id: 0, name: 'Color 1', preview: '#3B82F6' },
-  { id: 1, name: 'Color 2', preview: '#10B981' },
-  { id: 2, name: 'Color 3', preview: '#F59E0B' },
-  { id: 3, name: 'Color 4', preview: '#EF4444' },
-  { id: 4, name: 'Color 5', preview: '#8B5CF6' },
-  { id: 5, name: 'Color 6', preview: '#EC4899' },
-  { id: 6, name: 'Color 7', preview: '#06B6D4' },
-  { id: 7, name: 'Color 8', preview: '#F97316' },
+const DEFAULT_THEME_COLORS = [
+  '#3B82F6',
+  '#10B981',
+  '#F59E0B',
+  '#EF4444',
+  '#8B5CF6',
+  '#EC4899',
+  '#06B6D4',
+  '#F97316',
 ];
 
 const SHADE_OPTIONS = [
@@ -77,6 +78,7 @@ export function UnifiedColorPicker({
   enableShades = false,
   mode = 'light',
   neutralPalette,
+  themeColors = DEFAULT_THEME_COLORS,
   className,
   placeholder = 'Select color',
 }: UnifiedColorPickerProps) {
@@ -131,16 +133,16 @@ export function UnifiedColorPicker({
       if (!color) return '';
       if (typeof color === 'string') return color;
       if (typeof color === 'object' && color.expr?.ThemeDataColor?.ColorId !== undefined) {
-        const themeColor = THEME_COLORS[color.expr.ThemeDataColor.ColorId];
-        return themeColor ? `Theme ${themeColor.name}` : '';
+        const colorId = color.expr.ThemeDataColor.ColorId;
+        return colorId < themeColors.length ? `Theme Color ${colorId + 1}` : '';
       }
       return '';
     } else if (typeof value === 'object' && 'color' in value && value.color) {
       return value.color;
     } else if (typeof value === 'object' && 'themeColor' in value && value.themeColor) {
-      const themeColor = THEME_COLORS[value.themeColor.id];
+      const colorId = value.themeColor.id;
       const shade = value.themeColor.shade || 0;
-      return themeColor ? `Theme ${themeColor.name}${shade !== 0 ? ` (${shade > 0 ? '+' : ''}${shade * 100}%)` : ''}` : '';
+      return colorId < themeColors.length ? `Theme Color ${colorId + 1}${shade !== 0 ? ` (${shade > 0 ? '+' : ''}${shade * 100}%)` : ''}` : '';
     }
     return '';
   }
@@ -158,8 +160,8 @@ export function UnifiedColorPicker({
       if (color === undefined || color === null || color === '') return '';
       if (typeof color === 'string') return color;
       if (typeof color === 'object' && color.expr?.ThemeDataColor?.ColorId !== undefined) {
-        const themeColor = THEME_COLORS[color.expr.ThemeDataColor.ColorId];
-        return themeColor ? `Theme ${themeColor.name}` : '';
+        const colorId = color.expr.ThemeDataColor.ColorId;
+        return colorId < themeColors.length ? `Theme Color ${colorId + 1}` : '';
       }
       // Handle other object formats
       if (typeof color === 'object' && 'color' in color) {
@@ -169,9 +171,9 @@ export function UnifiedColorPicker({
     } else if (typeof value === 'object' && 'color' in value && value.color) {
       return value.color;
     } else if (typeof value === 'object' && 'themeColor' in value && value.themeColor) {
-      const themeColor = THEME_COLORS[value.themeColor.id];
+      const colorId = value.themeColor.id;
       const shade = value.themeColor.shade || 0;
-      return themeColor ? `Theme ${themeColor.name}${shade !== 0 ? ` (${shade > 0 ? '+' : ''}${shade * 100}%)` : ''}` : '';
+      return colorId < themeColors.length ? `Theme Color ${colorId + 1}${shade !== 0 ? ` (${shade > 0 ? '+' : ''}${shade * 100}%)` : ''}` : '';
     }
     return '';
   };
@@ -191,7 +193,11 @@ export function UnifiedColorPicker({
     }
     if (displayValue.startsWith('#')) return displayValue;
     if (displayValue.startsWith('@')) {
-      const neutralObj = neutralPalette ? Object.fromEntries(neutralPalette.map((color, i) => [String(i * 100), color])) : {};
+      // Convert neutralPalette array to proper shade keys
+      const shadeKeys = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+      const neutralObj = neutralPalette && neutralPalette.length > 0
+        ? Object.fromEntries(neutralPalette.slice(0, shadeKeys.length).map((color, i) => [shadeKeys[i], color]))
+        : {};
       const resolved = resolveToken(displayValue, mode, { neutral: neutralObj, dataColors: [] });
       return resolved || '#000000';
     }
@@ -199,7 +205,7 @@ export function UnifiedColorPicker({
       const match = displayValue.match(/Color (\d+)/);
       if (match) {
         const colorIndex = parseInt(match[1]) - 1;
-        return THEME_COLORS[colorIndex]?.preview || '#000000';
+        return themeColors[colorIndex] || '#000000';
       }
     }
     return '#E5E7EB'; // Light gray as fallback
@@ -338,22 +344,22 @@ export function UnifiedColorPicker({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between font-normal"
+            className={cn("w-full justify-between font-normal", className)}
             suppressHydrationWarning
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <div
-                className="h-5 w-5 rounded border border-gray-200"
+                className="h-3.5 w-3.5 rounded border border-gray-300 flex-shrink-0"
                 style={{ backgroundColor: getPreviewColor() }}
               />
-              <span className="truncate">
+              <span className="truncate text-left flex-1">
                 {getDisplayValue() || placeholder}
               </span>
             </div>
-            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[320px] p-0" align="start">
+        <PopoverContent className="w-[320px] p-0 overflow-hidden" align="start">
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
             <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}>
               {enableTokens && <TabsTrigger value="tokens">Tokens</TabsTrigger>}
@@ -362,8 +368,8 @@ export function UnifiedColorPicker({
             </TabsList>
             
             {enableTokens && (
-              <TabsContent value="tokens" className="p-3 space-y-3">
-                <div className="relative">
+              <TabsContent value="tokens" className="p-3 space-y-3 max-h-[400px] flex flex-col">
+                <div className="relative flex-shrink-0">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search tokens..."
@@ -372,7 +378,7 @@ export function UnifiedColorPicker({
                     className="pl-8"
                   />
                 </div>
-                <div className="max-h-[300px] overflow-y-auto space-y-3">
+                <div className="flex-1 overflow-y-auto space-y-3 pr-1 min-h-0">
                   {Object.entries(filteredTokens).map(([category, tokens]) => (
                     <div key={category}>
                       <p className="text-xs font-medium text-muted-foreground mb-2">
@@ -380,7 +386,12 @@ export function UnifiedColorPicker({
                       </p>
                       <div className="grid grid-cols-2 gap-1">
                         {tokens.map((token) => {
-                          const neutralObj = neutralPalette ? Object.fromEntries(neutralPalette.map((color, i) => [String(i * 100), color])) : {};
+                          // Convert neutralPalette array to proper shade keys
+                          // Standard shade values: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950
+                          const shadeKeys = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+                          const neutralObj = neutralPalette && neutralPalette.length > 0
+                            ? Object.fromEntries(neutralPalette.slice(0, shadeKeys.length).map((color, i) => [shadeKeys[i], color]))
+                            : {};
                           const resolvedColor = resolveToken(token, mode, { neutral: neutralObj, dataColors: [] });
                           return (
                             <Button
@@ -455,19 +466,19 @@ export function UnifiedColorPicker({
                 <div className="space-y-2">
                   <Label>Theme Colors</Label>
                   <div className="grid grid-cols-2 gap-2">
-                    {THEME_COLORS.map((color) => (
+                    {themeColors.map((color, index) => (
                       <Button
-                        key={color.id}
-                        variant={selectedThemeColor === color.id ? "default" : "outline"}
+                        key={index}
+                        variant={selectedThemeColor === index ? "default" : "outline"}
                         size="sm"
                         className="justify-start gap-2"
-                        onClick={() => handleThemeColorSelect(color.id)}
+                        onClick={() => handleThemeColorSelect(index)}
                       >
                         <div
                           className="h-4 w-4 rounded border border-gray-200"
-                          style={{ backgroundColor: color.preview }}
+                          style={{ backgroundColor: color }}
                         />
-                        <span>{color.name}</span>
+                        <span>Color {index + 1}</span>
                       </Button>
                     ))}
                   </div>

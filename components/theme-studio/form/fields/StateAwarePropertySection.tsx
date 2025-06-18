@@ -6,6 +6,7 @@ import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { sortPropertiesWithShowFirst, getContextualTitle } from '@/lib/theme-studio/utils/schema-form-utils';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
+import { ConnectedProperty } from '../../ui/connected-property';
 
 interface StateAwarePropertySectionProps {
   schema: SchemaProperty;
@@ -237,7 +238,7 @@ export function StateAwarePropertySection({
   };
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {!hideTitle && schema.title && (
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-medium text-gray-700">{schema.title}</h4>
@@ -250,42 +251,45 @@ export function StateAwarePropertySection({
         <p className="text-xs text-gray-500">{schema.description}</p>
       )}
       
-      <div className="space-y-4">
+      <div className="space-y-2">
         {(() => {
           const sorted = sortPropertiesWithShowFirst(schema.items?.properties || {});
+          const filtered = sorted.filter(([propName]) => propName !== '$id');
 
-          return sorted
-            .filter(([propName]) => propName !== '$id')
-            .map(([propName, propSchema]) => {
-              const contextualTitle = getContextualTitle(propSchema, propName);
+          return filtered
+            .map(([propName, propSchema], index) => {
+              const fullPath = [...path, globalSelectedState, propName];
+              const contextualTitle = getContextualTitle(propSchema, propName, fullPath);
+              const isLast = index === filtered.length - 1;
 
               return (
-                <SchemaForm
-                  key={`${globalSelectedState}-${propName}`}
-                  schema={{ ...propSchema, title: contextualTitle }}
-                  value={(() => {
-                    // For fill properties and show prop, get value from the separate object
-                    if (isFillProperty && propName === 'show') {
-                      const showObject = normalizedArray.find(item => !item.$id && 'show' in item);
-                      return showObject?.show ?? true;
-                    }
-                    
-                    // For text properties and show prop, get value from the separate object
-                    if (isTextProperty && propName === 'show') {
-                      const showObject = normalizedArray.find(item => !item.$id && 'show' in item);
-                      return showObject?.show ?? true;
-                    }
-                    
-                    return stateItem[propName];
-                  })()}
-                  onChange={(newValue: any) => {
-                    handleStateItemChange({ [propName]: newValue });
-                  }}
-                  schemaLoader={schemaLoader}
-                  path={[...path, globalSelectedState, propName]}
-                  level={level + 1}
-                  hideTitle={false}
-                />
+                <ConnectedProperty key={`${globalSelectedState}-${propName}`} isLast={isLast}>
+                  <SchemaForm
+                    schema={{ ...propSchema, title: contextualTitle }}
+                    value={(() => {
+                      // For fill properties and show prop, get value from the separate object
+                      if (isFillProperty && propName === 'show') {
+                        const showObject = normalizedArray.find(item => !item.$id && 'show' in item);
+                        return showObject?.show ?? true;
+                      }
+                      
+                      // For text properties and show prop, get value from the separate object
+                      if (isTextProperty && propName === 'show') {
+                        const showObject = normalizedArray.find(item => !item.$id && 'show' in item);
+                        return showObject?.show ?? true;
+                      }
+                      
+                      return stateItem[propName];
+                    })()}
+                    onChange={(newValue: any) => {
+                      handleStateItemChange({ [propName]: newValue });
+                    }}
+                    schemaLoader={schemaLoader}
+                    path={[...path, globalSelectedState, propName]}
+                    level={level + 1}
+                    hideTitle={false}
+                  />
+                </ConnectedProperty>
               );
             });
         })()}

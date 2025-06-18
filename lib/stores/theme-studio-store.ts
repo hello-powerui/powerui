@@ -17,7 +17,6 @@ interface StudioTheme {
   neutralPaletteId: string;
   mode: 'light' | 'dark';
   fontFamily: string;
-  structuralColorsMode: 'auto' | 'custom';
   structuralColors?: StructuralColors;
   textClasses?: TextClasses;
   
@@ -44,7 +43,7 @@ interface ThemeStudioState {
   selectedStyle: string;
   selectedVariant: string;
   selectedProperty: string;
-  selectedSection: 'properties' | 'visuals' | 'global';
+  selectedSection: 'typography' | 'structural' | 'visuals' | 'global';
   selectedState: string; // For state-driven properties (default, hover, selected, etc.)
   expandedPanels: string[];
   isDirty: boolean;
@@ -66,7 +65,6 @@ interface ThemeStudioState {
   setThemeMode: (mode: 'light' | 'dark') => void;
   setFontFamily: (fontFamily: string) => void;
   setStructuralColors: (colors: StructuralColors) => void;
-  setStructuralColorsMode: (mode: 'auto' | 'custom') => void;
   setTextClasses: (textClasses: TextClasses) => void;
   updateVisualStyles: (visualStyles: Record<string, any>) => void;
   updateVisualStyle: (visual: string, variant: string, value: any) => void;
@@ -79,7 +77,7 @@ interface ThemeStudioState {
   setSelectedVisual: (visual: string) => void;
   setSelectedVariant: (variant: string) => void;
   setSelectedState: (state: string) => void;
-  setSelectedSection: (section: 'properties' | 'visuals' | 'global') => void;
+  setSelectedSection: (section: 'typography' | 'structural' | 'visuals' | 'global') => void;
   setActiveTab: (tab: 'color' | 'typography' | 'style') => void;
   togglePanel: (panelId: string) => void;
   
@@ -107,15 +105,15 @@ interface ThemeStudioState {
 
 const defaultStudioTheme: StudioTheme = {
   name: 'Untitled Theme',
-  description: '',
   colorPaletteId: DEFAULT_COLOR_PALETTE.id,
   neutralPaletteId: AZURE_NEUTRAL_PALETTE.id,
   mode: 'light',
   fontFamily: 'Segoe UI',
-  structuralColorsMode: 'auto',
   structuralColors: {},
   textClasses: {},
-  visualStyles: {}
+  visualStyles: {
+    '*': { '*': {} }  // Initialize global properties structure
+  }
 };
 
 const defaultResolvedData: ResolvedThemeData = {
@@ -135,7 +133,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       selectedVisual: '',
       selectedVariant: '*',
       selectedState: 'default',
-      selectedSection: 'properties',
+      selectedSection: 'typography',
       selectedStyle: '*',
       selectedProperty: '',
       expandedPanels: [],
@@ -193,12 +191,6 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           isDirty: true,
         })),
         
-      setStructuralColorsMode: (mode) =>
-        set((state) => ({
-          theme: { ...state.theme, structuralColorsMode: mode },
-          isDirty: true,
-        })),
-        
       setTextClasses: (textClasses) =>
         set((state) => ({
           theme: { ...state.theme, textClasses },
@@ -247,7 +239,6 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
 
       // UI state actions
       setActiveTab: (tab) => set({ activeTab: tab }),
-      setIsGenerating: (generating) => set({ isGenerating: generating }),
 
       setSelectedVisual: (visual) => set({ selectedVisual: visual }),
       setSelectedVariant: (variant) => set({ selectedVariant: variant }),
@@ -378,7 +369,6 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           
           const payload = {
             name: theme.name,
-            description: theme.description,
             themeData: theme // Send the entire theme object
           };
           
@@ -414,6 +404,14 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         // Extract theme data, handling both old and new formats
         const loadedTheme = themeData.themeData || themeData;
         
+        // Ensure visualStyles has the proper structure for global properties
+        const visualStyles = loadedTheme.visualStyles || {};
+        if (!visualStyles['*']) {
+          visualStyles['*'] = { '*': {} };
+        } else if (!visualStyles['*']['*']) {
+          visualStyles['*']['*'] = {};
+        }
+        
         // Ensure we have all required fields
         const theme: StudioTheme = {
           id: themeData.id,
@@ -423,10 +421,9 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           neutralPaletteId: loadedTheme.neutralPaletteId || loadedTheme.paletteReference?.neutralPaletteId || AZURE_NEUTRAL_PALETTE.id,
           mode: loadedTheme.mode || 'light',
           fontFamily: loadedTheme.fontFamily || 'Segoe UI',
-          structuralColorsMode: loadedTheme.structuralColorsMode || 'auto',
           structuralColors: loadedTheme.structuralColors || {},
           textClasses: loadedTheme.textClasses || {},
-          visualStyles: loadedTheme.visualStyles || {}
+          visualStyles: visualStyles
         };
         
         set({
@@ -444,7 +441,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           selectedVisual: '',
           selectedVariant: '*',
           selectedState: 'default',
-          selectedSection: 'properties',
+          selectedSection: 'global',
           expandedPanels: [],
           isDirty: false,
           validationErrors: [],
@@ -458,13 +455,18 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         const newTheme = { ...defaultStudioTheme };
         delete newTheme.id; // Explicitly remove any ID
         
+        // Ensure global properties structure exists
+        if (!newTheme.visualStyles['*']) {
+          newTheme.visualStyles['*'] = { '*': {} };
+        }
+        
         set({
           theme: newTheme,
           resolved: { ...defaultResolvedData },
           selectedVisual: '',
           selectedVariant: '*',
           selectedState: 'default',
-          selectedSection: 'properties',
+          selectedSection: 'typography', // Keep default as typography
           expandedPanels: [],
           isDirty: false,
           validationErrors: [],

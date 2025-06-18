@@ -27,10 +27,8 @@ interface FoundationPanelProps {
   onThemeModeChange: (mode: 'light' | 'dark') => void;
   onFontFamilyChange: (fontFamily: string) => void;
   onStructuralColorsChange: (colors: any) => void;
-  onStructuralColorsModeChange: (mode: 'auto' | 'custom') => void;
   onTextClassesChange: (textClasses: any) => void;
   onShowPaletteManager: (type: 'color' | 'neutral') => void;
-  onShowTextClassesEditor: () => void;
   isVisible: boolean;
   onToggleVisibility: (visible: boolean) => void;
 }
@@ -49,7 +47,6 @@ export function FoundationPanel({
   onStructuralColorsModeChange,
   onTextClassesChange,
   onShowPaletteManager,
-  onShowTextClassesEditor,
   isVisible,
   onToggleVisibility,
 }: FoundationPanelProps) {
@@ -95,17 +92,6 @@ export function FoundationPanel({
         
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          
-          {/* Theme Description */}
-          <div className="bg-white rounded-md border border-gray-200 p-4">
-            <Label className="text-sm font-medium mb-2 block">Description</Label>
-            <textarea
-              value={theme.description || ''}
-              onChange={(e) => onThemeChange({ description: e.target.value })}
-              placeholder="Add a description for your theme..."
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md resize-none h-16 focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
-            />
-          </div>
           
           {/* Data Colors */}
           <div className="bg-white rounded-md border border-gray-200 p-4">
@@ -240,126 +226,7 @@ export function FoundationPanel({
             )}
           </div>
 
-          {/* Structural Colors Section */}
-          <div className="bg-white rounded-md border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-1.5">
-                <Label className="text-sm font-medium">Structural Colors</Label>
-                <ChangeIndicator hasChanged={hasChanges(['structuralColors']) || hasChanges(['structuralColorsMode'])} />
-              </div>
-              <div className="flex rounded-md border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => onStructuralColorsModeChange('auto')}
-                  className={`px-3 py-1 text-xs transition-colors ${
-                    theme.structuralColorsMode === 'auto' || !theme.structuralColorsMode
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  Auto
-                </button>
-                <button
-                  onClick={() => onStructuralColorsModeChange('custom')}
-                  className={`px-3 py-1 text-xs transition-colors border-l border-gray-200 ${
-                    theme.structuralColorsMode === 'custom'
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  Custom
-                </button>
-              </div>
-            </div>
-            
-            {theme.structuralColorsMode === 'auto' || !theme.structuralColorsMode ? (
-              <div className="space-y-2">
-                <p className="text-xs text-gray-600">
-                  Automatically derived from your neutral palette
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {getNeutralPalettePreview(neutralPalette || AZURE_NEUTRAL_PALETTE, theme.mode)
-                    .filter(m => ['firstLevelElements', 'secondLevelElements', 'thirdLevelElements', 'fourthLevelElements'].includes(m.property))
-                    .map((mapping) => (
-                    <div key={mapping.property} className="flex items-center gap-2">
-                      <div 
-                        className="w-3 h-3 rounded border border-gray-200"
-                        style={{ backgroundColor: mapping.value }}
-                      />
-                      <span className="text-xs text-gray-600">
-                        {mapping.property.replace(/([A-Z])/g, ' $1').replace('Elements', '').trim()}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {[
-                  { key: 'firstLevelElements', label: 'First Level', default: '#252526' },
-                  { key: 'secondLevelElements', label: 'Second Level', default: '#2D2D30' },
-                  { key: 'thirdLevelElements', label: 'Third Level', default: '#3E3E42' },
-                  { key: 'fourthLevelElements', label: 'Fourth Level', default: '#4D4D4D' },
-                  { key: 'background', label: 'Background', default: '#1E1E1E' },
-                  { key: 'secondaryBackground', label: 'Secondary BG', default: '#181818' },
-                  { key: 'tableAccent', label: 'Table Accent', default: '#0E639C' }
-                ].map(({ key, label, default: defaultColor }) => (
-                  <div key={key} className="flex items-center justify-between">
-                    <Label className="text-xs text-gray-600">{label}</Label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={theme.structuralColors?.[key as keyof typeof theme.structuralColors] || defaultColor}
-                        onChange={(e) => {
-                          const updatedColors = {
-                            ...theme.structuralColors,
-                            [key]: e.target.value
-                          };
-                          onStructuralColorsChange(updatedColors);
-                        }}
-                        className="w-6 h-6 rounded border border-gray-200 cursor-pointer"
-                      />
-                      <span className="text-xs font-mono text-gray-500">
-                        {(theme.structuralColors?.[key as keyof typeof theme.structuralColors] || defaultColor).substring(0, 7)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
-          {/* Typography & Text Classes */}
-          <div className="bg-white rounded-md border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-1.5">
-                <Label className="text-sm font-medium">Typography</Label>
-                <ChangeIndicator hasChanged={hasChanges(['fontFamily'])} />
-              </div>
-              <button
-                onClick={onShowTextClassesEditor}
-                className="text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors"
-              >
-                Text Classes
-              </button>
-            </div>
-            <Select value={theme.fontFamily} onValueChange={onFontFamilyChange}>
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Segoe UI">Segoe UI (Default)</SelectItem>
-                <SelectItem value="Arial">Arial</SelectItem>
-                <SelectItem value="Calibri">Calibri</SelectItem>
-                <SelectItem value="Helvetica Neue">Helvetica Neue</SelectItem>
-                <SelectItem value="Georgia">Georgia</SelectItem>
-                <SelectItem value="Times New Roman">Times New Roman</SelectItem>
-                <SelectItem value="Roboto">Roboto</SelectItem>
-                <SelectItem value="Inter">Inter</SelectItem>
-                <SelectItem value="Open Sans">Open Sans</SelectItem>
-                <SelectItem value="Lato">Lato</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
         </div>
       </div>

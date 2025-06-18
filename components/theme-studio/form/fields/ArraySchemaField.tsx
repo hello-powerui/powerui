@@ -67,25 +67,25 @@ export function ArraySchemaField({
   // Handle true multi-item arrays (not property sections)
   if (schema.items && !isVisualPropertySection(schema)) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {!hideTitle && schema.title && (
-          <h4 className="text-sm font-medium text-gray-700">{schema.title}</h4>
+          <h4 className="text-xs font-semibold text-gray-700">{schema.title}</h4>
         )}
         {schema.description && (
-          <p className="text-xs text-gray-500">{schema.description}</p>
+          <p className="text-[10px] text-gray-500 leading-relaxed">{schema.description}</p>
         )}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {arrayValue.map((item, index) => (
-            <Card key={index} className="p-3">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-sm font-medium">Item {index + 1}</span>
+            <Card key={index} className="p-2.5">
+              <div className="flex justify-between items-start mb-1.5">
+                <span className="text-xs font-medium">Item {index + 1}</span>
                 <button
                   type="button"
                   onClick={() => {
                     const newArray = arrayValue.filter((_, i) => i !== index);
                     onChange(newArray);
                   }}
-                  className="text-red-500 hover:text-red-700 text-sm"
+                  className="text-red-500 hover:text-red-700 text-xs"
                 >
                   Remove
                 </button>
@@ -113,7 +113,7 @@ export function ArraySchemaField({
               const newArray = [...arrayValue, {}];
               onChange(newArray);
             }}
-            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
+            className="px-2.5 py-1 text-xs font-medium bg-gray-100 hover:bg-gray-200 rounded"
           >
             + Add Item
           </button>

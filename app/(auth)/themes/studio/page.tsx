@@ -7,7 +7,6 @@ import { FoundationPanel } from './components/FoundationPanel';
 import { VisualStylesPanel } from './components/VisualStylesPanel';
 import { PowerBIPreview } from '@/components/theme-studio/preview/PowerBIPreview';
 import { UnifiedPaletteManager } from '@/components/theme-studio/palette/UnifiedPaletteManager';
-import { TextClassesEditor } from '@/components/theme-studio/typography/TextClassesEditor';
 import { ImportThemeModal } from '@/components/theme-studio/ui/import-theme-modal';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -26,18 +25,37 @@ function ThemeStudioContent() {
   
   // Local UI state
   const [showFoundation, setShowFoundation] = useState(true);
-  const [showVisualStyles, setShowVisualStyles] = useState(false);
+  const [showVisualStyles, setShowVisualStyles] = useState(true);
   const [showImportModal, setShowImportModal] = useState(false);
-  const [showTextClassesEditor, setShowTextClassesEditor] = useState(false);
   const [showPaletteManager, setShowPaletteManager] = useState(false);
   const [showNeutralPaletteManager, setShowNeutralPaletteManager] = useState(false);
   
   // Visual styles local state - sync with theme
-  const [visualSettings, setVisualSettings] = useState<Record<string, any>>(themeStudio.theme.visualStyles || {});
+  const [visualSettings, setVisualSettings] = useState<Record<string, any>>(() => {
+    const styles = themeStudio.theme.visualStyles || {};
+    // Ensure global properties structure exists
+    if (!styles['*']) {
+      styles['*'] = { '*': {} };
+    } else if (!styles['*']['*']) {
+      styles['*']['*'] = {};
+    }
+    return styles;
+  });
+  
+  // Focus mode state
+  const [isInFocusMode, setIsInFocusMode] = useState(false);
+  const [reportResetFn, setReportResetFn] = useState<(() => void) | null>(null);
   
   // Sync visual settings with theme
   useEffect(() => {
-    setVisualSettings(themeStudio.theme.visualStyles || {});
+    const styles = themeStudio.theme.visualStyles || {};
+    // Ensure global properties structure exists when syncing
+    if (!styles['*']) {
+      styles['*'] = { '*': {} };
+    } else if (!styles['*']['*']) {
+      styles['*']['*'] = {};
+    }
+    setVisualSettings(styles);
   }, [themeStudio.theme.visualStyles]);
   
   // Load theme on mount
@@ -216,7 +234,7 @@ function ThemeStudioContent() {
         {/* Foundation Sidebar - Left */}
         <div className={cn(
           "border-r bg-gray-50 transition-all duration-300",
-          showFoundation ? "w-96" : "w-12"
+          showFoundation ? "w-72" : "w-12"
         )}>
           <FoundationPanel
             theme={themeStudio.theme}
@@ -229,10 +247,8 @@ function ThemeStudioContent() {
             onThemeModeChange={themeStudio.setThemeMode}
             onFontFamilyChange={themeStudio.setFontFamily}
             onStructuralColorsChange={themeStudio.setStructuralColors}
-            onStructuralColorsModeChange={themeStudio.setStructuralColorsMode}
             onTextClassesChange={themeStudio.setTextClasses}
             onShowPaletteManager={handleShowPaletteManager}
-            onShowTextClassesEditor={() => setShowTextClassesEditor(true)}
             isVisible={showFoundation}
             onToggleVisibility={setShowFoundation}
           />
@@ -244,15 +260,20 @@ function ThemeStudioContent() {
             generatedTheme={themeStudio.previewTheme}
             selectedVisualType={themeStudio.selectedVisual}
             selectedVariant={themeStudio.selectedVariant}
-            onExitFocusMode={() => themeStudio.setSelectedVisual('')}
+            onExitFocusMode={() => {
+              setIsInFocusMode(false);
+              // Don't change the selected visual - keep it selected
+            }}
             onVariantChange={themeStudio.setSelectedVariant}
+            onReportReset={setReportResetFn}
+            enterFocusMode={isInFocusMode}
           />
         </div>
 
         {/* Visual Styles Sidebar - Right */}
         <div className={cn(
           "border-l bg-gray-50 transition-all duration-300",
-          showVisualStyles ? "w-[400px]" : "w-12"
+          showVisualStyles ? "w-[350px]" : "w-12"
         )}>
           <VisualStylesPanel
             theme={themeStudio.theme}
@@ -273,8 +294,7 @@ function ThemeStudioContent() {
             trackChange={() => {
               // Change tracking is handled by the updateTheme and updateVisualStyle methods
             }}
-            isVisible={showVisualStyles}
-            onToggleVisibility={setShowVisualStyles}
+            onEnterFocusMode={() => setIsInFocusMode(true)}
           />
         </div>
       </div>
@@ -302,11 +322,6 @@ function ThemeStudioContent() {
         }}
       />
 
-      <TextClassesEditor 
-        open={showTextClassesEditor}
-        onOpenChange={setShowTextClassesEditor}
-        onUpdateTextClasses={themeStudio.setTextClasses}
-      />
       
       <ImportThemeModal
         isOpen={showImportModal}

@@ -22,6 +22,8 @@ interface SimplePowerBIEmbedProps {
   selectedVariant?: string;
   onExitFocusMode?: () => void;
   onVariantChange?: (variant: string) => void;
+  onReportReset?: (resetFn: () => void) => void;
+  enterFocusMode?: boolean;
 }
 
 declare global {
@@ -35,7 +37,9 @@ export default function SimplePowerBIEmbed({
   selectedVisualType = '*',
   selectedVariant = '*',
   onExitFocusMode,
-  onVariantChange
+  onVariantChange,
+  onReportReset,
+  enterFocusMode = false
 }: SimplePowerBIEmbedProps) {
   const [embedConfig, setEmbedConfig] = useState<models.IReportEmbedConfiguration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,6 +53,7 @@ export default function SimplePowerBIEmbed({
   const currentPageRef = useRef<Page | null>(null);
   const [isReportReady, setIsReportReady] = useState(false);
   const isInitialLoad = useRef(true);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Generate theme with selected variant as default
   const variantPreviewTheme = useMemo(() => {
@@ -118,6 +123,8 @@ export default function SimplePowerBIEmbed({
         const themeToEmbed = { ...variantPreviewTheme };
         delete themeToEmbed.reportPage;
         
+        console.log('Initial theme being embedded:', themeToEmbed);
+        
         const embedConfiguration: models.IReportEmbedConfiguration = {
           type: 'report',
           id: config.id,
@@ -184,6 +191,7 @@ export default function SimplePowerBIEmbed({
           
           const themeToApply = { ...variantPreviewTheme };
           delete themeToApply.reportPage;
+          console.log('Applying theme update to report:', themeToApply);
           await reportRef.current.applyTheme({ themeJson: themeToApply });
         } catch (err) {
           // Only log if it's not a "report not ready" error
@@ -262,17 +270,57 @@ export default function SimplePowerBIEmbed({
     }
   };
 
+  // Reset report to original state
+  const resetReport = async () => {
+    if (!reportRef.current || isResetting) return;
+    
+    setIsResetting(true);
+    try {
+      // Reset to default layout settings
+      const defaultSettings = {
+        layoutType: models.LayoutType.Custom,
+        customLayout: {
+          displayOption: models.DisplayOption.FitToPage
+        }
+      };
+      
+      await reportRef.current.updateSettings(defaultSettings);
+      
+      // Reset focus mode state
+      setFocusMode(false);
+      
+      // Refresh the report to ensure clean state
+      await reportRef.current.refresh();
+      
+    } catch (error) {
+      console.error('Error resetting report:', error);
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
-  // Effect to apply focus mode when selected visual type changes
+
+  // Expose reset function to parent
   useEffect(() => {
-    if (reportRef.current && visuals.length > 0) {
-      // Enable focus mode for specific visual types, disable for '*'
-      setFocusMode(selectedVisualType !== '*');
-    } else if (reportRef.current && selectedVisualType !== '*' && isReportReady) {
-      // If visuals haven't been discovered yet, try to discover them
+    if (onReportReset) {
+      onReportReset(resetReport);
+    }
+  }, [onReportReset]);
+
+  // Effect to handle entering focus mode when prop changes
+  useEffect(() => {
+    if (enterFocusMode && selectedVisualType !== '*' && !focusMode) {
+      setFocusMode(true);
+    }
+  }, [enterFocusMode, selectedVisualType]);
+
+  // Effect to prepare visuals when selected visual type changes
+  useEffect(() => {
+    if (reportRef.current && selectedVisualType !== '*' && isReportReady) {
+      // Discover visuals when a specific visual is selected
       discoverVisuals();
     }
-  }, [selectedVisualType, visuals, isReportReady]);
+  }, [selectedVisualType, isReportReady]);
 
   // Effect to apply/remove focus mode
   useEffect(() => {
@@ -372,13 +420,19 @@ export default function SimplePowerBIEmbed({
         <div className="absolute top-2 left-2 z-50 flex items-center gap-2 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
           {/* Exit Focus Mode Button */}
           <Button
-            onClick={onExitFocusMode}
+            onClick={() => {
+              resetReport();
+              if (onExitFocusMode) {
+                onExitFocusMode();
+              }
+            }}
             variant="outline"
             size="sm"
             className="text-xs"
+            disabled={isResetting}
           >
             <Maximize2 className="w-3 h-3 mr-1" />
-            Exit Focus Mode
+            {isResetting ? 'Resetting...' : 'Exit Focus Mode'}
           </Button>
 
           {/* Focus mode indicator */}

@@ -38,7 +38,7 @@ export function useThemePreviewGenerator() {
         neutralPalette: resolved.neutralPalette.colors,
         fontFamily: debouncedTheme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
         visualStyles: debouncedTheme.visualStyles,
-        structuralColors: debouncedTheme.structuralColorsMode === 'custom' ? debouncedTheme.structuralColors : undefined,
+        structuralColors: debouncedTheme.structuralColors && Object.keys(debouncedTheme.structuralColors).length > 0 ? debouncedTheme.structuralColors : undefined,
         textClasses: debouncedTheme.textClasses && Object.keys(debouncedTheme.textClasses).length > 0 ? debouncedTheme.textClasses : undefined
       };
       

@@ -17,34 +17,16 @@ export function VisualStylesPanelWrapper({
   selectedSection,
   onSectionChange 
 }: VisualStylesPanelWrapperProps) {
-  const { showVisualStyles, toggleVisualStyles } = useUIStateStore();
+  const { showVisualStyles } = useUIStateStore();
   const visualStore = useThemeVisualStore();
   const editingStore = useVisualEditingStore();
 
   if (!showVisualStyles) {
-    return (
-      <div className="h-full flex flex-col items-center py-6 bg-gray-50 border-l border-gray-200 w-12">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleVisualStyles}
-          className="mb-4"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </Button>
-        <div className="flex flex-col items-center gap-2 text-gray-600">
-          <Layers className="w-5 h-5" />
-          <span className="writing-mode-vertical text-xs">Visual Styles</span>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className={cn(
-      "h-full bg-gray-50 border-l border-gray-200 transition-all duration-300",
-      showVisualStyles ? "w-[400px]" : "w-12"
-    )}>
+    <div className="h-full bg-gray-50 border-l border-gray-200 w-[350px]">
       <VisualStylesPanel
         theme={{}}
         visualSettings={visualStore.visualStyles}
@@ -71,8 +53,6 @@ export function VisualStylesPanelWrapper({
         onDeleteVariant={visualStore.deleteVariant}
         getVisualVariants={(visual) => visualStore.getVisualVariants(visual)}
         trackChange={() => {}}
-        isVisible={showVisualStyles}
-        onToggleVisibility={toggleVisualStyles}
       />
     </div>
   );

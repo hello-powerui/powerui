@@ -174,43 +174,48 @@ export function GlobalPropertySelector({
     <div className="space-y-6">
       {/* Structured Properties (Background, Border, etc.) */}
       {Object.keys(structuredProperties).length > 0 && (
-        <div className="space-y-3">
+        <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">Global Visual Sections</h4>
-          {Object.entries(structuredProperties).map(([key, schema]) => {
-            const sectionSchema = schema as any;
-            const sectionTitle = key; // Use property name directly
-            
-            return (
-              <CollapsibleSection
-                key={key}
-                title={sectionTitle}
-                defaultOpen={false}
-              >
-                <SchemaForm
-                  schema={sectionSchema || {}}
-                  value={visualStyles?.['*']?.['*']?.[key] || [{}]}
-                  onChange={(newValue) => {
-                    // Update at the *.*.property level
-                    if (onVisualStylesChange) {
-                      const newVisualStyles = {
-                        ...visualStyles,
-                        '*': {
-                          ...visualStyles?.['*'],
+          <div className="-space-y-px">
+            {Object.entries(structuredProperties).map(([key, schema]) => {
+              const sectionSchema = schema as any;
+              // Use the title from the schema if available, otherwise format the key
+              const sectionTitle = sectionSchema.title || 
+                key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim();
+              
+              return (
+                <CollapsibleSection
+                  key={key}
+                  title={sectionTitle}
+                  defaultOpen={false}
+                >
+                  <SchemaForm
+                    schema={sectionSchema || {}}
+                    value={visualStyles?.['*']?.['*']?.[key] || [{}]}
+                    onChange={(newValue) => {
+                      // Update at the *.*.property level
+                      if (onVisualStylesChange) {
+                        const newVisualStyles = {
+                          ...visualStyles,
                           '*': {
-                            ...visualStyles?.['*']?.['*'],
-                            [key]: newValue
+                            ...visualStyles?.['*'],
+                            '*': {
+                              ...visualStyles?.['*']?.['*'],
+                              [key]: newValue
+                            }
                           }
-                        }
-                      };
-                      onVisualStylesChange(newVisualStyles);
-                    }
-                  }}
-                  schemaLoader={schemaLoader}
-                  path={['visualStyles', '*', '*', key]}
-                />
-              </CollapsibleSection>
-            );
-          })}
+                        };
+                        onVisualStylesChange(newVisualStyles);
+                      }
+                    }}
+                    schemaLoader={schemaLoader}
+                    path={['visualStyles', '*', '*', key]}
+                    hideTitle={true}
+                  />
+                </CollapsibleSection>
+              );
+            })}
+          </div>
         </div>
       )}
       

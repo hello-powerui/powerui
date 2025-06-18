@@ -48,49 +48,43 @@ export function CollapsibleSection({
     <Collapsible.Root 
       open={isOpen} 
       onOpenChange={setIsOpen} 
-      className={`bg-white rounded-md border border-gray-200 mb-3 ${className}`}
+      className={`${className}`}
     >
-      <Collapsible.Trigger asChild>
-        <button className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 rounded-t-md transition-colors group text-left">
-          <div className="flex items-center gap-3 flex-1">
-            {icon && (
-              <div className="w-5 h-5 text-gray-500">{icon}</div>
-            )}
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-medium text-gray-900">{title}</h3>
-              {hasChanges && (
-                <div className="relative">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" title={`${changedCount || ''} ${changedCount === 1 ? 'change' : 'changes'}`} />
-                </div>
-              )}
-            </div>
-            {badge !== undefined && (
-              <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
-                {badge}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {headerAction && (
-              <div 
-                className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {headerAction}
-              </div>
-            )}
+      <div className="flex items-center justify-between w-full px-2 py-1.5 hover:bg-gray-50 transition-colors group">
+        <Collapsible.Trigger asChild>
+          <button className="flex items-center gap-1.5 flex-1 text-left">
             <ChevronDownIcon 
-              className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+              className={`w-3 h-3 text-gray-400 transition-transform duration-200 ${
                 isOpen ? 'transform rotate-180' : ''
               }`} 
             />
+            {icon && (
+              <div className="w-3.5 h-3.5 text-gray-500">{icon}</div>
+            )}
+            <h3 className={`text-[11px] text-gray-700 ${isOpen ? 'font-semibold' : 'font-medium'}`}>{title}</h3>
+            {hasChanges && (
+              <div className="w-1 h-1 bg-blue-500 rounded-full" title={`${changedCount || ''} ${changedCount === 1 ? 'change' : 'changes'}`} />
+            )}
+            {badge !== undefined && (
+              <span className="px-1 py-0 text-[10px] text-gray-500">
+                ({badge})
+              </span>
+            )}
+          </button>
+        </Collapsible.Trigger>
+        {headerAction && (
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+            {headerAction}
           </div>
-        </button>
-      </Collapsible.Trigger>
+        )}
+      </div>
       
-      <Collapsible.Content className="border-t border-gray-100">
-        <div className="p-4">
-          {children}
+      <Collapsible.Content className="data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up overflow-hidden">
+        <div className="relative pl-6 pr-2 pb-3">
+          {/* Content with connection points */}
+          <div className="relative pt-1">
+            {children}
+          </div>
         </div>
       </Collapsible.Content>
     </Collapsible.Root>

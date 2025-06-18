@@ -54,21 +54,15 @@ export function PropertyInput(props: PropertyInputProps) {
   const inputId = path.join('-');
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <Label htmlFor={inputId} className="text-sm font-medium">
+    <div className="space-y-0.5">
+      <div className="flex items-center gap-1">
+        <Label htmlFor={inputId} className="text-[11px] font-medium text-gray-700">
           {label}
         </Label>
         {required && (
-          <Badge variant="secondary" className="text-xs px-1 py-0">
-            Required
-          </Badge>
+          <span className="text-[10px] text-red-500">*</span>
         )}
       </div>
-
-      {description && (
-        <p className="text-xs text-gray-500">{description}</p>
-      )}
 
       {props.type === 'text' && (
         props.multiline ? (
@@ -77,7 +71,8 @@ export function PropertyInput(props: PropertyInputProps) {
             value={props.value}
             onChange={(e) => props.onChange(e.target.value)}
             placeholder={props.placeholder}
-            className="w-full"
+            className="w-full text-[11px] h-14 resize-none px-2 py-1"
+            title={description}
           />
         ) : (
           <Input
@@ -86,7 +81,8 @@ export function PropertyInput(props: PropertyInputProps) {
             value={props.value}
             onChange={(e) => props.onChange(e.target.value)}
             placeholder={props.placeholder}
-            className="w-full"
+            className="w-full h-6 text-[11px] px-2"
+            title={description}
           />
         )
       )}
@@ -100,20 +96,21 @@ export function PropertyInput(props: PropertyInputProps) {
           min={props.min}
           max={props.max}
           step={props.step}
-          className="w-full"
+          className="w-full h-6 text-[11px] px-2"
+          title={description}
         />
       )}
 
       {props.type === 'boolean' && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <input
             type="checkbox"
             id={inputId}
             checked={props.value}
             onChange={(e) => props.onChange(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+            className="h-3 w-3 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
           />
-          <Label htmlFor={inputId} className="text-sm text-gray-600 cursor-pointer">
+          <Label htmlFor={inputId} className="text-[11px] text-gray-600 cursor-pointer" title={description}>
             {props.value ? 'Enabled' : 'Disabled'}
           </Label>
         </div>
@@ -124,7 +121,8 @@ export function PropertyInput(props: PropertyInputProps) {
           id={inputId}
           value={props.value}
           onChange={(e) => props.onChange(e.target.value)}
-          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+          className="w-full h-6 rounded border border-gray-200 bg-white px-2 py-0 text-[11px] focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+          title={description}
         >
           {props.options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -135,7 +133,7 @@ export function PropertyInput(props: PropertyInputProps) {
       )}
 
       {error && (
-        <p className="text-xs text-red-500">{error}</p>
+        <p className="text-[10px] text-red-500">{error}</p>
       )}
     </div>
   );

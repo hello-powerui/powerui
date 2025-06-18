@@ -2,7 +2,6 @@ import { ThemeGenerationInput } from './types';
 import { ColorPalettes } from './token-registry';
 import { createUnifiedTokenResolver } from './shared-token-resolver';
 import { replaceTokens } from './utils';
-import { mapNeutralPaletteToTheme } from './neutral-mapper';
 import { createEmptyTheme } from './empty-theme';
 import { neutralColorsToShadeMap } from '@/lib/types/unified-palette';
 
@@ -27,38 +26,26 @@ export class ClientPreviewGenerator {
       dataColors: input.dataColors
     };
     
-    // Apply neutral palette mapping
-    if (input.neutralPalette) {
-      const neutralMapping = mapNeutralPaletteToTheme(
-        {
-          id: 'preview',
-          name: 'Preview',
-          colors: Array.isArray(input.neutralPalette) 
-            ? input.neutralPalette 
-            : Object.values(input.neutralPalette),
-          userId: 'preview',
-          isBuiltIn: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        input.mode
-      );
-      Object.assign(theme, neutralMapping);
-    }
+    // Create token resolver early so it can be used for all color resolution
+    const tokenResolver = this.createTokenResolver(input.mode, palettes, input.dataColors);
     
-    // Apply custom structural colors if provided
+    // No automatic neutral palette mapping - structural colors are handled explicitly
+    
+    // Apply custom structural colors with token resolution
     if (input.structuralColors && Object.keys(input.structuralColors).length > 0) {
-      Object.assign(theme, input.structuralColors);
+      // Resolve tokens in structural colors
+      const resolvedStructuralColors = replaceTokens(input.structuralColors, tokenResolver, input.dataColors);
+      Object.assign(theme, resolvedStructuralColors);
     }
     
-    // Apply custom text classes if provided
+    // Apply custom text classes with token resolution
     if (input.textClasses && Object.keys(input.textClasses).length > 0) {
-      theme.textClasses = this.formatTextClasses(input.textClasses);
+      const resolvedTextClasses = replaceTokens(input.textClasses, tokenResolver, input.dataColors);
+      theme.textClasses = this.formatTextClasses(resolvedTextClasses);
     }
     
     // Apply visual styles with token resolution
     if (input.visualStyles && Object.keys(input.visualStyles).length > 0) {
-      const tokenResolver = this.createTokenResolver(input.mode, palettes, input.dataColors);
       theme.visualStyles = replaceTokens(input.visualStyles, tokenResolver, input.dataColors);
     }
     

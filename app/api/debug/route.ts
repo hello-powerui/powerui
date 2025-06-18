@@ -33,8 +33,6 @@ export async function GET(request: NextRequest) {
     message: 'Debug API route is working correctly!',
   };
   
-  );
-  
   return NextResponse.json(debugInfo, {
     status: 200,
     headers: {
@@ -79,8 +77,6 @@ export async function POST(request: NextRequest) {
     },
     message: 'Debug API route POST is working correctly!',
   };
-  
-  );
   
   return NextResponse.json(debugInfo, {
     status: 200,

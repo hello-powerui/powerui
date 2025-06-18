@@ -65,6 +65,8 @@ const config: Config = {
         'in': 'fadeIn 150ms ease-out',
         'fade-in': 'fadeIn 150ms ease-out',
         'zoom-in': 'zoomIn 150ms ease-out',
+        'collapsible-down': 'collapsible-down 200ms ease-out',
+        'collapsible-up': 'collapsible-up 200ms ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -74,6 +76,14 @@ const config: Config = {
         zoomIn: {
           '0%': { opacity: '0', transform: 'scale(0.95)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'collapsible-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-collapsible-content-height)' },
+        },
+        'collapsible-up': {
+          from: { height: 'var(--radix-collapsible-content-height)' },
+          to: { height: '0' },
         },
       },
     },

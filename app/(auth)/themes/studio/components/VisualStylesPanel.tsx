@@ -9,12 +9,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Layers } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Layers, Plus, Copy, Trash2, Focus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { SchemaForm } from '@/components/theme-studio/form/schema-form';
 import { GlobalPropertySelector } from '@/components/theme-studio/form/global-property-selector';
 import { CollapsibleSection } from '@/components/theme-studio/ui/collapsible-section';
+import { Card } from '@/components/ui/card';
+import { TypographyTab } from '@/components/theme-studio/typography/TypographyTab';
+import { StructuralColorsTab } from '@/components/theme-studio/typography/StructuralColorsTab';
 
 const GlobalIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,19 +37,18 @@ interface VisualStylesPanelProps {
   selectedVisual: string;
   selectedVariant: string;
   selectedState: string;
-  selectedSection: 'properties' | 'visuals' | 'global';
+  selectedSection: 'typography' | 'structural' | 'visuals' | 'global';
   onVisualSettingsChange: (visualSettings: Record<string, any>) => void;
   onVisualStyleChange: (visual: string, variant: string, value: any) => void;
   onSelectedVisualChange: (visual: string) => void;
   onSelectedVariantChange: (variant: string) => void;
   onSelectedStateChange: (state: string) => void;
-  onSelectedSectionChange: (section: 'properties' | 'visuals' | 'global') => void;
+  onSelectedSectionChange: (section: 'typography' | 'structural' | 'visuals' | 'global') => void;
   onCreateVariant: (visual: string, variantName: string) => void;
   onDeleteVariant: (visual: string, variantName: string) => void;
   getVisualVariants: (visual: string) => string[];
   trackChange: (path: string[]) => void;
-  isVisible: boolean;
-  onToggleVisibility: (visible: boolean) => void;
+  onEnterFocusMode?: () => void;
 }
 
 export function VisualStylesPanel({
@@ -66,8 +68,7 @@ export function VisualStylesPanel({
   onDeleteVariant,
   getVisualVariants,
   trackChange,
-  isVisible,
-  onToggleVisibility,
+  onEnterFocusMode,
 }: VisualStylesPanelProps) {
   const [schemaLoader, setSchemaLoader] = useState<SchemaLoader | null>(null);
   const [schemaLoaded, setSchemaLoaded] = useState(false);
@@ -102,223 +103,251 @@ export function VisualStylesPanel({
 
   const hasStateDrivenProperties = selectedVisual && schemaLoader?.visualHasStateDrivenProperties(selectedVisual);
 
-  if (!isVisible) {
-    return (
-      <div className="h-full flex flex-col items-center py-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onToggleVisibility(true)}
-          className="mb-4"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </Button>
-        <div className="flex flex-col items-center gap-2 text-gray-600">
-          <Layers className="w-5 h-5" />
-          <span className="writing-mode-vertical text-xs">Visual Styles</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="h-full flex flex-col bg-white">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Visual Styles</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onToggleVisibility(false)}
-        >
-          <ChevronRight className="w-4 h-4" />
-        </Button>
-      </div>
-      
-      {/* Section Tabs */}
-      <div className="flex bg-white border-b border-gray-200">
-        <button
-          onClick={() => {
-            onSelectedSectionChange('global');
-            onSelectedVisualChange('*');
-          }}
-          className={cn(
-            "flex-1 px-3 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors border-b-2",
-            selectedSection === 'global'
-              ? 'bg-gray-50 text-gray-900 border-gray-900'
-              : 'text-gray-600 hover:bg-gray-50 border-transparent'
-          )}
-        >
-          <GlobalIcon />
-          Global
-        </button>
-        <button
-          onClick={() => onSelectedSectionChange('visuals')}
-          className={cn(
-            "flex-1 px-3 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors border-b-2",
-            selectedSection === 'visuals'
-              ? 'bg-gray-50 text-gray-900 border-gray-900'
-              : 'text-gray-600 hover:bg-gray-50 border-transparent'
-          )}
-        >
-          <VisualIcon />
-          Visuals
-        </button>
-      </div>
-      
-      {/* Content based on selected section */}
-      <div className="flex-1 overflow-y-auto bg-white">
-        {/* Navigation Section */}
+      {/* Figma-style Header */}
+      <div className="border-b border-gray-200">
+        {/* Tabs Row - Figma/Vercel style buttons */}
+        <div className="flex items-center gap-1 p-2">
+          <button
+            onClick={() => onSelectedSectionChange('typography')}
+            className={cn(
+              "px-3 py-1.5 text-[13px] font-medium rounded-md transition-all",
+              selectedSection === 'typography'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            )}
+          >
+            Typography
+          </button>
+          <button
+            onClick={() => onSelectedSectionChange('structural')}
+            className={cn(
+              "px-3 py-1.5 text-[13px] font-medium rounded-md transition-all",
+              selectedSection === 'structural'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            )}
+          >
+            Color
+          </button>
+          <button
+            onClick={() => onSelectedSectionChange('visuals')}
+            className={cn(
+              "px-3 py-1.5 text-[13px] font-medium rounded-md transition-all",
+              selectedSection === 'visuals'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            )}
+          >
+            Visuals
+          </button>
+          <button
+            onClick={() => {
+              onSelectedSectionChange('global');
+              onSelectedVisualChange('*');
+            }}
+            className={cn(
+              "px-3 py-1.5 text-[13px] font-medium rounded-md transition-all",
+              selectedSection === 'global'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            )}
+          >
+            Global
+          </button>
+          <div className="flex-1" />
+        </div>
+        
+        {/* Controls Row - Only for visuals section */}
         {selectedSection === 'visuals' && (
-          <div className="p-4 border-b border-gray-200">
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Visual Styles</h3>
-              {/* Visual Type Dropdown */}
-              <Select
-                value={selectedVisual || ''}
-                onValueChange={(value) => {
-                  onSelectedVisualChange(value);
-                  onSelectedVariantChange('*');
-                  onSelectedStateChange('default');
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a visual type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {visualTypes.map((visual) => (
-                    <SelectItem key={visual} value={visual}>
-                      {visual.charAt(0).toUpperCase() + visual.slice(1).replace(/([A-Z])/g, ' $1')}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex items-center gap-2 px-3 py-1.5">
+            <Select
+              value={selectedVisual || ''}
+              onValueChange={(value) => {
+                onSelectedVisualChange(value);
+                onSelectedVariantChange('*');
+                onSelectedStateChange('default');
+              }}
+            >
+              <SelectTrigger className="h-6 text-[11px] w-[140px]">
+                <SelectValue placeholder="Select visual" />
+              </SelectTrigger>
+              <SelectContent>
+                {visualTypes.map((visual) => (
+                  <SelectItem key={visual} value={visual} className="text-xs">
+                    {visual.charAt(0).toUpperCase() + visual.slice(1).replace(/([A-Z])/g, ' $1')}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             
-            {/* Focus Mode Info and Reset Button */}
-            {selectedVisual && selectedVisual !== '*' && (
-              <div className="mt-3 space-y-2">
-                <div className="flex items-center gap-2 px-1">
-                  <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  <span className="text-xs text-gray-600">
-                    Focus mode automatically activates to highlight {selectedVisual} visuals
-                  </span>
-                </div>
-                <button
-                  onClick={() => onSelectedVisualChange('')}
-                  className="w-full px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors border border-gray-200"
-                >
-                  ← Back to All Visuals
-                </button>
-              </div>
+            {/* Enter Focus Mode Button - show when visual is selected */}
+            {selectedVisual && (
+              <Button
+                onClick={onEnterFocusMode}
+                variant="outline"
+                size="sm"
+                className="h-6 px-2 text-[11px]"
+                title="View this visual in focus mode"
+              >
+                <Focus className="w-3 h-3 mr-1" />
+                Focus Mode
+              </Button>
             )}
           </div>
         )}
-
-        {/* Form Section */}
-        <div className="p-4">
-          {selectedSection === 'visuals' && !selectedVisual ? (
-            <div className="flex flex-col items-center justify-center h-full py-16">
-              <div className="mb-4">
-                <svg className="w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Visual to Customize</h3>
-              <p className="text-sm text-gray-600 text-center max-w-sm">
-                Choose a visual type from the dropdown above to customize its styling, create variants, and configure state-specific properties.
-              </p>
-              <p className="text-xs text-gray-500 text-center max-w-sm mt-2">
-                Visual styles allow you to define how different types of charts, cards, and other elements appear in your reports.
-              </p>
-            </div>
-          ) : selectedSection === 'visuals' && selectedVisual ? (
-            <>
-              <div className="mb-4">
-                <h2 className="text-lg font-semibold">
-                  {selectedVisual.charAt(0).toUpperCase() + selectedVisual.slice(1).replace(/([A-Z])/g, ' $1')}
-                </h2>
-              </div>
-              
-              {/* Visual Style Variants */}
-              <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium text-gray-700">Visual Style Variants</h3>
-                </div>
-                <p className="text-xs text-gray-600 mb-3">
-                  Create multiple style variations for this visual type. Users can select different styles 
-                  to apply varied looks to their visuals.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setShowVariantDialog(true)}
-                    className="px-3 py-1.5 text-xs bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
-                  >
-                    + New Style Variant
-                  </button>
-                  <div className="flex-1 flex gap-2">
-                    <select
-                      value={selectedVariant}
-                      onChange={(e) => onSelectedVariantChange(e.target.value)}
-                      className="flex-1 px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md"
-                    >
-                      {getVisualVariants(selectedVisual).map(variant => (
-                        <option key={variant} value={variant}>
-                          {variant === '*' ? 'Default Style' : variant}
-                        </option>
-                      ))}
-                    </select>
-                    {selectedVariant !== '*' && (
-                      <button
-                        onClick={() => {
-                          if (confirm(`Delete variant "${selectedVariant}"?`)) {
-                            onDeleteVariant(selectedVisual, selectedVariant);
-                            onSelectedVariantChange('*');
-                          }
-                        }}
-                        className="px-3 py-1.5 text-xs bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors border border-red-200"
+      </div>
+      
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto">
+        {selectedSection === 'typography' ? (
+          <div className="p-4">
+            <TypographyTab />
+          </div>
+        ) : selectedSection === 'structural' ? (
+          <div className="p-4">
+            <StructuralColorsTab />
+          </div>
+        ) : selectedSection === 'visuals' ? (
+          selectedVisual ? (
+            <div className="p-4">
+              {/* Visual Style Variants - Enhanced Section */}
+              <Card className="mb-3 p-4 border-gray-200 shadow-sm">
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                      Visual Style Variants
+                      <span className="text-xs font-normal text-gray-500">
+                        ({getVisualVariants(selectedVisual).length} {getVisualVariants(selectedVisual).length === 1 ? 'variant' : 'variants'} available)
+                      </span>
+                    </h3>
+                    <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                      Create different style variations of this visual type. Each variant can have its own unique appearance while maintaining the same data representation.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={selectedVariant || '*'}
+                        onValueChange={onSelectedVariantChange}
                       >
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Visual State Selector - only show for visuals with state-driven properties */}
-              {hasStateDrivenProperties && (
-                <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-gray-700">Visual State</h3>
-                  </div>
-                  <p className="text-xs text-gray-600 mb-2">
-                    Edit properties for different interaction states
-                  </p>
-                  <div className="flex gap-2">
-                    {['default', 'hover', 'selected', 'disabled'].map(state => (
-                      <button
-                        key={state}
-                        onClick={() => onSelectedStateChange(state)}
-                        className={cn(
-                          "px-3 py-1.5 text-sm rounded-md border transition-colors",
-                          selectedState === state
-                            ? 'bg-gray-900 text-white border-gray-900'
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
+                        <SelectTrigger className="flex-1 h-8 text-xs font-medium">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getVisualVariants(selectedVisual).map(variant => (
+                            <SelectItem key={variant} value={variant} className="text-xs">
+                              {variant === '*' ? 'Default Style' : variant}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      <div className="flex items-center gap-1 pl-2 border-l border-gray-200">
+                        <button
+                          onClick={() => setShowVariantDialog(true)}
+                          className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors flex items-center gap-1"
+                          title="Create a new variant"
+                        >
+                          <Plus className="w-3 h-3" />
+                          Create
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            const baseName = selectedVariant === '*' ? 'default' : selectedVariant;
+                            let copyNumber = 1;
+                            let newName = `${baseName}-copy`;
+                            const variants = getVisualVariants(selectedVisual);
+                            
+                            // Find a unique name
+                            while (variants.includes(newName)) {
+                              copyNumber++;
+                              newName = `${baseName}-copy-${copyNumber}`;
+                            }
+                            
+                            const variantName = prompt('Enter name for the duplicated variant:', newName);
+                            if (variantName && !variants.includes(variantName)) {
+                              // First create the variant
+                              onCreateVariant(selectedVisual, variantName);
+                              
+                              // Then copy the current variant's settings
+                              const currentSettings = visualSettings[selectedVisual]?.[selectedVariant] || {};
+                              const updatedVisualSettings = {
+                                ...visualSettings,
+                                [selectedVisual]: {
+                                  ...visualSettings[selectedVisual],
+                                  [variantName]: JSON.parse(JSON.stringify(currentSettings))
+                                }
+                              };
+                              onVisualSettingsChange(updatedVisualSettings);
+                              onSelectedVariantChange(variantName);
+                            }
+                          }}
+                          className="px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors flex items-center gap-1"
+                          title="Duplicate current variant"
+                        >
+                          <Copy className="w-3 h-3" />
+                          Duplicate
+                        </button>
+                        
+                        {selectedVariant !== '*' && (
+                          <button
+                            onClick={() => {
+                              if (confirm(`Delete variant "${selectedVariant}"?`)) {
+                                onDeleteVariant(selectedVisual, selectedVariant);
+                                onSelectedVariantChange('*');
+                              }
+                            }}
+                            className="p-1.5 text-xs font-medium text-red-600 rounded hover:bg-red-50 transition-colors"
+                            title="Delete variant"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         )}
-                      >
-                        {state.charAt(0).toUpperCase() + state.slice(1)}
-                      </button>
-                    ))}
+                      </div>
+                    </div>
+                    
+                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                      Select a variant to customize its properties. The default variant (*) applies when no specific variant is selected.
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Properties with state support will use the selected state. Properties without state support apply to all states.
-                  </p>
                 </div>
+              </Card>
+
+              {/* Visual State Selector - only show for visuals with state support */}
+              {hasStateDrivenProperties && (
+                <Card className="mb-3 p-4 border-gray-200 shadow-sm">
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900">Visual States</h3>
+                      <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                        Configure how this visual appears in different interaction states. Properties with state support will use the selected state.
+                      </p>
+                    </div>
+                    
+                    <div className="flex gap-1.5">
+                      {['default', 'hover', 'selected', 'disabled'].map(state => (
+                        <button
+                          key={state}
+                          onClick={() => onSelectedStateChange(state)}
+                          className={cn(
+                            "px-3 py-1.5 text-xs font-medium rounded transition-all",
+                            selectedState === state
+                              ? 'bg-gray-900 text-white'
+                              : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
+                          )}
+                        >
+                          {state.charAt(0).toUpperCase() + state.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </Card>
               )}
-              
+
               {/* SchemaForm renders its own tabs with collapsible sections */}
               {schemaLoader && (
                 <SchemaForm
@@ -346,30 +375,41 @@ export function VisualStylesPanel({
                   path={['visualStyles', selectedVisual, selectedVariant]}
                 />
               )}
-            </>
-          ) : selectedSection === 'global' ? (
-            <>
-              {/* Property Selector */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-lg font-semibold">Global Visual Settings</h2>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Select properties to configure default settings for all visuals
-                    </p>
-                  </div>
-                </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full py-16">
+              <div className="mb-4">
+                <svg className="w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
+                </svg>
               </div>
-              
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Visual to Customize</h3>
+              <p className="text-sm text-gray-600 text-center max-w-sm">
+                Choose a visual type from the dropdown above to customize its styling, create variants, and configure state-specific properties.
+              </p>
+              <p className="text-xs text-gray-500 text-center max-w-sm mt-2">
+                Visual styles allow you to define how different types of charts, cards, and other elements appear in your reports.
+              </p>
+            </div>
+          )
+        ) : selectedSection === 'global' ? (
+            <div className="p-4">
               {/* Global Settings Property Selector */}
-              {schemaLoader && (
+              {schemaLoader && schemaLoaded ? (
                 <GlobalPropertySelector
                   visualStyles={visualSettings}
                   onVisualStylesChange={onVisualSettingsChange}
                   schemaLoader={schemaLoader!}
                 />
+              ) : (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                    <p className="text-sm text-gray-600">Loading schema...</p>
+                  </div>
+                </div>
               )}
-            </>
+            </div>
           ) : (
             <div className="text-center py-12 text-gray-500">
               <p className="mb-2">
@@ -377,7 +417,6 @@ export function VisualStylesPanel({
               </p>
             </div>
           )}
-        </div>
 
         {/* Canvas & Layout Section */}
         {selectedSection === 'global' && (
