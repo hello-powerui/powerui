@@ -156,7 +156,7 @@ export default function PricingPage() {
             <div>
               <h3 className="font-semibold mb-2">What happens to my themes if I downgrade?</h3>
               <p className="text-muted-foreground">
-                Your existing themes remain accessible. You just won't be able to create new ones beyond the plan limit.
+                Your existing themes remain accessible. You just won&apos;t be able to create new ones beyond the plan limit.
               </p>
             </div>
             <div>

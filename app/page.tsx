@@ -27,7 +27,7 @@ export default function ComingSoonPage() {
             Something big is coming
           </h2>
           <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
-            We're building the future of Power BI theming. Get ready for a completely new experience.
+            We&apos;re building the future of Power BI theming. Get ready for a completely new experience.
           </p>
         </div>
 
