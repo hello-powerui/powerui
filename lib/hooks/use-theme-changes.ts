@@ -21,12 +21,16 @@ export const useThemeChanges = create<ThemeChangesState>((set, get) => ({
   
   trackChange: (path: string[]) => {
     const pathString = path.join('.');
-    set((state) => ({
-      changedPaths: new Set([...Array.from(state.changedPaths), pathString])
-    }));
+    console.log('[Theme Changes] Tracking change:', pathString);
+    set((state) => {
+      const newPaths = new Set([...Array.from(state.changedPaths), pathString]);
+      console.log('[Theme Changes] Total changes:', newPaths.size, Array.from(newPaths));
+      return { changedPaths: newPaths };
+    });
   },
   
   clearChanges: () => {
+    console.log('[Theme Changes] Clearing all changes');
     set({ changedPaths: new Set() });
   },
   
