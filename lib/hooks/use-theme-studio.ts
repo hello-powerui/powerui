@@ -56,8 +56,8 @@ export function useThemeStudio() {
   
   // Create new theme with change clearing
   const createNewTheme = () => {
+    clearChanges(); // Clear changes first
     store.createNewTheme();
-    clearChanges();
   };
   
   return {

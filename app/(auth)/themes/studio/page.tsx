@@ -25,7 +25,6 @@ function ThemeStudioContent() {
   const themeStudio = useThemeStudio();
   
   // Local UI state
-  const [themeName, setThemeName] = useState('');
   const [showFoundation, setShowFoundation] = useState(true);
   const [showVisualStyles, setShowVisualStyles] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -49,16 +48,9 @@ function ThemeStudioContent() {
     } else {
       // New theme - create a fresh one
       themeStudio.createNewTheme();
-      setThemeName('Untitled Theme');
     }
   }, [searchParams]);
   
-  // Sync theme name
-  useEffect(() => {
-    if (themeStudio.theme.name && !themeName) {
-      setThemeName(themeStudio.theme.name);
-    }
-  }, [themeStudio.theme.name]);
   
   const loadTheme = async (themeId: string) => {
     try {
@@ -67,7 +59,6 @@ function ThemeStudioContent() {
       
       const apiResponse = await response.json();
       themeStudio.loadTheme(apiResponse);
-      setThemeName(apiResponse.name || themeStudio.theme.name);
       
       // If theme has visual styles, show the visual styles panel
       const themeData = apiResponse.themeData || {};
@@ -84,8 +75,6 @@ function ThemeStudioContent() {
   
   const handleSave = async () => {
     try {
-      // Update theme name before saving
-      themeStudio.updateTheme({ name: themeName });
       await themeStudio.saveTheme();
       
       // If it was a new theme, update the URL
@@ -101,7 +90,6 @@ function ThemeStudioContent() {
     if (themeStudio.isDirty) {
       if (confirm('Reset all unsaved changes?')) {
         themeStudio.resetTheme();
-        setThemeName(themeStudio.theme.name);
       }
     }
   };
@@ -114,7 +102,7 @@ function ThemeStudioContent() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${themeName.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
+    a.download = `${themeStudio.theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success('Theme exported');
@@ -164,8 +152,8 @@ function ThemeStudioContent() {
               <div className="ml-3 pl-3 border-l border-gray-200">
                 <input
                   type="text"
-                  value={themeName}
-                  onChange={(e) => setThemeName(e.target.value)}
+                  value={themeStudio.theme.name}
+                  onChange={(e) => themeStudio.updateTheme({ name: e.target.value })}
                   className="text-lg font-medium bg-transparent border-none outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-2 py-1 rounded"
                   placeholder="Untitled Theme"
                 />
