@@ -8,6 +8,7 @@ import { useUIState } from './hooks/useUIState';
 import { ThemeStudioHeader } from './components/header/ThemeStudioHeader';
 import { FoundationSidebar } from './components/sidebars/FoundationSidebar';
 import { CreateVariantModal } from './components/modals/CreateVariantModal';
+import { VisualStylesPanelWrapper } from './components/VisualStylesPanelWrapper';
 
 // Store imports
 import { useThemeDataStore } from '@/lib/stores/theme-data-store';
@@ -22,7 +23,6 @@ import { ThemePreview } from '@/components/theme-studio/preview/ThemePreview';
 import { UnifiedPaletteManager } from '@/components/theme-studio/palette/UnifiedPaletteManager';
 import { TextClassesEditor } from '@/components/theme-studio/typography/TextClassesEditor';
 import { ImportThemeModal } from '@/components/theme-studio/ImportThemeModal';
-import { VisualPropertiesPanel } from '@/components/theme-studio/form/VisualPropertiesPanel';
 
 export default function ThemeStudioRefactored() {
   const searchParams = useSearchParams();
@@ -213,13 +213,6 @@ export default function ThemeStudioRefactored() {
           />
         )}
 
-        {uiState.showVisualStyles && (
-          <VisualPropertiesPanel
-            selectedSection={uiState.selectedSection}
-            onSectionChange={(section: any) => section}
-          />
-        )}
-
         <div className="flex-1 flex flex-col">
           <ThemePreview
             themeData={themeData}
@@ -227,6 +220,13 @@ export default function ThemeStudioRefactored() {
             selectedVisualId={selectedVisualId}
           />
         </div>
+
+        {uiState.showVisualStyles && (
+          <VisualStylesPanelWrapper
+            selectedSection={uiState.selectedSection}
+            onSectionChange={(section: any) => section}
+          />
+        )}
       </div>
 
       {/* Modals */}

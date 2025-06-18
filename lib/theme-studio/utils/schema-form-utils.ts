@@ -9,6 +9,7 @@ export const formatPropertyName = (name: string): string => {
     'fontFamily': 'Font Family',
     'fontSize': 'Font Size',
     'fontColor': 'Font Color',
+    'fontWeight': 'Font Weight',
     'backgroundColor': 'Background Color',
     'borderColor': 'Border Color',
     'transparency': 'Transparency',

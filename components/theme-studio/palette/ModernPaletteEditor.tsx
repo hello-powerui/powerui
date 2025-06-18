@@ -12,12 +12,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
-import { Plus, Trash2, Download, Upload, AlertCircle, Loader2, Palette, Sparkles, Copy, Check } from 'lucide-react';
+import { Plus, Upload, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import { usePaletteStore } from '@/lib/stores/palette-store';
 import type { ColorPalette, NeutralPalette, neutralColorsToShadeMap } from '@/lib/types/unified-palette';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { HorizontalColorItem } from './HorizontalColorItem';
 
 interface ModernPaletteEditorProps {
   open: boolean;
@@ -29,13 +30,6 @@ interface ModernPaletteEditorProps {
 
 const NEUTRAL_SHADES = ['25', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
 
-const PRESET_PALETTES = [
-  { name: 'Ocean', colors: ['#0891b2', '#06b6d4', '#22d3ee', '#67e8f9', '#a5f3fc'] },
-  { name: 'Forest', colors: ['#14532d', '#166534', '#16a34a', '#22c55e', '#4ade80'] },
-  { name: 'Sunset', colors: ['#dc2626', '#ea580c', '#f59e0b', '#fbbf24', '#fde68a'] },
-  { name: 'Purple', colors: ['#581c87', '#6b21a8', '#7c3aed', '#8b5cf6', '#a78bfa'] },
-  { name: 'Monochrome', colors: ['#18181b', '#3f3f46', '#71717a', '#a1a1aa', '#e4e4e7'] },
-];
 
 export function ModernPaletteEditor({
   open,
@@ -55,7 +49,13 @@ export function ModernPaletteEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [activeColorIndex, setActiveColorIndex] = useState<number | null>(null);
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
-  const colorInputRef = useRef<HTMLInputElement>(null);
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const { createColorPalette, updateColorPalette, createNeutralPalette, updateNeutralPalette } = usePaletteStore();
 
@@ -135,18 +135,13 @@ export function ModernPaletteEditor({
     }
   };
 
-  const handleExportToCoolors = () => {
-    const colorCodes = colors.map(c => c.replace('#', '')).join('-');
-    const url = `https://coolors.co/${colorCodes}`;
-    window.open(url, '_blank');
-  };
 
   const handleAddColor = () => {
     if (colors.length < 20) {
-      const newColors = [...colors, '#000000'];
+      // Generate a random color for variety
+      const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+      const newColors = [...colors, randomColor];
       setColors(newColors);
-      setActiveColorIndex(newColors.length - 1);
-      setTimeout(() => colorInputRef.current?.focus(), 100);
     }
   };
 
@@ -154,6 +149,18 @@ export function ModernPaletteEditor({
     const newColors = [...colors];
     newColors[index] = color;
     setColors(newColors);
+  };
+  
+  const handleDragEnd = (event: DragEndEvent) => {
+    const {active, over} = event;
+    
+    if (over && active.id !== over.id) {
+      setColors((items) => {
+        const oldIndex = items.findIndex((_, i) => i === active.id);
+        const newIndex = items.findIndex((_, i) => i === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
   };
 
   const handleRemoveColor = (index: number) => {
@@ -169,9 +176,6 @@ export function ModernPaletteEditor({
     setTimeout(() => setCopiedColor(null), 2000);
   };
 
-  const handleApplyPreset = (preset: typeof PRESET_PALETTES[0]) => {
-    setColors(preset.colors);
-  };
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -233,46 +237,45 @@ export function ModernPaletteEditor({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl p-0 gap-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gray-50/50">
-          <DialogTitle className="text-base font-semibold flex items-center gap-2">
-            <Palette className="h-4 w-4" />
+      <DialogContent className="max-w-3xl p-0 gap-0 overflow-hidden bg-white border-gray-200">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100">
+          <DialogTitle className="text-lg font-medium tracking-tight">
             {palette ? 'Edit' : 'Create'} {type === 'color' ? 'Color' : 'Neutral'} Palette
           </DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogDescription className="text-sm text-gray-500 font-normal">
             {type === 'color' 
-              ? 'Design a custom color palette for your visualizations'
+              ? 'Design a custom color palette for your data visualizations'
               : 'Generate a neutral color scale for UI elements'}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-auto max-h-[calc(80vh-200px)]">
-          <div className="p-6 space-y-6">
+        <div className="flex-1 overflow-auto max-h-[calc(80vh-160px)]">
+          <div className="px-6 py-5 space-y-5">
             {/* Basic Info */}
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-xs font-medium text-gray-700">
-                  Palette Name
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                  Name
                 </Label>
                 <Input
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder={`My ${type === 'color' ? 'Color' : 'Neutral'} Palette`}
-                  className="h-9 text-sm"
+                  placeholder={`${type === 'color' ? 'Color' : 'Neutral'} Palette`}
+                  className="h-9 text-sm border-gray-200 focus:border-gray-400 focus:ring-0"
                 />
               </div>
               {type === 'color' && (
-                <div className="space-y-2">
-                  <Label htmlFor="description" className="text-xs font-medium text-gray-700">
-                    Description <span className="text-gray-400">(optional)</span>
+                <div className="space-y-1.5">
+                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+                    Description
                   </Label>
                   <Input
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe your palette..."
-                    className="h-9 text-sm"
+                    placeholder="Add a description..."
+                    className="h-9 text-sm border-gray-200 focus:border-gray-400 focus:ring-0"
                   />
                 </div>
               )}
@@ -280,51 +283,21 @@ export function ModernPaletteEditor({
 
             {type === 'color' && (
               <>
-                {/* Quick Actions */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-gray-700">Quick Start</span>
-                    <div className="flex gap-1">
-                      {PRESET_PALETTES.map((preset) => (
-                        <Button
-                          key={preset.name}
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleApplyPreset(preset)}
-                          className="h-7 px-2 text-xs hover:bg-gray-100"
-                        >
-                          {preset.name}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleExportToCoolors}
-                    disabled={colors.length === 0}
-                    className="h-7 text-xs hover:bg-gray-100"
-                  >
-                    <Download className="h-3 w-3 mr-1" />
-                    Export
-                  </Button>
-                </div>
-
                 {/* Import from Coolors */}
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-gray-700">Import from Coolors</Label>
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-medium text-gray-700">Import from Coolors</Label>
                   <div className="flex gap-2">
                     <Input
                       value={importUrl}
                       onChange={(e) => setImportUrl(e.target.value)}
                       placeholder="https://coolors.co/palette/..."
-                      className="h-9 text-sm"
+                      className="h-9 text-sm border-gray-200 focus:border-gray-400 focus:ring-0"
                     />
                     <Button 
                       variant="outline" 
                       size="sm"
                       onClick={handleImportFromCoolors}
-                      className="h-9 px-3 hover:bg-gray-50"
+                      className="h-9 px-3 hover:bg-gray-50 border-gray-200"
                     >
                       <Upload className="h-3.5 w-3.5 mr-1.5" />
                       Import
@@ -332,80 +305,48 @@ export function ModernPaletteEditor({
                   </div>
                 </div>
 
-                {/* Color Grid */}
+                {/* Color Management */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-medium text-gray-700">
-                      Colors <span className="text-gray-400">({colors.length}/20)</span>
+                    <Label className="text-sm font-medium text-gray-700">
+                      Colors <span className="text-gray-500">({colors.length}/20)</span>
                     </Label>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={handleAddColor}
                       disabled={colors.length >= 20}
-                      className="h-7 text-xs hover:bg-gray-50"
+                      className="h-8 px-3 text-sm hover:bg-gray-50 border-gray-200"
                     >
-                      <Plus className="h-3 w-3 mr-1" />
-                      Add Color
+                      <Plus className="h-3.5 w-3.5 mr-1" />
+                      Add
                     </Button>
                   </div>
                   
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                    {colors.map((color, index) => (
-                      <div
-                        key={index}
-                        className={cn(
-                          "group relative rounded-lg border-2 transition-all",
-                          activeColorIndex === index 
-                            ? "border-gray-900 shadow-lg" 
-                            : "border-gray-200 hover:border-gray-300"
-                        )}
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={colors.map((_, i) => i)}
+                        strategy={horizontalListSortingStrategy}
                       >
-                        <div
-                          className="aspect-square rounded-t-md cursor-pointer relative overflow-hidden"
-                          style={{ backgroundColor: color }}
-                          onClick={() => setActiveColorIndex(index)}
-                        >
-                          <input
-                            ref={activeColorIndex === index ? colorInputRef : undefined}
-                            type="color"
-                            value={color}
-                            onChange={(e) => handleUpdateColor(index, e.target.value)}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                        <div className="flex gap-3 overflow-x-auto pb-2">
+                          {colors.map((color, index) => (
+                            <HorizontalColorItem
+                              key={index}
+                              id={index}
+                              color={color}
+                              onRemove={() => handleRemoveColor(index)}
+                              onColorChange={(newColor) => handleUpdateColor(index, newColor)}
+                              disabled={colors.length === 1}
+                            />
+                          ))}
                         </div>
-                        
-                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded-b-md">
-                          <button
-                            onClick={() => handleCopyColor(color)}
-                            className="flex items-center gap-1 text-xs font-mono text-gray-600 hover:text-gray-900 transition-colors"
-                          >
-                            {copiedColor === color ? (
-                              <>
-                                <Check className="h-3 w-3" />
-                                Copied
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="h-3 w-3" />
-                                {color}
-                              </>
-                            )}
-                          </button>
-                          
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleRemoveColor(index)}
-                            disabled={colors.length === 1}
-                            className="h-6 w-6 text-gray-400 hover:text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                      </SortableContext>
+                    </DndContext>
                   </div>
                 </div>
               </>
@@ -413,15 +354,15 @@ export function ModernPaletteEditor({
 
             {type === 'neutral' && (
               <>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div>
-                    <Label className="text-xs font-medium text-gray-700">Base Color</Label>
-                    <p className="text-xs text-gray-500 mt-1">Choose a color to generate a complete neutral scale</p>
+                    <h3 className="text-sm font-medium text-gray-900">Base Color</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">Choose a color to generate a complete neutral scale</p>
                   </div>
-                  <div className="flex gap-2">
-                    <div className="flex-1 flex gap-2">
+                  <div className="flex gap-3">
+                    <div className="flex gap-2">
                       <div
-                        className="w-10 h-10 rounded-md border-2 border-gray-200 cursor-pointer"
+                        className="w-12 h-12 rounded-lg border border-gray-200 cursor-pointer hover:border-gray-300 transition-colors"
                         style={{ backgroundColor: baseColor }}
                       >
                         <input
@@ -440,13 +381,13 @@ export function ModernPaletteEditor({
                           }
                         }}
                         placeholder="#6B7280"
-                        className="font-mono text-sm"
+                        className="w-32 font-mono text-sm border-gray-200 focus:border-gray-400 focus:ring-0"
                       />
                     </div>
                     <Button 
                       onClick={handleGenerateNeutralPalette}
                       disabled={isGenerating}
-                      className="h-10"
+                      className="h-12 px-6 bg-black text-white hover:bg-gray-800"
                     >
                       {isGenerating ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -459,21 +400,21 @@ export function ModernPaletteEditor({
                 </div>
 
                 {Object.keys(neutralShades).length > 0 && (
-                  <div className="space-y-3">
-                    <Label className="text-xs font-medium text-gray-700">Generated Scale</Label>
-                    <div className="grid grid-cols-6 md:grid-cols-12 gap-1.5">
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium text-gray-900">Generated Scale</h3>
+                    <div className="grid grid-cols-6 md:grid-cols-12 gap-2">
                       {NEUTRAL_SHADES.map((shade) => (
-                        <div key={shade} className="text-center">
+                        <div key={shade} className="space-y-1">
                           <div
                             className={cn(
-                              "h-12 w-full rounded border transition-all",
-                              neutralShades[shade] ? "border-gray-200 shadow-sm" : "border-gray-100 bg-gray-50"
+                              "aspect-square w-full rounded-lg border transition-all",
+                              neutralShades[shade] ? "border-gray-200 hover:border-gray-300" : "border-gray-100 bg-gray-50"
                             )}
                             style={{ 
                               backgroundColor: neutralShades[shade] || undefined 
                             }}
                           />
-                          <span className="text-xs text-gray-500 mt-1 block font-medium">{shade}</span>
+                          <span className="text-xs text-gray-600 text-center block font-medium">{shade}</span>
                         </div>
                       ))}
                     </div>
@@ -484,7 +425,7 @@ export function ModernPaletteEditor({
           </div>
         </div>
 
-        <DialogFooter className="px-6 py-4 border-t bg-gray-50/50">
+        <DialogFooter className="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
           <div className="flex items-center justify-between w-full">
             <div>
               {error && (
@@ -499,7 +440,7 @@ export function ModernPaletteEditor({
                 variant="outline" 
                 size="sm" 
                 onClick={() => onOpenChange(false)} 
-                className="h-9 hover:bg-gray-100"
+                className="h-9 px-3 hover:bg-gray-50 border-gray-200 font-normal"
               >
                 Cancel
               </Button>
@@ -507,10 +448,10 @@ export function ModernPaletteEditor({
                 size="sm" 
                 onClick={handleSave} 
                 disabled={isSaving} 
-                className="h-9 min-w-[100px]"
+                className="h-9 px-4 bg-black text-white hover:bg-gray-800 font-normal min-w-[100px]"
               >
                 {isSaving && <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />}
-                {palette ? 'Update' : 'Create'}
+                {palette ? 'Save' : 'Create'}
               </Button>
             </div>
           </div>

@@ -213,7 +213,7 @@ function ThemeStudioContent() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Foundation Sidebar */}
+        {/* Foundation Sidebar - Left */}
         <div className={cn(
           "border-r bg-gray-50 transition-all duration-300",
           showFoundation ? "w-96" : "w-12"
@@ -238,9 +238,20 @@ function ThemeStudioContent() {
           />
         </div>
 
-        {/* Visual Styles Sidebar */}
+        {/* Preview Panel - Center */}
+        <div className="flex-1 overflow-hidden h-full">
+          <PowerBIPreview 
+            generatedTheme={themeStudio.previewTheme}
+            selectedVisualType={themeStudio.selectedVisual}
+            selectedVariant={themeStudio.selectedVariant}
+            onExitFocusMode={() => themeStudio.setSelectedVisual('')}
+            onVariantChange={themeStudio.setSelectedVariant}
+          />
+        </div>
+
+        {/* Visual Styles Sidebar - Right */}
         <div className={cn(
-          "border-r bg-gray-50 transition-all duration-300",
+          "border-l bg-gray-50 transition-all duration-300",
           showVisualStyles ? "w-[400px]" : "w-12"
         )}>
           <VisualStylesPanel
@@ -264,17 +275,6 @@ function ThemeStudioContent() {
             }}
             isVisible={showVisualStyles}
             onToggleVisibility={setShowVisualStyles}
-          />
-        </div>
-
-        {/* Preview Panel */}
-        <div className="flex-1 overflow-hidden h-full">
-          <PowerBIPreview 
-            generatedTheme={themeStudio.previewTheme}
-            selectedVisualType={themeStudio.selectedVisual}
-            selectedVariant={themeStudio.selectedVariant}
-            onExitFocusMode={() => themeStudio.setSelectedVisual('')}
-            onVariantChange={themeStudio.setSelectedVariant}
           />
         </div>
       </div>

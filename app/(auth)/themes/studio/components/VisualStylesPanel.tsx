@@ -111,7 +111,7 @@ export function VisualStylesPanel({
           onClick={() => onToggleVisibility(true)}
           className="mb-4"
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronLeft className="w-4 h-4" />
         </Button>
         <div className="flex flex-col items-center gap-2 text-gray-600">
           <Layers className="w-5 h-5" />
@@ -131,7 +131,7 @@ export function VisualStylesPanel({
           size="sm"
           onClick={() => onToggleVisibility(false)}
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
       

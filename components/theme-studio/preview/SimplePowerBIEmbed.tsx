@@ -130,8 +130,7 @@ export default function SimplePowerBIEmbed({
                 visible: false
               },
               pageNavigation: {
-                visible: true,
-                position: models.PageNavigationPosition.Bottom
+                visible: false
               }
             },
             layoutType: models.LayoutType.Custom,
@@ -443,8 +442,7 @@ export default function SimplePowerBIEmbed({
                     panes: {
                       filters: { visible: false },
                       pageNavigation: {
-                        visible: true,
-                        position: models.PageNavigationPosition.Bottom
+                        visible: false
                       }
                     },
                     layoutType: models.LayoutType.Custom,
@@ -489,7 +487,7 @@ export default function SimplePowerBIEmbed({
         }
         .report-container iframe {
           border: none;
-          border-radius: 0.5rem;
+          border-radius: 0;
         }
       `}</style>
     </div>

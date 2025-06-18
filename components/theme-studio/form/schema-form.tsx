@@ -14,7 +14,10 @@ import {
   BooleanSchemaField,
   ColorSchemaField,
   ArraySchemaField,
-  ObjectSchemaField
+  ObjectSchemaField,
+  FontFamilyField,
+  FontSizeField,
+  FontWeightField
 } from './fields';
 import { 
   isColorProperty, 
@@ -395,6 +398,51 @@ export function SchemaForm({
         path={path}
       />
     );
+  }
+
+  // Handle font properties
+  const propertyName = path[path.length - 1];
+  if (propertyName && (schema.type === 'string' || schema.type === 'number')) {
+    // Font family detection
+    if (propertyName === 'fontFamily' || propertyName.endsWith('FontFamily')) {
+      return (
+        <FontFamilyField
+          schema={schema}
+          value={value}
+          onChange={handleChange}
+          path={path}
+        />
+      );
+    }
+    
+    // Font size detection
+    if ((propertyName === 'fontSize' || propertyName.endsWith('FontSize')) && schema.type === 'number') {
+      return (
+        <FontSizeField
+          schema={schema}
+          value={value}
+          onChange={handleChange}
+          path={path}
+        />
+      );
+    }
+    
+    // Font weight detection
+    if (propertyName === 'fontWeight' || propertyName.endsWith('FontWeight')) {
+      // Get the parent object to find fontFamily
+      // The value here is the fontWeight value itself, we need to look at the parent
+      // We'll need to pass this through props or context in a real implementation
+      // For now, default to Segoe UI
+      return (
+        <FontWeightField
+          schema={schema}
+          value={value}
+          onChange={handleChange}
+          path={path}
+          fontFamily={'Segoe UI'} // TODO: Get from parent context
+        />
+      );
+    }
   }
 
   // Handle primitive types

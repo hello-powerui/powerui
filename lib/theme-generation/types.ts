@@ -11,8 +11,8 @@ export interface StructuralColors {
 export interface TextClass {
   fontFace?: string;
   fontSize?: number;
-  fontColor?: string;
-  bold?: boolean;
+  fontWeight?: string;
+  color?: string;
 }
 
 export interface TextClasses {
@@ -28,6 +28,8 @@ export interface TextClasses {
   boldLabel?: TextClass;
   largeLightLabel?: TextClass;
   smallLightLabel?: TextClass;
+  dataTitle?: TextClass;
+  smallDataLabel?: TextClass;
 }
 
 export interface ThemeGenerationInput {

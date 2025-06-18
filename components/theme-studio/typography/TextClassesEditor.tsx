@@ -4,18 +4,19 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UnifiedColorPicker } from '@/components/ui/unified-color-picker';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
+import { FONT_WEIGHTS, FONT_AVAILABLE_WEIGHTS, pointsToPixels, getAvailableWeights, getWeightLabel } from '@/lib/theme-studio/font-registry';
 
 type ThemeDataColor = string | { color: string } | { dataColorIndex: number };
 
 interface TextClass {
   fontFace?: string;
   fontSize?: number;
-  fontColor?: ThemeDataColor;
-  bold?: boolean;
+  fontWeight?: string;
+  color?: ThemeDataColor;
 }
 
 interface TextClassesEditorProps {
@@ -104,24 +105,24 @@ const TEXT_CLASS_INFO: TextClassInfo[] = [
 ];
 
 const DEFAULT_TEXT_CLASSES: Record<string, TextClass> = {
-  title: { fontSize: 12, bold: true },
-  label: { fontSize: 10 },
-  callout: { fontSize: 45, bold: true },
-  header: { fontSize: 12, bold: true },
-  largeTitle: { fontSize: 20, bold: true },
-  dataTitle: { fontSize: 14, bold: true },
-  boldLabel: { fontSize: 10, bold: true },
-  largeLabel: { fontSize: 12 },
-  largeLightLabel: { fontSize: 12 },
-  lightLabel: { fontSize: 10 },
-  semiboldLabel: { fontSize: 10, bold: true },
-  smallLabel: { fontSize: 9 },
-  smallLightLabel: { fontSize: 9 },
-  smallDataLabel: { fontSize: 9 }
+  title: { fontSize: 12, fontWeight: "600" },
+  label: { fontSize: 10, fontWeight: "400" },
+  callout: { fontSize: 45, fontWeight: "700" },
+  header: { fontSize: 12, fontWeight: "600" },
+  largeTitle: { fontSize: 20, fontWeight: "700" },
+  dataTitle: { fontSize: 14, fontWeight: "600" },
+  boldLabel: { fontSize: 10, fontWeight: "700" },
+  largeLabel: { fontSize: 12, fontWeight: "400" },
+  largeLightLabel: { fontSize: 12, fontWeight: "300" },
+  lightLabel: { fontSize: 10, fontWeight: "300" },
+  semiboldLabel: { fontSize: 10, fontWeight: "600" },
+  smallLabel: { fontSize: 9, fontWeight: "400" },
+  smallLightLabel: { fontSize: 9, fontWeight: "300" },
+  smallDataLabel: { fontSize: 9, fontWeight: "400" }
 };
 
 export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: TextClassesEditorProps) {
-  const { theme, updateTextClasses } = useThemeStudioStore();
+  const { theme, setTextClasses } = useThemeStudioStore();
   const [localTextClasses, setLocalTextClasses] = useState<Record<string, TextClass>>({});
   
   const textClasses = theme.textClasses;
@@ -159,47 +160,47 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
     }
   };
 
-  const handleFontColorChange = (className: string, value: any) => {
+  const handleColorChange = (className: string, value: any) => {
     // Handle the different formats that UnifiedColorPicker might return
-    let fontColor: ThemeDataColor;
+    let color: ThemeDataColor;
     
     if (typeof value === 'string') {
       // Simple color string
-      fontColor = value;
+      color = value;
     } else if (value?.solid?.color) {
       // PowerBI format - extract the color
       const solidColor = value.solid.color;
       if (typeof solidColor === 'string') {
-        fontColor = solidColor;
+        color = solidColor;
       } else if (solidColor?.expr?.ThemeDataColor?.ColorId !== undefined) {
         // Theme color reference
-        fontColor = { dataColorIndex: solidColor.expr.ThemeDataColor.ColorId };
+        color = { dataColorIndex: solidColor.expr.ThemeDataColor.ColorId };
       } else {
-        fontColor = '#000000';
+        color = '#000000';
       }
     } else if (value?.color) {
       // Theme studio format
-      fontColor = value.color;
+      color = value.color;
     } else if (value?.themeColor?.id !== undefined) {
       // Theme color with id
-      fontColor = { dataColorIndex: value.themeColor.id };
+      color = { dataColorIndex: value.themeColor.id };
     } else {
-      fontColor = value || '#000000';
+      color = value || '#000000';
     }
     
     setLocalTextClasses(prev => ({
       ...prev,
       [className]: { 
         ...prev[className], 
-        fontColor
+        color
       }
     }));
   };
 
-  const handleBoldChange = (className: string, checked: boolean) => {
+  const handleFontWeightChange = (className: string, weight: string) => {
     setLocalTextClasses(prev => ({
       ...prev,
-      [className]: { ...prev[className], bold: checked }
+      [className]: { ...prev[className], fontWeight: weight }
     }));
   };
 
@@ -207,7 +208,7 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
     if (onUpdateTextClasses) {
       onUpdateTextClasses(localTextClasses);
     } else {
-      updateTextClasses(localTextClasses);
+      setTextClasses(localTextClasses);
     }
     onOpenChange(false);
   };
@@ -220,28 +221,28 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
     setLocalTextClasses(resetClasses);
   };
 
-  const getColorValue = (fontColor?: ThemeDataColor): string => {
-    if (!fontColor) return '#000000';
+  const getColorValue = (color?: ThemeDataColor): string => {
+    if (!color) return '#000000';
     
     // If it's a string, return it directly
-    if (typeof fontColor === 'string') {
+    if (typeof color === 'string') {
       // Check if it's a token (starts with @)
-      if (fontColor.startsWith('@')) {
+      if (color.startsWith('@')) {
         // For now, return a default color for tokens
         // In a real implementation, this would resolve the token
         return '#666666';
       }
-      return fontColor;
+      return color;
     }
     
     // If it's an object with color property
-    if (typeof fontColor === 'object' && 'color' in fontColor) {
-      return fontColor.color;
+    if (typeof color === 'object' && 'color' in color) {
+      return color.color;
     }
     
     // If it's an object with dataColorIndex property (theme color reference)
-    if (typeof fontColor === 'object' && 'dataColorIndex' in fontColor && fontColor.dataColorIndex !== undefined) {
-      return (dataColors && Array.isArray(dataColors)) ? (dataColors[fontColor.dataColorIndex] as string) || '#000000' : '#000000';
+    if (typeof color === 'object' && 'dataColorIndex' in color && color.dataColorIndex !== undefined) {
+      return (dataColors && Array.isArray(dataColors)) ? (dataColors[color.dataColorIndex] as string) || '#000000' : '#000000';
     }
     
     return '#000000';
@@ -277,7 +278,8 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
           <div className="space-y-3">
             {TEXT_CLASS_INFO.map(({ name, description, usage }) => {
               const textClass = localTextClasses[name] || {};
-              const colorValue = getColorValue(textClass.fontColor);
+              const colorValue = getColorValue(textClass.color);
+              const availableWeights = getAvailableWeights(fontFamily || 'Segoe UI');
               
               return (
                 <div key={name} className="bg-white rounded-md border border-gray-200 hover:border-gray-300 transition-colors">
@@ -293,7 +295,7 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
                         style={{
                           fontSize: `${Math.min(textClass.fontSize || 12, 16)}px`,
                           color: colorValue,
-                          fontWeight: textClass.bold ? 'bold' : 'normal',
+                          fontWeight: textClass.fontWeight || '400',
                           fontFamily: fontFamily
                         }}
                       >
@@ -319,14 +321,15 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
                             className="w-20"
                           />
                           <span className="text-xs text-gray-500">pt</span>
+                          <span className="text-xs text-gray-400">({pointsToPixels(textClass.fontSize || 12)}px)</span>
                         </div>
                       </div>
                     
                       <div className="space-y-2">
                         <UnifiedColorPicker
                           label="Color"
-                          value={textClass.fontColor || '#000000'}
-                          onChange={(value) => handleFontColorChange(name, value)}
+                          value={textClass.color || '#000000'}
+                          onChange={(value) => handleColorChange(name, value)}
                           format="simple"
                           enableTokens={true}
                           enableThemeColors={true}
@@ -335,19 +338,26 @@ export function TextClassesEditor({ open, onOpenChange, onUpdateTextClasses }: T
                       </div>
                       
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-gray-700">Style</Label>
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              id={`${name}-bold`}
-                              checked={textClass.bold || false}
-                              onCheckedChange={(checked) => handleBoldChange(name, checked)}
-                            />
-                            <Label htmlFor={`${name}-bold`} className="text-sm text-gray-600 cursor-pointer">
-                              Bold
-                            </Label>
-                          </div>
-                        </div>
+                        <Label htmlFor={`${name}-weight`} className="text-sm font-medium text-gray-700">
+                          Font Weight
+                        </Label>
+                        <Select 
+                          value={textClass.fontWeight || "400"} 
+                          onValueChange={(value) => handleFontWeightChange(name, value)}
+                        >
+                          <SelectTrigger id={`${name}-weight`} className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {FONT_WEIGHTS.filter(weight => 
+                              availableWeights.includes(weight.value)
+                            ).map(weight => (
+                              <SelectItem key={weight.value} value={weight.value}>
+                                {weight.label} ({weight.value})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   </div>
