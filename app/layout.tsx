@@ -1,13 +1,10 @@
 import type { Metadata } from 'next'
-import { Providers } from './providers'
-import { AppHeader } from '@/components/ui/app-header'
-import { Toaster } from 'sonner'
 import './globals.css'
 import './fonts.css'
 
 export const metadata: Metadata = {
-  title: 'PowerUI - Professional Power BI Theme Generator',
-  description: 'Create beautiful, consistent Power BI themes with PowerUI. Professional theme generation for Power BI reports.',
+  title: 'Power UI - Something big is coming',
+  description: 'The future of Power BI theming is almost here.',
 }
 
 export default function RootLayout({
@@ -17,13 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="font-segoe">
-        <Providers>
-          <AppHeader />
-          <main>{children}</main>
-          <Toaster position="bottom-right" />
-        </Providers>
-      </body>
+      <body>{children}</body>
     </html>
   )
 }
