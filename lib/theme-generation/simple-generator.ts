@@ -90,6 +90,11 @@ export class SimpleThemeGenerator {
       Object.assign(theme, neutralMapping);
     }
     
+    // Apply custom structural colors if provided
+    if (input.structuralColors && Object.keys(input.structuralColors).length > 0) {
+      Object.assign(theme, input.structuralColors);
+    }
+    
     // Apply custom text classes if provided
     if (input.textClasses && Object.keys(input.textClasses).length > 0) {
       theme.textClasses = this.formatTextClasses(input.textClasses);
@@ -140,10 +145,11 @@ export class SimpleThemeGenerator {
         const textClass: any = {};
         const classConfig = config as any;
         
-        if (classConfig.fontColor) textClass.color = classConfig.fontColor;
+        // Map color property (already using correct name)
+        if (classConfig.color) textClass.color = classConfig.color;
         if (classConfig.fontFace) textClass.fontFace = classConfig.fontFace;
         if (classConfig.fontSize) textClass.fontSize = classConfig.fontSize;
-        if (classConfig.bold) textClass.bold = true;
+        if (classConfig.fontWeight) textClass.fontWeight = classConfig.fontWeight;
         
         formatted[className] = textClass;
       }

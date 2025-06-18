@@ -22,29 +22,43 @@ export const NeutralPaletteSchema = z.object({
 });
 
 // Text class schemas
-export const FontSchema = z.object({
-  fontFamily: z.string(),
-  fontSize: z.string(),
-  fontWeight: z.union([z.string(), z.number()]).optional(),
-  fontStyle: z.string().optional(),
-  lineHeight: z.union([z.string(), z.number()]).optional(),
+export const TextClassSchema = z.object({
+  fontFace: z.string().optional(),
+  fontSize: z.number().optional(),
+  fontWeight: z.string().optional(),
+  color: z.union([
+    z.string(),
+    z.object({ color: z.string() }),
+    z.object({ dataColorIndex: z.number() })
+  ]).optional(),
 });
 
 export const TextClassesSchema = z.object({
-  callout: FontSchema,
-  title: FontSchema,
-  header: FontSchema,
-  label: FontSchema,
+  callout: TextClassSchema.optional(),
+  title: TextClassSchema.optional(),
+  header: TextClassSchema.optional(),
+  label: TextClassSchema.optional(),
+  largeTitle: TextClassSchema.optional(),
+  dataTitle: TextClassSchema.optional(),
+  boldLabel: TextClassSchema.optional(),
+  largeLabel: TextClassSchema.optional(),
+  largeLightLabel: TextClassSchema.optional(),
+  lightLabel: TextClassSchema.optional(),
+  semiboldLabel: TextClassSchema.optional(),
+  smallLabel: TextClassSchema.optional(),
+  smallLightLabel: TextClassSchema.optional(),
+  smallDataLabel: TextClassSchema.optional(),
 });
 
 // Structural colors schema
 export const StructuralColorsSchema = z.object({
-  background: ColorSchema,
-  foreground: ColorSchema,
-  border: ColorSchema,
-  selection: ColorSchema,
-  hover: ColorSchema,
-  disabled: ColorSchema,
+  firstLevelElements: ColorSchema.optional(),
+  secondLevelElements: ColorSchema.optional(),
+  thirdLevelElements: ColorSchema.optional(),
+  fourthLevelElements: ColorSchema.optional(),
+  background: ColorSchema.optional(),
+  secondaryBackground: ColorSchema.optional(),
+  tableAccent: ColorSchema.optional(),
 });
 
 // Visual style value types
