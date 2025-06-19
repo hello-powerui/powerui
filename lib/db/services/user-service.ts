@@ -19,13 +19,13 @@ export class UserService {
   /**
    * Ensure user exists, creating from Clerk if needed
    */
-  static async ensureUserExists(clerkUserId: string): Promise<string> {
+  static async ensureUserExists(clerkUserId: string): Promise<User> {
     const existingUser = await prisma.user.findUnique({
       where: { id: clerkUserId },
     });
 
     if (existingUser) {
-      return existingUser.id;
+      return existingUser;
     }
 
     // If user doesn't exist, we need to get their email from Clerk
@@ -37,7 +37,7 @@ export class UserService {
       },
     });
 
-    return newUser.id;
+    return newUser;
   }
 
   /**

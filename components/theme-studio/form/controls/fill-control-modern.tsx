@@ -45,8 +45,8 @@ export function FillControl({
             enableTokens={true}
             enableThemeColors={true}
             mode={theme.mode || 'light'}
-            neutralPalette={Object.values(neutralPalette?.shades || {}) as string[]}
-            themeColors={colorPalette?.colors || []}
+            neutralPalette={(neutralPalette?.colors as string[]) || []}
+            themeColors={(colorPalette?.colors as string[]) || []}
             className="[&_button]:h-6 [&_button]:text-[11px] [&_button]:px-2"
           />
         </div>
@@ -67,8 +67,8 @@ export function FillControl({
         enableTokens={true}
         enableThemeColors={true}
         mode={theme.mode || 'light'}
-        neutralPalette={Object.values(neutralPalette?.shades || {}) as string[]}
-        themeColors={colorPalette?.colors || []}
+        neutralPalette={(neutralPalette?.colors as string[]) || []}
+        themeColors={(colorPalette?.colors as string[]) || []}
         className="[&_button]:h-6 [&_button]:text-[11px] [&_button]:px-2"
       />
     </div>

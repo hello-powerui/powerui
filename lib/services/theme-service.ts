@@ -79,9 +79,12 @@ export class ThemeService extends BaseService {
       
       return await this.prisma.theme.create({
         data: {
-          ...data,
-          theme: JSON.stringify(themeData),
-          schemaVersion: data.schemaVersion || '2.143',
+          name: data.name,
+          description: data.description,
+          userId: data.userId,
+          organizationId: data.organizationId,
+          themeData: JSON.stringify(themeData),
+          version: data.schemaVersion || '2.143',
           visibility: data.visibility || 'PRIVATE',
         },
       });
@@ -108,9 +111,9 @@ export class ThemeService extends BaseService {
     
     try {
       // If theme data is provided, validate it
-      if (data.theme && typeof data.theme === 'string') {
-        const themeData = validatePowerBITheme(JSON.parse(data.theme));
-        data.theme = JSON.stringify(themeData);
+      if (data.themeData && typeof data.themeData === 'string') {
+        const themeData = validatePowerBITheme(JSON.parse(data.themeData as string));
+        data.themeData = JSON.stringify(themeData);
       }
       
       return await this.prisma.theme.update({

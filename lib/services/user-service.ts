@@ -19,7 +19,7 @@ export class UserService extends BaseService {
   /**
    * Ensure a user exists in the database
    */
-  async ensureUserExists(userId: string, email?: string): Promise<string> {
+  async ensureUserExists(userId: string, email?: string): Promise<User> {
     try {
       const user = await this.prisma.user.upsert({
         where: { id: userId },
@@ -34,7 +34,7 @@ export class UserService extends BaseService {
         },
       });
       
-      return user.id;
+      return user;
     } catch (error) {
       this.handleDatabaseError(error, 'ensureUserExists');
     }

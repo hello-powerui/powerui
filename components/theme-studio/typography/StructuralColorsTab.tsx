@@ -117,7 +117,7 @@ export function StructuralColorsTab() {
   };
 
   const handleResetGroup = (colors: string[]) => {
-    const updatedColors = { ...structuralColors };
+    const updatedColors: Record<string, any> = { ...structuralColors };
     colors.forEach(colorKey => {
       delete updatedColors[colorKey];
     });
@@ -130,7 +130,7 @@ export function StructuralColorsTab() {
   };
 
   const getColorValue = (colorKey: string): string => {
-    const value = structuralColors[colorKey];
+    const value = (structuralColors as Record<string, any>)[colorKey];
     if (!value) {
       // Provide sensible defaults based on mode
       return mode === 'dark' ? '#FFFFFF' : '#000000';

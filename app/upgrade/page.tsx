@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -52,7 +53,7 @@ const plans = [
   }
 ]
 
-export default function UpgradePage() {
+function UpgradeContent() {
   const searchParams = useSearchParams()
   const returnUrl = searchParams.get('returnUrl') || '/dashboard'
   const router = useRouter()
@@ -141,5 +142,13 @@ export default function UpgradePage() {
       </div>
     </div>
     </>
+  )
+}
+
+export default function UpgradePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UpgradeContent />
+    </Suspense>
   )
 }

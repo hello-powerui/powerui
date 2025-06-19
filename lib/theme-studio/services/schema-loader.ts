@@ -61,7 +61,7 @@ export class SchemaLoader {
       const defName = ref.replace('#/definitions/', '');
       const resolved = this.definitions.get(defName);
       if (!resolved) {
-        return null;
+        return undefined;
       }
       return resolved;
     }

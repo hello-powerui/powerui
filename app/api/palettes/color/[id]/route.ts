@@ -14,11 +14,11 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const dbUserId = await UserService.ensureUserExists(userId);
+    const dbUser = await UserService.ensureUserExists(userId);
     const data = await request.json();
     const { id } = await params;
     
-    const palette = await PaletteService.updateColorPalette(id, dbUserId, {
+    const palette = await PaletteService.updateColorPalette(id, dbUser.id, {
       name: data.name,
       description: data.description,
       colors: data.colors,
@@ -51,10 +51,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const dbUserId = await UserService.ensureUserExists(userId);
+    const dbUser = await UserService.ensureUserExists(userId);
     const { id } = await params;
     
-    const result = await PaletteService.deleteColorPalette(id, dbUserId);
+    const result = await PaletteService.deleteColorPalette(id, dbUser.id);
     
     return NextResponse.json({ 
       success: true,

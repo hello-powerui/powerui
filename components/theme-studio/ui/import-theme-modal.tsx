@@ -49,7 +49,7 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const { setTheme, setThemeMetadata } = useThemeStudioStore();
+  const { loadTheme, updateTheme } = useThemeStudioStore();
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -111,8 +111,8 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
       // Set theme name from file or use filename
       const themeName = fileContent.name || selectedFile?.name.replace('.json', '') || 'Imported Theme';
       
-      setTheme(fileContent);
-      setThemeMetadata({ 
+      loadTheme(fileContent);
+      updateTheme({ 
         name: themeName,
         description: `Imported from ${selectedFile?.name}`
       });

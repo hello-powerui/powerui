@@ -77,10 +77,10 @@ export function withAuth<T = any>(
       }
 
       console.log('[withAuth] Ensuring user exists in database');
-      const dbUserId = await services.user.ensureUserExists(userId);
-      console.log('[withAuth] Database userId:', dbUserId);
+      const dbUser = await services.user.ensureUserExists(userId);
+      console.log('[withAuth] Database userId:', dbUser.id);
       
-      return handler(req, { userId, dbUserId });
+      return handler(req, { userId, dbUserId: dbUser.id });
     } catch (error) {
       console.error('[withAuth] Error:', error);
       if (error instanceof AuthenticationError) {
@@ -93,7 +93,7 @@ export function withAuth<T = any>(
 
 // Paid user middleware
 export function withPaidUser<T = any>(
-  handler: (req: NextRequest, context: { userId: string; dbUserId: string }) => Promise<NextResponse<T>>
+  handler: (req: NextRequest, context: { userId: string; dbUserId: string }) => Promise<NextResponse<ApiResponse<T>>>
 ) {
   return withAuth(async (req, context) => {
     try {
@@ -151,7 +151,7 @@ export async function withRateLimit(
   options: { requests: number; windowMs: number } = { requests: 60, windowMs: 60000 }
 ) {
   return async (req: NextRequest, context: any): Promise<NextResponse> => {
-    const identifier = context.userId || req.ip || 'anonymous';
+    const identifier = context.userId || req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'anonymous';
     const now = Date.now();
     
     const record = requestCounts.get(identifier);

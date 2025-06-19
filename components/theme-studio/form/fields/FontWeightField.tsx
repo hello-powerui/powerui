@@ -34,7 +34,6 @@ export function FontWeightField({ schema, value, onChange, path, fontFamily = 'S
     <PropertyWrapper 
       label={schema.title || 'Font Weight'} 
       path={path}
-      description={schema.description}
       inline={true}
     >
       <Select 

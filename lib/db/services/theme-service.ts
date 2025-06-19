@@ -221,7 +221,7 @@ export class ThemeService {
       data: {
         name: newName || `${originalTheme.name} (Copy)`,
         description: originalTheme.description,
-        themeData: originalTheme.themeData,
+        themeData: originalTheme.themeData || {},
         visibility: 'PRIVATE', // Always set duplicated themes as private
         isDefault: false,
         user: {

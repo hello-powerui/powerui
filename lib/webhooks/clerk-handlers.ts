@@ -138,7 +138,7 @@ export const organizationMembershipCreatedHandler: WebhookHandler = {
     // Add user to organization members table
     await prisma.organizationMember.upsert({
       where: {
-        userId_organizationId: {
+        organizationId_userId: {
           userId: public_user_data.user_id,
           organizationId: org.id,
         },

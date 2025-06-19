@@ -24,7 +24,7 @@ export default function SignInPage() {
             borderRadius: "0.5rem",
           }
         }}
-        signInFallbackRedirectUrl="/dashboard"
+        fallbackRedirectUrl="/dashboard"
       />
     </div>
   );

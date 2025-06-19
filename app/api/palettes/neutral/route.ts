@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(builtInPalettes);
     }
     
-    let userPalettes = [];
+    let userPalettes: any[] = [];
     try {
       userPalettes = await getUserNeutralPalettes(user.id);
     } catch (dbError) {

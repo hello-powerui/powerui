@@ -42,7 +42,7 @@ export function useThemePreviewGenerator() {
         name: debouncedTheme.name,
         mode: debouncedTheme.mode,
         dataColors: resolved.colorPalette.colors as string[],
-        neutralPalette: resolved.neutralPalette.colors,
+        neutralPalette: resolved.neutralPalette.colors as string[],
         fontFamily: debouncedTheme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
         visualStyles: debouncedTheme.visualStyles,
         structuralColors: debouncedTheme.structuralColors && Object.keys(debouncedTheme.structuralColors).length > 0 ? debouncedTheme.structuralColors : undefined,

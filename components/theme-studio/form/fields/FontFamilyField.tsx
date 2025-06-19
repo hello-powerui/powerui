@@ -19,7 +19,6 @@ export function FontFamilyField({ schema, value, onChange, path }: FontFamilyFie
     <PropertyWrapper 
       label={schema.title || 'Font Family'} 
       path={path}
-      description={schema.description}
       inline={true}
     >
       <Select value={value || 'Segoe UI'} onValueChange={onChange}>

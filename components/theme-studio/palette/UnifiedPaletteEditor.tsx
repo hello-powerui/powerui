@@ -19,7 +19,8 @@ import { UnifiedColorPicker } from '@/components/ui/unified-color-picker';
 import { cn } from '@/lib/utils';
 import { Plus, Trash2, Download, Upload, AlertCircle, Loader2 } from 'lucide-react';
 import { usePaletteStore } from '@/lib/stores/palette-store';
-import type { ColorPalette, NeutralPalette } from '@/lib/types/palette';
+import type { ColorPalette, NeutralPalette } from '@/lib/types/unified-palette';
+import { neutralColorsToShadeMap } from '@/lib/types/unified-palette';
 
 interface UnifiedPaletteEditorProps {
   open: boolean;
@@ -56,10 +57,12 @@ export function UnifiedPaletteEditor({
       if (type === 'color' && 'colors' in palette) {
         setDescription(palette.description || '');
         setColors(palette.colors);
-      } else if (type === 'neutral' && 'shades' in palette) {
-        setNeutralShades(palette.shades);
+      } else if (type === 'neutral' && 'colors' in palette) {
+        // Convert colors array to shades format for the editor
+        const shades = neutralColorsToShadeMap(palette.colors);
+        setNeutralShades(shades);
         // Try to guess base color from 500 shade
-        setBaseColor(palette.shades['500'] || '#6B7280');
+        setBaseColor(shades['500'] || '#6B7280');
       }
     } else {
       // Reset for new palette

@@ -12,11 +12,11 @@ interface PaletteStore {
   
   // Actions
   loadPalettes: () => Promise<void>
-  createColorPalette: (palette: Partial<ColorPalette>) => Promise<void>
+  createColorPalette: (palette: Partial<ColorPalette>) => Promise<ColorPalette>
   updateColorPalette: (id: string, palette: Partial<ColorPalette>) => Promise<void>
   deleteColorPalette: (id: string) => Promise<void>
   
-  createNeutralPalette: (palette: Partial<NeutralPalette>) => Promise<void>
+  createNeutralPalette: (palette: Partial<NeutralPalette>) => Promise<NeutralPalette>
   updateNeutralPalette: (id: string, palette: Partial<NeutralPalette>) => Promise<void>
   deleteNeutralPalette: (id: string) => Promise<void>
   
@@ -145,6 +145,7 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         colorPalettes: [...state.colorPalettes, data.palette],
         isLoading: false
       }));
+      return data.palette;
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Failed to create palette', isLoading: false });
       throw error;

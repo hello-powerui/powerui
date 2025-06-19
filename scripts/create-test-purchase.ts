@@ -1,5 +1,5 @@
 import { prisma } from "../lib/db/prisma";
-import { PurchasePlan, UserPlan } from "@prisma/client";
+import { PurchasePlan, UserPlan } from "../lib/generated/prisma";
 
 async function createTestPurchase(userId: string, plan: "pro" | "team-5" | "team-10") {
   try {

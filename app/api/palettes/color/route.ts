@@ -86,16 +86,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ palettes: BUILT_IN_COLOR_PALETTES });
     }
 
-    const dbUserId = await UserService.ensureUserExists(userId);
+    const dbUser = await UserService.ensureUserExists(userId);
 
     // Get both user palettes and built-in palettes
     
-    let userPalettes = [];
-    let builtInPalettes = [];
+    let userPalettes: any[] = [];
+    let builtInPalettes: any[] = [];
     
     try {
       [userPalettes, builtInPalettes] = await Promise.all([
-        PaletteService.getUserColorPalettes(dbUserId),
+        PaletteService.getUserColorPalettes(dbUser.id),
         PaletteService.getBuiltInColorPalettes()
       ]);
 
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const dbUserId = await UserService.ensureUserExists(userId);
+    const dbUser = await UserService.ensureUserExists(userId);
     const data = await request.json();
     
     // Validate input
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const palette = await PaletteService.createColorPalette(dbUserId, {
+    const palette = await PaletteService.createColorPalette(dbUser.id, {
       name: data.name.trim().slice(0, 50),
       description: data.description ? data.description.trim().slice(0, 200) : undefined,
       colors: data.colors.map((c: string) => c.toUpperCase()),

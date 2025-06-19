@@ -48,7 +48,7 @@ export async function extractCommonVisualProperties(): Promise<PropertyInfo> {
   const commonProperties: PropertyInfo = {};
   const minVisualsThreshold = 3; // Property must appear in at least 3 visuals to be considered common
   
-  for (const [propName, info] of propertyMap.entries()) {
+  for (const [propName, info] of Array.from(propertyMap.entries())) {
     if (info.visuals.size >= minVisualsThreshold) {
       commonProperties[propName] = {
         title: info.title || formatPropertyName(propName),

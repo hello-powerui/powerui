@@ -117,8 +117,6 @@ export function PropertyWithInheritance({
         onChange={onChange}
         description={schema.description}
         path={propertyPath}
-        inheritanceIndicator={inheritanceIndicator}
-        onReset={showReset ? handleReset : undefined}
       />
     );
   }
@@ -138,8 +136,6 @@ export function PropertyWithInheritance({
         step={schema.type === 'integer' ? 1 : 0.01}
         path={propertyPath}
         isPercentage={isPercentage}
-        inheritanceIndicator={inheritanceIndicator}
-        onReset={showReset ? handleReset : undefined}
       />
     );
   }

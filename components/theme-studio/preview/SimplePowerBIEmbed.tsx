@@ -195,7 +195,7 @@ export default function SimplePowerBIEmbed({
           await reportRef.current.applyTheme({ themeJson: themeToApply });
         } catch (err) {
           // Only log if it's not a "report not ready" error
-          if (err && err.message && !err.message.includes('not ready')) {
+          if (err instanceof Error && !err.message.includes('not ready')) {
             console.error('Error applying theme update:', err.message);
           }
         }
@@ -246,7 +246,10 @@ export default function SimplePowerBIEmbed({
     
     try {
       const pageId = currentPageRef.current.name;
-      const pageSize = currentPageRef.current.defaultSize || { width: 1280, height: 720 };
+      const pageSize = {
+        width: currentPageRef.current.defaultSize?.width || 1280,
+        height: currentPageRef.current.defaultSize?.height || 720
+      };
       
       if (focusMode && selectedVisualType !== '*') {
         // Apply focused layout

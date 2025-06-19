@@ -64,14 +64,11 @@ async function testOrganizationFlow() {
     // 4. Database integrity checks
     console.log("\n4️⃣ Running integrity checks...");
     
-    // Check for orphaned organization members
-    const orphanedMembers = await prisma.organizationMember.findMany({
-      where: {
-        organization: {
-          is: null,
-        },
-      },
+    // Check for organization members with no valid organization
+    const allMembers = await prisma.organizationMember.findMany({
+      include: { organization: true }
     });
+    const orphanedMembers = allMembers.filter(m => !m.organization);
     console.log(`   Orphaned organization members: ${orphanedMembers.length}`);
 
     // Check for purchases with multiple organizations (should be 0)

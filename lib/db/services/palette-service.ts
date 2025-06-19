@@ -78,7 +78,6 @@ export class PaletteService {
     const updatePromises = affectedThemes.map(theme => {
       const updatedThemeData = {
         ...(theme.themeData as Record<string, any> || {}),
-        palette: DEFAULT_COLOR_PALETTE,
         dataColors: DEFAULT_COLOR_PALETTE.colors
       };
       
@@ -221,7 +220,8 @@ export class PaletteService {
     const updatePromises = affectedThemes.map(theme => {
       const updatedThemeData = {
         ...(theme.themeData as Record<string, any> || {}),
-        neutralPalette: AZURE_NEUTRAL_PALETTE
+        // Remove reference to deleted neutral palette
+        neutralPaletteId: 'azure-default'
       };
       
       return prisma.theme.update({
@@ -267,7 +267,12 @@ export class PaletteService {
     for (const palette of BUILT_IN_COLOR_PALETTES) {
       await prisma.colorPalette.upsert({
         where: { id: palette.id },
-        update: palette,
+        update: {
+          name: palette.name,
+          description: palette.description,
+          colors: palette.colors,
+          isBuiltIn: palette.isBuiltIn,
+        },
         create: {
           ...palette,
           userId: 'system',
@@ -279,7 +284,11 @@ export class PaletteService {
     for (const palette of BUILT_IN_NEUTRAL_PALETTES) {
       await prisma.neutralPalette.upsert({
         where: { id: palette.id },
-        update: palette,
+        update: {
+          name: palette.name,
+          colors: palette.colors,
+          isBuiltIn: palette.isBuiltIn,
+        },
         create: {
           ...palette,
           userId: 'system',

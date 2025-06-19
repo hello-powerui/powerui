@@ -3,17 +3,13 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ThemeDescription } from './ThemeDescription';
 import { DataColorsSection } from './DataColorsSection';
 import { ThemeModeSelector } from './ThemeModeSelector';
 import { NeutralPaletteSection } from './NeutralPaletteSection';
 import { StructuralColorsSection } from './StructuralColorsSection';
 import { CanvasLayoutSection } from './CanvasLayoutSection';
-import { TypographySection } from './TypographySection';
 
 interface FoundationSidebarProps {
-  description: string;
-  onDescriptionChange: (desc: string) => void;
   dataColors: string[];
   neutralColors: any;
   structuralColors: any;
@@ -26,8 +22,6 @@ interface FoundationSidebarProps {
 }
 
 export function FoundationSidebar({
-  description,
-  onDescriptionChange,
   dataColors,
   neutralColors,
   structuralColors,
@@ -49,11 +43,6 @@ export function FoundationSidebar({
       
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-6">
-          <ThemeDescription 
-            description={description}
-            onChange={onDescriptionChange}
-          />
-          
           <DataColorsSection 
             dataColors={dataColors}
             onTogglePaletteManager={onTogglePaletteManager}
@@ -74,11 +63,6 @@ export function FoundationSidebar({
           <CanvasLayoutSection 
             canvasLayout={canvasLayout}
             updateThemeDataField={updateThemeDataField}
-          />
-          
-          <TypographySection 
-            textClasses={textClasses}
-            onToggleTextClassesEditor={onToggleTextClassesEditor}
           />
         </div>
       </ScrollArea>

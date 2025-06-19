@@ -55,7 +55,6 @@ export function FontSizeField({ schema, value, onChange, path }: FontSizeFieldPr
     <PropertyWrapper 
       label={schema.title || 'Font Size'} 
       path={path}
-      description={schema.description}
       inline={true}
     >
       <div className="flex items-center gap-2 flex-1">

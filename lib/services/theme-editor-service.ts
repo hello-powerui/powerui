@@ -271,7 +271,7 @@ export class ThemeEditorService {
         ...Object.keys(flatDefault),
       ]);
       
-      for (const key of allKeys) {
+      for (const key of Array.from(allKeys)) {
         if (flatValue[key] !== flatDefault[key]) {
           return true;
         }

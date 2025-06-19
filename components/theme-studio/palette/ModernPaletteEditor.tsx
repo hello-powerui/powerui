@@ -15,7 +15,8 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Plus, Upload, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import { usePaletteStore } from '@/lib/stores/palette-store';
-import type { ColorPalette, NeutralPalette, neutralColorsToShadeMap } from '@/lib/types/unified-palette';
+import type { ColorPalette, NeutralPalette } from '@/lib/types/unified-palette';
+import { neutralColorsToShadeMap } from '@/lib/types/unified-palette';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { HorizontalColorItem } from './HorizontalColorItem';
@@ -70,10 +71,6 @@ export function ModernPaletteEditor({
         const shades = neutralColorsToShadeMap(palette.colors);
         setNeutralShades(shades);
         setBaseColor(shades['500'] || '#6B7280');
-      } else if (type === 'neutral' && 'shades' in palette) {
-        // Handle legacy shades format
-        setNeutralShades(palette.shades);
-        setBaseColor(palette.shades['500'] || '#6B7280');
       }
     } else {
       setName('');
