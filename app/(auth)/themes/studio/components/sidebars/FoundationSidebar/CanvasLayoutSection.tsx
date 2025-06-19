@@ -1,7 +1,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
+// import { Slider } from '@/components/ui/slider';
 
 interface CanvasLayoutSectionProps {
   canvasLayout: any;
@@ -32,6 +32,7 @@ export function CanvasLayoutSection({
         </Select>
       </div>
 
+      {/* Outer Spacing Slider - temporarily disabled
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label className="text-xs">Outer Spacing</Label>
@@ -47,6 +48,7 @@ export function CanvasLayoutSection({
           step={5}
         />
       </div>
+      */}
     </div>
   );
 }

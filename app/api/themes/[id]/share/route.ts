@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db/prisma";
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth();
@@ -13,7 +13,7 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const themeId = params.id;
+    const { id: themeId } = await params;
     const body = await req.json();
     const { visibility, organizationId } = body;
 
@@ -44,7 +44,7 @@ export async function POST(
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth();
@@ -53,7 +53,7 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const themeId = params.id;
+    const { id: themeId } = await params;
 
     // Get theme with sharing info
     const theme = await prisma.theme.findUnique({

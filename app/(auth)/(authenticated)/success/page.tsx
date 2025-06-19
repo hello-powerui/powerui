@@ -75,7 +75,7 @@ export default function SuccessPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 space-y-4">
-              <h3 className="font-semibold text-lg">What's next?</h3>
+              <h3 className="font-semibold text-lg">What&apos;s next?</h3>
               <div className="space-y-3 text-left">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">

@@ -30,7 +30,7 @@ export default function TeamSetupPage() {
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-1">•</span>
-                <span>You'll be the organization admin</span>
+                <span>You&apos;ll be the organization admin</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-1">•</span>

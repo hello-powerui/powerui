@@ -44,7 +44,6 @@ export function FoundationPanel({
   onThemeModeChange,
   onFontFamilyChange,
   onStructuralColorsChange,
-  onStructuralColorsModeChange,
   onTextClassesChange,
   onShowPaletteManager,
   isVisible,

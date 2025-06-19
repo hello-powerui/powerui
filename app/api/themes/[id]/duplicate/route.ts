@@ -4,7 +4,7 @@ import { ThemeService } from '@/lib/db/services/theme-service';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth();
@@ -21,8 +21,9 @@ export async function POST(
       // If no body or invalid JSON, that's okay - we'll use default naming
     }
 
+    const { id } = await params;
     const duplicatedTheme = await ThemeService.duplicateTheme(
-      params.id,
+      id,
       userId,
       newName
     );

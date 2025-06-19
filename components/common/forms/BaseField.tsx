@@ -65,7 +65,7 @@ export function createFormField<T, P = {}>(
     id?: string;
   } & P>
 ) {
-  return React.forwardRef<
+  const FormFieldComponent = React.forwardRef<
     HTMLElement,
     Omit<BaseFieldProps<T>, 'children'> & P
   >(({ label, name, value, onChange, error, description, required, disabled, className, ...props }, ref) => {
@@ -92,4 +92,8 @@ export function createFormField<T, P = {}>(
       </BaseField>
     );
   });
+  
+  FormFieldComponent.displayName = `FormField(${Component.displayName || Component.name || 'Component'})`;
+  
+  return FormFieldComponent;
 }

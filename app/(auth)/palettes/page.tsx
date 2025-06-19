@@ -158,14 +158,12 @@ export default function PalettesPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex gap-0.5">
-                      {Object.entries(palette.shades as Record<string, string>)
-                        .sort(([a], [b]) => parseInt(a) - parseInt(b))
-                        .map(([shade, color]) => (
+                      {palette.colors.map((color, index) => (
                           <div
-                            key={shade}
+                            key={index}
                             className="h-8 w-4 first:rounded-l last:rounded-r"
                             style={{ backgroundColor: color }}
-                            title={`${shade}: ${color}`}
+                            title={color}
                           />
                         ))}
                     </div>
@@ -180,7 +178,6 @@ export default function PalettesPage() {
       <UnifiedPaletteManager
         open={showManager}
         onOpenChange={setShowManager}
-        mode="manage"
         paletteType={managerType}
       />
     </div>

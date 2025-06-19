@@ -5,10 +5,10 @@ import { BUILT_IN_NEUTRAL_PALETTES, toApiNeutralPalette } from '@/lib/constants/
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     // First check built-in palettes
     const builtInPalette = BUILT_IN_NEUTRAL_PALETTES.find(p => p.id === id);
@@ -57,11 +57,11 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireUser();
-    const { id } = params;
+    const { id } = await params;
     const data = await req.json();
     
     if (!data.name || (!data.colors && !data.shades)) {
@@ -96,11 +96,11 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireUser();
-    const { id } = params;
+    const { id } = await params;
     
     // Check if this is a built-in palette (cannot be deleted)
     const builtInPalette = BUILT_IN_NEUTRAL_PALETTES.find(p => p.id === id);
