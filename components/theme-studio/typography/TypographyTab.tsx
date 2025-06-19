@@ -305,7 +305,6 @@ export function TypographyTab() {
               defaultOpen={false}
               headerAction={
                 <div
-                  className="px-3 py-1 rounded-md border border-gray-200 bg-gray-50"
                   style={{
                     fontSize: `${Math.min(textClass.fontSize || 12, 16)}px`,
                     color: colorValue,

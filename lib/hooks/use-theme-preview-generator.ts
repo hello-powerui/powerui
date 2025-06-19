@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-generator';
 import { useDebounce } from '@/lib/hooks/use-debounce';
@@ -13,8 +13,15 @@ export function useThemePreviewGenerator() {
   const isGenerating = useThemeStudioStore((state) => state.isGenerating);
   const setIsGenerating = useThemeStudioStore((state) => state.setIsGenerating);
   
-  // Debounce theme changes for performance
-  const debouncedTheme = useDebounce(theme, 300);
+  // Debounce theme changes for performance, but not when theme ID changes
+  const previousThemeId = useRef(theme.id);
+  const isThemeIdChange = previousThemeId.current !== theme.id;
+  const debouncedTheme = useDebounce(theme, isThemeIdChange ? 0 : 300);
+  
+  useEffect(() => {
+    // Update the previous theme ID
+    previousThemeId.current = theme.id;
+  }, [theme.id]);
   
   useEffect(() => {
     // Skip if palettes aren't resolved yet

@@ -73,7 +73,7 @@ export function CollapsibleSection({
           </button>
         </Collapsible.Trigger>
         {headerAction && (
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+          <div className="flex items-center gap-1">
             {headerAction}
           </div>
         )}

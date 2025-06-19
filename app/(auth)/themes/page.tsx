@@ -38,12 +38,20 @@ const MoreIcon = () => (
   </svg>
 );
 
+// Icon for duplicate
+const DuplicateIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+  </svg>
+);
+
 export default function ThemesPage() {
   const router = useRouter();
   const { isLoaded, isSignedIn } = useUser();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
   
   // Redirect to sign-in if not authenticated
   if (isLoaded && !isSignedIn) {
@@ -89,6 +97,28 @@ export default function ThemesPage() {
       alert('Failed to delete theme');
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleDuplicate = async (themeId: string) => {
+    setDuplicatingId(themeId);
+    try {
+      const response = await fetch(`/api/themes/${themeId}/duplicate`, {
+        method: 'POST',
+      });
+      
+      if (response.ok) {
+        const duplicatedTheme = await response.json();
+        // Refresh the themes list to show the new duplicate
+        await fetchThemes();
+      } else {
+        alert('Failed to duplicate theme');
+      }
+    } catch (error) {
+      // console.error('Failed to duplicate theme:', error);
+      alert('Failed to duplicate theme');
+    } finally {
+      setDuplicatingId(null);
     }
   };
 
@@ -223,6 +253,18 @@ export default function ThemesPage() {
                     className="flex-1 px-3 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     Edit
+                  </button>
+                  <button 
+                    onClick={() => handleDuplicate(theme.id)}
+                    disabled={duplicatingId === theme.id}
+                    className="px-3 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Duplicate theme"
+                  >
+                    {duplicatingId === theme.id ? (
+                      <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <DuplicateIcon />
+                    )}
                   </button>
                   <button 
                     className="px-3 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"

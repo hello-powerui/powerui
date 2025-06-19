@@ -52,8 +52,8 @@ export function useThemeStudio() {
   
   // Reset with change clearing
   const resetTheme = () => {
+    clearChanges(); // Clear changes first
     store.resetTheme();
-    clearChanges();
   };
   
   // Create new theme with change clearing
@@ -134,7 +134,10 @@ export function useThemeStudio() {
     
     // Save/load
     saveTheme,
-    loadTheme: store.loadTheme,
+    loadTheme: (themeData: any) => {
+      clearChanges(); // Clear changes when loading a new theme
+      store.loadTheme(themeData);
+    },
     resetTheme,
     createNewTheme,
     exportTheme: store.exportTheme,

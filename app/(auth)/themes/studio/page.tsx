@@ -29,6 +29,7 @@ function ThemeStudioContent() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showPaletteManager, setShowPaletteManager] = useState(false);
   const [showNeutralPaletteManager, setShowNeutralPaletteManager] = useState(false);
+  const [isThemeLoading, setIsThemeLoading] = useState(false);
   
   // Visual styles local state - sync with theme
   const [visualSettings, setVisualSettings] = useState<Record<string, any>>(() => {
@@ -58,19 +59,24 @@ function ThemeStudioContent() {
     setVisualSettings(styles);
   }, [themeStudio.theme.visualStyles]);
   
+  // Extract themeId to use as dependency
+  const themeId = searchParams.get('themeId');
+  
   // Load theme on mount
   useEffect(() => {
-    const themeId = searchParams.get('themeId');
     if (themeId) {
+      // Reset store state before loading new theme to prevent stale data
+      themeStudio.resetTheme();
       loadTheme(themeId);
     } else {
       // New theme - create a fresh one
       themeStudio.createNewTheme();
     }
-  }, [searchParams]);
+  }, [themeId]);
   
   
   const loadTheme = async (themeId: string) => {
+    setIsThemeLoading(true);
     try {
       const response = await fetch(`/api/themes/${themeId}`);
       if (!response.ok) throw new Error('Failed to load theme');
@@ -88,6 +94,8 @@ function ThemeStudioContent() {
     } catch (error) {
       toast.error('Failed to load theme');
       console.error('Error loading theme:', error);
+    } finally {
+      setIsThemeLoading(false);
     }
   };
   
@@ -146,6 +154,26 @@ function ThemeStudioContent() {
   
   return (
     <div className="flex flex-col h-screen bg-gray-50">
+      {/* Loading Bar */}
+      {isThemeLoading && (
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <div className="h-1 bg-gray-200">
+            <div className="h-full bg-blue-500 animate-pulse" style={{
+              animation: 'loading 1.5s ease-in-out infinite',
+              background: 'linear-gradient(90deg, #3B82F6 0%, #60A5FA 50%, #3B82F6 100%)',
+              backgroundSize: '200% 100%',
+            }}>
+              <style jsx>{`
+                @keyframes loading {
+                  0% { background-position: 200% 0; }
+                  100% { background-position: -200% 0; }
+                }
+              `}</style>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Header */}
       <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-full px-4 sm:px-6 lg:px-8">
@@ -156,9 +184,11 @@ function ThemeStudioContent() {
                 onClick={() => {
                   if (themeStudio.isDirty) {
                     if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
+                      themeStudio.resetTheme(); // Reset store when leaving
                       router.push('/themes');
                     }
                   } else {
+                    themeStudio.resetTheme(); // Reset store when leaving
                     router.push('/themes');
                   }
                 }}
@@ -256,18 +286,31 @@ function ThemeStudioContent() {
 
         {/* Preview Panel - Center */}
         <div className="flex-1 overflow-hidden h-full">
-          <PowerBIPreview 
-            generatedTheme={themeStudio.previewTheme}
-            selectedVisualType={themeStudio.selectedVisual}
-            selectedVariant={themeStudio.selectedVariant}
-            onExitFocusMode={() => {
-              setIsInFocusMode(false);
-              // Don't change the selected visual - keep it selected
-            }}
-            onVariantChange={themeStudio.setSelectedVariant}
-            onReportReset={setReportResetFn}
-            enterFocusMode={isInFocusMode}
-          />
+          {/* Only render Power BI when theme is fully loaded and preview is generated */}
+          {(isThemeLoading || !themeStudio.previewTheme) ? (
+            <div className="flex items-center justify-center h-full bg-gray-50">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                <p className="text-sm text-gray-600">
+                  {isThemeLoading ? 'Loading theme...' : 'Generating preview...'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <PowerBIPreview 
+              key={themeStudio.theme.id || 'new'} // Forces fresh mount when theme ID changes
+              generatedTheme={themeStudio.previewTheme}
+              selectedVisualType={themeStudio.selectedVisual}
+              selectedVariant={themeStudio.selectedVariant}
+              onExitFocusMode={() => {
+                setIsInFocusMode(false);
+                // Don't change the selected visual - keep it selected
+              }}
+              onVariantChange={themeStudio.setSelectedVariant}
+              onReportReset={setReportResetFn}
+              enterFocusMode={isInFocusMode}
+            />
+          )}
         </div>
 
         {/* Visual Styles Sidebar - Right */}

@@ -122,8 +122,9 @@ export class PowerBIService {
   ): Promise<EmbedConfig> {
     const embedConfig = await this.getEmbedToken(reportId, workspaceId);
 
+    // Don't wrap theme here - it will be wrapped by the caller
     if (theme) {
-      embedConfig.theme = { themeJson: theme };
+      embedConfig.theme = theme;
     }
 
     // Add default settings

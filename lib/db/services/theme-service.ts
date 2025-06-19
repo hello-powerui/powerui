@@ -200,4 +200,36 @@ export class ThemeService {
     
     return cached?.generatedJson as object | null
   }
+
+  /**
+   * Duplicate a theme
+   */
+  static async duplicateTheme(
+    themeId: string,
+    userId: string,
+    newName?: string
+  ): Promise<Theme> {
+    // Get the original theme with access check
+    const originalTheme = await this.getThemeById(themeId, userId);
+    
+    if (!originalTheme) {
+      throw new Error('Theme not found or access denied');
+    }
+
+    // Create the duplicate with a new name
+    const duplicatedTheme = await prisma.theme.create({
+      data: {
+        name: newName || `${originalTheme.name} (Copy)`,
+        description: originalTheme.description,
+        themeData: originalTheme.themeData,
+        visibility: 'PRIVATE', // Always set duplicated themes as private
+        isDefault: false,
+        user: {
+          connect: { id: userId },
+        },
+      },
+    });
+
+    return duplicatedTheme;
+  }
 }
