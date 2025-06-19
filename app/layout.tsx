@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Providers } from './providers'
 import { Toaster } from 'sonner'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 import './fonts.css'
 
@@ -22,6 +23,7 @@ export default function RootLayout({
           <main>{children}</main>
           <Toaster position="bottom-right" />
           <Analytics />
+          <SpeedInsights />
         </Providers>
       </body>
     </html>
