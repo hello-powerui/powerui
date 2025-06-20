@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { 
@@ -33,7 +33,7 @@ interface FoundationPanelProps {
   onToggleVisibility: (visible: boolean) => void;
 }
 
-export function FoundationPanel({
+function FoundationPanelComponent({
   theme,
   colorPalette,
   neutralPalette,
@@ -232,3 +232,16 @@ export function FoundationPanel({
     </div>
   );
 }
+
+// Memoize to prevent re-renders when only unrelated props change
+export const FoundationPanel = memo(FoundationPanelComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.isVisible === nextProps.isVisible &&
+    prevProps.theme.colorPaletteId === nextProps.theme.colorPaletteId &&
+    prevProps.theme.neutralPaletteId === nextProps.theme.neutralPaletteId &&
+    prevProps.theme.mode === nextProps.theme.mode &&
+    prevProps.theme.fontFamily === nextProps.theme.fontFamily &&
+    prevProps.colorPalette?.id === nextProps.colorPalette?.id &&
+    prevProps.neutralPalette?.id === nextProps.neutralPalette?.id
+  );
+});

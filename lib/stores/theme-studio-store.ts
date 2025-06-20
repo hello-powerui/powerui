@@ -369,7 +369,9 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       
       saveTheme: async () => {
         const { theme } = get();
-        set({ isSaving: true });
+        
+        // Batch the initial state update
+        set({ isSaving: true }, false); // false prevents re-render
         
         try {
           const isUpdate = theme.id !== undefined;
@@ -393,19 +395,20 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           
           const savedTheme = await response.json();
           
-          // Update ID if it was a create operation
-          if (!isUpdate && savedTheme.id) {
-            set((state) => ({
-              theme: { ...state.theme, id: savedTheme.id },
-              isDirty: false
-            }));
-          } else {
-            set({ isDirty: false });
-          }
+          // Batch all state updates together to prevent multiple re-renders
+          set((state) => ({
+            theme: !isUpdate && savedTheme.id 
+              ? { ...state.theme, id: savedTheme.id }
+              : state.theme,
+            isDirty: false,
+            isSaving: false
+          }));
           
           return savedTheme;
-        } finally {
+        } catch (error) {
+          // Only update isSaving on error
           set({ isSaving: false });
+          throw error;
         }
       },
 

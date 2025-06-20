@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Select,
@@ -51,7 +51,7 @@ interface VisualStylesPanelProps {
   onEnterFocusMode?: () => void;
 }
 
-export function VisualStylesPanel({
+function VisualStylesPanelComponent({
   theme,
   visualSettings,
   selectedVisual,
@@ -567,3 +567,21 @@ export function VisualStylesPanel({
     </div>
   );
 }
+
+// Memoize the component to prevent unnecessary re-renders
+export const VisualStylesPanel = memo(VisualStylesPanelComponent, (prevProps, nextProps) => {
+  // Custom comparison - only re-render if relevant props change
+  return (
+    prevProps.selectedVisual === nextProps.selectedVisual &&
+    prevProps.selectedVariant === nextProps.selectedVariant &&
+    prevProps.selectedState === nextProps.selectedState &&
+    prevProps.selectedSection === nextProps.selectedSection &&
+    JSON.stringify(prevProps.visualSettings) === JSON.stringify(nextProps.visualSettings) &&
+    // Don't re-render for theme name changes
+    prevProps.theme.id === nextProps.theme.id &&
+    prevProps.theme.colorPaletteId === nextProps.theme.colorPaletteId &&
+    prevProps.theme.neutralPaletteId === nextProps.theme.neutralPaletteId &&
+    prevProps.theme.mode === nextProps.theme.mode &&
+    prevProps.theme.fontFamily === nextProps.theme.fontFamily
+  );
+});
