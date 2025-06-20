@@ -79,8 +79,8 @@ export function useThemeStudio() {
     updateTheme({ textClasses });
   }, [updateTheme]);
 
-  // Return combined API without useStableObject - hooks already provide stable references
-  return {
+  // Memoize the return value to prevent unnecessary re-renders
+  return useMemo(() => ({
     // Theme data
     theme: themeData.theme,
     previewTheme,
@@ -131,5 +131,39 @@ export function useThemeStudio() {
     resetTheme: persistence.resetTheme,
     createNewTheme: persistence.createNewTheme,
     exportTheme: persistence.exportTheme,
-  };
+  }), [
+    themeData.theme,
+    previewTheme,
+    colorPalette,
+    neutralPalette,
+    uiState.selectedVisual,
+    uiState.selectedVariant,
+    uiState.selectedState,
+    uiState.selectedSection,
+    palettesLoading,
+    persistence.isSaving,
+    isGenerating,
+    hasChangesValue,
+    changedPaths,
+    updateTheme,
+    setColorPaletteId,
+    setNeutralPaletteId,
+    setThemeMode,
+    setFontFamily,
+    setStructuralColors,
+    setTextClasses,
+    visualStyles.updateVisualStyle,
+    uiState.setSelectedVisual,
+    uiState.setSelectedVariant,
+    uiState.setSelectedState,
+    uiState.setSelectedSection,
+    uiState.getVisualVariants,
+    uiState.createVariant,
+    uiState.deleteVariant,
+    persistence.saveTheme,
+    persistence.loadTheme,
+    persistence.resetTheme,
+    persistence.createNewTheme,
+    persistence.exportTheme
+  ]);
 }
