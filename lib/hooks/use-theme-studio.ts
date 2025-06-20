@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { useThemeStudioPalettes } from './use-theme-studio-palettes';
 import { useThemePreviewGenerator } from './use-theme-preview-generator';
@@ -6,6 +6,9 @@ import { useThemeChanges } from './use-theme-changes';
 import { useStableObject } from './use-stable-object';
 import { toast } from 'sonner';
 import { useRenderDebug } from '@/lib/utils/debug-infinite-renders';
+
+// Stable empty set reference
+const EMPTY_SET = new Set<string>();
 
 /**
  * Main hook for theme studio that combines all functionality
@@ -20,29 +23,27 @@ export function useThemeStudio() {
   const isDirty = useThemeStudioStore((state) => state.isDirty);
   const isSaving = useThemeStudioStore((state) => state.isSaving);
   
-  // Store actions - these are stable references
-  const storeActions = useThemeStudioStore((state) => ({
-    updateTheme: state.updateTheme,
-    setColorPaletteId: state.setColorPaletteId,
-    setNeutralPaletteId: state.setNeutralPaletteId,
-    setThemeMode: state.setThemeMode,
-    setFontFamily: state.setFontFamily,
-    setStructuralColors: state.setStructuralColors,
-    setTextClasses: state.setTextClasses,
-    updateVisualStyle: state.updateVisualStyle,
-    setSelectedVisual: state.setSelectedVisual,
-    setSelectedVariant: state.setSelectedVariant,
-    setSelectedState: state.setSelectedState,
-    setSelectedSection: state.setSelectedSection,
-    getVisualVariants: state.getVisualVariants,
-    createVariant: state.createVariant,
-    deleteVariant: state.deleteVariant,
-    saveTheme: state.saveTheme,
-    resetTheme: state.resetTheme,
-    createNewTheme: state.createNewTheme,
-    loadTheme: state.loadTheme,
-    exportTheme: state.exportTheme
-  }));
+  // Store actions - use individual selectors for stable references
+  const updateThemeAction = useThemeStudioStore((state) => state.updateTheme);
+  const setColorPaletteIdAction = useThemeStudioStore((state) => state.setColorPaletteId);
+  const setNeutralPaletteIdAction = useThemeStudioStore((state) => state.setNeutralPaletteId);
+  const setThemeModeAction = useThemeStudioStore((state) => state.setThemeMode);
+  const setFontFamilyAction = useThemeStudioStore((state) => state.setFontFamily);
+  const setStructuralColorsAction = useThemeStudioStore((state) => state.setStructuralColors);
+  const setTextClassesAction = useThemeStudioStore((state) => state.setTextClasses);
+  const updateVisualStyleAction = useThemeStudioStore((state) => state.updateVisualStyle);
+  const setSelectedVisual = useThemeStudioStore((state) => state.setSelectedVisual);
+  const setSelectedVariant = useThemeStudioStore((state) => state.setSelectedVariant);
+  const setSelectedState = useThemeStudioStore((state) => state.setSelectedState);
+  const setSelectedSection = useThemeStudioStore((state) => state.setSelectedSection);
+  const getVisualVariants = useThemeStudioStore((state) => state.getVisualVariants);
+  const createVariant = useThemeStudioStore((state) => state.createVariant);
+  const deleteVariant = useThemeStudioStore((state) => state.deleteVariant);
+  const saveThemeAction = useThemeStudioStore((state) => state.saveTheme);
+  const resetThemeAction = useThemeStudioStore((state) => state.resetTheme);
+  const createNewThemeAction = useThemeStudioStore((state) => state.createNewTheme);
+  const loadThemeAction = useThemeStudioStore((state) => state.loadTheme);
+  const exportTheme = useThemeStudioStore((state) => state.exportTheme);
   
   // Palette resolution
   const { colorPalette, neutralPalette, isLoading: palettesLoading } = useThemeStudioPalettes();
@@ -50,9 +51,9 @@ export function useThemeStudio() {
   // Preview generation
   const { previewTheme, isGenerating } = useThemePreviewGenerator();
   
-  // Change tracking
-  const changeTracking = useThemeChanges();
-  const hasChangesValue = changeTracking.hasChanges();
+  // Change tracking - destructure to get specific functions
+  const { changedPaths, trackChange, clearChanges, hasChanges } = useThemeChanges();
+  const hasChangesValue = useMemo(() => hasChanges(), [changedPaths]); // Only recalculate when paths change
   
   // Add render debugging
   useRenderDebug('useThemeStudio', {
@@ -67,80 +68,80 @@ export function useThemeStudio() {
   // Combined save function with change tracking
   const saveTheme = useCallback(async () => {
     try {
-      await storeActions.saveTheme();
-      changeTracking.clearChanges();
+      await saveThemeAction();
+      clearChanges();
       toast.success('Theme saved successfully');
     } catch (error) {
       toast.error('Failed to save theme');
       throw error;
     }
-  }, [storeActions, changeTracking]);
+  }, [saveThemeAction, clearChanges]);
   
   // Enhanced theme update with change tracking
-  const updateTheme = useCallback((updates: Parameters<typeof storeActions.updateTheme>[0]) => {
-    storeActions.updateTheme(updates);
+  const updateTheme = useCallback((updates: Parameters<typeof updateThemeAction>[0]) => {
+    updateThemeAction(updates);
     
     // Track changes for the updated keys, but skip visualStyles as it's tracked at a more specific level
     Object.keys(updates).forEach(key => {
       if (key !== 'visualStyles') {
-        changeTracking.trackChange([key]);
+        trackChange([key]);
       }
     });
-  }, [storeActions, changeTracking]);
+  }, [updateThemeAction, trackChange]);
   
   // Enhanced visual style update with change tracking
   const updateVisualStyle = useCallback((visual: string, variant: string, value: any) => {
-    storeActions.updateVisualStyle(visual, variant, value);
-    changeTracking.trackChange(['visualStyles', visual, variant]);
-  }, [storeActions, changeTracking]);
+    updateVisualStyleAction(visual, variant, value);
+    trackChange(['visualStyles', visual, variant]);
+  }, [updateVisualStyleAction, trackChange]);
   
   // Reset with change clearing
   const resetTheme = useCallback(() => {
-    changeTracking.clearChanges(); // Clear changes first
-    storeActions.resetTheme();
-  }, [changeTracking, storeActions]);
+    clearChanges(); // Clear changes first
+    resetThemeAction();
+  }, [clearChanges, resetThemeAction]);
   
   // Create new theme with change clearing
   const createNewTheme = useCallback(() => {
-    changeTracking.clearChanges(); // Clear changes first
-    storeActions.createNewTheme();
-  }, [changeTracking, storeActions]);
+    clearChanges(); // Clear changes first
+    createNewThemeAction();
+  }, [clearChanges, createNewThemeAction]);
   
   // Memoize callbacks that need to be stable
   const setColorPaletteId = useCallback((id: string) => {
-    storeActions.setColorPaletteId(id);
-    changeTracking.trackChange(['colorPaletteId']);
-  }, [storeActions, changeTracking]);
+    setColorPaletteIdAction(id);
+    trackChange(['colorPaletteId']);
+  }, [setColorPaletteIdAction, trackChange]);
   
   const setNeutralPaletteId = useCallback((id: string) => {
-    storeActions.setNeutralPaletteId(id);
-    changeTracking.trackChange(['neutralPaletteId']);
-  }, [storeActions, changeTracking]);
+    setNeutralPaletteIdAction(id);
+    trackChange(['neutralPaletteId']);
+  }, [setNeutralPaletteIdAction, trackChange]);
   
   const setThemeMode = useCallback((mode: 'light' | 'dark') => {
-    storeActions.setThemeMode(mode);
-    changeTracking.trackChange(['mode']);
-  }, [storeActions, changeTracking]);
+    setThemeModeAction(mode);
+    trackChange(['mode']);
+  }, [setThemeModeAction, trackChange]);
   
   const setFontFamily = useCallback((fontFamily: string) => {
-    storeActions.setFontFamily(fontFamily);
-    changeTracking.trackChange(['fontFamily']);
-  }, [storeActions, changeTracking]);
+    setFontFamilyAction(fontFamily);
+    trackChange(['fontFamily']);
+  }, [setFontFamilyAction, trackChange]);
   
   const setStructuralColors = useCallback((colors: any) => {
-    storeActions.setStructuralColors(colors);
-    changeTracking.trackChange(['structuralColors']);
-  }, [storeActions, changeTracking]);
+    setStructuralColorsAction(colors);
+    trackChange(['structuralColors']);
+  }, [setStructuralColorsAction, trackChange]);
   
   const setTextClasses = useCallback((textClasses: any) => {
-    storeActions.setTextClasses(textClasses);
-    changeTracking.trackChange(['textClasses']);
-  }, [storeActions, changeTracking]);
+    setTextClassesAction(textClasses);
+    trackChange(['textClasses']);
+  }, [setTextClassesAction, trackChange]);
   
   const loadTheme = useCallback((themeData: any) => {
-    changeTracking.clearChanges(); // Clear changes when loading a new theme
-    storeActions.loadTheme(themeData);
-  }, [changeTracking, storeActions]);
+    clearChanges(); // Clear changes when loading a new theme
+    loadThemeAction(themeData);
+  }, [clearChanges, loadThemeAction]);
 
   // Create the return object
   const result = {
@@ -165,7 +166,7 @@ export function useThemeStudio() {
     
     // Change tracking
     isDirty: isDirty || hasChangesValue,
-    changedPaths: changeTracking.changedPaths || new Set(),
+    changedPaths: changedPaths || EMPTY_SET,
     
     // Theme actions
     updateTheme,
@@ -178,22 +179,22 @@ export function useThemeStudio() {
     updateVisualStyle,
     
     // UI actions
-    setSelectedVisual: storeActions.setSelectedVisual,
-    setSelectedVariant: storeActions.setSelectedVariant,
-    setSelectedState: storeActions.setSelectedState,
-    setSelectedSection: storeActions.setSelectedSection,
+    setSelectedVisual,
+    setSelectedVariant,
+    setSelectedState,
+    setSelectedSection,
     
     // Variant management
-    getVisualVariants: storeActions.getVisualVariants,
-    createVariant: storeActions.createVariant,
-    deleteVariant: storeActions.deleteVariant,
+    getVisualVariants,
+    createVariant,
+    deleteVariant,
     
     // Save/load
     saveTheme,
     loadTheme,
     resetTheme,
     createNewTheme,
-    exportTheme: storeActions.exportTheme,
+    exportTheme,
   };
   
   // Return a stable object reference
