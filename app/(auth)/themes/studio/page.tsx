@@ -10,7 +10,6 @@ import { UnifiedPaletteManager } from '@/components/theme-studio/palette/Unified
 import { ImportThemeModal } from '@/components/theme-studio/ui/import-theme-modal';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { useRenderDebug, useEffectDebug } from '@/lib/utils/debug-infinite-renders';
 import { ErrorBoundaryWithLogging } from '@/components/debug/ErrorBoundaryWithLogging';
 
 // Icons
@@ -25,11 +24,6 @@ function ThemeStudioContent() {
   const searchParams = useSearchParams();
   const themeStudio = useThemeStudio();
   
-  // Add render debugging
-  useRenderDebug('ThemeStudioContent', {
-    themeStudio: themeStudio,
-    searchParams: searchParams
-  });
   
   // Local UI state
   const [showFoundation, setShowFoundation] = useState(true);
@@ -75,7 +69,7 @@ function ThemeStudioContent() {
   }, [themeStudio, setShowVisualStyles]);
   
   // Load theme on mount
-  useEffectDebug(() => {
+  useEffect(() => {
     if (themeId) {
       // Reset store state before loading new theme to prevent stale data
       themeStudio.resetTheme();
@@ -85,7 +79,7 @@ function ThemeStudioContent() {
       themeStudio.createNewTheme();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [themeId], 'ThemeStudioContent', 'loadTheme'); // Only depend on themeId to avoid infinite loops
+  }, [themeId]); // Only depend on themeId to avoid infinite loops
   
   const handleSave = async () => {
     try {

@@ -6,7 +6,6 @@ import { useThemeVisualStyles } from './use-theme-visual-styles';
 import { useThemeStudioPalettes } from './use-theme-studio-palettes';
 import { useThemePreviewGenerator } from './use-theme-preview-generator';
 import { useThemeChanges } from './use-theme-changes';
-import { useRenderDebug } from '@/lib/utils/debug-infinite-renders';
 
 // Stable empty set reference
 const EMPTY_SET = new Set<string>();
@@ -32,15 +31,6 @@ export function useThemeStudio() {
   const { changedPaths, trackChange, hasChanges } = useThemeChanges();
   const hasChangesValue = useMemo(() => hasChanges(), [changedPaths]);
   
-  // Add render debugging
-  useRenderDebug('useThemeStudio', {
-    theme: themeData.theme,
-    colorPalette,
-    neutralPalette,
-    previewTheme,
-    isGenerating,
-    hasChangesValue
-  });
   
   // Enhanced theme update with change tracking
   const updateTheme = useCallback((updates: Parameters<typeof themeData.updateTheme>[0]) => {

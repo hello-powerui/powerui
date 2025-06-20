@@ -6,7 +6,6 @@ import { useEffect, useState, useRef, useMemo, useCallback, memo } from 'react';
 import { powerBIConfig } from '@/lib/powerbi/config';
 import { PowerBIService } from '@/lib/powerbi/service';
 import { generateFocusedVisualLayout, generateDefaultLayout, VisualInfo } from '@/lib/powerbi/visual-focus-utils';
-import { useRenderDebug, useEffectDebug } from '@/lib/utils/debug-infinite-renders';
 import { 
   Select,
   SelectContent,
@@ -42,13 +41,6 @@ function SimplePowerBIEmbed({
   onReportReset,
   enterFocusMode = false
 }: SimplePowerBIEmbedProps) {
-  // Add render debugging
-  useRenderDebug('SimplePowerBIEmbed', {
-    generatedTheme,
-    selectedVisualType,
-    selectedVariant,
-    enterFocusMode
-  });
   const [embedConfig, setEmbedConfig] = useState<models.IReportEmbedConfiguration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

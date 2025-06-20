@@ -93,10 +93,10 @@ export function UnifiedColorPicker({
     return 'custom';
   };
   
-  const [selectedTab, setSelectedTab] = React.useState(() => getInitialTab());
+  const [selectedTab, setSelectedTab] = React.useState<string>(() => getInitialTab());
   
   // Initialize theme color selection based on current value
-  const getInitialThemeColor = (): number | null => {
+  const getInitialThemeColor = React.useCallback((): number | null => {
     if (!value) return null;
     
     if (typeof value === 'object' && 'solid' in value && value.solid) {
@@ -108,16 +108,16 @@ export function UnifiedColorPicker({
       return value.themeColor.id;
     }
     return null;
-  };
+  }, [value]);
   
-  const getInitialShade = (): number => {
+  const getInitialShade = React.useCallback((): number => {
     if (!value) return 0;
     
     if (typeof value === 'object' && 'themeColor' in value && value.themeColor) {
       return value.themeColor.shade || 0;
     }
     return 0;
-  };
+  }, [value]);
   
   const [selectedThemeColor, setSelectedThemeColor] = React.useState<number | null>(() => getInitialThemeColor());
   const [selectedShade, setSelectedShade] = React.useState(() => getInitialShade());
@@ -130,11 +130,15 @@ export function UnifiedColorPicker({
       return value;
     } else if (typeof value === 'object' && 'solid' in value && value.solid) {
       const color = value.solid.color;
-      if (!color) return '';
+      if (color === undefined || color === null || color === '') return '';
       if (typeof color === 'string') return color;
       if (typeof color === 'object' && color.expr?.ThemeDataColor?.ColorId !== undefined) {
         const colorId = color.expr.ThemeDataColor.ColorId;
         return colorId < themeColors.length ? `Theme Color ${colorId + 1}` : '';
+      }
+      // Handle other object formats
+      if (typeof color === 'object' && 'color' in color) {
+        return color.color || '';
       }
       return '';
     } else if (typeof value === 'object' && 'color' in value && value.color) {
@@ -148,7 +152,7 @@ export function UnifiedColorPicker({
   }
 
   // Extract display value based on format
-  const getDisplayValue = (): string => {
+  const getDisplayValue = React.useCallback((): string => {
     if (!value) {
       return '';
     }
@@ -176,7 +180,7 @@ export function UnifiedColorPicker({
       return colorId < themeColors.length ? `Theme Color ${colorId + 1}${shade !== 0 ? ` (${shade > 0 ? '+' : ''}${shade * 100}%)` : ''}` : '';
     }
     return '';
-  };
+  }, [value, themeColors]);
 
   // Get preview color
   const getPreviewColor = (): string => {
@@ -250,9 +254,14 @@ export function UnifiedColorPicker({
   const handleThemeColorSelect = (colorId: number) => {
     setSelectedThemeColor(colorId);
     if (enableShades) {
+      // Stay on theme tab to allow shade selection
       setSelectedTab('theme');
     } else {
-      handleColorChange(format === 'themestudio' ? { themeColor: { id: colorId, shade: 0 } } : colorId);
+      // Immediately apply the theme color selection
+      const formattedValue = format === 'themestudio' 
+        ? { themeColor: { id: colorId, shade: 0 } } 
+        : colorId;
+      handleColorChange(formattedValue);
     }
   };
 
@@ -320,6 +329,10 @@ export function UnifiedColorPicker({
     const themeColorId = getInitialThemeColor();
     if (themeColorId !== null) {
       setSelectedThemeColor(themeColorId);
+      // Also ensure we're on the theme tab if we have a theme color selected
+      if (enableThemeColors) {
+        setSelectedTab('theme');
+      }
     }
     
     // Update shade
@@ -338,7 +351,20 @@ export function UnifiedColorPicker({
       {description && (
         <p className="text-sm text-muted-foreground">{description}</p>
       )}
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={(newOpen) => {
+        setOpen(newOpen);
+        if (newOpen) {
+          // When opening, ensure tab matches current value
+          const displayValue = getDisplayValue();
+          if (displayValue.startsWith('@') && enableTokens) {
+            setSelectedTab('tokens');
+          } else if (displayValue.startsWith('Theme') && enableThemeColors) {
+            setSelectedTab('theme');
+          } else if (displayValue.startsWith('#')) {
+            setSelectedTab('custom');
+          }
+        }
+      }}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -400,6 +426,7 @@ export function UnifiedColorPicker({
                               size="sm"
                               className="justify-start gap-2 h-8 px-2"
                               onClick={() => handleColorChange(token)}
+                              type="button"
                             >
                               <div
                                 className="h-4 w-4 rounded border border-gray-200 shrink-0"
@@ -465,6 +492,9 @@ export function UnifiedColorPicker({
               <TabsContent value="theme" className="p-3 space-y-3">
                 <div className="space-y-2">
                   <Label>Theme Colors</Label>
+                  {themeColors.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No theme colors available</p>
+                  ) : (
                   <div className="grid grid-cols-2 gap-2">
                     {themeColors.map((color, index) => (
                       <Button
@@ -473,6 +503,7 @@ export function UnifiedColorPicker({
                         size="sm"
                         className="justify-start gap-2"
                         onClick={() => handleThemeColorSelect(index)}
+                        type="button"
                       >
                         <div
                           className="h-4 w-4 rounded border border-gray-200"
@@ -482,6 +513,7 @@ export function UnifiedColorPicker({
                       </Button>
                     ))}
                   </div>
+                  )}
                 </div>
                 {enableShades && selectedThemeColor !== null && (
                   <div className="space-y-2">

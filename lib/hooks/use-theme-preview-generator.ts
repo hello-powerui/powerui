@@ -2,7 +2,6 @@ import { useEffect, useRef, useMemo } from 'react';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-generator';
 import { useDebounce } from '@/lib/hooks/use-debounce';
-import { useEffectDebug } from '@/lib/utils/debug-infinite-renders';
 import isEqual from 'fast-deep-equal';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -50,7 +49,7 @@ export function useThemePreviewGenerator() {
   // Add debouncing to batch rapid changes
   const debouncedVisualProperties = useDebounce(visualProperties, 200);
   
-  useEffectDebug(() => {
+  useEffect(() => {
     // Skip if palettes aren't resolved yet
     if (!colorPalette || !neutralPalette) {
       return;
@@ -114,7 +113,7 @@ export function useThemePreviewGenerator() {
     previewTheme,
     setPreviewTheme,
     setIsGenerating
-  ], 'useThemePreviewGenerator', 'generatePreview');
+  ]);
   
   return {
     previewTheme,
