@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db/prisma'
-import type { User } from '@/lib/generated/prisma'
+import type { User } from '@prisma/client'
 
 export class UserService {
   /**

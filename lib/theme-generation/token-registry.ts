@@ -1,4 +1,4 @@
-import { NeutralPalette } from '@/lib/generated/prisma';
+import { NeutralPalette } from '@prisma/client';
 
 // Type definitions for theme configuration
 export interface ColorPalettes {

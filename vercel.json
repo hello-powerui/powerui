@@ -1,9 +1,25 @@
 {
   "functions": {
+    "app/api/palettes/color/[id]/route.ts": {
+      "maxDuration": 30,
+      "includeFiles": "node_modules/.prisma/client/**"
+    },
+    "app/api/palettes/color/route.ts": {
+      "maxDuration": 30,
+      "includeFiles": "node_modules/.prisma/client/**"
+    },
+    "app/api/palettes/neutral/route.ts": {
+      "maxDuration": 30,
+      "includeFiles": "node_modules/.prisma/client/**"
+    },
+    "app/api/webhooks/clerk/route.ts": {
+      "maxDuration": 30,
+      "includeFiles": "node_modules/.prisma/client/**"
+    },
     "app/api/**/*.ts": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": "node_modules/.prisma/client/**"
     }
   },
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next"
+  "buildCommand": "npm run build"
 }

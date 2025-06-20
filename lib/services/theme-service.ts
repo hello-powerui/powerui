@@ -1,5 +1,5 @@
 import { BaseService } from './base-service';
-import type { Theme, Prisma } from '@/lib/generated/prisma';
+import type { Theme, Prisma } from '@prisma/client';
 import { NotFoundError, AuthorizationError } from '@/lib/errors';
 import { validatePowerBITheme } from '@/lib/types/theme';
 

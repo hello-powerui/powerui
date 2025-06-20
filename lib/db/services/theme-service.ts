@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db/prisma'
-import type { Theme, Prisma } from '@/lib/generated/prisma'
+import type { Theme, Prisma } from '@prisma/client'
 
 export class ThemeService {
   /**

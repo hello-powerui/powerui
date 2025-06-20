@@ -5,7 +5,7 @@ import {
   AuthenticationError, 
   SubscriptionRequiredError 
 } from '@/lib/errors'
-import type { User } from '@/lib/generated/prisma'
+import type { User } from '@prisma/client'
 import type { User as ClerkUser } from '@clerk/nextjs/server'
 
 interface AuthenticatedUser {

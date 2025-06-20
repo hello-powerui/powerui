@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { PowerBITheme, StudioThemeData, SchemaValidationError } from '@/lib/theme-studio/types';
-import { ColorPalette, NeutralPalette } from '@/lib/generated/prisma';
+import { ColorPalette, NeutralPalette } from '@prisma/client';
 import { StructuralColors, TextClasses } from '@/lib/theme-generation/types';
 import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
 

@@ -1,5 +1,5 @@
 import { BaseService } from './base-service';
-import type { User, Prisma } from '@/lib/generated/prisma';
+import type { User, Prisma } from '@prisma/client';
 import { NotFoundError } from '@/lib/errors';
 
 export class UserService extends BaseService {

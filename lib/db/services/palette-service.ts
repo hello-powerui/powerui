@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db/prisma'
-import type { ColorPalette, NeutralPalette, Prisma } from '@/lib/generated/prisma'
+import type { ColorPalette, NeutralPalette, Prisma } from '@prisma/client'
 import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes'
 import { shadeMapToNeutralColors } from '@/lib/types/unified-palette'
 import { BUILT_IN_COLOR_PALETTES, BUILT_IN_NEUTRAL_PALETTES } from '@/lib/constants/built-in-palettes'

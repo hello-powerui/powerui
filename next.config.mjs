@@ -11,7 +11,6 @@ const nextConfig = {
       },
     ],
   },
-  output: 'standalone',
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
   },
