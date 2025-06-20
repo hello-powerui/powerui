@@ -4,6 +4,7 @@ import { PowerBITheme, StudioThemeData, SchemaValidationError } from '@/lib/them
 import { ColorPalette, NeutralPalette } from '@prisma/client';
 import { StructuralColors, TextClasses } from '@/lib/theme-generation/types';
 import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
+import isEqual from 'fast-deep-equal';
 
 // Single unified theme structure
 interface StudioTheme {
@@ -46,17 +47,11 @@ interface ThemeStudioState {
   selectedSection: 'typography' | 'structural' | 'visuals' | 'global';
   selectedState: string; // For state-driven properties (default, hover, selected, etc.)
   expandedPanels: string[];
-  isDirty: boolean;
   isSaving: boolean;
   isLoading: boolean;
   isGenerating: boolean;
   validationErrors: SchemaValidationError[];
   activeTab: 'color' | 'typography' | 'style';
-  
-  // History for undo/redo
-  history: StudioTheme[];
-  historyIndex: number;
-  maxHistorySize: number;
   
   // Theme actions (simplified and unified)
   updateTheme: (updates: Partial<StudioTheme>) => void;
@@ -85,11 +80,6 @@ interface ThemeStudioState {
   getVisualVariants: (visual: string) => string[];
   createVariant: (visual: string, variantName: string) => void;
   deleteVariant: (visual: string, variantName: string) => void;
-  
-  // History actions
-  undo: () => void;
-  redo: () => void;
-  addToHistory: () => void; // Simplified - uses current theme
   
   // Loading/saving actions
   setIsSaving: (saving: boolean) => void;
@@ -140,24 +130,22 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       activeTab: 'color',
       
       // Loading states
-      isDirty: false,
       isSaving: false,
       isLoading: false,
       isGenerating: false,
       validationErrors: [],
-      
-      // History
-      history: [{ ...defaultStudioTheme }],
-      historyIndex: 0,
-      maxHistorySize: 50,
 
       // Theme actions (simplified and unified)
       updateTheme: (updates) =>
         set((state) => {
-          // Check if the update actually changes anything
-          const hasChanges = Object.keys(updates).some(
-            key => state.theme[key as keyof StudioTheme] !== updates[key as keyof StudioTheme]
-          );
+          // Deep equality check for complex properties
+          const hasChanges = Object.keys(updates).some(key => {
+            const oldValue = state.theme[key as keyof StudioTheme];
+            const newValue = updates[key as keyof StudioTheme];
+            
+            // Use fast-deep-equal for accurate comparison
+            return !isEqual(oldValue, newValue);
+          });
           
           if (!hasChanges) {
             return state; // No actual changes, return current state
@@ -165,51 +153,43 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           
           const newTheme = { ...state.theme, ...updates };
           return {
-            theme: newTheme,
-            isDirty: true,
+            theme: newTheme
           };
         }),
         
       setColorPaletteId: (paletteId) =>
         set((state) => ({
-          theme: { ...state.theme, colorPaletteId: paletteId },
-          isDirty: true,
+          theme: { ...state.theme, colorPaletteId: paletteId }
         })),
         
       setNeutralPaletteId: (paletteId) =>
         set((state) => ({
-          theme: { ...state.theme, neutralPaletteId: paletteId },
-          isDirty: true,
+          theme: { ...state.theme, neutralPaletteId: paletteId }
         })),
         
       setThemeMode: (mode) =>
         set((state) => ({
-          theme: { ...state.theme, mode },
-          isDirty: true,
+          theme: { ...state.theme, mode }
         })),
         
       setFontFamily: (fontFamily) =>
         set((state) => ({
-          theme: { ...state.theme, fontFamily },
-          isDirty: true,
+          theme: { ...state.theme, fontFamily }
         })),
         
       setStructuralColors: (structuralColors) =>
         set((state) => ({
-          theme: { ...state.theme, structuralColors },
-          isDirty: true,
+          theme: { ...state.theme, structuralColors }
         })),
         
       setTextClasses: (textClasses) =>
         set((state) => ({
-          theme: { ...state.theme, textClasses },
-          isDirty: true,
+          theme: { ...state.theme, textClasses }
         })),
         
       updateVisualStyles: (visualStyles) =>
         set((state) => ({
-          theme: { ...state.theme, visualStyles },
-          isDirty: true,
+          theme: { ...state.theme, visualStyles }
         })),
         
       updateVisualStyle: (visual, variant, value) =>
@@ -223,8 +203,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           newVisualStyles[visual][variant] = value;
           
           return {
-            theme: { ...state.theme, visualStyles: newVisualStyles },
-            isDirty: true,
+            theme: { ...state.theme, visualStyles: newVisualStyles }
           };
         }),
       
@@ -290,10 +269,8 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           return {
             theme: { ...state.theme, visualStyles: newVisualStyles },
             selectedVariant: variantName,
-            isDirty: true,
           };
         });
-        get().addToHistory();
       },
 
       deleteVariant: (visual, variantName) => {
@@ -309,55 +286,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           return {
             theme: { ...state.theme, visualStyles: newVisualStyles },
             selectedVariant: '*', // Reset to default
-            isDirty: true,
           };
-        });
-        get().addToHistory();
-      },
-
-      // History actions
-      addToHistory: () => {
-        set((state) => {
-          const newHistory = state.history.slice(0, state.historyIndex + 1);
-          newHistory.push({ ...state.theme });
-          
-          // Limit history size
-          if (newHistory.length > state.maxHistorySize) {
-            newHistory.shift();
-          }
-          
-          return {
-            history: newHistory,
-            historyIndex: newHistory.length - 1,
-          };
-        });
-      },
-
-      undo: () => {
-        set((state) => {
-          if (state.historyIndex > 0) {
-            const newIndex = state.historyIndex - 1;
-            return {
-              theme: { ...state.history[newIndex] },
-              historyIndex: newIndex,
-              isDirty: true,
-            };
-          }
-          return state;
-        });
-      },
-
-      redo: () => {
-        set((state) => {
-          if (state.historyIndex < state.history.length - 1) {
-            const newIndex = state.historyIndex + 1;
-            return {
-              theme: { ...state.history[newIndex] },
-              historyIndex: newIndex,
-              isDirty: true,
-            };
-          }
-          return state;
         });
       },
 
@@ -400,8 +329,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
             theme: !isUpdate && savedTheme.id 
               ? { ...state.theme, id: savedTheme.id }
               : state.theme,
-            isDirty: false,
-            isSaving: false
+                  isSaving: false
           }));
           
           return savedTheme;
@@ -439,10 +367,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         };
         
         set({
-          theme,
-          isDirty: false,
-          history: [{ ...theme }],
-          historyIndex: 0,
+          theme
         });
       },
 
@@ -455,10 +380,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           selectedState: 'default',
           selectedSection: 'global',
           expandedPanels: [],
-          isDirty: false,
-          validationErrors: [],
-          history: [{ ...defaultStudioTheme }],
-          historyIndex: 0,
+          validationErrors: []
         });
       },
 
@@ -480,10 +402,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           selectedState: 'default',
           selectedSection: 'typography', // Keep default as typography
           expandedPanels: [],
-          isDirty: false,
-          validationErrors: [],
-          history: [newTheme],
-          historyIndex: 0,
+          validationErrors: []
         });
       },
 

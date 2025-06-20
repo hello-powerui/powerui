@@ -1,8 +1,8 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-generator';
-// import { useDebounce } from '@/lib/hooks/use-debounce'; // Removed debouncing for immediate updates
 import { useEffectDebug } from '@/lib/utils/debug-infinite-renders';
+import isEqual from 'fast-deep-equal';
 
 /**
  * Hook that automatically generates preview themes when theme data changes
@@ -15,7 +15,7 @@ export function useThemePreviewGenerator() {
   const setIsGenerating = useThemeStudioStore((state) => state.setIsGenerating);
   
   // Track previous visual properties for comparison
-  const previousVisualPropsRef = useRef<string>('');
+  const previousVisualPropsRef = useRef<any>(null);
   
   // Extract only the properties that affect visual rendering
   // Use useMemo to create stable reference when properties don't change
@@ -37,12 +37,6 @@ export function useThemePreviewGenerator() {
     theme.textClasses
   ]);
   
-  // Create a stable string representation for comparison
-  const visualPropsString = JSON.stringify(visualProperties);
-  
-  // No debouncing for immediate updates
-  const debouncedVisualProperties = visualProperties;
-  
   useEffectDebug(() => {
     // Skip if palettes aren't resolved yet
     if (!resolved.colorPalette || !resolved.neutralPalette) {
@@ -50,7 +44,7 @@ export function useThemePreviewGenerator() {
     }
     
     // Check if only the name changed
-    const onlyNameChanged = previousVisualPropsRef.current === visualPropsString && 
+    const onlyNameChanged = isEqual(previousVisualPropsRef.current, visualProperties) && 
                            resolved.previewTheme && 
                            resolved.previewTheme.name !== theme.name;
     
@@ -65,8 +59,8 @@ export function useThemePreviewGenerator() {
     }
     
     // Visual properties changed, need to regenerate
-    if (previousVisualPropsRef.current !== visualPropsString) {
-      previousVisualPropsRef.current = visualPropsString;
+    if (!isEqual(previousVisualPropsRef.current, visualProperties)) {
+      previousVisualPropsRef.current = visualProperties;
       
       const generatePreview = async () => {
         setIsGenerating(true);
@@ -75,13 +69,13 @@ export function useThemePreviewGenerator() {
           // Prepare theme input for generator
           const themeInput = {
             name: theme.name,
-            mode: debouncedVisualProperties.mode,
+            mode: visualProperties.mode,
             dataColors: resolved.colorPalette!.colors as string[],
             neutralPalette: resolved.neutralPalette!.colors as string[],
-            fontFamily: debouncedVisualProperties.fontFamily.toLowerCase().replace(/\s+/g, '-'),
-            visualStyles: debouncedVisualProperties.visualStyles,
-            structuralColors: debouncedVisualProperties.structuralColors && Object.keys(debouncedVisualProperties.structuralColors).length > 0 ? debouncedVisualProperties.structuralColors : undefined,
-            textClasses: debouncedVisualProperties.textClasses && Object.keys(debouncedVisualProperties.textClasses).length > 0 ? debouncedVisualProperties.textClasses : undefined
+            fontFamily: visualProperties.fontFamily.toLowerCase().replace(/\s+/g, '-'),
+            visualStyles: visualProperties.visualStyles,
+            structuralColors: visualProperties.structuralColors && Object.keys(visualProperties.structuralColors).length > 0 ? visualProperties.structuralColors : undefined,
+            textClasses: visualProperties.textClasses && Object.keys(visualProperties.textClasses).length > 0 ? visualProperties.textClasses : undefined
           };
           
           // Generate preview using client-side generator
@@ -100,8 +94,7 @@ export function useThemePreviewGenerator() {
       generatePreview();
     }
   }, [
-    visualPropsString,
-    debouncedVisualProperties,
+    visualProperties,
     theme.name,
     resolved.colorPalette,
     resolved.neutralPalette,

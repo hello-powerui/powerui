@@ -54,36 +54,30 @@ export function useThemeStudio() {
     });
   }, [themeData, trackChange]);
   
-  // Wrap theme data actions with change tracking
+  // Wrap theme data actions with change tracking - using batch update
   const setColorPaletteId = useCallback((id: string) => {
-    themeData.setColorPaletteId(id);
-    trackChange(['colorPaletteId']);
-  }, [themeData, trackChange]);
+    updateTheme({ colorPaletteId: id });
+  }, [updateTheme]);
   
   const setNeutralPaletteId = useCallback((id: string) => {
-    themeData.setNeutralPaletteId(id);
-    trackChange(['neutralPaletteId']);
-  }, [themeData, trackChange]);
+    updateTheme({ neutralPaletteId: id });
+  }, [updateTheme]);
   
   const setThemeMode = useCallback((mode: 'light' | 'dark') => {
-    themeData.setThemeMode(mode);
-    trackChange(['mode']);
-  }, [themeData, trackChange]);
+    updateTheme({ mode });
+  }, [updateTheme]);
   
   const setFontFamily = useCallback((fontFamily: string) => {
-    themeData.setFontFamily(fontFamily);
-    trackChange(['fontFamily']);
-  }, [themeData, trackChange]);
+    updateTheme({ fontFamily });
+  }, [updateTheme]);
   
   const setStructuralColors = useCallback((colors: any) => {
-    themeData.setStructuralColors(colors);
-    trackChange(['structuralColors']);
-  }, [themeData, trackChange]);
+    updateTheme({ structuralColors: colors });
+  }, [updateTheme]);
   
   const setTextClasses = useCallback((textClasses: any) => {
-    themeData.setTextClasses(textClasses);
-    trackChange(['textClasses']);
-  }, [themeData, trackChange]);
+    updateTheme({ textClasses });
+  }, [updateTheme]);
 
   // Return combined API without useStableObject - hooks already provide stable references
   return {
@@ -107,7 +101,7 @@ export function useThemeStudio() {
     isGenerating,
     
     // Change tracking
-    isDirty: persistence.isDirty || hasChangesValue,
+    isDirty: hasChangesValue,
     changedPaths: changedPaths || EMPTY_SET,
     
     // Theme actions

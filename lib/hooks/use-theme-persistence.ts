@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 export function useThemePersistence() {
   // Only subscribe to persistence-related state
   const isSaving = useThemeStudioStore((state) => state.isSaving);
-  const isDirty = useThemeStudioStore((state) => state.isDirty);
   
   // Get actions without subscribing to state changes
   const saveThemeAction = useThemeStudioStore((state) => state.saveTheme);
@@ -65,7 +64,6 @@ export function useThemePersistence() {
   return {
     // State
     isSaving,
-    isDirty,
     
     // Actions
     saveTheme,
