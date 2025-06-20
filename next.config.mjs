@@ -11,15 +11,7 @@ const nextConfig = {
       },
     ],
   },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      // Ensure Prisma binaries are included
-      config.externals.push({
-        '@prisma/client': 'commonjs @prisma/client',
-      })
-    }
-    return config
-  },
+  output: 'standalone',
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
   },
