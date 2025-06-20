@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-generator';
+import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useEffectDebug } from '@/lib/utils/debug-infinite-renders';
 import isEqual from 'fast-deep-equal';
 
@@ -37,6 +38,9 @@ export function useThemePreviewGenerator() {
     theme.textClasses
   ]);
   
+  // Add minimal debouncing to prevent infinite renders
+  const debouncedVisualProperties = useDebounce(visualProperties, 50);
+  
   useEffectDebug(() => {
     // Skip if palettes aren't resolved yet
     if (!resolved.colorPalette || !resolved.neutralPalette) {
@@ -44,7 +48,7 @@ export function useThemePreviewGenerator() {
     }
     
     // Check if only the name changed
-    const onlyNameChanged = isEqual(previousVisualPropsRef.current, visualProperties) && 
+    const onlyNameChanged = isEqual(previousVisualPropsRef.current, debouncedVisualProperties) && 
                            resolved.previewTheme && 
                            resolved.previewTheme.name !== theme.name;
     
@@ -59,8 +63,8 @@ export function useThemePreviewGenerator() {
     }
     
     // Visual properties changed, need to regenerate
-    if (!isEqual(previousVisualPropsRef.current, visualProperties)) {
-      previousVisualPropsRef.current = visualProperties;
+    if (!isEqual(previousVisualPropsRef.current, debouncedVisualProperties)) {
+      previousVisualPropsRef.current = debouncedVisualProperties;
       
       const generatePreview = async () => {
         setIsGenerating(true);
@@ -69,13 +73,13 @@ export function useThemePreviewGenerator() {
           // Prepare theme input for generator
           const themeInput = {
             name: theme.name,
-            mode: visualProperties.mode,
+            mode: debouncedVisualProperties.mode,
             dataColors: resolved.colorPalette!.colors as string[],
             neutralPalette: resolved.neutralPalette!.colors as string[],
-            fontFamily: visualProperties.fontFamily.toLowerCase().replace(/\s+/g, '-'),
-            visualStyles: visualProperties.visualStyles,
-            structuralColors: visualProperties.structuralColors && Object.keys(visualProperties.structuralColors).length > 0 ? visualProperties.structuralColors : undefined,
-            textClasses: visualProperties.textClasses && Object.keys(visualProperties.textClasses).length > 0 ? visualProperties.textClasses : undefined
+            fontFamily: debouncedVisualProperties.fontFamily.toLowerCase().replace(/\s+/g, '-'),
+            visualStyles: debouncedVisualProperties.visualStyles,
+            structuralColors: debouncedVisualProperties.structuralColors && Object.keys(debouncedVisualProperties.structuralColors).length > 0 ? debouncedVisualProperties.structuralColors : undefined,
+            textClasses: debouncedVisualProperties.textClasses && Object.keys(debouncedVisualProperties.textClasses).length > 0 ? debouncedVisualProperties.textClasses : undefined
           };
           
           // Generate preview using client-side generator
@@ -94,7 +98,7 @@ export function useThemePreviewGenerator() {
       generatePreview();
     }
   }, [
-    visualProperties,
+    debouncedVisualProperties,
     theme.name,
     resolved.colorPalette,
     resolved.neutralPalette,
