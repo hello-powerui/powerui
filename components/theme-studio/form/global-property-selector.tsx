@@ -221,8 +221,9 @@ export function GlobalPropertySelector({
       
       {/* Global Properties (Complex Properties - CategoryAxis, ValueAxis, etc.) */}
       {selectedComplexProperties.length > 0 ? (
-        <div className="space-y-3">
+        <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">Global Properties</h4>
+          <div className="-space-y-px">
           {selectedComplexProperties.map(propertyName => {
             const schema = complexProperties[propertyName];
             if (!schema) return null;
@@ -304,6 +305,7 @@ export function GlobalPropertySelector({
               </CollapsibleSection>
             );
           })}
+          </div>
         </div>
       ) : (
         <div className="mt-6">

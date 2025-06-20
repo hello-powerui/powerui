@@ -149,7 +149,7 @@ export function StructuralColorsTab() {
         </p>
       </div>
       
-      <div className={THEME_STUDIO_SPACING.sectionGap}>
+      <div className="-space-y-px">
         {Object.entries(STRUCTURAL_COLOR_GROUPS).map(([groupName, { colors, description }]) => (
           <CollapsibleSection
             key={groupName}

@@ -281,7 +281,7 @@ export function TypographyTab() {
         </div>
       </div>
       
-      <div className={THEME_STUDIO_SPACING.sectionGap}>
+      <div className="-space-y-px">
         {TEXT_CLASS_INFO.map(({ name, description, usage }) => {
           const textClass = localTextClasses[name] || {};
           const colorValue = getColorValue(textClass.color);

@@ -185,7 +185,7 @@ export function VisualPropertiesPanel({
       {/* Tab content */}
       <div className="mt-2">
         {activeTab === TAB_TYPES.SPECIFIC ? (
-          <div className="space-y-3">
+          <div className="-space-y-px">
             {specificSections.length > 0 ? (
               specificSections.map(({ name, schema: sectionSchema, title }) => (
                 <VisualPropertySection
@@ -209,7 +209,7 @@ export function VisualPropertiesPanel({
             )}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="-space-y-px">
             {generalSections.length > 0 ? (
               generalSections.map(({ name, schema: sectionSchema, title }) => (
                 <VisualPropertySection
