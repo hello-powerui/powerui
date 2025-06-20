@@ -309,13 +309,11 @@ function ThemeStudioContent() {
               visualSettings={visualSettings}
               selectedVisual={themeStudio.selectedVisual}
               selectedVariant={themeStudio.selectedVariant}
-              selectedState={themeStudio.selectedState}
               selectedSection={themeStudio.selectedSection}
               onVisualSettingsChange={handleVisualSettingsChange}
               onVisualStyleChange={handleVisualStyleChange}
               onSelectedVisualChange={themeStudio.setSelectedVisual}
               onSelectedVariantChange={themeStudio.setSelectedVariant}
-              onSelectedStateChange={themeStudio.setSelectedState}
               onSelectedSectionChange={themeStudio.setSelectedSection}
               onCreateVariant={themeStudio.createVariant}
               onDeleteVariant={themeStudio.deleteVariant}

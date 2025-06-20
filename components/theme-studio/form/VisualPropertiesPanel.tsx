@@ -9,6 +9,8 @@ import { TAB_TYPES } from '@/lib/theme-studio/utils/schema-form-constants';
 import { VisualPropertySection } from './VisualPropertySection';
 import { customVisualComponents } from './custom-visuals';
 import { THEME_STUDIO_TYPOGRAPHY } from '../constants/typography';
+import { VisualStates } from './VisualStates';
+import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 
 interface VisualPropertiesPanelProps {
   schema: SchemaProperty;
@@ -30,6 +32,8 @@ export function VisualPropertiesPanel({
   const [activeTab, setActiveTab] = useState<'specific' | 'general'>(TAB_TYPES.SPECIFIC);
   const hasChangesInSection = useThemeChanges(state => state.hasChangesInSection);
   const getChangedPropertiesCount = useThemeChanges(state => state.getChangedPropertiesCount);
+  const selectedState = useThemeStudioStore(state => state.selectedState);
+  const setSelectedState = useThemeStudioStore(state => state.setSelectedState);
   
   // Check if we have a custom component for this visual type
   // The path structure is typically: ['visualStyles', 'actionButton', '*', '*']
@@ -39,6 +43,9 @@ export function VisualPropertiesPanel({
     visualType = path[1];
   }
   const CustomVisualComponent = customVisualComponents[visualType];
+  
+  // Check if this visual has state-driven properties
+  const hasStateDrivenProperties = visualType && schemaLoader?.visualHasStateDrivenProperties(visualType);
   
   // If we have a custom component, use it instead of generic rendering
   if (CustomVisualComponent) {
@@ -185,7 +192,14 @@ export function VisualPropertiesPanel({
       {/* Tab content */}
       <div className="mt-2">
         {activeTab === TAB_TYPES.SPECIFIC ? (
-          <div className="-space-y-px">
+          <div>
+            {/* Visual States - only shown in Visual Properties tab */}
+            <VisualStates
+              selectedState={selectedState}
+              onSelectedStateChange={setSelectedState}
+              hasStateDrivenProperties={hasStateDrivenProperties || false}
+            />
+            <div className="-space-y-px">
             {specificSections.length > 0 ? (
               specificSections.map(({ name, schema: sectionSchema, title }) => (
                 <VisualPropertySection
@@ -207,6 +221,7 @@ export function VisualPropertiesPanel({
                 No visual-specific properties available for this visual type.
               </p>
             )}
+            </div>
           </div>
         ) : (
           <div className="-space-y-px">

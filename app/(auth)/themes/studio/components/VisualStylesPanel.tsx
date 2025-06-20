@@ -36,13 +36,11 @@ interface VisualStylesPanelProps {
   visualSettings: Record<string, any>;
   selectedVisual: string;
   selectedVariant: string;
-  selectedState: string;
   selectedSection: 'typography' | 'structural' | 'visuals' | 'global';
   onVisualSettingsChange: (visualSettings: Record<string, any>) => void;
   onVisualStyleChange: (visual: string, variant: string, value: any) => void;
   onSelectedVisualChange: (visual: string) => void;
   onSelectedVariantChange: (variant: string) => void;
-  onSelectedStateChange: (state: string) => void;
   onSelectedSectionChange: (section: 'typography' | 'structural' | 'visuals' | 'global') => void;
   onCreateVariant: (visual: string, variantName: string) => void;
   onDeleteVariant: (visual: string, variantName: string) => void;
@@ -56,13 +54,11 @@ function VisualStylesPanelComponent({
   visualSettings,
   selectedVisual,
   selectedVariant,
-  selectedState,
   selectedSection,
   onVisualSettingsChange,
   onVisualStyleChange,
   onSelectedVisualChange,
   onSelectedVariantChange,
-  onSelectedStateChange,
   onSelectedSectionChange,
   onCreateVariant,
   onDeleteVariant,
@@ -101,7 +97,6 @@ function VisualStylesPanelComponent({
     loadSchema();
   }, [schemaLoader]);
 
-  const hasStateDrivenProperties = selectedVisual && schemaLoader?.visualHasStateDrivenProperties(selectedVisual);
   
   // Memoize the variants list to avoid calling getVisualVariants multiple times
   const visualVariants = useMemo(() => 
@@ -201,7 +196,6 @@ function VisualStylesPanelComponent({
               onValueChange={(value) => {
                 onSelectedVisualChange(value);
                 onSelectedVariantChange('*');
-                onSelectedStateChange('default');
               }}
             >
               <SelectTrigger className="h-6 text-sm w-[140px]">
@@ -358,36 +352,6 @@ function VisualStylesPanelComponent({
                 </div>
               </Card>
 
-              {/* Visual State Selector - only show for visuals with state support */}
-              {hasStateDrivenProperties && (
-                <Card className="mb-3 p-4 border-gray-200 shadow-sm">
-                  <div className="space-y-3">
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-900">Visual States</h3>
-                      <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                        Configure how this visual appears in different interaction states. Properties with state support will use the selected state.
-                      </p>
-                    </div>
-                    
-                    <div className="flex gap-1.5">
-                      {['default', 'hover', 'selected', 'disabled'].map(state => (
-                        <button
-                          key={state}
-                          onClick={() => onSelectedStateChange(state)}
-                          className={cn(
-                            "px-3 py-1.5 text-xs font-medium rounded transition-all",
-                            selectedState === state
-                              ? 'bg-gray-900 text-white'
-                              : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
-                          )}
-                        >
-                          {state.charAt(0).toUpperCase() + state.slice(1)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              )}
 
               {/* SchemaForm renders its own tabs with collapsible sections */}
               {schemaLoader && (
@@ -588,7 +552,6 @@ export const VisualStylesPanel = memo(VisualStylesPanelComponent, (prevProps, ne
   return (
     prevProps.selectedVisual === nextProps.selectedVisual &&
     prevProps.selectedVariant === nextProps.selectedVariant &&
-    prevProps.selectedState === nextProps.selectedState &&
     prevProps.selectedSection === nextProps.selectedSection &&
     JSON.stringify(prevProps.visualSettings) === JSON.stringify(nextProps.visualSettings) &&
     // Don't re-render for theme name changes
