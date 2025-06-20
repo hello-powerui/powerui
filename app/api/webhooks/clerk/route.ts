@@ -6,11 +6,12 @@ import { UserService } from '@/lib/db/services/user-service'
 import { prisma } from '@/lib/db/prisma'
 
 export async function POST(req: Request) {
-  // Get the headers
-  const headerPayload = await headers()
-  const svix_id = headerPayload.get("svix-id")
-  const svix_timestamp = headerPayload.get("svix-timestamp")
-  const svix_signature = headerPayload.get("svix-signature")
+  try {
+    // Get the headers
+    const headerPayload = await headers()
+    const svix_id = headerPayload.get("svix-id")
+    const svix_timestamp = headerPayload.get("svix-timestamp")
+    const svix_signature = headerPayload.get("svix-signature")
 
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
@@ -56,9 +57,12 @@ export async function POST(req: Request) {
         await UserService.upsertUser(id, primaryEmail.email_address)
         
       } catch (error) {
-        // console.error('Error syncing user to database:', error)
+        console.error('Error syncing user to database:', error)
         return NextResponse.json(
-          { error: 'Failed to sync user' },
+          { 
+            error: 'Failed to sync user',
+            details: error instanceof Error ? error.message : 'Unknown error'
+          },
           { status: 500 }
         )
       }
@@ -212,4 +216,14 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ received: true })
+  } catch (error) {
+    console.error('Webhook handler error:', error)
+    return NextResponse.json(
+      { 
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    )
+  }
 }
