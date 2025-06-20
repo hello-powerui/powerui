@@ -121,19 +121,20 @@ function VisualStylesPanelComponent({
   }, [visualSettings, selectedVisual, selectedVariant, onVisualSettingsChange, trackChange]);
   
   // Memoize handlers for canvas sections
-  const createCanvasChangeHandler = useCallback((canvasType: string) => (value: any) => {
-    const updatedVisualSettings = {
-      ...visualSettings,
-      [canvasType]: {
-        '*': value
-      }
+  const createCanvasChangeHandler = useCallback((canvasType: string) => {
+    return (value: any) => {
+      const updatedVisualSettings = {
+        ...visualSettings,
+        [canvasType]: {
+          '*': value
+        }
+      };
+      onVisualSettingsChange(updatedVisualSettings);
+      trackChange(['visualStyles', canvasType]);
     };
-    onVisualSettingsChange(updatedVisualSettings);
-    trackChange(['visualStyles', canvasType]);
   }, [visualSettings, onVisualSettingsChange, trackChange]);
-
-  return (
-    <div className="h-full flex flex-col bg-white">
+  
+  return (<div className="h-full flex flex-col bg-white">
       {/* Figma-style Header */}
       <div className="border-b border-gray-200">
         {/* Tabs Row - Figma/Vercel style buttons */}
@@ -247,30 +248,37 @@ function VisualStylesPanelComponent({
                 </p>
               </div>
               
-              {/* Visual Style Variants - Enhanced Section */}
-              <Card className="mb-3 p-4 border-gray-200 shadow-sm">
-                <div className="space-y-3">
+              {/* Visual Style Configuration */}
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 mb-6 border border-purple-200">
+                <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                      Visual Style Variants
-                      <span className="text-xs font-normal text-gray-500">
-                        ({visualVariants.length} {visualVariants.length === 1 ? 'variant' : 'variants'} available)
-                      </span>
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                      </svg>
+                      Style Variants
                     </h3>
-                    <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                      Create different style variations of this visual type. Each variant can have its own unique appearance while maintaining the same data representation.
+                    <p className="text-sm text-gray-600 mt-1">
+                      Create multiple visual styles for different contexts and purposes
+                    </p>
+                    <p className="text-xs text-purple-700 mt-2 font-medium">
+                      ✨ Exclusive feature: Power BI's only style variant editor
                     </p>
                   </div>
+                  <span className="text-sm font-medium text-purple-700 bg-purple-100 px-3 py-1 rounded-full">
+                    {visualVariants.length} {visualVariants.length === 1 ? 'variant' : 'variants'}
+                  </span>
+                </div>
                   
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Select
-                        value={selectedVariant || '*'}
-                        onValueChange={onSelectedVariantChange}
-                      >
-                        <SelectTrigger className="flex-1 h-8 text-xs font-medium">
-                          <SelectValue />
-                        </SelectTrigger>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Select
+                      value={selectedVariant || '*'}
+                      onValueChange={onSelectedVariantChange}
+                    >
+                      <SelectTrigger className="flex-1 h-10 text-sm font-medium bg-white border-gray-300 shadow-sm">
+                        <SelectValue />
+                      </SelectTrigger>
                         <SelectContent>
                           {visualVariants.map(variant => (
                             <SelectItem key={variant} value={variant} className="text-xs">
@@ -280,13 +288,13 @@ function VisualStylesPanelComponent({
                         </SelectContent>
                       </Select>
                       
-                      <div className="flex items-center gap-1 pl-2 border-l border-gray-200">
+                    <div className="flex items-center gap-2">
                         <button
                           onClick={() => setShowVariantDialog(true)}
-                          className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors flex items-center gap-1"
+                          className="px-4 py-2 text-sm font-medium bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors flex items-center gap-1.5 shadow-sm"
                           title="Create a new variant"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-4 h-4" />
                           Create
                         </button>
                         
@@ -321,10 +329,10 @@ function VisualStylesPanelComponent({
                               onSelectedVariantChange(variantName);
                             }
                           }}
-                          className="px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors flex items-center gap-1"
+                          className="px-4 py-2 text-sm font-medium bg-white text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-1.5 border border-gray-300 shadow-sm"
                           title="Duplicate current variant"
                         >
-                          <Copy className="w-3 h-3" />
+                          <Copy className="w-4 h-4" />
                           Duplicate
                         </button>
                         
@@ -336,24 +344,19 @@ function VisualStylesPanelComponent({
                                 onSelectedVariantChange('*');
                               }
                             }}
-                            className="p-1.5 text-xs font-medium text-red-600 rounded hover:bg-red-50 transition-colors"
+                            className="p-2 text-sm font-medium text-red-600 rounded-md hover:bg-red-50 transition-colors"
                             title="Delete variant"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         )}
                       </div>
                     </div>
-                    
-                    <p className="text-sm text-gray-500 leading-relaxed">
-                      Select a variant to customize its properties. The default variant (*) applies when no specific variant is selected.
-                    </p>
                   </div>
                 </div>
-              </Card>
-
-
-              {/* SchemaForm renders its own tabs with collapsible sections */}
+              </div>
+              
+              {/* Properties for the selected variant */}
               {schemaLoader && (
                 <SchemaForm
                   schema={
