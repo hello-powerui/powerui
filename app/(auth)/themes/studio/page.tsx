@@ -33,11 +33,12 @@ function ThemeStudioContent() {
   
   // Visual styles local state - sync with theme
   const [visualSettings, setVisualSettings] = useState<Record<string, any>>(() => {
-    const styles = themeStudio.theme.visualStyles || {};
+    const styles = { ...(themeStudio.theme.visualStyles || {}) };
     // Ensure global properties structure exists
     if (!styles['*']) {
       styles['*'] = { '*': {} };
     } else if (!styles['*']['*']) {
+      styles['*'] = { ...styles['*'] };
       styles['*']['*'] = {};
     }
     return styles;
@@ -49,11 +50,12 @@ function ThemeStudioContent() {
   
   // Sync visual settings with theme
   useEffect(() => {
-    const styles = themeStudio.theme.visualStyles || {};
+    const styles = { ...(themeStudio.theme.visualStyles || {}) };
     // Ensure global properties structure exists when syncing
     if (!styles['*']) {
       styles['*'] = { '*': {} };
     } else if (!styles['*']['*']) {
+      styles['*'] = { ...styles['*'] };
       styles['*']['*'] = {};
     }
     setVisualSettings(styles);
@@ -96,7 +98,8 @@ function ThemeStudioContent() {
       // New theme - create a fresh one
       themeStudio.createNewTheme();
     }
-  }, [themeId, loadTheme, themeStudio]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [themeId]); // Only depend on themeId to avoid infinite loops
   
   const handleSave = async () => {
     try {

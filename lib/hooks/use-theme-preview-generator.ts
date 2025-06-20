@@ -29,42 +29,40 @@ export function useThemePreviewGenerator() {
       return;
     }
     
-    // Skip if already generating
-    if (isGenerating) {
-      return;
-    }
-    
-    setIsGenerating(true);
-    
-    try {
-      // Prepare theme input for generator
-      const themeInput = {
-        name: debouncedTheme.name,
-        mode: debouncedTheme.mode,
-        dataColors: resolved.colorPalette.colors as string[],
-        neutralPalette: resolved.neutralPalette.colors as string[],
-        fontFamily: debouncedTheme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
-        visualStyles: debouncedTheme.visualStyles,
-        structuralColors: debouncedTheme.structuralColors && Object.keys(debouncedTheme.structuralColors).length > 0 ? debouncedTheme.structuralColors : undefined,
-        textClasses: debouncedTheme.textClasses && Object.keys(debouncedTheme.textClasses).length > 0 ? debouncedTheme.textClasses : undefined
-      };
+    const generatePreview = async () => {
+      setIsGenerating(true);
       
-      // Generate preview using client-side generator
-      const previewGenerator = getPreviewGenerator();
-      const previewTheme = previewGenerator.generatePreview(themeInput);
-      
-      setPreviewTheme(previewTheme);
-    } catch (error) {
-      console.error('Failed to generate preview theme:', error);
-      setPreviewTheme(null);
-    } finally {
-      setIsGenerating(false);
-    }
+      try {
+        // Prepare theme input for generator
+        const themeInput = {
+          name: debouncedTheme.name,
+          mode: debouncedTheme.mode,
+          dataColors: resolved.colorPalette.colors as string[],
+          neutralPalette: resolved.neutralPalette.colors as string[],
+          fontFamily: debouncedTheme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
+          visualStyles: debouncedTheme.visualStyles,
+          structuralColors: debouncedTheme.structuralColors && Object.keys(debouncedTheme.structuralColors).length > 0 ? debouncedTheme.structuralColors : undefined,
+          textClasses: debouncedTheme.textClasses && Object.keys(debouncedTheme.textClasses).length > 0 ? debouncedTheme.textClasses : undefined
+        };
+        
+        // Generate preview using client-side generator
+        const previewGenerator = getPreviewGenerator();
+        const previewTheme = previewGenerator.generatePreview(themeInput);
+        
+        setPreviewTheme(previewTheme);
+      } catch (error) {
+        console.error('Failed to generate preview theme:', error);
+        setPreviewTheme(null);
+      } finally {
+        setIsGenerating(false);
+      }
+    };
+    
+    generatePreview();
   }, [
     debouncedTheme,
     resolved.colorPalette,
     resolved.neutralPalette,
-    isGenerating,
     setPreviewTheme,
     setIsGenerating
   ]);
