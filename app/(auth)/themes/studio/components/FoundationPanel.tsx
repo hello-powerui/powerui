@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { ChangeIndicator } from '@/components/theme-studio/ui/change-indicator';
 import { getNeutralPalettePreview } from '@/lib/theme-generation';
 import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
+import { THEME_STUDIO_TYPOGRAPHY } from '@/components/theme-studio/constants/typography';
 
 interface FoundationPanelProps {
   theme: any;
@@ -64,7 +65,7 @@ function FoundationPanelComponent({
         </Button>
         <div className="flex flex-col items-center gap-2 text-gray-600">
           <Palette className="w-5 h-5" />
-          <span className="writing-mode-vertical text-xs">Theme Foundation</span>
+          <span className={`writing-mode-vertical ${THEME_STUDIO_TYPOGRAPHY.description.size}`}>Theme Foundation</span>
         </div>
       </div>
     );
@@ -77,7 +78,7 @@ function FoundationPanelComponent({
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
             <Palette className="w-5 h-5 text-gray-700" />
-            <h2 className="text-lg font-semibold">Theme Foundation</h2>
+            <h2 className={`${THEME_STUDIO_TYPOGRAPHY.panelHeader.size} ${THEME_STUDIO_TYPOGRAPHY.panelHeader.weight}`}>Theme Foundation</h2>
           </div>
           <Button
             variant="ghost"
@@ -97,14 +98,14 @@ function FoundationPanelComponent({
             <div className="flex items-center justify-between mb-3">
               <div>
                 <div className="flex items-center gap-1.5">
-                  <Label className="text-sm font-medium">Data Colors</Label>
+                  <Label className={`${THEME_STUDIO_TYPOGRAPHY.label.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight}`}>Data Colors</Label>
                   <ChangeIndicator hasChanged={hasChanges(['colorPaletteId'])} />
                 </div>
-                <p className="text-xs text-gray-600 mt-0.5">{colorPalette?.name || 'Custom'} • {colorPalette?.colors?.length || 0} colors</p>
+                <p className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color} mt-0.5`}>{colorPalette?.name || 'Custom'} • {colorPalette?.colors?.length || 0} colors</p>
               </div>
               <button
                 onClick={() => onShowPaletteManager('color')}
-                className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 px-3 py-1.5 rounded-md transition-colors font-medium"
+                className={`${THEME_STUDIO_TYPOGRAPHY.button.size} bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 px-3 py-1.5 rounded-md transition-colors ${THEME_STUDIO_TYPOGRAPHY.button.weight}`}
               >
                 Browse & Select
               </button>
@@ -135,13 +136,13 @@ function FoundationPanelComponent({
           {/* Theme Mode */}
           <div className="bg-white rounded-md border border-gray-200 p-4">
             <div className="flex items-center gap-1.5 mb-2">
-              <Label className="text-sm font-medium">Theme Mode</Label>
+              <Label className={`${THEME_STUDIO_TYPOGRAPHY.label.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight}`}>Theme Mode</Label>
               <ChangeIndicator hasChanged={hasChanges(['mode'])} />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => onThemeModeChange('light')}
-                className={`px-3 py-2 text-sm rounded-md border transition-all ${
+                className={`px-3 py-2 ${THEME_STUDIO_TYPOGRAPHY.label.size} rounded-md border transition-all ${
                   theme.mode === 'light'
                     ? 'bg-gray-900 text-white border-gray-900'
                     : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
@@ -154,7 +155,7 @@ function FoundationPanelComponent({
               </button>
               <button
                 onClick={() => onThemeModeChange('dark')}
-                className={`px-3 py-2 text-sm rounded-md border transition-all ${
+                className={`px-3 py-2 ${THEME_STUDIO_TYPOGRAPHY.label.size} rounded-md border transition-all ${
                   theme.mode === 'dark'
                     ? 'bg-gray-900 text-white border-gray-900'
                     : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
@@ -173,21 +174,21 @@ function FoundationPanelComponent({
             <div className="flex items-center justify-between mb-3">
               <div>
                 <div className="flex items-center gap-1.5">
-                  <Label className="text-sm font-medium">Neutral Palette</Label>
+                  <Label className={`${THEME_STUDIO_TYPOGRAPHY.label.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight}`}>Neutral Palette</Label>
                   <ChangeIndicator hasChanged={hasChanges(['neutralPaletteId'])} />
                 </div>
-                <p className="text-xs text-gray-600 mt-0.5">{neutralPalette?.name || 'Azure'}</p>
+                <p className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color} mt-0.5`}>{neutralPalette?.name || 'Azure'}</p>
               </div>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setShowNeutralPreview(!showNeutralPreview)}
-                  className="text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors"
+                  className={`${THEME_STUDIO_TYPOGRAPHY.button.size} text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors`}
                 >
                   {showNeutralPreview ? 'Hide' : 'Show'} Details
                 </button>
                 <button
                   onClick={() => onShowPaletteManager('neutral')}
-                  className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 px-3 py-1.5 rounded-md transition-colors font-medium"
+                  className={`${THEME_STUDIO_TYPOGRAPHY.button.size} bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 px-3 py-1.5 rounded-md transition-colors ${THEME_STUDIO_TYPOGRAPHY.button.weight}`}
                 >
                   Browse & Select
                 </button>
@@ -209,14 +210,14 @@ function FoundationPanelComponent({
             {/* Neutral Palette Details */}
             {showNeutralPreview && (
               <div className="mt-3 pt-3 border-t border-gray-100 space-y-1.5">
-                <p className="text-xs font-medium text-gray-700 mb-2">Auto-mapped to:</p>
+                <p className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight} text-gray-700 mb-2`}>Auto-mapped to:</p>
                 {getNeutralPalettePreview(neutralPalette || AZURE_NEUTRAL_PALETTE, theme.mode).slice(0, 4).map((mapping) => (
                   <div key={mapping.property} className="flex items-center gap-2">
                     <div 
                       className="w-3 h-3 rounded border border-gray-200"
                       style={{ backgroundColor: mapping.value }}
                     />
-                    <span className="text-xs text-gray-600">
+                    <span className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color}`}>
                       {mapping.property.replace(/([A-Z])/g, ' $1').trim()}
                     </span>
                   </div>

@@ -7,6 +7,7 @@ import { ConnectedProperty } from '../ui/connected-property';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 import { getContextualTitle } from '@/lib/theme-studio/utils/schema-form-utils';
+import { THEME_STUDIO_TYPOGRAPHY } from '../constants/typography';
 
 interface VisualPropertySectionProps {
   name: string;
@@ -71,7 +72,7 @@ export function VisualPropertySection({
               handleSectionReset();
             }
           }}
-          className="text-xs text-gray-600 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
+          className={`${THEME_STUDIO_TYPOGRAPHY.button.size} text-gray-600 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer`}
         >
           Reset Section
         </div>
@@ -81,13 +82,13 @@ export function VisualPropertySection({
         {/* Show state indicator if this section has state support */}
         {sectionSchema.items?.properties?.$id && (
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded flex items-center gap-1">
+            <span className={`${THEME_STUDIO_TYPOGRAPHY.description.size} text-gray-700 bg-gray-100 px-2 py-1 rounded flex items-center gap-1`}>
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
               State: {useThemeStudioStore.getState().selectedState || 'default'}
             </span>
-            <span className="text-xs text-gray-500">This section uses the visual state selector</span>
+            <span className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color}`}>This section uses the visual state selector</span>
           </div>
         )}
         

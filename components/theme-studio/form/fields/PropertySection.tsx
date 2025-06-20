@@ -5,6 +5,7 @@ import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { getContextualTitle } from '@/lib/theme-studio/utils/schema-form-utils';
 import { ConnectedProperty } from '../../ui/connected-property';
+import { THEME_STUDIO_TYPOGRAPHY } from '../../constants/typography';
 
 interface PropertySectionProps {
   schema: SchemaProperty;
@@ -39,10 +40,10 @@ export function PropertySection({
   return (
     <div className="space-y-2">
       {!hideTitle && schema.title && (
-        <h4 className="text-sm font-medium text-gray-700">{schema.title}</h4>
+        <h4 className={`${THEME_STUDIO_TYPOGRAPHY.label.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight} text-gray-700`}>{schema.title}</h4>
       )}
       {schema.description && (
-        <p className="text-xs text-gray-500">{schema.description}</p>
+        <p className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color}`}>{schema.description}</p>
       )}
       
       {/* Render the properties from the items schema */}

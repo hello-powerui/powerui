@@ -2,6 +2,7 @@
 
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { useState, useEffect } from 'react';
+import { THEME_STUDIO_TYPOGRAPHY } from '../constants/typography';
 
 // Icons
 const ChevronDownIcon = ({ className }: { className?: string }) => (
@@ -50,23 +51,25 @@ export function CollapsibleSection({
       onOpenChange={setIsOpen} 
       className={`${className}`}
     >
-      <div className="flex items-center justify-between w-full px-2 py-1.5 hover:bg-gray-50 transition-colors group">
+      <div className="flex items-center justify-between w-full px-3 py-2 hover:bg-gray-50 transition-colors group">
         <Collapsible.Trigger asChild>
-          <button className="flex items-center gap-1.5 flex-1 text-left">
+          <button className="flex items-center gap-2 flex-1 text-left">
             <ChevronDownIcon 
-              className={`w-3 h-3 text-gray-400 transition-transform duration-200 ${
+              className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
                 isOpen ? 'transform rotate-180' : ''
               }`} 
             />
             {icon && (
-              <div className="w-3.5 h-3.5 text-gray-500">{icon}</div>
+              <div className="w-4 h-4 text-gray-500">{icon}</div>
             )}
-            <h3 className={`text-[11px] text-gray-700 ${isOpen ? 'font-semibold' : 'font-medium'}`}>{title}</h3>
+            <h3 className={`${THEME_STUDIO_TYPOGRAPHY.sectionHeader.size} text-gray-700 ${
+              isOpen ? THEME_STUDIO_TYPOGRAPHY.sectionHeader.weightExpanded : THEME_STUDIO_TYPOGRAPHY.sectionHeader.weight
+            }`}>{title}</h3>
             {hasChanges && (
-              <div className="w-1 h-1 bg-blue-500 rounded-full" title={`${changedCount || ''} ${changedCount === 1 ? 'change' : 'changes'}`} />
+              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" title={`${changedCount || ''} ${changedCount === 1 ? 'change' : 'changes'}`} />
             )}
             {badge !== undefined && (
-              <span className="px-1 py-0 text-[10px] text-gray-500">
+              <span className={`px-1.5 py-0.5 ${THEME_STUDIO_TYPOGRAPHY.metadata.size} ${THEME_STUDIO_TYPOGRAPHY.metadata.color}`}>
                 ({badge})
               </span>
             )}

@@ -8,6 +8,7 @@ import { formatGroupTitle, getImportantSections } from '@/lib/theme-studio/utils
 import { TAB_TYPES } from '@/lib/theme-studio/utils/schema-form-constants';
 import { VisualPropertySection } from './VisualPropertySection';
 import { customVisualComponents } from './custom-visuals';
+import { THEME_STUDIO_TYPOGRAPHY } from '../constants/typography';
 
 interface VisualPropertiesPanelProps {
   schema: SchemaProperty;
@@ -147,7 +148,7 @@ export function VisualPropertiesPanel({
           <button
             onClick={() => setActiveTab(TAB_TYPES.SPECIFIC)}
             className={`
-              flex-1 whitespace-nowrap py-1 px-2 rounded font-medium text-[11px] transition-all
+              flex-1 whitespace-nowrap py-1.5 px-3 rounded ${THEME_STUDIO_TYPOGRAPHY.button.weight} ${THEME_STUDIO_TYPOGRAPHY.button.size} transition-all
               ${activeTab === TAB_TYPES.SPECIFIC
                 ? 'bg-gray-900 text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
@@ -156,7 +157,7 @@ export function VisualPropertiesPanel({
           >
             Visual Properties
             {specificSections.length > 0 && (
-              <span className={`ml-1.5 text-[10px] ${activeTab === TAB_TYPES.SPECIFIC ? 'text-gray-300' : 'text-gray-500'}`}>
+              <span className={`ml-1.5 ${THEME_STUDIO_TYPOGRAPHY.metadata.size} ${activeTab === TAB_TYPES.SPECIFIC ? 'text-gray-300' : 'text-gray-500'}`}>
                 ({specificSections.length})
               </span>
             )}
@@ -164,7 +165,7 @@ export function VisualPropertiesPanel({
           <button
             onClick={() => setActiveTab(TAB_TYPES.GENERAL)}
             className={`
-              flex-1 whitespace-nowrap py-1 px-2 rounded font-medium text-[11px] transition-all
+              flex-1 whitespace-nowrap py-1.5 px-3 rounded ${THEME_STUDIO_TYPOGRAPHY.button.weight} ${THEME_STUDIO_TYPOGRAPHY.button.size} transition-all
               ${activeTab === TAB_TYPES.GENERAL
                 ? 'bg-gray-900 text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
@@ -173,7 +174,7 @@ export function VisualPropertiesPanel({
           >
             General Properties
             {generalSections.length > 0 && (
-              <span className={`ml-1.5 text-[10px] ${activeTab === TAB_TYPES.GENERAL ? 'text-gray-300' : 'text-gray-500'}`}>
+              <span className={`ml-1.5 ${THEME_STUDIO_TYPOGRAPHY.metadata.size} ${activeTab === TAB_TYPES.GENERAL ? 'text-gray-300' : 'text-gray-500'}`}>
                 ({generalSections.length})
               </span>
             )}
@@ -202,7 +203,7 @@ export function VisualPropertiesPanel({
                 />
               ))
             ) : (
-              <p className="text-sm text-gray-500 text-center py-8">
+              <p className={`${THEME_STUDIO_TYPOGRAPHY.label.size} text-gray-500 text-center py-8`}>
                 No visual-specific properties available for this visual type.
               </p>
             )}
@@ -226,7 +227,7 @@ export function VisualPropertiesPanel({
                 />
               ))
             ) : (
-              <p className="text-sm text-gray-500 text-center py-8">
+              <p className={`${THEME_STUDIO_TYPOGRAPHY.label.size} text-gray-500 text-center py-8`}>
                 No general properties available for this visual type.
               </p>
             )}
