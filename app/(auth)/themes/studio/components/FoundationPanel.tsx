@@ -13,7 +13,6 @@ import {
 import { ChevronLeft, ChevronRight, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ChangeIndicator } from '@/components/theme-studio/ui/change-indicator';
-import { getNeutralPalettePreview } from '@/lib/theme-generation';
 import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 import { THEME_STUDIO_TYPOGRAPHY } from '@/components/theme-studio/constants/typography';
 
@@ -50,7 +49,6 @@ function FoundationPanelComponent({
   isVisible,
   onToggleVisibility,
 }: FoundationPanelProps) {
-  const [showNeutralPreview, setShowNeutralPreview] = useState(false);
   
   if (!isVisible) {
     return (
@@ -179,20 +177,12 @@ function FoundationPanelComponent({
                 </div>
                 <p className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color} mt-0.5`}>{neutralPalette?.name || 'Azure'}</p>
               </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setShowNeutralPreview(!showNeutralPreview)}
-                  className={`${THEME_STUDIO_TYPOGRAPHY.button.size} text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors`}
-                >
-                  {showNeutralPreview ? 'Hide' : 'Show'} Details
-                </button>
-                <button
-                  onClick={() => onShowPaletteManager('neutral')}
-                  className={`${THEME_STUDIO_TYPOGRAPHY.button.size} bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 px-3 py-1.5 rounded-md transition-colors ${THEME_STUDIO_TYPOGRAPHY.button.weight}`}
-                >
-                  Browse & Select
-                </button>
-              </div>
+              <button
+                onClick={() => onShowPaletteManager('neutral')}
+                className={`${THEME_STUDIO_TYPOGRAPHY.button.size} bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 px-3 py-1.5 rounded-md transition-colors ${THEME_STUDIO_TYPOGRAPHY.button.weight}`}
+              >
+                Browse & Select
+              </button>
             </div>
             
             {/* Compact neutral gradient */}
@@ -206,24 +196,6 @@ function FoundationPanelComponent({
                 />
               ))}
             </div>
-            
-            {/* Neutral Palette Details */}
-            {showNeutralPreview && (
-              <div className="mt-3 pt-3 border-t border-gray-100 space-y-1.5">
-                <p className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight} text-gray-700 mb-2`}>Auto-mapped to:</p>
-                {getNeutralPalettePreview(neutralPalette || AZURE_NEUTRAL_PALETTE, theme.mode).slice(0, 4).map((mapping) => (
-                  <div key={mapping.property} className="flex items-center gap-2">
-                    <div 
-                      className="w-3 h-3 rounded border border-gray-200"
-                      style={{ backgroundColor: mapping.value }}
-                    />
-                    <span className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color}`}>
-                      {mapping.property.replace(/([A-Z])/g, ' $1').trim()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
 
 
