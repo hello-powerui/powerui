@@ -162,7 +162,7 @@ function ThemeStudioContent() {
     setVisualSettings(newVisualSettings);
     // Update the theme with new visual styles
     themeStudio.updateTheme({ visualStyles: newVisualSettings });
-  }, [themeStudio]);
+  }, [themeStudio.updateTheme]);
   
   const handleVisualStyleChange = (visual: string, variant: string, value: any) => {
     themeStudio.updateVisualStyle(visual, variant, value);
