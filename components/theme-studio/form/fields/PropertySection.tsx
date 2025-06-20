@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useMemo } from 'react';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { getContextualTitle } from '@/lib/theme-studio/utils/schema-form-utils';
@@ -26,8 +27,14 @@ export function PropertySection({
   hideTitle,
   SchemaForm
 }: PropertySectionProps) {
-  const arrayValue = Array.isArray(value) ? value : [{}];
-  const itemValue = arrayValue.length > 0 ? arrayValue[0] : {};
+  const arrayValue = useMemo(() => Array.isArray(value) ? value : [{}], [value]);
+  const itemValue = useMemo(() => arrayValue.length > 0 ? arrayValue[0] : {}, [arrayValue]);
+  
+  // Memoize the property change handler
+  const handlePropertyChange = useCallback((propName: string, newValue: any) => {
+    const newItemValue = { ...itemValue, [propName]: newValue };
+    onChange([newItemValue]);
+  }, [itemValue, onChange]);
   
   return (
     <div className="space-y-2">
@@ -52,10 +59,7 @@ export function PropertySection({
                 <SchemaForm
                   schema={{ ...propSchema, title: contextualTitle }}
                   value={itemValue[propName]}
-                  onChange={(newValue: any) => {
-                    const newItemValue = { ...itemValue, [propName]: newValue };
-                    onChange([newItemValue]);
-                  }}
+                  onChange={(newValue: any) => handlePropertyChange(propName, newValue)}
                   schemaLoader={schemaLoader}
                   path={fullPath}
                   level={level + 1}

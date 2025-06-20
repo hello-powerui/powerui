@@ -56,6 +56,16 @@ export function SchemaForm({
       trackChangeRef(path);
     }
   }, [onChange, path, trackChangeRef]);
+  
+  // Memoize the star property change handler
+  const handleStarPropertyChange = useCallback((newValue: any) => {
+    // When updating, wrap in the * property if needed
+    if (path.length >= 2 && path[0] === 'visualStyles') {
+      handleChange({ '*': newValue });
+    } else {
+      handleChange(newValue);
+    }
+  }, [path, handleChange]);
 
   // Handle visual style wrapper (e.g., { properties: { "*": { "$ref": "#/definitions/visual-lineChart" } } })
   if (schema.type === 'object' && schema.properties?.['*'] && Object.keys(schema.properties).length === 1) {
@@ -70,14 +80,7 @@ export function SchemaForm({
             <VisualPropertiesPanel
               schema={resolvedSchema}
               value={value['*'] || value || {}}
-              onChange={(newValue) => {
-                // When updating, wrap in the * property if needed
-                if (path.length >= 2 && path[0] === 'visualStyles') {
-                  handleChange({ '*': newValue });
-                } else {
-                  handleChange(newValue);
-                }
-              }}
+              onChange={handleStarPropertyChange}
               schemaLoader={schemaLoader}
               path={[...path, '*']}
               level={level}
@@ -89,14 +92,7 @@ export function SchemaForm({
             <SchemaForm
               schema={resolvedSchema}
               value={value['*'] || value || {}}
-              onChange={(newValue) => {
-                // When updating, wrap in the * property if needed
-                if (path.length >= 2 && path[0] === 'visualStyles') {
-                  handleChange({ '*': newValue });
-                } else {
-                  handleChange(newValue);
-                }
-              }}
+              onChange={handleStarPropertyChange}
               schemaLoader={schemaLoader}
               path={[...path, '*']}
               level={level}

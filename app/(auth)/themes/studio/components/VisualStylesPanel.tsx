@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Select,
@@ -102,6 +102,40 @@ export function VisualStylesPanel({
   }, [schemaLoader]);
 
   const hasStateDrivenProperties = selectedVisual && schemaLoader?.visualHasStateDrivenProperties(selectedVisual);
+  
+  // Memoize the variants list to avoid calling getVisualVariants multiple times
+  const visualVariants = useMemo(() => 
+    selectedVisual ? getVisualVariants(selectedVisual) : []
+  , [selectedVisual, getVisualVariants]);
+  
+  // Memoize the SchemaForm onChange handler
+  const handleSchemaFormChange = useCallback((value: any) => {
+    // Extract the value from the * wrapper
+    const variantValue = value['*'] || value;
+    
+    // Update visual settings directly
+    const updatedVisualSettings = {
+      ...visualSettings,
+      [selectedVisual]: {
+        ...visualSettings[selectedVisual],
+        [selectedVariant]: variantValue
+      }
+    };
+    onVisualSettingsChange(updatedVisualSettings);
+    trackChange(['visualStyles', selectedVisual, selectedVariant]);
+  }, [visualSettings, selectedVisual, selectedVariant, onVisualSettingsChange, trackChange]);
+  
+  // Memoize handlers for canvas sections
+  const createCanvasChangeHandler = useCallback((canvasType: string) => (value: any) => {
+    const updatedVisualSettings = {
+      ...visualSettings,
+      [canvasType]: {
+        '*': value
+      }
+    };
+    onVisualSettingsChange(updatedVisualSettings);
+    trackChange(['visualStyles', canvasType]);
+  }, [visualSettings, onVisualSettingsChange, trackChange]);
 
   return (
     <div className="h-full flex flex-col bg-white">
@@ -219,7 +253,7 @@ export function VisualStylesPanel({
                     <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                       Visual Style Variants
                       <span className="text-xs font-normal text-gray-500">
-                        ({getVisualVariants(selectedVisual).length} {getVisualVariants(selectedVisual).length === 1 ? 'variant' : 'variants'} available)
+                        ({visualVariants.length} {visualVariants.length === 1 ? 'variant' : 'variants'} available)
                       </span>
                     </h3>
                     <p className="text-xs text-gray-600 mt-1 leading-relaxed">
@@ -237,7 +271,7 @@ export function VisualStylesPanel({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {getVisualVariants(selectedVisual).map(variant => (
+                          {visualVariants.map(variant => (
                             <SelectItem key={variant} value={variant} className="text-xs">
                               {variant === '*' ? 'Default Style' : variant}
                             </SelectItem>
@@ -260,7 +294,7 @@ export function VisualStylesPanel({
                             const baseName = selectedVariant === '*' ? 'default' : selectedVariant;
                             let copyNumber = 1;
                             let newName = `${baseName}-copy`;
-                            const variants = getVisualVariants(selectedVisual);
+                            const variants = visualVariants;
                             
                             // Find a unique name
                             while (variants.includes(newName)) {
@@ -356,21 +390,7 @@ export function VisualStylesPanel({
                     { type: 'object' }
                   }
                   value={{ '*': visualSettings[selectedVisual]?.[selectedVariant] || {} }}
-                  onChange={(value) => {
-                    // Extract the value from the * wrapper
-                    const variantValue = value['*'] || value;
-                    
-                    // Update visual settings directly
-                    const updatedVisualSettings = {
-                      ...visualSettings,
-                      [selectedVisual]: {
-                        ...visualSettings[selectedVisual],
-                        [selectedVariant]: variantValue
-                      }
-                    };
-                    onVisualSettingsChange(updatedVisualSettings);
-                    trackChange(['visualStyles', selectedVisual, selectedVariant]);
-                  }}
+                  onChange={handleSchemaFormChange}
                   schemaLoader={schemaLoader!}
                   path={['visualStyles', selectedVisual, selectedVariant]}
                 />
@@ -444,16 +464,7 @@ export function VisualStylesPanel({
                   <SchemaForm
                     schema={schemaLoader?.getVisualSchema('report')?.properties?.['*'] || {}}
                     value={visualSettings.report?.['*'] || {}}
-                    onChange={(value) => {
-                      const updatedVisualSettings = {
-                        ...visualSettings,
-                        report: {
-                          '*': value
-                        }
-                      };
-                      onVisualSettingsChange(updatedVisualSettings);
-                      trackChange(['visualStyles', 'report']);
-                    }}
+                    onChange={createCanvasChangeHandler('report')}
                     schemaLoader={schemaLoader!}
                     path={['visualStyles', 'report', '*']}
                   />
@@ -470,16 +481,7 @@ export function VisualStylesPanel({
                   <SchemaForm
                     schema={schemaLoader?.getVisualSchema('page')?.properties?.['*'] || {}}
                     value={visualSettings.page?.['*'] || {}}
-                    onChange={(value) => {
-                      const updatedVisualSettings = {
-                        ...visualSettings,
-                        page: {
-                          '*': value
-                        }
-                      };
-                      onVisualSettingsChange(updatedVisualSettings);
-                      trackChange(['visualStyles', 'page']);
-                    }}
+                    onChange={createCanvasChangeHandler('page')}
                     schemaLoader={schemaLoader!}
                     path={['visualStyles', 'page', '*']}
                   />
@@ -496,16 +498,7 @@ export function VisualStylesPanel({
                   <SchemaForm
                     schema={schemaLoader?.getVisualSchema('filter')?.properties?.['*'] || {}}
                     value={visualSettings.filter?.['*'] || {}}
-                    onChange={(value) => {
-                      const updatedVisualSettings = {
-                        ...visualSettings,
-                        filter: {
-                          '*': value
-                        }
-                      };
-                      onVisualSettingsChange(updatedVisualSettings);
-                      trackChange(['visualStyles', 'filter']);
-                    }}
+                    onChange={createCanvasChangeHandler('filter')}
                     schemaLoader={schemaLoader!}
                     path={['visualStyles', 'filter', '*']}
                   />
