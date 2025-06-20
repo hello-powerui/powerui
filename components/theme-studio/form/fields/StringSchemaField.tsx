@@ -18,13 +18,13 @@ export function StringSchemaField({ schema, value, onChange, path, inline = true
     if (inline) {
       return (
         <div className="flex items-center gap-3">
-          <label className="text-[11px] font-medium text-gray-700 w-[110px] flex-shrink-0">
+          <label className="text-sm font-medium text-gray-700 w-[110px] flex-shrink-0">
             {schema.title || ''}
           </label>
           <select
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
-            className="flex-1 h-6 rounded border border-gray-200 bg-white px-2 py-0 text-[11px] focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            className="flex-1 h-6 rounded border border-gray-200 bg-white px-2 py-0 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
             title={schema.description}
           >
             {schema.oneOf.map(option => (
@@ -57,13 +57,13 @@ export function StringSchemaField({ schema, value, onChange, path, inline = true
     if (inline) {
       return (
         <div className="flex items-center gap-3">
-          <label className="text-[11px] font-medium text-gray-700 w-[110px] flex-shrink-0">
+          <label className="text-sm font-medium text-gray-700 w-[110px] flex-shrink-0">
             {schema.title || ''}
           </label>
           <select
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
-            className="flex-1 h-6 rounded border border-gray-200 bg-white px-2 py-0 text-[11px] focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            className="flex-1 h-6 rounded border border-gray-200 bg-white px-2 py-0 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
             title={schema.description}
           >
             {schema.enum.map(val => (
@@ -99,7 +99,7 @@ export function StringSchemaField({ schema, value, onChange, path, inline = true
           type="text"
           value={value || ''}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full h-6 rounded border border-gray-200 bg-white px-2 text-[11px] focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+          className="w-full h-6 rounded border border-gray-200 bg-white px-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
           title={schema.description}
         />
       </PropertyWrapper>

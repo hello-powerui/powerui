@@ -280,7 +280,7 @@ function ThemeStudioContent() {
         {/* Foundation Sidebar - Left */}
         <div className={cn(
           "border-r bg-gray-50 transition-all duration-300",
-          showFoundation ? "w-72" : "w-12"
+          showFoundation ? "w-80" : "w-12"
         )}>
           <ErrorBoundaryWithLogging componentName="FoundationPanel">
             <FoundationPanel

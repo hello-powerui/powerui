@@ -31,7 +31,7 @@ export function BooleanControl({
   if (inline) {
     return (
       <div className="flex items-center justify-between gap-2">
-        <Label htmlFor={path.join('-')} className="text-[11px] font-medium text-gray-700 w-[120px] flex-shrink-0 cursor-pointer">
+        <Label htmlFor={path.join('-')} className="text-sm font-medium text-gray-700 w-[120px] flex-shrink-0 cursor-pointer">
           {label}
           {required && <span className="text-[10px] text-red-500 ml-0.5">*</span>}
         </Label>
@@ -61,7 +61,7 @@ export function BooleanControl({
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
-        <Label htmlFor={path.join('-')} className="text-[11px] font-medium cursor-pointer">
+        <Label htmlFor={path.join('-')} className="text-sm font-medium cursor-pointer">
           {label}
           {required && <span className="text-[10px] text-red-500 ml-0.5">*</span>}
         </Label>

@@ -204,7 +204,7 @@ function VisualStylesPanelComponent({
                 onSelectedStateChange('default');
               }}
             >
-              <SelectTrigger className="h-6 text-[11px] w-[140px]">
+              <SelectTrigger className="h-6 text-sm w-[140px]">
                 <SelectValue placeholder="Select visual" />
               </SelectTrigger>
               <SelectContent>
@@ -222,7 +222,7 @@ function VisualStylesPanelComponent({
                 onClick={onEnterFocusMode}
                 variant="outline"
                 size="sm"
-                className="h-6 px-2 text-[11px]"
+                className="h-6 px-2 text-sm"
                 title="View this visual in focus mode"
               >
                 <Focus className="w-3 h-3 mr-1" />
@@ -344,7 +344,7 @@ function VisualStylesPanelComponent({
                       </div>
                     </div>
                     
-                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                    <p className="text-sm text-gray-500 leading-relaxed">
                       Select a variant to customize its properties. The default variant (*) applies when no specific variant is selected.
                     </p>
                   </div>

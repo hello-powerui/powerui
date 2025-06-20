@@ -18,7 +18,7 @@ export function PropertyWrapper({ label, path, children, className = '', inline 
   if (inline) {
     return (
       <div className={`flex items-center gap-3 ${className}`}>
-        <label className="text-[11px] font-medium text-gray-700 w-[110px] flex-shrink-0 flex items-center gap-1">
+        <label className="text-sm font-medium text-gray-700 w-[110px] flex-shrink-0 flex items-center gap-1">
           {label}
           {hasChanged && <div className="w-1 h-1 bg-blue-500 rounded-full" />}
         </label>
@@ -33,7 +33,7 @@ export function PropertyWrapper({ label, path, children, className = '', inline 
     <div className={`relative ${className}`}>
       {label && (
         <div className="flex items-center gap-1 mb-0.5">
-          <label className="text-[11px] font-medium text-gray-700">{label}</label>
+          <label className="text-sm font-medium text-gray-700">{label}</label>
           <ChangeIndicator hasChanged={hasChanged} />
         </div>
       )}

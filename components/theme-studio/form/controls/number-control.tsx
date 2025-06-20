@@ -45,7 +45,7 @@ export function NumberControl({
   if (inline) {
     return (
       <div className="flex items-center gap-3">
-        <Label htmlFor={path.join('-')} className="text-[11px] font-medium text-gray-700 w-[110px] flex-shrink-0">
+        <Label htmlFor={path.join('-')} className="text-sm font-medium text-gray-700 w-[110px] flex-shrink-0">
           {label}
           {required && <span className="text-[10px] text-red-500 ml-0.5">*</span>}
         </Label>
@@ -58,11 +58,11 @@ export function NumberControl({
             min={isPercentage ? 0 : min}
             max={isPercentage ? 100 : max}
             step={isPercentage ? 1 : step}
-            className="h-6 text-[11px] px-2"
+            className="h-6 text-sm px-2"
             title={description}
           />
           {isPercentage && (
-            <span className="text-[11px] text-gray-600">%</span>
+            <span className="text-sm text-gray-600">%</span>
           )}
         </div>
       </div>
@@ -72,7 +72,7 @@ export function NumberControl({
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-1">
-        <Label htmlFor={path.join('-')} className="text-[11px] font-medium text-gray-700">
+        <Label htmlFor={path.join('-')} className="text-sm font-medium text-gray-700">
           {label}
         </Label>
         {required && (
@@ -93,7 +93,7 @@ export function NumberControl({
           min={isPercentage ? 0 : min}
           max={isPercentage ? 100 : max}
           step={isPercentage ? 1 : step}
-          className="flex-1 h-6 text-[11px] px-2"
+          className="flex-1 h-6 text-sm px-2"
         />
         {isPercentage && (
           <span className="text-[11px] text-gray-600">%</span>

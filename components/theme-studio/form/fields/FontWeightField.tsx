@@ -40,7 +40,7 @@ export function FontWeightField({ schema, value, onChange, path, fontFamily = 'S
         value={isValidWeight ? currentValue : availableWeights.includes('400') ? '400' : availableWeights[0]} 
         onValueChange={onChange}
       >
-        <SelectTrigger className="w-full h-6 text-[11px]">
+        <SelectTrigger className="w-full h-6 text-sm">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

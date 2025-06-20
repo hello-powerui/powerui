@@ -22,7 +22,7 @@ export function FontFamilyField({ schema, value, onChange, path }: FontFamilyFie
       inline={true}
     >
       <Select value={value || 'Segoe UI'} onValueChange={onChange}>
-        <SelectTrigger className="w-full h-6 text-[11px]">
+        <SelectTrigger className="w-full h-6 text-sm">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

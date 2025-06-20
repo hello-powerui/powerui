@@ -33,7 +33,7 @@ export function FillControl({
   if (inline) {
     return (
       <div className="flex items-center gap-3">
-        <Label className="text-[11px] font-medium text-gray-700 w-[110px] flex-shrink-0">
+        <Label className="text-sm font-medium text-gray-700 w-[110px] flex-shrink-0">
           {label}
           {required && <span className="text-[10px] text-red-500 ml-0.5">*</span>}
         </Label>
@@ -47,7 +47,7 @@ export function FillControl({
             mode={theme.mode || 'light'}
             neutralPalette={(neutralPalette?.colors as string[]) || []}
             themeColors={(colorPalette?.colors as string[]) || []}
-            className="[&_button]:h-6 [&_button]:text-[11px] [&_button]:px-2"
+            className="[&_button]:h-6 [&_button]:text-sm [&_button]:px-2"
           />
         </div>
       </div>
@@ -56,7 +56,7 @@ export function FillControl({
   
   return (
     <div className="space-y-1">
-      <Label className="text-[11px] font-medium text-gray-700">
+      <Label className="text-sm font-medium text-gray-700">
         {label}
         {required && <span className="text-[10px] text-red-500 ml-0.5">*</span>}
       </Label>

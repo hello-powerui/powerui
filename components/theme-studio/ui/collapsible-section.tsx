@@ -51,18 +51,18 @@ export function CollapsibleSection({
       onOpenChange={setIsOpen} 
       className={`${className}`}
     >
-      <div className="flex items-center justify-between w-full px-3 py-2 hover:bg-gray-50 transition-colors group">
+      <div className="flex items-center justify-between w-full px-3 py-2.5 hover:bg-gray-50 transition-colors group">
         <Collapsible.Trigger asChild>
           <button className="flex items-center gap-2 flex-1 text-left">
             <ChevronDownIcon 
-              className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
+              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
                 isOpen ? 'transform rotate-180' : ''
               }`} 
             />
             {icon && (
-              <div className="w-4 h-4 text-gray-500">{icon}</div>
+              <div className="w-4.5 h-4.5 text-gray-500">{icon}</div>
             )}
-            <h3 className={`${THEME_STUDIO_TYPOGRAPHY.sectionHeader.size} text-gray-700 ${
+            <h3 className={`${THEME_STUDIO_TYPOGRAPHY.sectionHeader.size} text-gray-800 ${
               isOpen ? THEME_STUDIO_TYPOGRAPHY.sectionHeader.weightExpanded : THEME_STUDIO_TYPOGRAPHY.sectionHeader.weight
             }`}>{title}</h3>
             {hasChanges && (

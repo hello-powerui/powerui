@@ -63,7 +63,7 @@ export function FontSizeField({ schema, value, onChange, path }: FontSizeFieldPr
             value={String(currentValue)} 
             onValueChange={handlePresetChange}
           >
-            <SelectTrigger className="w-full h-6 text-[11px]">
+            <SelectTrigger className="w-full h-6 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -83,7 +83,7 @@ export function FontSizeField({ schema, value, onChange, path }: FontSizeFieldPr
               max="100"
               value={currentValue}
               onChange={handleCustomChange}
-              className="flex-1 h-6 text-[11px] px-2"
+              className="flex-1 h-6 text-sm px-2"
               title={`${currentValue}pt (${pixelValue}px)`}
             />
             <Button
@@ -97,7 +97,7 @@ export function FontSizeField({ schema, value, onChange, path }: FontSizeFieldPr
                 );
                 onChange(closest.value);
               }}
-              className="h-6 px-2 text-[11px]"
+              className="h-6 px-2 text-sm"
             >
               Presets
             </Button>
