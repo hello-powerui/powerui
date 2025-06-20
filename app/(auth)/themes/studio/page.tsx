@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useThemeStudio } from '@/lib/hooks/use-theme-studio';
 import { FoundationPanel } from './components/FoundationPanel';
@@ -62,20 +62,7 @@ function ThemeStudioContent() {
   // Extract themeId to use as dependency
   const themeId = searchParams.get('themeId');
   
-  // Load theme on mount
-  useEffect(() => {
-    if (themeId) {
-      // Reset store state before loading new theme to prevent stale data
-      themeStudio.resetTheme();
-      loadTheme(themeId);
-    } else {
-      // New theme - create a fresh one
-      themeStudio.createNewTheme();
-    }
-  }, [themeId]);
-  
-  
-  const loadTheme = async (themeId: string) => {
+  const loadTheme = useCallback(async (themeId: string) => {
     setIsThemeLoading(true);
     try {
       const response = await fetch(`/api/themes/${themeId}`);
@@ -97,7 +84,19 @@ function ThemeStudioContent() {
     } finally {
       setIsThemeLoading(false);
     }
-  };
+  }, [themeStudio, setShowVisualStyles]);
+  
+  // Load theme on mount
+  useEffect(() => {
+    if (themeId) {
+      // Reset store state before loading new theme to prevent stale data
+      themeStudio.resetTheme();
+      loadTheme(themeId);
+    } else {
+      // New theme - create a fresh one
+      themeStudio.createNewTheme();
+    }
+  }, [themeId, loadTheme, themeStudio]);
   
   const handleSave = async () => {
     try {

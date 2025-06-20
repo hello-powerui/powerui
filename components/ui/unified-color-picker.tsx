@@ -325,7 +325,7 @@ export function UnifiedColorPicker({
     // Update shade
     const shade = getInitialShade();
     setSelectedShade(shade);
-  }, [value, enableTokens, enableThemeColors]);
+  }, [value, enableTokens, enableThemeColors, getDisplayValue, getInitialShade, getInitialThemeColor]);
 
   return (
     <div className={cn("space-y-2", className)}>

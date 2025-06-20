@@ -15,14 +15,17 @@ function getValueByPath(obj: any, path: string[]): any {
 export function useThemeProperty(path: string[]) {
   const { currentTheme, updateThemeProperty } = useThemeDataStore();
   
+  // Create a stable string representation of the path
+  const pathKey = path.join('.');
+  
   const value = useMemo(() => 
     getValueByPath(currentTheme, path),
-    [currentTheme, path.join('.')]
+    [currentTheme, pathKey]
   );
   
   const setValue = useCallback((newValue: any) => {
     updateThemeProperty(path, newValue);
-  }, [path.join('.'), updateThemeProperty]);
+  }, [path, updateThemeProperty]);
   
   return [value, setValue] as const;
 }
@@ -58,14 +61,18 @@ export function usePropertyInheritance(
 ) {
   const { currentTheme } = useThemeDataStore();
   
+  // Create stable string representations
+  const pathKey = path.join('.');
+  const globalPathKey = globalPath?.join('.');
+  
   const localValue = useMemo(() => 
     getValueByPath(currentTheme, path),
-    [currentTheme, path.join('.')]
+    [currentTheme, pathKey]
   );
   
   const globalValue = useMemo(() => 
     globalPath ? getValueByPath(currentTheme, globalPath) : undefined,
-    [currentTheme, globalPath?.join('.')]
+    [currentTheme, globalPathKey]
   );
   
   const effectiveValue = localValue ?? globalValue;

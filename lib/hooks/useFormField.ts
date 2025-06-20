@@ -41,13 +41,6 @@ export function useFormField<T>({
   const [touched, setTouched] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
-  // Validate on value change
-  useEffect(() => {
-    if (touched) {
-      validateField();
-    }
-  }, [value, touched]);
-
   const validateField = useCallback((): boolean => {
     // Required validation
     if (required && !value) {
@@ -65,6 +58,13 @@ export function useFormField<T>({
     setError(undefined);
     return true;
   }, [value, validate, required, requiredMessage]);
+
+  // Validate on value change
+  useEffect(() => {
+    if (touched) {
+      validateField();
+    }
+  }, [value, touched, validateField]);
 
   const handleChange = useCallback((newValue: T) => {
     setValue(newValue);

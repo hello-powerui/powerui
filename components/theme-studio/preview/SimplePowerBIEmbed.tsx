@@ -308,14 +308,14 @@ export default function SimplePowerBIEmbed({
     if (onReportReset) {
       onReportReset(resetReport);
     }
-  }, [onReportReset]);
+  }, [onReportReset, resetReport]);
 
   // Effect to handle entering focus mode when prop changes
   useEffect(() => {
     if (enterFocusMode && selectedVisualType !== '*' && !focusMode) {
       setFocusMode(true);
     }
-  }, [enterFocusMode, selectedVisualType]);
+  }, [enterFocusMode, selectedVisualType, focusMode]);
 
   // Effect to prepare visuals when selected visual type changes
   useEffect(() => {
