@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
@@ -28,7 +29,26 @@ export function ArraySchemaField({
   hideTitle,
   SchemaForm 
 }: ArraySchemaFieldProps) {
-  const arrayValue = Array.isArray(value) ? value : [];
+  const arrayValue = useMemo(() => Array.isArray(value) ? value : [], [value]);
+  
+  // Memoize the item change handler
+  const handleItemChange = useCallback((index: number, newItem: any) => {
+    const newArray = [...arrayValue];
+    newArray[index] = newItem;
+    onChange(newArray);
+  }, [arrayValue, onChange]);
+  
+  // Memoize the remove handler
+  const handleRemoveItem = useCallback((index: number) => {
+    const newArray = arrayValue.filter((_, i) => i !== index);
+    onChange(newArray);
+  }, [arrayValue, onChange]);
+  
+  // Memoize the add handler
+  const handleAddItem = useCallback(() => {
+    const newArray = [...arrayValue, {}];
+    onChange(newArray);
+  }, [arrayValue, onChange]);
   
   // Handle property section arrays (Power BI schema pattern)
   if (schema.items?.type === 'object' && schema.items.properties) {
@@ -81,10 +101,7 @@ export function ArraySchemaField({
                 <span className="text-xs font-medium">Item {index + 1}</span>
                 <button
                   type="button"
-                  onClick={() => {
-                    const newArray = arrayValue.filter((_, i) => i !== index);
-                    onChange(newArray);
-                  }}
+                  onClick={() => handleRemoveItem(index)}
                   className="text-red-500 hover:text-red-700 text-xs"
                 >
                   Remove
@@ -94,11 +111,7 @@ export function ArraySchemaField({
                 <SchemaForm
                   schema={schema.items}
                   value={item}
-                  onChange={(newItem: any) => {
-                    const newArray = [...arrayValue];
-                    newArray[index] = newItem;
-                    onChange(newArray);
-                  }}
+                  onChange={(newItem: any) => handleItemChange(index, newItem)}
                   schemaLoader={schemaLoader}
                   path={[...path, String(index)]}
                   level={level + 1}
@@ -109,10 +122,7 @@ export function ArraySchemaField({
           ))}
           <button
             type="button"
-            onClick={() => {
-              const newArray = [...arrayValue, {}];
-              onChange(newArray);
-            }}
+            onClick={handleAddItem}
             className="px-2.5 py-1 text-xs font-medium bg-gray-100 hover:bg-gray-200 rounded"
           >
             + Add Item

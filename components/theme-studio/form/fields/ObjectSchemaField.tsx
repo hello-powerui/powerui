@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
@@ -28,7 +29,14 @@ export function ObjectSchemaField({
   SchemaForm,
   VisualPropertiesRenderer
 }: ObjectSchemaFieldProps) {
-  const objectValue = typeof value === 'object' && value !== null ? value : {};
+  const objectValue = useMemo(() => 
+    typeof value === 'object' && value !== null ? value : {}
+  , [value]);
+  
+  // Memoize the property change handler
+  const handlePropertyChange = useCallback((propName: string, newValue: any) => {
+    onChange({ ...objectValue, [propName]: newValue });
+  }, [objectValue, onChange]);
   
   // Check if this is a visual style object with a "*" property that has a $ref
   const starProperty = schema.properties?.['*'];
@@ -114,9 +122,7 @@ export function ObjectSchemaField({
             key={propName}
             schema={{ ...propSchema, title: contextualTitle }}
             value={objectValue[propName]}
-            onChange={(newValue: any) => {
-              onChange({ ...objectValue, [propName]: newValue });
-            }}
+            onChange={(newValue: any) => handlePropertyChange(propName, newValue)}
             schemaLoader={schemaLoader}
             path={fullPath}
             level={level + 1}
