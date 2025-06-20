@@ -184,12 +184,6 @@ export function ActionButtonVisual({
       <div className="mt-4">
         {activeTab === TAB_TYPES.SPECIFIC ? (
           <div className="space-y-4">
-            {/* Visual States selector */}
-            <VisualStates
-              selectedState={globalSelectedState}
-              onSelectedStateChange={setSelectedState}
-              hasStateDrivenProperties={true}
-            />
             {/* Fill and Text toggles - separated from Visual State controls 
                 Note: Both fill and text toggles are placed at the top level because in Power BI's action button,
                 the "show" property for both is not state-dependent (unlike other properties).
@@ -238,36 +232,23 @@ export function ActionButtonVisual({
               </div>
             )}
             
-            {/* Visual State Section */}
-            <div className="border-t pt-4">
-              <h3 className="text-sm font-semibold text-gray-800 mb-3">Visual State Properties</h3>
-            </div>
+            {/* Visual States selector with state-aware properties */}
+            <VisualStates
+              selectedState={globalSelectedState}
+              onSelectedStateChange={setSelectedState}
+              hasStateDrivenProperties={true}
+            >
+              <div className="-space-y-px">
             
-            {/* Visual State Selector */}
-            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  <span className="text-sm font-medium text-blue-900">Visual State</span>
-                </div>
-                <span className="text-sm text-blue-700 font-medium">{globalSelectedState}</span>
-              </div>
-              <p className="text-xs text-blue-600 mt-1">
-                The properties below apply to the <strong>{globalSelectedState}</strong> state
-              </p>
-            </div>
-            
-            {/* Fill Properties (state-aware) - using schema without show */}
-            {fillSchemaWithoutShow && fillShowValue && (
-              <CollapsibleSection
-                id={`${path.join('-')}-fill`}
-                title="Fill Properties"
-                defaultOpen={true}
-                hasChanges={hasChangesInSection([...path, 'fill'])}
-                changedCount={getChangedPropertiesCount([...path, 'fill'])}
-              >
+                {/* Fill Properties (state-aware) - using schema without show */}
+                {fillSchemaWithoutShow && fillShowValue && (
+                  <CollapsibleSection
+                    id={`${path.join('-')}-fill`}
+                    title="Fill Properties"
+                    defaultOpen={false}
+                    hasChanges={hasChangesInSection([...path, 'fill'])}
+                    changedCount={getChangedPropertiesCount([...path, 'fill'])}
+                  >
                 <StateAwarePropertySection
                   schema={fillSchemaWithoutShow}
                   value={value?.fill}
@@ -278,18 +259,18 @@ export function ActionButtonVisual({
                   hideTitle={true}
                   SchemaForm={SchemaForm}
                 />
-              </CollapsibleSection>
-            )}
-            
-            {/* Text Properties (state-aware) - using schema without show */}
-            {textSchemaWithoutShow && textShowValue && (
-              <CollapsibleSection
-                id={`${path.join('-')}-text`}
-                title="Text Properties"
-                defaultOpen={true}
-                hasChanges={hasChangesInSection([...path, 'text'])}
-                changedCount={getChangedPropertiesCount([...path, 'text'])}
-              >
+                  </CollapsibleSection>
+                )}
+                
+                {/* Text Properties (state-aware) - using schema without show */}
+                {textSchemaWithoutShow && textShowValue && (
+                  <CollapsibleSection
+                    id={`${path.join('-')}-text`}
+                    title="Text Properties"
+                    defaultOpen={false}
+                    hasChanges={hasChangesInSection([...path, 'text'])}
+                    changedCount={getChangedPropertiesCount([...path, 'text'])}
+                  >
                 <StateAwarePropertySection
                   schema={textSchemaWithoutShow}
                   value={value?.text}
@@ -300,11 +281,11 @@ export function ActionButtonVisual({
                   hideTitle={true}
                   SchemaForm={SchemaForm}
                 />
-              </CollapsibleSection>
-            )}
-            
-            {/* Other State-Aware Properties */}
-            {Object.entries(stateAwareProperties).map(([propName, propSchema]) => {
+                  </CollapsibleSection>
+                )}
+                
+                {/* Other State-Aware Properties */}
+                {Object.entries(stateAwareProperties).map(([propName, propSchema]) => {
               // For shape property, we need to add $id support to the schema
               let modifiedSchema = propSchema;
               if (propName === 'shape' && propSchema.items?.properties) {
@@ -330,15 +311,15 @@ export function ActionButtonVisual({
                 };
               }
               
-              return (
-                <CollapsibleSection
-                  key={propName}
-                  id={`${path.join('-')}-${propName}`}
-                  title={propSchema.title || formatGroupTitle(propName)}
-                  defaultOpen={false}
-                  hasChanges={hasChangesInSection([...path, propName])}
-                  changedCount={getChangedPropertiesCount([...path, propName])}
-                >
+                  return (
+                    <CollapsibleSection
+                      key={propName}
+                      id={`${path.join('-')}-${propName}`}
+                      title={propSchema.title || formatGroupTitle(propName)}
+                      defaultOpen={false}
+                      hasChanges={hasChangesInSection([...path, propName])}
+                      changedCount={getChangedPropertiesCount([...path, propName])}
+                    >
                   <StateAwarePropertySection
                     schema={modifiedSchema}
                     value={value?.[propName]}
@@ -349,9 +330,11 @@ export function ActionButtonVisual({
                     hideTitle={true}
                     SchemaForm={SchemaForm}
                   />
-                </CollapsibleSection>
-              );
-            })}
+                    </CollapsibleSection>
+                  );
+                })}
+              </div>
+            </VisualStates>
             
             {/* Visual-Specific Properties (non-state-aware) */}
             {Object.keys(visualSpecificProperties).length > 0 && (

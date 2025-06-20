@@ -199,30 +199,51 @@ export function VisualPropertiesPanel({
               selectedState={selectedState}
               onSelectedStateChange={setSelectedState}
               hasStateDrivenProperties={hasStateDrivenProperties || false}
-            />
-            <div className="-space-y-px">
-            {specificSections.length > 0 ? (
-              specificSections.map(({ name, schema: sectionSchema, title }) => (
-                <VisualPropertySection
-                  key={name}
-                  name={name}
-                  schema={sectionSchema}
-                  title={title}
-                  value={value}
-                  onChange={onChange}
-                  schemaLoader={schemaLoader}
-                  path={path}
-                  level={level}
-                  hasChanges={hasChangesInSection([...path, name])}
-                  changedCount={getChangedPropertiesCount([...path, name])}
-                />
-              ))
-            ) : (
+            >
+              {specificSections.length > 0 && (
+                <div className="-space-y-px">
+                  {specificSections.map(({ name, schema: sectionSchema, title }) => (
+                    <VisualPropertySection
+                      key={name}
+                      name={name}
+                      schema={sectionSchema}
+                      title={title}
+                      value={value}
+                      onChange={onChange}
+                      schemaLoader={schemaLoader}
+                      path={path}
+                      level={level}
+                      hasChanges={hasChangesInSection([...path, name])}
+                      changedCount={getChangedPropertiesCount([...path, name])}
+                    />
+                  ))}
+                </div>
+              )}
+            </VisualStates>
+            {!hasStateDrivenProperties && specificSections.length > 0 && (
+              <div className="-space-y-px">
+                {specificSections.map(({ name, schema: sectionSchema, title }) => (
+                  <VisualPropertySection
+                    key={name}
+                    name={name}
+                    schema={sectionSchema}
+                    title={title}
+                    value={value}
+                    onChange={onChange}
+                    schemaLoader={schemaLoader}
+                    path={path}
+                    level={level}
+                    hasChanges={hasChangesInSection([...path, name])}
+                    changedCount={getChangedPropertiesCount([...path, name])}
+                  />
+                ))}
+              </div>
+            )}
+            {specificSections.length === 0 && (
               <p className={`${THEME_STUDIO_TYPOGRAPHY.label.size} text-gray-500 text-center py-8`}>
                 No visual-specific properties available for this visual type.
               </p>
             )}
-            </div>
           </div>
         ) : (
           <div className="-space-y-px">

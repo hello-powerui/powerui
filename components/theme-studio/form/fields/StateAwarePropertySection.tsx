@@ -240,12 +240,7 @@ export function StateAwarePropertySection({
   return (
     <div className="space-y-2">
       {!hideTitle && schema.title && (
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-medium text-gray-700">{schema.title}</h4>
-          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-            State: {globalSelectedState}
-          </span>
-        </div>
+        <h4 className="text-sm font-medium text-gray-700">{schema.title}</h4>
       )}
       {schema.description && (
         <p className="text-xs text-gray-500">{schema.description}</p>

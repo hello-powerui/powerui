@@ -6,6 +6,7 @@ interface VisualStatesProps {
   selectedState: string;
   onSelectedStateChange: (state: string) => void;
   hasStateDrivenProperties: boolean;
+  children?: React.ReactNode;
 }
 
 const states = ['default', 'hover', 'selected', 'disabled'] as const;
@@ -13,7 +14,8 @@ const states = ['default', 'hover', 'selected', 'disabled'] as const;
 export function VisualStates({ 
   selectedState, 
   onSelectedStateChange,
-  hasStateDrivenProperties 
+  hasStateDrivenProperties,
+  children 
 }: VisualStatesProps) {
   if (!hasStateDrivenProperties) {
     return null;
@@ -25,7 +27,7 @@ export function VisualStates({
         <div>
           <h3 className="text-sm font-semibold text-gray-900">Visual States</h3>
           <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-            Configure how this visual appears in different interaction states. Properties with state support will use the selected state.
+            Configure how this visual appears in different interaction states.
           </p>
         </div>
         <div className="flex gap-1.5">
@@ -45,6 +47,11 @@ export function VisualStates({
             </button>
           ))}
         </div>
+        {children && (
+          <div className="pt-3 border-t border-gray-200">
+            {children}
+          </div>
+        )}
       </div>
     </Card>
   );
