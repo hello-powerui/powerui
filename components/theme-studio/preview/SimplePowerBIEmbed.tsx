@@ -2,7 +2,7 @@
 
 import { PowerBIEmbed } from 'powerbi-client-react';
 import { models, Report, Page, VisualDescriptor } from 'powerbi-client';
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { powerBIConfig } from '@/lib/powerbi/config';
 import { PowerBIService } from '@/lib/powerbi/service';
 import { generateFocusedVisualLayout, generateDefaultLayout, VisualInfo } from '@/lib/powerbi/visual-focus-utils';
@@ -214,7 +214,7 @@ export default function SimplePowerBIEmbed({
   }, [variantPreviewTheme, isReportReady]);
 
   // Discover visuals in the report
-  const discoverVisuals = async () => {
+  const discoverVisuals = useCallback(async () => {
     if (!reportRef.current) return;
     
     try {
@@ -246,10 +246,10 @@ export default function SimplePowerBIEmbed({
     } catch (error) {
       // console.error('Error discovering visuals:', error);
     }
-  };
+  }, []);
 
   // Apply focus mode layout
-  const applyFocusMode = async () => {
+  const applyFocusMode = useCallback(async () => {
     if (!reportRef.current || !currentPageRef.current) return;
     
     try {
@@ -279,10 +279,10 @@ export default function SimplePowerBIEmbed({
     } catch (error) {
       // console.error('Error applying focus mode:', error);
     }
-  };
+  }, [focusMode, selectedVisualType, visuals]);
 
   // Reset report to original state
-  const resetReport = async () => {
+  const resetReport = useCallback(async () => {
     if (!reportRef.current || isResetting) return;
     
     setIsResetting(true);
@@ -308,7 +308,7 @@ export default function SimplePowerBIEmbed({
     } finally {
       setIsResetting(false);
     }
-  };
+  }, [isResetting]);
 
 
   // Expose reset function to parent
@@ -331,17 +331,17 @@ export default function SimplePowerBIEmbed({
       // Discover visuals when a specific visual is selected
       discoverVisuals();
     }
-  }, [selectedVisualType, isReportReady]);
+  }, [selectedVisualType, isReportReady, discoverVisuals]);
 
   // Effect to apply/remove focus mode
   useEffect(() => {
     if (reportRef.current && visuals.length > 0) {
       applyFocusMode();
     }
-  }, [focusMode, selectedVisualType, visuals]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [applyFocusMode]); // applyFocusMode already depends on focusMode, selectedVisualType, visuals
 
 
-  const eventHandlers = new Map([
+  const eventHandlers = useMemo(() => new Map([
     ['loaded', function () {
       setIsReportReady(true);
       // Discover visuals immediately after report loads
@@ -360,7 +360,7 @@ export default function SimplePowerBIEmbed({
       // Re-discover visuals on page change
       discoverVisuals();
     }]
-  ]);
+  ]), [discoverVisuals]);
 
   if (!variantPreviewTheme || isLoading) {
     return (
