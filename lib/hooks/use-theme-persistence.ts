@@ -25,9 +25,12 @@ export function useThemePersistence() {
   const saveTheme = useCallback(async () => {
     try {
       const result = await saveThemeAction();
-      if (clearChanges) {
-        clearChanges();
-      }
+      // Delay clearing changes to avoid simultaneous state updates
+      setTimeout(() => {
+        if (clearChanges) {
+          clearChanges();
+        }
+      }, 100);
       toast.success('Theme saved successfully');
       return result;
     } catch (error) {
