@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-generator';
-import { useDebounce } from '@/lib/hooks/use-debounce';
+// import { useDebounce } from '@/lib/hooks/use-debounce'; // Removed debouncing for immediate updates
 import { useEffectDebug } from '@/lib/utils/debug-infinite-renders';
 
 /**
@@ -40,15 +40,8 @@ export function useThemePreviewGenerator() {
   // Create a stable string representation for comparison
   const visualPropsString = JSON.stringify(visualProperties);
   
-  // Debounce theme changes for performance, but not when theme ID changes
-  const previousThemeId = useRef(theme.id);
-  const isThemeIdChange = previousThemeId.current !== theme.id;
-  const debouncedVisualProperties = useDebounce(visualProperties, isThemeIdChange ? 0 : 300);
-  
-  useEffect(() => {
-    // Update the previous theme ID
-    previousThemeId.current = theme.id;
-  }, [theme.id]);
+  // No debouncing for immediate updates
+  const debouncedVisualProperties = visualProperties;
   
   useEffectDebug(() => {
     // Skip if palettes aren't resolved yet

@@ -151,13 +151,14 @@ export function TypographyTab() {
   const handleFontSizeChange = (className: string, value: string) => {
     const fontSize = parseInt(value);
     if (!isNaN(fontSize) && fontSize > 0) {
+      const updatedClass = { ...localTextClasses[className], fontSize };
       setLocalTextClasses(prev => ({
         ...prev,
-        [className]: { ...prev[className], fontSize }
+        [className]: updatedClass
       }));
       setTextClasses({
         ...textClasses,
-        [className]: { ...localTextClasses[className], fontSize }
+        [className]: updatedClass
       });
       // Change tracking is handled at the hook level
     }
@@ -182,28 +183,27 @@ export function TypographyTab() {
       color = '#000000';
     }
     
+    const updatedClass = { ...localTextClasses[className], color };
     setLocalTextClasses(prev => ({
       ...prev,
-      [className]: { 
-        ...prev[className], 
-        color
-      }
+      [className]: updatedClass
     }));
     setTextClasses({
       ...textClasses,
-      [className]: { ...localTextClasses[className], color }
+      [className]: updatedClass
     });
     // Change tracking is handled at the hook level
   };
 
   const handleFontWeightChange = (className: string, weight: string) => {
+    const updatedClass = { ...localTextClasses[className], fontWeight: weight };
     setLocalTextClasses(prev => ({
       ...prev,
-      [className]: { ...prev[className], fontWeight: weight }
+      [className]: updatedClass
     }));
     setTextClasses({
       ...textClasses,
-      [className]: { ...localTextClasses[className], fontWeight: weight }
+      [className]: updatedClass
     });
     // Change tracking is handled at the hook level
   };
