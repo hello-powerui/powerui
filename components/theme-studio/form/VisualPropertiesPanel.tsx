@@ -36,8 +36,9 @@ export function VisualPropertiesPanel({
   const setSelectedState = useThemeStudioStore(state => state.setSelectedState);
   
   // Check if we have a custom component for this visual type
-  // The path structure is typically: ['visualStyles', 'actionButton', '*', '*']
-  // So we need to get the visual type from path[1]
+  // The path structure can be:
+  // - ['visualStyles', 'actionButton', '*'] when coming from schema-form
+  // - ['visualStyles', 'actionButton', '*', '*'] in other cases
   let visualType = '';
   if (path[0] === 'visualStyles' && path.length >= 2) {
     visualType = path[1];

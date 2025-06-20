@@ -215,6 +215,7 @@ export class SchemaLoader {
     try {
       const visualDef = this.definitions.get(`visual-${visualType}`);
       if (!visualDef || !visualDef.allOf || visualDef.allOf.length < 2) {
+        console.log(`No visual definition found for visual-${visualType}`);
         return false;
       }
       
@@ -226,13 +227,15 @@ export class SchemaLoader {
         if (propSchema.type === 'array' && 
             propSchema.items?.type === 'object' && 
             propSchema.items.properties?.$id) {
+          console.log(`Found state-driven property '${propName}' for ${visualType}`);
           return true;
         }
       }
       
+      console.log(`No state-driven properties found for ${visualType}`, visualProps);
       return false;
     } catch (error) {
-      // console.error('Error checking state-driven properties:', error);
+      console.error('Error checking state-driven properties:', error);
       return false;
     }
   }

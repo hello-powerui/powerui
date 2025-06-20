@@ -9,6 +9,7 @@ import { CollapsibleSection } from '../../ui/collapsible-section';
 import { StateAwarePropertySection } from '../fields/StateAwarePropertySection';
 import { formatGroupTitle } from '@/lib/theme-studio/utils/schema-form-utils';
 import { TAB_TYPES } from '@/lib/theme-studio/utils/schema-form-constants';
+import { VisualStates } from '../VisualStates';
 
 interface ActionButtonVisualProps {
   schema: SchemaProperty;
@@ -31,6 +32,7 @@ export function ActionButtonVisual({
   const hasChangesInSection = useThemeChanges(state => state.hasChangesInSection);
   const getChangedPropertiesCount = useThemeChanges(state => state.getChangedPropertiesCount);
   const globalSelectedState = useThemeStudioStore(state => state.selectedState) || 'default';
+  const setSelectedState = useThemeStudioStore(state => state.setSelectedState);
   
   // Import SchemaForm here to avoid circular dependency
   const { SchemaForm } = require('../schema-form');
@@ -182,6 +184,12 @@ export function ActionButtonVisual({
       <div className="mt-4">
         {activeTab === TAB_TYPES.SPECIFIC ? (
           <div className="space-y-4">
+            {/* Visual States selector */}
+            <VisualStates
+              selectedState={globalSelectedState}
+              onSelectedStateChange={setSelectedState}
+              hasStateDrivenProperties={true}
+            />
             {/* Fill and Text toggles - separated from Visual State controls 
                 Note: Both fill and text toggles are placed at the top level because in Power BI's action button,
                 the "show" property for both is not state-dependent (unlike other properties).
