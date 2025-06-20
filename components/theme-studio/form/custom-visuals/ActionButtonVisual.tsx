@@ -190,14 +190,12 @@ export function ActionButtonVisual({
                 This means the button either has a fill/text or doesn't, regardless of state.
                 The appearance (color, size, etc.) is what changes per state. */}
             
-            {/* Fill toggle */}
-            {fillSchema && (
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900">Button Fill</h4>
-                    <p className="text-xs text-gray-500 mt-1">Enable or disable the button background fill</p>
-                  </div>
+            {/* Compact toggles for fill and text */}
+            <div className="space-y-2">
+              {/* Fill toggle */}
+              {fillSchema && (
+                <div className="flex items-center justify-between bg-gray-50 rounded-md px-3 py-2 border border-gray-200">
+                  <span className="text-sm font-medium text-gray-700">Button Fill</span>
                   <SchemaForm
                     schema={{ type: 'boolean', title: '' }}
                     value={fillShowValue}
@@ -208,17 +206,12 @@ export function ActionButtonVisual({
                     hideTitle={true}
                   />
                 </div>
-              </div>
-            )}
-            
-            {/* Text toggle */}
-            {textSchema && (
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900">Button Text</h4>
-                    <p className="text-xs text-gray-500 mt-1">Enable or disable the button text</p>
-                  </div>
+              )}
+              
+              {/* Text toggle */}
+              {textSchema && (
+                <div className="flex items-center justify-between bg-gray-50 rounded-md px-3 py-2 border border-gray-200">
+                  <span className="text-sm font-medium text-gray-700">Button Text</span>
                   <SchemaForm
                     schema={{ type: 'boolean', title: '' }}
                     value={textShowValue}
@@ -229,8 +222,8 @@ export function ActionButtonVisual({
                     hideTitle={true}
                   />
                 </div>
-              </div>
-            )}
+              )}
+            </div>
             
             {/* Visual States selector with state-aware properties */}
             <VisualStates

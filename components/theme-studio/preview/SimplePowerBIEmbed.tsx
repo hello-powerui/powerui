@@ -275,32 +275,64 @@ function SimplePowerBIEmbed({
 
   // Reset report to original state
   const resetReport = useCallback(async () => {
-    if (!reportRef.current || isResetting) return;
+    if (isResetting) return;
     
     setIsResetting(true);
-    try {
-      // Reset to default layout settings
-      const defaultSettings = {
-        layoutType: models.LayoutType.Custom,
-        customLayout: {
-          displayOption: models.DisplayOption.FitToPage
+    
+    // First, reset focus mode state
+    setFocusMode(false);
+    
+    // Clear visuals array to ensure clean state
+    setVisuals([]);
+    
+    // Force a complete reload of the report (like the reload button does)
+    // This ensures the layout is properly reset
+    isInitialLoad.current = true;
+    setEmbedConfig(null);
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      const loadReport = async () => {
+        try {
+          const config = await powerBIService.getEmbedConfigWithTheme(
+            powerBIConfig.reportId,
+            powerBIConfig.workspaceId,
+            variantPreviewTheme
+          );
+          
+          const embedConfiguration: models.IReportEmbedConfiguration = {
+            type: 'report',
+            id: config.id,
+            embedUrl: config.embedUrl,
+            accessToken: config.accessToken,
+            tokenType: models.TokenType.Embed,
+            settings: {
+              panes: {
+                filters: { visible: false },
+                pageNavigation: {
+                  visible: false
+                }
+              },
+              layoutType: models.LayoutType.Custom,
+              customLayout: { displayOption: models.DisplayOption.FitToPage },
+              bars: { actionBar: { visible: false } }
+            },
+            theme: variantPreviewTheme ? { themeJson: variantPreviewTheme } : undefined
+          };
+
+          setEmbedConfig(embedConfiguration);
+          isInitialLoad.current = false;
+        } catch (err) {
+          console.error('Error reloading report:', err);
+          setError(err instanceof Error ? err.message : 'Failed to reload report');
+        } finally {
+          setIsLoading(false);
+          setIsResetting(false);
         }
       };
-      
-      await reportRef.current.updateSettings(defaultSettings);
-      
-      // Reset focus mode state
-      setFocusMode(false);
-      
-      // Refresh the report to ensure clean state
-      await reportRef.current.refresh();
-      
-    } catch (error) {
-      console.error('Error resetting report:', error);
-    } finally {
-      setIsResetting(false);
-    }
-  }, [isResetting]);
+      loadReport();
+    }, 100);
+  }, [isResetting, variantPreviewTheme, powerBIService]);
 
 
   // Expose reset function to parent

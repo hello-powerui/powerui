@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense, useCallback } from 'react';
+import { useEffect, useState, Suspense, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useThemeStudio } from '@/lib/hooks/use-theme-studio';
 import { FoundationPanel } from './components/FoundationPanel';
@@ -33,8 +33,49 @@ function ThemeStudioContent() {
   const [showNeutralPaletteManager, setShowNeutralPaletteManager] = useState(false);
   const [isThemeLoading, setIsThemeLoading] = useState(false);
   
+  // Visual styles panel width state
+  const [visualStylesPanelWidth, setVisualStylesPanelWidth] = useState(350);
+  const minPanelWidth = 350;
+  const maxPanelWidth = 600;
+  const isResizingRef = useRef(false);
+  
   // Get visual styles directly from the store
   const visualSettings = themeStudio.theme.visualStyles || {};
+  
+  // Handle resize for visual styles panel
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isResizingRef.current = true;
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizingRef.current) return;
+      
+      const newWidth = window.innerWidth - e.clientX;
+      if (newWidth >= minPanelWidth && newWidth <= maxPanelWidth) {
+        setVisualStylesPanelWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isResizingRef.current) {
+        isResizingRef.current = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [minPanelWidth, maxPanelWidth]);
   
   // Focus mode state
   const [isInFocusMode, setIsInFocusMode] = useState(false);
@@ -291,7 +332,10 @@ function ThemeStudioContent() {
                   // Don't change the selected visual - keep it selected
                 }}
                 onVariantChange={themeStudio.setSelectedVariant}
-                onReportReset={setReportResetFn}
+                onReportReset={(resetFn) => {
+                  // Use setTimeout to avoid state update during render
+                  setTimeout(() => setReportResetFn(() => resetFn), 0);
+                }}
                 enterFocusMode={isInFocusMode}
               />
             )}
@@ -299,10 +343,23 @@ function ThemeStudioContent() {
         </div>
 
         {/* Visual Styles Sidebar - Right */}
-        <div className={cn(
-          "border-l bg-gray-50 transition-all duration-300",
-          showVisualStyles ? "w-[350px]" : "w-12"
-        )}>
+        <div 
+          className={cn(
+            "relative border-l bg-gray-50 transition-all duration-300",
+            !showVisualStyles && "w-12"
+          )}
+          style={showVisualStyles ? { width: `${visualStylesPanelWidth}px` } : undefined}
+        >
+          {/* Resize Handle */}
+          {showVisualStyles && (
+            <div
+              className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize group"
+              onMouseDown={handleMouseDown}
+              style={{ marginLeft: '-4px' }}
+            >
+              <div className="absolute inset-y-0 left-1/2 w-0.5 bg-gray-300 group-hover:bg-blue-500 transition-colors" />
+            </div>
+          )}
           <ErrorBoundaryWithLogging componentName="VisualStylesPanel">
             <VisualStylesPanel
               theme={themeStudio.theme}

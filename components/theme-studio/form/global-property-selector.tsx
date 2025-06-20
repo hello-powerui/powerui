@@ -220,9 +220,78 @@ export function GlobalPropertySelector({
       )}
       
       {/* Global Properties (Complex Properties - CategoryAxis, ValueAxis, etc.) */}
-      {selectedComplexProperties.length > 0 ? (
-        <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Global Properties</h4>
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="text-sm font-medium text-gray-700">Custom Global Properties</h4>
+          <div className="relative">
+            <button
+              onClick={() => setShowPropertyPicker(!showPropertyPicker)}
+              className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+              title="Add global property"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+            
+            {/* Property Picker Dropdown */}
+            {showPropertyPicker && (
+              <>
+                {/* Close on click outside - moved outside dropdown container */}
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => {
+                    setShowPropertyPicker(false);
+                    setSearchQuery('');
+                  }}
+                />
+                
+                <div className="absolute top-full right-0 mt-2 bg-white rounded-md shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden w-80">
+                  {/* Search bar */}
+                  <div className="p-3 border-b border-gray-200">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Search properties..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        onClick={(e) => e.stopPropagation()}
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Property list */}
+                  <div className="max-h-80 overflow-y-auto">
+                    {Object.entries(complexProperties)
+                      .filter(([name]) => 
+                        name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+                        !selectedComplexProperties.includes(name)
+                      )
+                      .map(([name, schema]) => (
+                        <button
+                          key={name}
+                          onClick={() => {
+                            handleAddComplexProperty(name);
+                            setShowPropertyPicker(false);
+                            setSearchQuery('');
+                          }}
+                          className="w-full px-4 py-2.5 text-left hover:bg-gray-50 border-b border-gray-100 last:border-0"
+                        >
+                          <div className="font-medium text-sm text-gray-900">{name}</div>
+                          {(schema as any).description && (
+                            <div className="text-xs text-gray-500 mt-0.5">{(schema as any).description}</div>
+                          )}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        
+        {selectedComplexProperties.length > 0 ? (
           <div className="-space-y-px">
           {selectedComplexProperties.map(propertyName => {
             const schema = complexProperties[propertyName];
@@ -306,119 +375,14 @@ export function GlobalPropertySelector({
             );
           })}
           </div>
-        </div>
-      ) : (
-        <div className="mt-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-4">Global Properties</h4>
-          <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-md">
-            <p className="text-gray-500 mb-2">No global properties configured</p>
-            <p className="text-sm text-gray-400">Use the button below to add properties</p>
+        ) : (
+          <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-md">
+            <p className="text-sm text-gray-500 mb-1">No custom global properties configured</p>
+            <p className="text-xs text-gray-400">Click the + button above to add properties</p>
           </div>
-        </div>
-      )}
-
-      {/* Add Global Property Button */}
-      <div className="relative">
-        <button
-          onClick={() => setShowPropertyPicker(!showPropertyPicker)}
-          className="w-full px-4 py-3 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-        >
-          <Plus className="w-4 h-4" />
-          Add Global Property
-        </button>
-
-        {/* Property Picker Dropdown */}
-        {showPropertyPicker && (
-          <>
-            {/* Close on click outside - moved outside dropdown container */}
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => {
-                setShowPropertyPicker(false);
-                setSearchQuery('');
-              }}
-            />
-            
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-md shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
-              {/* Search bar */}
-              <div className="p-3 border-b border-gray-200">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search properties..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    autoFocus
-                  />
-                </div>
-              </div>
-              
-              {/* Properties list */}
-              <div className="max-h-80 overflow-y-auto p-3">
-                {filteredComplexProperties.length > 0 ? (
-                  <div className="space-y-1">
-                    {filteredComplexProperties.map(([propName, schema]) => {
-                      const isSelected = selectedComplexProperties.includes(propName);
-                      
-                      return (
-                        <button
-                          key={propName}
-                          onClick={() => !isSelected && handleAddComplexProperty(propName)}
-                          disabled={isSelected}
-                          className={cn(
-                            "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
-                            isSelected
-                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                              : "hover:bg-gray-50 text-gray-700"
-                          )}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium font-mono">{propName}</span>
-                            {isSelected && (
-                              <Badge variant="secondary" className="text-xs">Added</Badge>
-                            )}
-                          </div>
-                          {(schema as any).description && (
-                            <p className="text-xs text-gray-500 mt-0.5">{(schema as any).description}</p>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p className="text-sm">No properties found matching "{searchQuery}"</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </>
         )}
       </div>
 
-      {/* Info box */}
-      <div className="p-4 bg-gray-50 border border-gray-200 rounded-md">
-        <div className="flex items-start gap-2">
-          <div className="text-gray-600 mt-0.5">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <p className="text-sm text-gray-700 font-medium">How Global Visual Properties Work</p>
-            <p className="text-xs text-gray-600 mt-1">
-              Global properties let you define visual styling that applies to all visuals in your report. 
-              Complex properties like <strong>categoryAxis</strong>, <strong>valueAxis</strong>, <strong>legend</strong>, and <strong>dataPoint</strong> 
-              contain multiple sub-properties (e.g., gridlines, fonts, colors) that can be configured globally.
-            </p>
-            <p className="text-xs text-gray-600 mt-1">
-              These settings use the pattern <code className="bg-gray-100 px-1 rounded">visualStyles.*.*.propertyName</code> in the theme JSON.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
