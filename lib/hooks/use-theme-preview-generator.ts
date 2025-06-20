@@ -4,13 +4,22 @@ import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-gener
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useEffectDebug } from '@/lib/utils/debug-infinite-renders';
 import isEqual from 'fast-deep-equal';
+import { useShallow } from 'zustand/react/shallow';
 
 /**
  * Hook that automatically generates preview themes when theme data changes
  */
 export function useThemePreviewGenerator() {
-  const theme = useThemeStudioStore((state) => state.theme);
-  const resolved = useThemeStudioStore((state) => state.resolved);
+  // Use shallow equality for better performance
+  const { theme, colorPalette, neutralPalette, previewTheme } = useThemeStudioStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      colorPalette: state.resolved.colorPalette,
+      neutralPalette: state.resolved.neutralPalette,
+      previewTheme: state.resolved.previewTheme
+    }))
+  );
+  
   const setPreviewTheme = useThemeStudioStore((state) => state.setPreviewTheme);
   const isGenerating = useThemeStudioStore((state) => state.isGenerating);
   const setIsGenerating = useThemeStudioStore((state) => state.setIsGenerating);
@@ -38,24 +47,24 @@ export function useThemePreviewGenerator() {
     theme.textClasses
   ]);
   
-  // Add minimal debouncing to prevent infinite renders
-  const debouncedVisualProperties = useDebounce(visualProperties, 50);
+  // Add debouncing to batch rapid changes
+  const debouncedVisualProperties = useDebounce(visualProperties, 200);
   
   useEffectDebug(() => {
     // Skip if palettes aren't resolved yet
-    if (!resolved.colorPalette || !resolved.neutralPalette) {
+    if (!colorPalette || !neutralPalette) {
       return;
     }
     
     // Check if only the name changed
     const onlyNameChanged = isEqual(previousVisualPropsRef.current, debouncedVisualProperties) && 
-                           resolved.previewTheme && 
-                           resolved.previewTheme.name !== theme.name;
+                           previewTheme && 
+                           previewTheme.name !== theme.name;
     
     if (onlyNameChanged) {
       // Just update the name without regenerating the entire theme
       const updatedPreview = {
-        ...resolved.previewTheme,
+        ...previewTheme,
         name: theme.name
       };
       setPreviewTheme(updatedPreview);
@@ -74,8 +83,8 @@ export function useThemePreviewGenerator() {
           const themeInput = {
             name: theme.name,
             mode: debouncedVisualProperties.mode,
-            dataColors: resolved.colorPalette!.colors as string[],
-            neutralPalette: resolved.neutralPalette!.colors as string[],
+            dataColors: colorPalette!.colors as string[],
+            neutralPalette: neutralPalette!.colors as string[],
             fontFamily: debouncedVisualProperties.fontFamily.toLowerCase().replace(/\s+/g, '-'),
             visualStyles: debouncedVisualProperties.visualStyles,
             structuralColors: debouncedVisualProperties.structuralColors && Object.keys(debouncedVisualProperties.structuralColors).length > 0 ? debouncedVisualProperties.structuralColors : undefined,
@@ -100,15 +109,15 @@ export function useThemePreviewGenerator() {
   }, [
     debouncedVisualProperties,
     theme.name,
-    resolved.colorPalette,
-    resolved.neutralPalette,
-    resolved.previewTheme,
+    colorPalette,
+    neutralPalette,
+    previewTheme,
     setPreviewTheme,
     setIsGenerating
   ], 'useThemePreviewGenerator', 'generatePreview');
   
   return {
-    previewTheme: resolved.previewTheme,
+    previewTheme,
     isGenerating
   };
 }

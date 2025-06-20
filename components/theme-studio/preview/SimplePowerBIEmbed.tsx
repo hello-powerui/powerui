@@ -561,32 +561,29 @@ function SimplePowerBIEmbed({
 
 // Memoize the component with custom comparison
 export default memo(SimplePowerBIEmbed, (prevProps, nextProps) => {
-  // If themes are both defined, compare everything except the name
-  if (prevProps.generatedTheme && nextProps.generatedTheme) {
-    const prevThemeCopy = { ...prevProps.generatedTheme };
-    const nextThemeCopy = { ...nextProps.generatedTheme };
-    delete prevThemeCopy.name;
-    delete nextThemeCopy.name;
-    
-    return (
-      JSON.stringify(prevThemeCopy) === JSON.stringify(nextThemeCopy) &&
-      prevProps.selectedVisualType === nextProps.selectedVisualType &&
-      prevProps.selectedVariant === nextProps.selectedVariant &&
-      prevProps.enterFocusMode === nextProps.enterFocusMode &&
-      prevProps.onExitFocusMode === nextProps.onExitFocusMode &&
-      prevProps.onVariantChange === nextProps.onVariantChange &&
-      prevProps.onReportReset === nextProps.onReportReset
-    );
+  // Compare non-theme props first (faster)
+  if (
+    prevProps.selectedVisualType !== nextProps.selectedVisualType ||
+    prevProps.selectedVariant !== nextProps.selectedVariant ||
+    prevProps.enterFocusMode !== nextProps.enterFocusMode ||
+    prevProps.onExitFocusMode !== nextProps.onExitFocusMode ||
+    prevProps.onVariantChange !== nextProps.onVariantChange ||
+    prevProps.onReportReset !== nextProps.onReportReset
+  ) {
+    return false;
   }
   
-  // Otherwise, do a normal comparison
-  return (
-    prevProps.generatedTheme === nextProps.generatedTheme &&
-    prevProps.selectedVisualType === nextProps.selectedVisualType &&
-    prevProps.selectedVariant === nextProps.selectedVariant &&
-    prevProps.enterFocusMode === nextProps.enterFocusMode &&
-    prevProps.onExitFocusMode === nextProps.onExitFocusMode &&
-    prevProps.onVariantChange === nextProps.onVariantChange &&
-    prevProps.onReportReset === nextProps.onReportReset
-  );
+  // If both themes are undefined or the same reference, they're equal
+  if (prevProps.generatedTheme === nextProps.generatedTheme) {
+    return true;
+  }
+  
+  // If one is undefined and the other isn't, they're different
+  if (!prevProps.generatedTheme || !nextProps.generatedTheme) {
+    return false;
+  }
+  
+  // For theme comparison, we only care about properties that affect visual rendering
+  // Name changes don't require re-render
+  return prevProps.generatedTheme.name !== nextProps.generatedTheme.name;
 });
