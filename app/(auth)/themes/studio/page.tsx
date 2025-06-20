@@ -10,6 +10,8 @@ import { UnifiedPaletteManager } from '@/components/theme-studio/palette/Unified
 import { ImportThemeModal } from '@/components/theme-studio/ui/import-theme-modal';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useRenderDebug, useEffectDebug } from '@/lib/utils/debug-infinite-renders';
+import { ErrorBoundaryWithLogging } from '@/components/debug/ErrorBoundaryWithLogging';
 
 // Icons
 const BackIcon = () => (
@@ -22,6 +24,12 @@ function ThemeStudioContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const themeStudio = useThemeStudio();
+  
+  // Add render debugging
+  useRenderDebug('ThemeStudioContent', {
+    themeStudio: themeStudio,
+    searchParams: searchParams
+  });
   
   // Local UI state
   const [showFoundation, setShowFoundation] = useState(true);
@@ -49,7 +57,7 @@ function ThemeStudioContent() {
   const [reportResetFn, setReportResetFn] = useState<(() => void) | null>(null);
   
   // Sync visual settings with theme
-  useEffect(() => {
+  useEffectDebug(() => {
     // Only update if the visual styles have actually changed
     const currentStyles = themeStudio.theme.visualStyles || {};
     const hasChanges = JSON.stringify(currentStyles) !== JSON.stringify(visualSettings);
@@ -65,7 +73,7 @@ function ThemeStudioContent() {
       }
       setVisualSettings(styles);
     }
-  }, [themeStudio.theme.visualStyles]); // Don't include visualSettings in deps to avoid loop
+  }, [themeStudio.theme.visualStyles], 'ThemeStudioContent', 'syncVisualSettings'); // Don't include visualSettings in deps to avoid loop
   
   // Extract themeId to use as dependency
   const themeId = searchParams.get('themeId');
@@ -95,7 +103,7 @@ function ThemeStudioContent() {
   }, [themeStudio, setShowVisualStyles]);
   
   // Load theme on mount
-  useEffect(() => {
+  useEffectDebug(() => {
     if (themeId) {
       // Reset store state before loading new theme to prevent stale data
       themeStudio.resetTheme();
@@ -105,7 +113,7 @@ function ThemeStudioContent() {
       themeStudio.createNewTheme();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [themeId]); // Only depend on themeId to avoid infinite loops
+  }, [themeId], 'ThemeStudioContent', 'loadTheme'); // Only depend on themeId to avoid infinite loops
   
   const handleSave = async () => {
     try {
@@ -274,51 +282,55 @@ function ThemeStudioContent() {
           "border-r bg-gray-50 transition-all duration-300",
           showFoundation ? "w-72" : "w-12"
         )}>
-          <FoundationPanel
-            theme={themeStudio.theme}
-            colorPalette={themeStudio.colorPalette}
-            neutralPalette={themeStudio.neutralPalette}
-            hasChanges={(path) => themeStudio.changedPaths.has(path.join('.'))}
-            onThemeChange={themeStudio.updateTheme}
-            onColorPaletteChange={themeStudio.setColorPaletteId}
-            onNeutralPaletteChange={themeStudio.setNeutralPaletteId}
-            onThemeModeChange={themeStudio.setThemeMode}
-            onFontFamilyChange={themeStudio.setFontFamily}
-            onStructuralColorsChange={themeStudio.setStructuralColors}
-            onTextClassesChange={themeStudio.setTextClasses}
-            onShowPaletteManager={handleShowPaletteManager}
-            isVisible={showFoundation}
-            onToggleVisibility={setShowFoundation}
-          />
+          <ErrorBoundaryWithLogging componentName="FoundationPanel">
+            <FoundationPanel
+              theme={themeStudio.theme}
+              colorPalette={themeStudio.colorPalette}
+              neutralPalette={themeStudio.neutralPalette}
+              hasChanges={(path) => themeStudio.changedPaths.has(path.join('.'))}
+              onThemeChange={themeStudio.updateTheme}
+              onColorPaletteChange={themeStudio.setColorPaletteId}
+              onNeutralPaletteChange={themeStudio.setNeutralPaletteId}
+              onThemeModeChange={themeStudio.setThemeMode}
+              onFontFamilyChange={themeStudio.setFontFamily}
+              onStructuralColorsChange={themeStudio.setStructuralColors}
+              onTextClassesChange={themeStudio.setTextClasses}
+              onShowPaletteManager={handleShowPaletteManager}
+              isVisible={showFoundation}
+              onToggleVisibility={setShowFoundation}
+            />
+          </ErrorBoundaryWithLogging>
         </div>
 
         {/* Preview Panel - Center */}
         <div className="flex-1 overflow-hidden h-full">
-          {/* Only render Power BI when theme is fully loaded and preview is generated */}
-          {(isThemeLoading || !themeStudio.previewTheme) ? (
-            <div className="flex items-center justify-center h-full bg-gray-50">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-                <p className="text-sm text-gray-600">
-                  {isThemeLoading ? 'Loading theme...' : 'Generating preview...'}
-                </p>
+          <ErrorBoundaryWithLogging componentName="PowerBIPreview">
+            {/* Only render Power BI when theme is fully loaded and preview is generated */}
+            {(isThemeLoading || !themeStudio.previewTheme) ? (
+              <div className="flex items-center justify-center h-full bg-gray-50">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                  <p className="text-sm text-gray-600">
+                    {isThemeLoading ? 'Loading theme...' : 'Generating preview...'}
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : (
-            <PowerBIPreview 
-              key={themeStudio.theme.id || 'new'} // Forces fresh mount when theme ID changes
-              generatedTheme={themeStudio.previewTheme}
-              selectedVisualType={themeStudio.selectedVisual}
-              selectedVariant={themeStudio.selectedVariant}
-              onExitFocusMode={() => {
-                setIsInFocusMode(false);
-                // Don't change the selected visual - keep it selected
-              }}
-              onVariantChange={themeStudio.setSelectedVariant}
-              onReportReset={setReportResetFn}
-              enterFocusMode={isInFocusMode}
-            />
-          )}
+            ) : (
+              <PowerBIPreview 
+                key={themeStudio.theme.id || 'new'} // Forces fresh mount when theme ID changes
+                generatedTheme={themeStudio.previewTheme}
+                selectedVisualType={themeStudio.selectedVisual}
+                selectedVariant={themeStudio.selectedVariant}
+                onExitFocusMode={() => {
+                  setIsInFocusMode(false);
+                  // Don't change the selected visual - keep it selected
+                }}
+                onVariantChange={themeStudio.setSelectedVariant}
+                onReportReset={setReportResetFn}
+                enterFocusMode={isInFocusMode}
+              />
+            )}
+          </ErrorBoundaryWithLogging>
         </div>
 
         {/* Visual Styles Sidebar - Right */}
@@ -326,27 +338,29 @@ function ThemeStudioContent() {
           "border-l bg-gray-50 transition-all duration-300",
           showVisualStyles ? "w-[350px]" : "w-12"
         )}>
-          <VisualStylesPanel
-            theme={themeStudio.theme}
-            visualSettings={visualSettings}
-            selectedVisual={themeStudio.selectedVisual}
-            selectedVariant={themeStudio.selectedVariant}
-            selectedState={themeStudio.selectedState}
-            selectedSection={themeStudio.selectedSection}
-            onVisualSettingsChange={handleVisualSettingsChange}
-            onVisualStyleChange={handleVisualStyleChange}
-            onSelectedVisualChange={themeStudio.setSelectedVisual}
-            onSelectedVariantChange={themeStudio.setSelectedVariant}
-            onSelectedStateChange={themeStudio.setSelectedState}
-            onSelectedSectionChange={themeStudio.setSelectedSection}
-            onCreateVariant={themeStudio.createVariant}
-            onDeleteVariant={themeStudio.deleteVariant}
-            getVisualVariants={themeStudio.getVisualVariants}
-            trackChange={() => {
-              // Change tracking is handled by the updateTheme and updateVisualStyle methods
-            }}
-            onEnterFocusMode={() => setIsInFocusMode(true)}
-          />
+          <ErrorBoundaryWithLogging componentName="VisualStylesPanel">
+            <VisualStylesPanel
+              theme={themeStudio.theme}
+              visualSettings={visualSettings}
+              selectedVisual={themeStudio.selectedVisual}
+              selectedVariant={themeStudio.selectedVariant}
+              selectedState={themeStudio.selectedState}
+              selectedSection={themeStudio.selectedSection}
+              onVisualSettingsChange={handleVisualSettingsChange}
+              onVisualStyleChange={handleVisualStyleChange}
+              onSelectedVisualChange={themeStudio.setSelectedVisual}
+              onSelectedVariantChange={themeStudio.setSelectedVariant}
+              onSelectedStateChange={themeStudio.setSelectedState}
+              onSelectedSectionChange={themeStudio.setSelectedSection}
+              onCreateVariant={themeStudio.createVariant}
+              onDeleteVariant={themeStudio.deleteVariant}
+              getVisualVariants={themeStudio.getVisualVariants}
+              trackChange={() => {
+                // Change tracking is handled by the updateTheme and updateVisualStyle methods
+              }}
+              onEnterFocusMode={() => setIsInFocusMode(true)}
+            />
+          </ErrorBoundaryWithLogging>
         </div>
       </div>
 

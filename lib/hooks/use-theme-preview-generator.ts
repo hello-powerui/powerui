@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-generator';
 import { useDebounce } from '@/lib/hooks/use-debounce';
+import { useEffectDebug } from '@/lib/utils/debug-infinite-renders';
 
 /**
  * Hook that automatically generates preview themes when theme data changes
@@ -23,7 +24,7 @@ export function useThemePreviewGenerator() {
     previousThemeId.current = theme.id;
   }, [theme.id]);
   
-  useEffect(() => {
+  useEffectDebug(() => {
     // Skip if palettes aren't resolved yet
     if (!resolved.colorPalette || !resolved.neutralPalette) {
       return;
@@ -65,7 +66,7 @@ export function useThemePreviewGenerator() {
     resolved.neutralPalette,
     setPreviewTheme,
     setIsGenerating
-  ]);
+  ], 'useThemePreviewGenerator', 'generatePreview');
   
   return {
     previewTheme: resolved.previewTheme,

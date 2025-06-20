@@ -3,6 +3,7 @@ import { useThemeStudioPalettes } from './use-theme-studio-palettes';
 import { useThemePreviewGenerator } from './use-theme-preview-generator';
 import { useThemeChanges } from './use-theme-changes';
 import { toast } from 'sonner';
+import { useRenderDebug } from '@/lib/utils/debug-infinite-renders';
 
 /**
  * Main hook for theme studio that combines all functionality
@@ -19,6 +20,16 @@ export function useThemeStudio() {
   
   // Change tracking
   const { hasChanges, changedPaths, trackChange, clearChanges } = useThemeChanges();
+  
+  // Add render debugging
+  useRenderDebug('useThemeStudio', {
+    theme: store.theme,
+    colorPalette,
+    neutralPalette,
+    previewTheme,
+    isGenerating,
+    hasChanges
+  });
   
   // Combined save function with change tracking
   const saveTheme = async () => {
