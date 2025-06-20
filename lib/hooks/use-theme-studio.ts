@@ -3,6 +3,7 @@ import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { useThemeStudioPalettes } from './use-theme-studio-palettes';
 import { useThemePreviewGenerator } from './use-theme-preview-generator';
 import { useThemeChanges } from './use-theme-changes';
+import { useStableObject } from './use-stable-object';
 import { toast } from 'sonner';
 import { useRenderDebug } from '@/lib/utils/debug-infinite-renders';
 
@@ -50,7 +51,8 @@ export function useThemeStudio() {
   const { previewTheme, isGenerating } = useThemePreviewGenerator();
   
   // Change tracking
-  const { hasChanges, changedPaths, trackChange, clearChanges } = useThemeChanges();
+  const changeTracking = useThemeChanges();
+  const hasChangesValue = changeTracking.hasChanges();
   
   // Add render debugging
   useRenderDebug('useThemeStudio', {
@@ -59,20 +61,20 @@ export function useThemeStudio() {
     neutralPalette,
     previewTheme,
     isGenerating,
-    hasChanges
+    hasChangesValue
   });
   
   // Combined save function with change tracking
   const saveTheme = useCallback(async () => {
     try {
       await storeActions.saveTheme();
-      clearChanges();
+      changeTracking.clearChanges();
       toast.success('Theme saved successfully');
     } catch (error) {
       toast.error('Failed to save theme');
       throw error;
     }
-  }, [storeActions, clearChanges]);
+  }, [storeActions, changeTracking]);
   
   // Enhanced theme update with change tracking
   const updateTheme = useCallback((updates: Parameters<typeof storeActions.updateTheme>[0]) => {
@@ -81,30 +83,67 @@ export function useThemeStudio() {
     // Track changes for the updated keys, but skip visualStyles as it's tracked at a more specific level
     Object.keys(updates).forEach(key => {
       if (key !== 'visualStyles') {
-        trackChange([key]);
+        changeTracking.trackChange([key]);
       }
     });
-  }, [storeActions, trackChange]);
+  }, [storeActions, changeTracking]);
   
   // Enhanced visual style update with change tracking
   const updateVisualStyle = useCallback((visual: string, variant: string, value: any) => {
     storeActions.updateVisualStyle(visual, variant, value);
-    trackChange(['visualStyles', visual, variant]);
-  }, [storeActions, trackChange]);
+    changeTracking.trackChange(['visualStyles', visual, variant]);
+  }, [storeActions, changeTracking]);
   
   // Reset with change clearing
   const resetTheme = useCallback(() => {
-    clearChanges(); // Clear changes first
+    changeTracking.clearChanges(); // Clear changes first
     storeActions.resetTheme();
-  }, [clearChanges, storeActions]);
+  }, [changeTracking, storeActions]);
   
   // Create new theme with change clearing
   const createNewTheme = useCallback(() => {
-    clearChanges(); // Clear changes first
+    changeTracking.clearChanges(); // Clear changes first
     storeActions.createNewTheme();
-  }, [clearChanges, storeActions]);
+  }, [changeTracking, storeActions]);
   
-  return {
+  // Memoize callbacks that need to be stable
+  const setColorPaletteId = useCallback((id: string) => {
+    storeActions.setColorPaletteId(id);
+    changeTracking.trackChange(['colorPaletteId']);
+  }, [storeActions, changeTracking]);
+  
+  const setNeutralPaletteId = useCallback((id: string) => {
+    storeActions.setNeutralPaletteId(id);
+    changeTracking.trackChange(['neutralPaletteId']);
+  }, [storeActions, changeTracking]);
+  
+  const setThemeMode = useCallback((mode: 'light' | 'dark') => {
+    storeActions.setThemeMode(mode);
+    changeTracking.trackChange(['mode']);
+  }, [storeActions, changeTracking]);
+  
+  const setFontFamily = useCallback((fontFamily: string) => {
+    storeActions.setFontFamily(fontFamily);
+    changeTracking.trackChange(['fontFamily']);
+  }, [storeActions, changeTracking]);
+  
+  const setStructuralColors = useCallback((colors: any) => {
+    storeActions.setStructuralColors(colors);
+    changeTracking.trackChange(['structuralColors']);
+  }, [storeActions, changeTracking]);
+  
+  const setTextClasses = useCallback((textClasses: any) => {
+    storeActions.setTextClasses(textClasses);
+    changeTracking.trackChange(['textClasses']);
+  }, [storeActions, changeTracking]);
+  
+  const loadTheme = useCallback((themeData: any) => {
+    changeTracking.clearChanges(); // Clear changes when loading a new theme
+    storeActions.loadTheme(themeData);
+  }, [changeTracking, storeActions]);
+
+  // Create the return object
+  const result = {
     // Theme data
     theme,
     previewTheme,
@@ -125,35 +164,17 @@ export function useThemeStudio() {
     isGenerating,
     
     // Change tracking
-    isDirty: isDirty || hasChanges(),
-    changedPaths: changedPaths || new Set(),
+    isDirty: isDirty || hasChangesValue,
+    changedPaths: changeTracking.changedPaths || new Set(),
     
     // Theme actions
     updateTheme,
-    setColorPaletteId: useCallback((id: string) => {
-      storeActions.setColorPaletteId(id);
-      trackChange(['colorPaletteId']);
-    }, [storeActions, trackChange]),
-    setNeutralPaletteId: useCallback((id: string) => {
-      storeActions.setNeutralPaletteId(id);
-      trackChange(['neutralPaletteId']);
-    }, [storeActions, trackChange]),
-    setThemeMode: useCallback((mode: 'light' | 'dark') => {
-      storeActions.setThemeMode(mode);
-      trackChange(['mode']);
-    }, [storeActions, trackChange]),
-    setFontFamily: useCallback((fontFamily: string) => {
-      storeActions.setFontFamily(fontFamily);
-      trackChange(['fontFamily']);
-    }, [storeActions, trackChange]),
-    setStructuralColors: useCallback((colors: any) => {
-      storeActions.setStructuralColors(colors);
-      trackChange(['structuralColors']);
-    }, [storeActions, trackChange]),
-    setTextClasses: useCallback((textClasses: any) => {
-      storeActions.setTextClasses(textClasses);
-      trackChange(['textClasses']);
-    }, [storeActions, trackChange]),
+    setColorPaletteId,
+    setNeutralPaletteId,
+    setThemeMode,
+    setFontFamily,
+    setStructuralColors,
+    setTextClasses,
     updateVisualStyle,
     
     // UI actions
@@ -169,12 +190,12 @@ export function useThemeStudio() {
     
     // Save/load
     saveTheme,
-    loadTheme: useCallback((themeData: any) => {
-      clearChanges(); // Clear changes when loading a new theme
-      storeActions.loadTheme(themeData);
-    }, [clearChanges, storeActions]),
+    loadTheme,
     resetTheme,
     createNewTheme,
     exportTheme: storeActions.exportTheme,
   };
+  
+  // Return a stable object reference
+  return useStableObject(result);
 }
