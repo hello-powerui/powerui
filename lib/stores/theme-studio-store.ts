@@ -154,6 +154,15 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       // Theme actions (simplified and unified)
       updateTheme: (updates) =>
         set((state) => {
+          // Check if the update actually changes anything
+          const hasChanges = Object.keys(updates).some(
+            key => state.theme[key as keyof StudioTheme] !== updates[key as keyof StudioTheme]
+          );
+          
+          if (!hasChanges) {
+            return state; // No actual changes, return current state
+          }
+          
           const newTheme = { ...state.theme, ...updates };
           return {
             theme: newTheme,

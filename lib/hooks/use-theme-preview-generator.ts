@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-generator';
 import { useDebounce } from '@/lib/hooks/use-debounce';
@@ -14,10 +14,36 @@ export function useThemePreviewGenerator() {
   const isGenerating = useThemeStudioStore((state) => state.isGenerating);
   const setIsGenerating = useThemeStudioStore((state) => state.setIsGenerating);
   
+  // Track previous visual properties for comparison
+  const previousVisualPropsRef = useRef<string>('');
+  
+  // Extract only the properties that affect visual rendering
+  // Use useMemo to create stable reference when properties don't change
+  const visualProperties = useMemo(() => ({
+    mode: theme.mode,
+    colorPaletteId: theme.colorPaletteId,
+    neutralPaletteId: theme.neutralPaletteId,
+    fontFamily: theme.fontFamily,
+    visualStyles: theme.visualStyles,
+    structuralColors: theme.structuralColors,
+    textClasses: theme.textClasses
+  }), [
+    theme.mode,
+    theme.colorPaletteId,
+    theme.neutralPaletteId,
+    theme.fontFamily,
+    theme.visualStyles,
+    theme.structuralColors,
+    theme.textClasses
+  ]);
+  
+  // Create a stable string representation for comparison
+  const visualPropsString = JSON.stringify(visualProperties);
+  
   // Debounce theme changes for performance, but not when theme ID changes
   const previousThemeId = useRef(theme.id);
   const isThemeIdChange = previousThemeId.current !== theme.id;
-  const debouncedTheme = useDebounce(theme, isThemeIdChange ? 0 : 300);
+  const debouncedVisualProperties = useDebounce(visualProperties, isThemeIdChange ? 0 : 300);
   
   useEffect(() => {
     // Update the previous theme ID
@@ -30,40 +56,63 @@ export function useThemePreviewGenerator() {
       return;
     }
     
-    const generatePreview = async () => {
-      setIsGenerating(true);
-      
-      try {
-        // Prepare theme input for generator
-        const themeInput = {
-          name: debouncedTheme.name,
-          mode: debouncedTheme.mode,
-          dataColors: resolved.colorPalette!.colors as string[],
-          neutralPalette: resolved.neutralPalette!.colors as string[],
-          fontFamily: debouncedTheme.fontFamily.toLowerCase().replace(/\s+/g, '-'),
-          visualStyles: debouncedTheme.visualStyles,
-          structuralColors: debouncedTheme.structuralColors && Object.keys(debouncedTheme.structuralColors).length > 0 ? debouncedTheme.structuralColors : undefined,
-          textClasses: debouncedTheme.textClasses && Object.keys(debouncedTheme.textClasses).length > 0 ? debouncedTheme.textClasses : undefined
-        };
-        
-        // Generate preview using client-side generator
-        const previewGenerator = getPreviewGenerator();
-        const previewTheme = previewGenerator.generatePreview(themeInput);
-        
-        setPreviewTheme(previewTheme);
-      } catch (error) {
-        console.error('Failed to generate preview theme:', error);
-        setPreviewTheme(null);
-      } finally {
-        setIsGenerating(false);
-      }
-    };
+    // Check if only the name changed
+    const onlyNameChanged = previousVisualPropsRef.current === visualPropsString && 
+                           resolved.previewTheme && 
+                           resolved.previewTheme.name !== theme.name;
     
-    generatePreview();
+    if (onlyNameChanged) {
+      // Just update the name without regenerating the entire theme
+      const updatedPreview = {
+        ...resolved.previewTheme,
+        name: theme.name
+      };
+      setPreviewTheme(updatedPreview);
+      return;
+    }
+    
+    // Visual properties changed, need to regenerate
+    if (previousVisualPropsRef.current !== visualPropsString) {
+      previousVisualPropsRef.current = visualPropsString;
+      
+      const generatePreview = async () => {
+        setIsGenerating(true);
+        
+        try {
+          // Prepare theme input for generator
+          const themeInput = {
+            name: theme.name,
+            mode: debouncedVisualProperties.mode,
+            dataColors: resolved.colorPalette!.colors as string[],
+            neutralPalette: resolved.neutralPalette!.colors as string[],
+            fontFamily: debouncedVisualProperties.fontFamily.toLowerCase().replace(/\s+/g, '-'),
+            visualStyles: debouncedVisualProperties.visualStyles,
+            structuralColors: debouncedVisualProperties.structuralColors && Object.keys(debouncedVisualProperties.structuralColors).length > 0 ? debouncedVisualProperties.structuralColors : undefined,
+            textClasses: debouncedVisualProperties.textClasses && Object.keys(debouncedVisualProperties.textClasses).length > 0 ? debouncedVisualProperties.textClasses : undefined
+          };
+          
+          // Generate preview using client-side generator
+          const previewGenerator = getPreviewGenerator();
+          const previewTheme = previewGenerator.generatePreview(themeInput);
+          
+          setPreviewTheme(previewTheme);
+        } catch (error) {
+          console.error('Failed to generate preview theme:', error);
+          setPreviewTheme(null);
+        } finally {
+          setIsGenerating(false);
+        }
+      };
+      
+      generatePreview();
+    }
   }, [
-    debouncedTheme,
+    visualPropsString,
+    debouncedVisualProperties,
+    theme.name,
     resolved.colorPalette,
     resolved.neutralPalette,
+    resolved.previewTheme,
     setPreviewTheme,
     setIsGenerating
   ], 'useThemePreviewGenerator', 'generatePreview');

@@ -2,7 +2,7 @@
 
 import { PowerBIEmbed } from 'powerbi-client-react';
 import { models, Report, Page, VisualDescriptor } from 'powerbi-client';
-import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import { useEffect, useState, useRef, useMemo, useCallback, memo } from 'react';
 import { powerBIConfig } from '@/lib/powerbi/config';
 import { PowerBIService } from '@/lib/powerbi/service';
 import { generateFocusedVisualLayout, generateDefaultLayout, VisualInfo } from '@/lib/powerbi/visual-focus-utils';
@@ -33,7 +33,7 @@ declare global {
   }
 }
 
-export default function SimplePowerBIEmbed({ 
+function SimplePowerBIEmbed({ 
   generatedTheme, 
   selectedVisualType = '*',
   selectedVariant = '*',
@@ -558,3 +558,35 @@ export default function SimplePowerBIEmbed({
     </div>
   );
 }
+
+// Memoize the component with custom comparison
+export default memo(SimplePowerBIEmbed, (prevProps, nextProps) => {
+  // If themes are both defined, compare everything except the name
+  if (prevProps.generatedTheme && nextProps.generatedTheme) {
+    const prevThemeCopy = { ...prevProps.generatedTheme };
+    const nextThemeCopy = { ...nextProps.generatedTheme };
+    delete prevThemeCopy.name;
+    delete nextThemeCopy.name;
+    
+    return (
+      JSON.stringify(prevThemeCopy) === JSON.stringify(nextThemeCopy) &&
+      prevProps.selectedVisualType === nextProps.selectedVisualType &&
+      prevProps.selectedVariant === nextProps.selectedVariant &&
+      prevProps.enterFocusMode === nextProps.enterFocusMode &&
+      prevProps.onExitFocusMode === nextProps.onExitFocusMode &&
+      prevProps.onVariantChange === nextProps.onVariantChange &&
+      prevProps.onReportReset === nextProps.onReportReset
+    );
+  }
+  
+  // Otherwise, do a normal comparison
+  return (
+    prevProps.generatedTheme === nextProps.generatedTheme &&
+    prevProps.selectedVisualType === nextProps.selectedVisualType &&
+    prevProps.selectedVariant === nextProps.selectedVariant &&
+    prevProps.enterFocusMode === nextProps.enterFocusMode &&
+    prevProps.onExitFocusMode === nextProps.onExitFocusMode &&
+    prevProps.onVariantChange === nextProps.onVariantChange &&
+    prevProps.onReportReset === nextProps.onReportReset
+  );
+});
