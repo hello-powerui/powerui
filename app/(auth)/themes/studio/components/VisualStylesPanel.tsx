@@ -246,6 +246,13 @@ function VisualStylesPanelComponent({
         ) : selectedSection === 'visuals' ? (
           selectedVisual ? (
             <div className="p-4">
+              {/* Description */}
+              <div className="mb-4">
+                <p className="text-sm text-gray-700">
+                  Customize the appearance of {selectedVisual} visuals with style variants and state-specific properties
+                </p>
+              </div>
+              
               {/* Visual Style Variants - Enhanced Section */}
               <Card className="mb-3 p-4 border-gray-200 shadow-sm">
                 <div className="space-y-3">
@@ -414,6 +421,13 @@ function VisualStylesPanelComponent({
           )
         ) : selectedSection === 'global' ? (
             <div className="p-4">
+              {/* Description */}
+              <div className="mb-4">
+                <p className="text-sm text-gray-700">
+                  Define global visual properties that apply across all visuals in your Power BI reports
+                </p>
+              </div>
+              
               {/* Global Settings Property Selector */}
               {schemaLoader && schemaLoaded ? (
                 <GlobalPropertySelector

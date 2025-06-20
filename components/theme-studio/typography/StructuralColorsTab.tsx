@@ -140,23 +140,13 @@ export function StructuralColorsTab() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <p className="text-sm text-gray-700">
-            Configure structural colors that define the overall theme appearance
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            These colors are used as base colors throughout your Power BI reports
-          </p>
-        </div>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleResetAll}
-          className="text-gray-600 hover:text-gray-900"
-        >
-          Reset All
-        </Button>
+      <div className="mb-4">
+        <p className="text-sm text-gray-700">
+          Configure structural colors that define the overall theme appearance
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          These colors are used as base colors throughout your Power BI reports
+        </p>
       </div>
       
       <div className={THEME_STUDIO_SPACING.sectionGap}>
@@ -167,16 +157,6 @@ export function StructuralColorsTab() {
             tooltip={description}
             defaultOpen={false}
             badge={colors.length}
-            headerAction={
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleResetGroup(colors)}
-                className="h-6 px-2 text-xs"
-              >
-                Reset
-              </Button>
-            }
           >
             <div className={`${THEME_STUDIO_SPACING.propertyGap} pt-2`}>
               {colors.map((colorKey, index) => {

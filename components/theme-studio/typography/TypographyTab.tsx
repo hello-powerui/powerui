@@ -247,20 +247,10 @@ export function TypographyTab() {
   return (
     <div>
       <div className="mb-4">
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-sm text-gray-700">
-              Configure text styles for different elements in your Power BI reports
-            </p>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleReset}
-            className="text-gray-600 hover:text-gray-900"
-          >
-            Reset All
-          </Button>
+        <div className="mb-2">
+          <p className="text-sm text-gray-700">
+            Configure text styles for different elements in your Power BI reports
+          </p>
         </div>
         
         {/* Font Family Selector */}
