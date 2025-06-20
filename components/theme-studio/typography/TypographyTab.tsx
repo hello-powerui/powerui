@@ -156,7 +156,7 @@ export function TypographyTab() {
         [className]: { ...prev[className], fontSize }
       }));
       setTextClasses({
-        ...localTextClasses,
+        ...textClasses,
         [className]: { ...localTextClasses[className], fontSize }
       });
       // Change tracking is handled at the hook level
@@ -190,7 +190,7 @@ export function TypographyTab() {
       }
     }));
     setTextClasses({
-      ...localTextClasses,
+      ...textClasses,
       [className]: { ...localTextClasses[className], color }
     });
     // Change tracking is handled at the hook level
@@ -202,7 +202,7 @@ export function TypographyTab() {
       [className]: { ...prev[className], fontWeight: weight }
     }));
     setTextClasses({
-      ...localTextClasses,
+      ...textClasses,
       [className]: { ...localTextClasses[className], fontWeight: weight }
     });
     // Change tracking is handled at the hook level
