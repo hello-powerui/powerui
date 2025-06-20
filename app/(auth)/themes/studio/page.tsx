@@ -50,16 +50,22 @@ function ThemeStudioContent() {
   
   // Sync visual settings with theme
   useEffect(() => {
-    const styles = { ...(themeStudio.theme.visualStyles || {}) };
-    // Ensure global properties structure exists when syncing
-    if (!styles['*']) {
-      styles['*'] = { '*': {} };
-    } else if (!styles['*']['*']) {
-      styles['*'] = { ...styles['*'] };
-      styles['*']['*'] = {};
+    // Only update if the visual styles have actually changed
+    const currentStyles = themeStudio.theme.visualStyles || {};
+    const hasChanges = JSON.stringify(currentStyles) !== JSON.stringify(visualSettings);
+    
+    if (hasChanges) {
+      const styles = { ...currentStyles };
+      // Ensure global properties structure exists when syncing
+      if (!styles['*']) {
+        styles['*'] = { '*': {} };
+      } else if (!styles['*']['*']) {
+        styles['*'] = { ...styles['*'] };
+        styles['*']['*'] = {};
+      }
+      setVisualSettings(styles);
     }
-    setVisualSettings(styles);
-  }, [themeStudio.theme.visualStyles]);
+  }, [themeStudio.theme.visualStyles]); // Don't include visualSettings in deps to avoid loop
   
   // Extract themeId to use as dependency
   const themeId = searchParams.get('themeId');
@@ -144,11 +150,11 @@ function ThemeStudioContent() {
     }
   };
   
-  const handleVisualSettingsChange = (newVisualSettings: Record<string, any>) => {
+  const handleVisualSettingsChange = useCallback((newVisualSettings: Record<string, any>) => {
     setVisualSettings(newVisualSettings);
     // Update the theme with new visual styles
     themeStudio.updateTheme({ visualStyles: newVisualSettings });
-  };
+  }, [themeStudio]);
   
   const handleVisualStyleChange = (visual: string, variant: string, value: any) => {
     themeStudio.updateVisualStyle(visual, variant, value);
