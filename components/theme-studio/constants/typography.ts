@@ -27,7 +27,7 @@ export const THEME_STUDIO_TYPOGRAPHY = {
   
   // Small metadata (e.g., change indicators, counts)
   metadata: {
-    size: 'text-[10px]',
+    size: 'text-xs',
     color: 'text-gray-500',
   },
   

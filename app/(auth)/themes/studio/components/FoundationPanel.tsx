@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { 
@@ -15,11 +15,14 @@ import { cn } from '@/lib/utils';
 import { ChangeIndicator } from '@/components/theme-studio/ui/change-indicator';
 import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 import { THEME_STUDIO_TYPOGRAPHY } from '@/components/theme-studio/constants/typography';
+import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
+import { CanvasLayoutSection } from './CanvasLayoutSection';
 
 interface FoundationPanelProps {
   theme: any;
   colorPalette: any;
   neutralPalette: any;
+  visualSettings: Record<string, any>;
   hasChanges: (path: string[]) => boolean;
   onThemeChange: (updates: any) => void;
   onColorPaletteChange: (paletteId: string) => void;
@@ -29,6 +32,8 @@ interface FoundationPanelProps {
   onStructuralColorsChange: (colors: any) => void;
   onTextClassesChange: (textClasses: any) => void;
   onShowPaletteManager: (type: 'color' | 'neutral') => void;
+  onVisualSettingsChange: (visualSettings: Record<string, any>) => void;
+  trackChange: (path: string[]) => void;
   isVisible: boolean;
   onToggleVisibility: (visible: boolean) => void;
 }
@@ -37,6 +42,7 @@ function FoundationPanelComponent({
   theme,
   colorPalette,
   neutralPalette,
+  visualSettings,
   hasChanges,
   onThemeChange,
   onColorPaletteChange,
@@ -46,9 +52,36 @@ function FoundationPanelComponent({
   onStructuralColorsChange,
   onTextClassesChange,
   onShowPaletteManager,
+  onVisualSettingsChange,
+  trackChange,
   isVisible,
   onToggleVisibility,
 }: FoundationPanelProps) {
+  const [schemaLoader, setSchemaLoader] = useState<SchemaLoader | null>(null);
+  const [schemaLoaded, setSchemaLoaded] = useState(false);
+  const [canvasTypes, setCanvasTypes] = useState<string[]>([]);
+  
+  // Initialize SchemaLoader
+  useEffect(() => {
+    setSchemaLoader(SchemaLoader.getInstance());
+  }, []);
+  
+  // Load schema on mount
+  useEffect(() => {
+    if (!schemaLoader) return;
+    
+    const loadSchema = async () => {
+      try {
+        await schemaLoader.loadSchema();
+        const canvas = schemaLoader.getCanvasTypes();
+        setCanvasTypes(canvas);
+        setSchemaLoaded(true);
+      } catch (error) {
+        // Silently fail - schema will be loaded on next attempt
+      }
+    };
+    loadSchema();
+  }, [schemaLoader]);
   
   if (!isVisible) {
     return (
@@ -198,7 +231,16 @@ function FoundationPanelComponent({
             </div>
           </div>
 
-
+          {/* Canvas & Layout */}
+          <CanvasLayoutSection
+            visualSettings={visualSettings}
+            onVisualSettingsChange={onVisualSettingsChange}
+            trackChange={trackChange}
+            hasChanges={hasChanges}
+            schemaLoader={schemaLoader}
+            schemaLoaded={schemaLoaded}
+            canvasTypes={canvasTypes}
+          />
 
         </div>
       </div>
@@ -215,6 +257,7 @@ export const FoundationPanel = memo(FoundationPanelComponent, (prevProps, nextPr
     prevProps.theme.mode === nextProps.theme.mode &&
     prevProps.theme.fontFamily === nextProps.theme.fontFamily &&
     prevProps.colorPalette?.id === nextProps.colorPalette?.id &&
-    prevProps.neutralPalette?.id === nextProps.neutralPalette?.id
+    prevProps.neutralPalette?.id === nextProps.neutralPalette?.id &&
+    JSON.stringify(prevProps.visualSettings) === JSON.stringify(nextProps.visualSettings)
   );
 });

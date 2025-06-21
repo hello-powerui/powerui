@@ -5,9 +5,9 @@ import { useState, useEffect } from 'react';
 import { THEME_STUDIO_TYPOGRAPHY } from '../constants/typography';
 
 // Icons
-const ChevronDownIcon = ({ className }: { className?: string }) => (
+const ChevronRightIcon = ({ className }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
   </svg>
 );
 
@@ -51,12 +51,12 @@ export function CollapsibleSection({
       onOpenChange={setIsOpen} 
       className={`${className}`}
     >
-      <div className="flex items-center justify-between w-full px-3 py-2.5 hover:bg-gray-50 transition-colors group">
+      <div className="flex items-center justify-between w-full px-2 py-2.5 hover:bg-gray-50 rounded-md transition-colors group">
         <Collapsible.Trigger asChild>
           <button className="flex items-center gap-2 flex-1 text-left">
-            <ChevronDownIcon 
+            <ChevronRightIcon 
               className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                isOpen ? 'transform rotate-180' : ''
+                isOpen ? 'transform rotate-90' : ''
               }`} 
             />
             {icon && (
@@ -83,9 +83,9 @@ export function CollapsibleSection({
       </div>
       
       <Collapsible.Content className="data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up overflow-hidden">
-        <div className="relative pl-6 pr-2 pb-3">
-          {/* Content with connection points */}
-          <div className="relative pt-1">
+        <div className="relative pl-7 pr-3 py-3">
+          {/* Content area with improved spacing */}
+          <div className="space-y-3">
             {children}
           </div>
         </div>

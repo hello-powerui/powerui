@@ -293,6 +293,7 @@ function ThemeStudioContent() {
               theme={themeStudio.theme}
               colorPalette={themeStudio.colorPalette}
               neutralPalette={themeStudio.neutralPalette}
+              visualSettings={visualSettings}
               hasChanges={(path) => themeStudio.changedPaths.has(path.join('.'))}
               onThemeChange={themeStudio.updateTheme}
               onColorPaletteChange={themeStudio.setColorPaletteId}
@@ -302,6 +303,10 @@ function ThemeStudioContent() {
               onStructuralColorsChange={themeStudio.setStructuralColors}
               onTextClassesChange={themeStudio.setTextClasses}
               onShowPaletteManager={handleShowPaletteManager}
+              onVisualSettingsChange={handleVisualSettingsChange}
+              trackChange={(path) => {
+                // Change tracking is handled internally by updateTheme
+              }}
               isVisible={showFoundation}
               onToggleVisibility={setShowFoundation}
             />

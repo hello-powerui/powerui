@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { stripe, planToPurchasePlan, planToUserPlan, planToSeats, PlanType } from "@/lib/stripe";
 import { prisma } from "@/lib/db/prisma";
+import { clerkClient } from "@clerk/nextjs/server";
 import Stripe from "stripe";
 
 export async function POST(req: Request) {
@@ -82,11 +83,23 @@ export async function POST(req: Request) {
             },
           });
 
-          // If this is a team plan, create an organization
+          // If this is a team plan, enable organization creation for the user
           if (plan === "team-5" || plan === "team-10") {
-            // We'll need to create the organization after the user confirms their org details
-            // For now, we'll just mark them as having a team plan
-            
+            try {
+              const client = await clerkClient();
+              const clerkUser = await client.users.getUser(userId);
+              
+              await client.users.updateUser(userId, {
+                publicMetadata: {
+                  ...clerkUser.publicMetadata,
+                  canCreateOrganizations: true,
+                  organizationLimit: 1,
+                }
+              });
+            } catch (error) {
+              console.error("Failed to enable organization creation for user:", error);
+              // Don't fail the webhook if this fails - user can contact support
+            }
           }
         });
 

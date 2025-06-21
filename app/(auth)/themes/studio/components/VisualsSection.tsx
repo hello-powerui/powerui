@@ -60,7 +60,7 @@ export function VisualsSection({
   return (
     <>
       {/* Controls Row */}
-      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-gray-200">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-200">
         <Select
           value={selectedVisual || ''}
           onValueChange={(value) => {
@@ -68,12 +68,12 @@ export function VisualsSection({
             onSelectedVariantChange('*');
           }}
         >
-          <SelectTrigger className="h-6 text-sm w-[140px]">
+          <SelectTrigger className="h-9 text-sm w-[180px] font-medium">
             <SelectValue placeholder="Select visual" />
           </SelectTrigger>
           <SelectContent>
             {visualTypes.map((visual) => (
-              <SelectItem key={visual} value={visual} className="text-xs">
+              <SelectItem key={visual} value={visual} className="text-sm">
                 {visual.charAt(0).toUpperCase() + visual.slice(1).replace(/([A-Z])/g, ' $1')}
               </SelectItem>
             ))}
@@ -85,11 +85,11 @@ export function VisualsSection({
           <Button
             onClick={onEnterFocusMode}
             variant="outline"
-            size="sm"
-            className="h-6 px-2 text-sm"
+            size="default"
+            className="h-9 px-4 text-sm font-medium"
             title="View this visual in focus mode"
           >
-            <Focus className="w-3 h-3 mr-1" />
+            <Focus className="w-4 h-4 mr-2" />
             Focus Mode
           </Button>
         )}

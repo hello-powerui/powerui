@@ -17,13 +17,75 @@ export async function POST(
     const body = await req.json();
     const { visibility, organizationId } = body;
 
-    // Verify user owns the theme
+    // Get theme and check access
     const theme = await prisma.theme.findUnique({
       where: { id: themeId },
+      include: {
+        user: true,
+        organization: true,
+      },
     });
 
-    if (!theme || theme.userId !== userId) {
-      return new NextResponse("Theme not found or unauthorized", { status: 404 });
+    if (!theme) {
+      return new NextResponse("Theme not found", { status: 404 });
+    }
+
+    // Check if user has permission to share
+    let canShare = false;
+    
+    // Owner can always share
+    if (theme.userId === userId) {
+      canShare = true;
+    }
+    
+    // Organization members can share organization themes
+    if (theme.visibility === "ORGANIZATION" && theme.organizationId) {
+      const membership = await prisma.organizationMember.findFirst({
+        where: {
+          userId,
+          organizationId: theme.organizationId,
+        },
+      });
+      if (membership) {
+        canShare = true;
+      }
+    }
+
+    if (!canShare) {
+      return new NextResponse("Unauthorized to share this theme", { status: 403 });
+    }
+
+    // Check if user is trying to set organization visibility
+    if (visibility === "ORGANIZATION") {
+      // Get the current user's plan
+      const currentUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { plan: true },
+      });
+      
+      if (currentUser?.plan !== "TEAM") {
+        return new NextResponse(
+          "Organization sharing is only available for Team plan users",
+          { status: 403 }
+        );
+      }
+
+      // Verify user is part of the organization
+      if (organizationId) {
+        const membership = await prisma.organizationMember.findFirst({
+          where: {
+            userId,
+            organizationId,
+          },
+        });
+
+        if (!membership) {
+          return new NextResponse(
+            "You are not a member of this organization",
+            { status: 403 }
+          );
+        }
+      }
     }
 
     // Update theme visibility

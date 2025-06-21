@@ -27,6 +27,13 @@ export class ThemeService {
       orderBy: { createdAt: 'desc' },
       include: {
         organization: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            plan: true,
+          },
+        },
       },
     })
   }
@@ -39,6 +46,13 @@ export class ThemeService {
       where: { id: themeId },
       include: {
         organization: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            plan: true,
+          },
+        },
       },
     });
     
@@ -87,11 +101,45 @@ export class ThemeService {
     userId: string,
     data: Prisma.ThemeUpdateInput
   ): Promise<Theme> {
-    return prisma.theme.update({
-      where: {
-        id: themeId,
-        userId,
+    // First check if user owns the theme or has organization access
+    const theme = await prisma.theme.findUnique({
+      where: { id: themeId },
+      include: {
+        organization: true,
       },
+    });
+
+    if (!theme) {
+      throw new Error('Theme not found');
+    }
+
+    // Check if user can edit
+    let canEdit = false;
+    
+    // Owner can always edit
+    if (theme.userId === userId) {
+      canEdit = true;
+    }
+    
+    // Organization members can edit organization themes
+    if (theme.visibility === 'ORGANIZATION' && theme.organizationId) {
+      const membership = await prisma.organizationMember.findFirst({
+        where: {
+          userId,
+          organizationId: theme.organizationId,
+        },
+      });
+      if (membership) {
+        canEdit = true;
+      }
+    }
+
+    if (!canEdit) {
+      throw new Error('Unauthorized to edit this theme');
+    }
+
+    return prisma.theme.update({
+      where: { id: themeId },
       data,
     })
   }
@@ -100,6 +148,7 @@ export class ThemeService {
    * Delete a theme
    */
   static async deleteTheme(themeId: string, userId: string): Promise<void> {
+    // Only the owner can delete a theme
     await prisma.theme.delete({
       where: {
         id: themeId,

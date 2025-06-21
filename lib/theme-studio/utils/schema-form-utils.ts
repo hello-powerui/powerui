@@ -153,6 +153,11 @@ export const isPercentageProperty = (schema: SchemaProperty): boolean => {
 
 // Add contextual title for known references
 export const getContextualTitle = (schema: SchemaProperty, propertyName: string, path?: string[]): string => {
+  // Special case for the "*" property which represents default/wildcard settings
+  if (propertyName === '*') {
+    return 'Default Settings';
+  }
+  
   // Check if we're in a visual property section (like legend, labels, etc.)
   const isInVisualSection = path && path.length >= 4 && path[0] === 'visualStyles';
   

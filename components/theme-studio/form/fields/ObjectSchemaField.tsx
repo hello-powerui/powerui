@@ -2,6 +2,8 @@
 
 import { useCallback, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
+import { FieldGroupCard } from '@/components/theme-studio/ui/field-group-card';
+import { ConnectedProperty } from '@/components/theme-studio/ui/connected-property';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { getContextualTitle } from '@/lib/theme-studio/utils/schema-form-utils';
@@ -111,44 +113,77 @@ export function ObjectSchemaField({
   );
   
   // Render fields function
-  const renderFields = () => (
-    <div className="space-y-2">
-      {Object.entries(schema.properties || {}).map(([propName, propSchema]) => {
-        const fullPath = [...path, propName];
-        const contextualTitle = getContextualTitle(propSchema, propName, fullPath);
-        
-        return (
-          <SchemaForm
-            key={propName}
-            schema={{ ...propSchema, title: contextualTitle }}
-            value={objectValue[propName]}
-            onChange={(newValue: any) => handlePropertyChange(propName, newValue)}
-            schemaLoader={schemaLoader}
-            path={fullPath}
-            level={level + 1}
-            hideTitle={false}
-          />
-        );
-      })}
-    </div>
-  );
+  const renderFields = () => {
+    const entries = Object.entries(schema.properties || {});
+    
+    // If this needs visual grouping, wrap each property with ConnectedProperty
+    if (needsVisualGrouping && !hideTitle) {
+      return (
+        <div className="relative">
+          {entries.map(([propName, propSchema], index) => {
+            const fullPath = [...path, propName];
+            const contextualTitle = getContextualTitle(propSchema, propName, fullPath);
+            
+            return (
+              <ConnectedProperty
+                key={propName}
+                isLast={index === entries.length - 1}
+                isNested={true}
+              >
+                <SchemaForm
+                  schema={{ ...propSchema, title: contextualTitle }}
+                  value={objectValue[propName]}
+                  onChange={(newValue: any) => handlePropertyChange(propName, newValue)}
+                  schemaLoader={schemaLoader}
+                  path={fullPath}
+                  level={level + 1}
+                  hideTitle={false}
+                />
+              </ConnectedProperty>
+            );
+          })}
+        </div>
+      );
+    }
+    
+    // Regular rendering without ConnectedProperty
+    return (
+      <div className="space-y-3">
+        {entries.map(([propName, propSchema]) => {
+          const fullPath = [...path, propName];
+          const contextualTitle = getContextualTitle(propSchema, propName, fullPath);
+          
+          return (
+            <SchemaForm
+              key={propName}
+              schema={{ ...propSchema, title: contextualTitle }}
+              value={objectValue[propName]}
+              onChange={(newValue: any) => handlePropertyChange(propName, newValue)}
+              schemaLoader={schemaLoader}
+              path={fullPath}
+              level={level + 1}
+              hideTitle={false}
+            />
+          );
+        })}
+      </div>
+    );
+  };
   
   if (isPropertySection) {
     // Render individual property fields inline
     return renderFields();
   }
   
-  // If this needs visual grouping, wrap in a card
+  // If this needs visual grouping, wrap in a field group card
   if (needsVisualGrouping && !hideTitle) {
     return (
-      <Card className="p-3 border-l-2 border-l-blue-500">
-        <div className="space-y-2">
-          {schema.title && (
-            <h5 className="text-xs font-semibold text-gray-700 mb-2">{schema.title}</h5>
-          )}
-          {renderFields()}
-        </div>
-      </Card>
+      <FieldGroupCard
+        title={schema.title || "Image Settings"}
+        accentColor="text-blue-600"
+      >
+        {renderFields()}
+      </FieldGroupCard>
     );
   }
   

@@ -117,7 +117,6 @@ function VisualStylesPanelComponent({
             trackChange={trackChange}
             schemaLoader={schemaLoader}
             schemaLoaded={schemaLoaded}
-            canvasTypes={canvasTypes}
           />
         );
       

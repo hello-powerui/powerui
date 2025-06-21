@@ -33,9 +33,9 @@ export function FillControl({
   if (inline) {
     return (
       <div className="flex items-center gap-3">
-        <Label className="text-sm font-medium text-gray-700 w-[110px] flex-shrink-0">
+        <Label className="text-sm font-medium text-gray-700 min-w-[100px] flex-shrink-0">
           {label}
-          {required && <span className="text-[10px] text-red-500 ml-0.5">*</span>}
+          {required && <span className="text-xs text-red-500 ml-0.5">*</span>}
         </Label>
         <div className="flex-1">
           <UnifiedColorPicker
@@ -47,7 +47,7 @@ export function FillControl({
             mode={theme.mode || 'light'}
             neutralPalette={(neutralPalette?.colors as string[]) || []}
             themeColors={(colorPalette?.colors as string[]) || []}
-            className="[&_button]:h-6 [&_button]:text-sm [&_button]:px-2"
+            className="[&_button]:h-8 [&_button]:text-sm [&_button]:px-3 [&_button]:hover:border-gray-400 [&_button]:transition-colors"
           />
         </div>
       </div>

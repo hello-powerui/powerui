@@ -173,42 +173,6 @@ export class SchemaLoader {
     
     return schemas.some(schema => this.supportsStates(schema));
   }
-
-  // Get global property value from theme
-  getGlobalPropertyValue(theme: any, propertyPath: string[]): any {
-    try {
-      // Global values are stored at visualStyles.*.*.*
-      const globalArray = theme?.visualStyles?.['*']?.['*']?.['*'];
-      if (!Array.isArray(globalArray) || globalArray.length === 0) {
-        return undefined;
-      }
-      
-      // Get the first object in the array (combined properties)
-      const globalProps = globalArray[0];
-      
-      // Navigate to the specific property
-      let value = globalProps;
-      for (const key of propertyPath) {
-        if (value && typeof value === 'object' && key in value) {
-          value = value[key];
-        } else {
-          return undefined;
-        }
-      }
-      
-      return value;
-    } catch (error) {
-      return undefined;
-    }
-  }
-
-  // Check if a property value is inherited from global
-  isInheritedFromGlobal(theme: any, visualType: string, variant: string, propertyPath: string[], currentValue: any): boolean {
-    const globalValue = this.getGlobalPropertyValue(theme, propertyPath);
-    if (globalValue === undefined) return false;
-    
-    return JSON.stringify(currentValue) === JSON.stringify(globalValue);
-  }
   
   // Check if a visual has any state-driven properties
   visualHasStateDrivenProperties(visualType: string): boolean {

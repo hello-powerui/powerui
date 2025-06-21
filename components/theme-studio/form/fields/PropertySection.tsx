@@ -40,14 +40,14 @@ export function PropertySection({
   return (
     <div className="space-y-2">
       {!hideTitle && schema.title && (
-        <h4 className={`${THEME_STUDIO_TYPOGRAPHY.label.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight} text-gray-700`}>{schema.title}</h4>
+        <h4 className={`${THEME_STUDIO_TYPOGRAPHY.sectionHeader.size} font-semibold text-gray-700`}>{schema.title}</h4>
       )}
       {schema.description && (
         <p className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color}`}>{schema.description}</p>
       )}
       
       {/* Render the properties from the items schema */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         {(() => {
           const entries = Object.entries(schema.items?.properties || {});
           return entries.map(([propName, propSchema], index) => {

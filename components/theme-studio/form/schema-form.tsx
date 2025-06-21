@@ -6,6 +6,7 @@ import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { PropertyInput } from './property-input';
 import { PropertyWrapper } from './property-wrapper';
 import { Card } from '@/components/ui/card';
+import { FieldGroupCard } from '@/components/theme-studio/ui/field-group-card';
 import { FillControl } from './controls';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 import { VisualPropertiesPanel } from './VisualPropertiesPanel';
@@ -139,23 +140,23 @@ export function SchemaForm({
       description: schema.description || resolvedSchema.description,
     };
     
-    // If this is an image object, wrap it in a card for better visual grouping
+    // If this is an image object, wrap it in a field group card for better visual grouping
     if (isImageRef && resolvedSchema.properties?.name && resolvedSchema.properties?.url) {
       return (
-        <Card className="p-3 border-l-2 border-l-blue-500">
-          <div className="space-y-2">
-            <h5 className="text-xs font-semibold text-gray-700 mb-2">Image Settings</h5>
-            <SchemaForm
-              schema={mergedSchema}
-              value={value}
-              onChange={handleChange}
-              schemaLoader={schemaLoader}
-              path={path}
-              level={level}
-              hideTitle={true}
-            />
-          </div>
-        </Card>
+        <FieldGroupCard
+          title="Image Settings"
+          accentColor="text-blue-600"
+        >
+          <SchemaForm
+            schema={mergedSchema}
+            value={value}
+            onChange={handleChange}
+            schemaLoader={schemaLoader}
+            path={path}
+            level={level}
+            hideTitle={true}
+          />
+        </FieldGroupCard>
       );
     }
     

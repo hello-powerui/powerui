@@ -45,11 +45,11 @@ export function NumberControl({
   if (inline) {
     return (
       <div className="flex items-center gap-3">
-        <Label htmlFor={path.join('-')} className="text-sm font-medium text-gray-700 w-[110px] flex-shrink-0">
+        <Label htmlFor={path.join('-')} className="text-sm font-medium text-gray-700 min-w-[100px] flex-shrink-0">
           {label}
-          {required && <span className="text-[10px] text-red-500 ml-0.5">*</span>}
+          {required && <span className="text-xs text-red-500 ml-0.5">*</span>}
         </Label>
-        <div className="flex items-center gap-1 flex-1">
+        <div className="flex items-center gap-1.5 flex-1">
           <Input
             id={path.join('-')}
             type="number"
@@ -58,7 +58,7 @@ export function NumberControl({
             min={isPercentage ? 0 : min}
             max={isPercentage ? 100 : max}
             step={isPercentage ? 1 : step}
-            className="h-6 text-sm px-2"
+            className="h-8 text-sm px-2.5 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             title={description}
           />
           {isPercentage && (
@@ -81,10 +81,10 @@ export function NumberControl({
       </div>
 
       {description && (
-        <p className="text-[10px] text-gray-500 leading-relaxed">{description}</p>
+        <p className="text-xs text-gray-500 leading-relaxed">{description}</p>
       )}
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         <Input
           id={path.join('-')}
           type="number"
@@ -93,10 +93,10 @@ export function NumberControl({
           min={isPercentage ? 0 : min}
           max={isPercentage ? 100 : max}
           step={isPercentage ? 1 : step}
-          className="flex-1 h-6 text-sm px-2"
+          className="flex-1 h-8 text-sm px-2.5 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
         />
         {isPercentage && (
-          <span className="text-[11px] text-gray-600">%</span>
+          <span className="text-sm text-gray-600">%</span>
         )}
       </div>
 

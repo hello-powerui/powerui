@@ -16,6 +16,8 @@ export default async function DashboardWrapper({
   const hasSubscription = await hasActiveSubscription(userId);
   
   if (!hasSubscription) {
+    // Note: For local development, make sure Clerk webhooks are configured
+    // to sync organization memberships to the database
     redirect('/upgrade?returnUrl=/dashboard');
   }
   
