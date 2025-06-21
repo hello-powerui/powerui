@@ -140,7 +140,8 @@ export default function ThemesPage() {
       });
       
       if (response.ok) {
-        setThemes(themes.filter(t => t.id !== themeId));
+        // Refresh all themes to reflect deletion
+        await fetchAllThemes();
       } else {
         alert('Failed to delete theme');
       }
@@ -264,7 +265,7 @@ export default function ThemesPage() {
         
         {/* Actions */}
         <div className="flex gap-1">
-          {(isOwner || (theme.visibility === 'ORGANIZATION' && theme.organizationId === userOrganization?.id)) ? (
+          {(isOwner || (theme.visibility === 'ORGANIZATION' && theme.organization?.id === userOrganization?.id)) ? (
             <>
               <button 
                 onClick={() => router.push(`/themes/studio?themeId=${theme.id}`)}
@@ -366,7 +367,7 @@ export default function ThemesPage() {
         </div>
         
         {/* Sharing controls on separate row for owners and org members */}
-        {(isOwner || (theme.visibility === 'ORGANIZATION' && theme.organizationId === userOrganization?.id)) && (
+        {(isOwner || (theme.visibility === 'ORGANIZATION' && theme.organization?.id === userOrganization?.id)) && (
           <div className="mt-2">
             <ThemeSharingControls
               themeId={theme.id}
