@@ -183,7 +183,7 @@ function ThemeStudioContent() {
   const handleVisualSettingsChange = useCallback((newVisualSettings: Record<string, any>) => {
     // Update the theme with new visual styles
     themeStudio.updateTheme({ visualStyles: newVisualSettings });
-  }, [themeStudio.updateTheme]);
+  }, [themeStudio]);
   
   const handleVisualStyleChange = (visual: string, variant: string, value: any) => {
     themeStudio.updateVisualStyle(visual, variant, value);

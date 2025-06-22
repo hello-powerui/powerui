@@ -362,7 +362,7 @@ function SimplePowerBIEmbed({
     if (reportRef.current && visuals.length > 0) {
       applyFocusMode();
     }
-  }, [applyFocusMode]); // applyFocusMode already depends on focusMode, selectedVisualType, visuals
+  }, [applyFocusMode, visuals.length]); // applyFocusMode already depends on focusMode, selectedVisualType, visuals
 
 
   const eventHandlers = useMemo(() => new Map([

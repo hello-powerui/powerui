@@ -29,7 +29,7 @@ export function useThemeStudio() {
   
   // Change tracking
   const { changedPaths, trackChange, hasChanges } = useThemeChanges();
-  const hasChangesValue = useMemo(() => hasChanges(), [changedPaths]);
+  const hasChangesValue = useMemo(() => hasChanges(), [hasChanges]);
   
   
   // Enhanced theme update with change tracking

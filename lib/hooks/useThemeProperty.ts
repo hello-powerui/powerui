@@ -20,7 +20,7 @@ export function useThemeProperty(path: string[]) {
   
   const value = useMemo(() => 
     getValueByPath(currentTheme, path),
-    [currentTheme, pathKey]
+    [currentTheme, path]
   );
   
   const setValue = useCallback((newValue: any) => {
@@ -67,12 +67,12 @@ export function usePropertyInheritance(
   
   const localValue = useMemo(() => 
     getValueByPath(currentTheme, path),
-    [currentTheme, pathKey]
+    [currentTheme, path]
   );
   
   const globalValue = useMemo(() => 
     globalPath ? getValueByPath(currentTheme, globalPath) : undefined,
-    [currentTheme, globalPathKey]
+    [currentTheme, globalPath]
   );
   
   const effectiveValue = localValue ?? globalValue;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, redirect } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { VisibilityBadge } from '@/components/theme-sharing-controls';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -86,11 +86,6 @@ export default function ThemesPage() {
     redirect('/sign-in');
   }
 
-  useEffect(() => {
-    fetchAllThemes();
-    fetchUserDetails();
-  }, []);
-
   const fetchUserDetails = async () => {
     try {
       const response = await fetch('/api/user/me');
@@ -104,7 +99,7 @@ export default function ThemesPage() {
     }
   };
 
-  const fetchAllThemes = async () => {
+  const fetchAllThemes = useCallback(async () => {
     try {
       // Fetch user's themes
       const [myThemesResponse, publicThemesResponse] = await Promise.all([
@@ -134,7 +129,12 @@ export default function ThemesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    fetchAllThemes();
+    fetchUserDetails();
+  }, [fetchAllThemes]);
 
   const handleDelete = async (themeId: string, themeName: string) => {
     if (!confirm(`Are you sure you want to delete "${themeName}"? This action cannot be undone.`)) {
