@@ -87,14 +87,9 @@ export async function POST(req: Request) {
           if (plan === "team-5" || plan === "team-10") {
             try {
               const client = await clerkClient();
-              const clerkUser = await client.users.getUser(userId);
-              
               await client.users.updateUser(userId, {
-                publicMetadata: {
-                  ...clerkUser.publicMetadata,
-                  canCreateOrganizations: true,
-                  organizationLimit: 1,
-                }
+                createOrganizationEnabled: true,
+                createOrganizationsLimit: 1
               });
             } catch (error) {
               console.error("Failed to enable organization creation for user:", error);
