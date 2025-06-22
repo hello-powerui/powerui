@@ -95,6 +95,7 @@ interface ThemeStudioState {
 
 const defaultStudioTheme: StudioTheme = {
   name: 'Untitled Theme',
+  description: '',
   colorPaletteId: DEFAULT_COLOR_PALETTE.id,
   neutralPaletteId: AZURE_NEUTRAL_PALETTE.id,
   mode: 'light',
@@ -307,9 +308,13 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           const url = isUpdate ? `/api/themes/${theme.id}` : '/api/themes';
           const method = isUpdate ? 'PUT' : 'POST';
           
+          // Extract only the theme data fields, excluding metadata
+          const { id, ...themeDataFields } = theme;
+          
           const payload = {
             name: theme.name,
-            themeData: theme // Send the entire theme object
+            description: theme.description,
+            themeData: themeDataFields // Send only the theme configuration data
           };
           
           const response = await fetch(url, {
@@ -319,7 +324,9 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           });
           
           if (!response.ok) {
-            throw new Error('Failed to save theme');
+            const errorText = await response.text();
+            console.error('Save theme failed:', response.status, errorText);
+            throw new Error(`Failed to save theme: ${response.status} ${errorText}`);
           }
           
           const savedTheme = await response.json();

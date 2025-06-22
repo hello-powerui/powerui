@@ -31,6 +31,7 @@ export class ThemeService {
           select: {
             id: true,
             email: true,
+            username: true,
             plan: true,
           },
         },
@@ -50,6 +51,7 @@ export class ThemeService {
           select: {
             id: true,
             email: true,
+            username: true,
             plan: true,
           },
         },

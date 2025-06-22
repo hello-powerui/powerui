@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
             select: {
               id: true,
               email: true,
+              username: true,
             },
           },
           organization: {
@@ -56,8 +57,9 @@ export async function GET(req: NextRequest) {
       updatedAt: theme.updatedAt,
       author: {
         id: theme.user.id,
-        // Only show first part of email for privacy
+        // Show username if available, otherwise show masked email
         email: theme.user.email.split('@')[0] + '@...',
+        username: theme.user.username,
       },
     }));
 

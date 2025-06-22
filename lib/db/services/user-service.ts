@@ -5,13 +5,17 @@ export class UserService {
   /**
    * Create or update a user from Clerk data
    */
-  static async upsertUser(clerkUserId: string, email: string): Promise<User> {
+  static async upsertUser(clerkUserId: string, email: string, username?: string): Promise<User> {
     return prisma.user.upsert({
       where: { id: clerkUserId },
-      update: { email },
+      update: { 
+        email,
+        ...(username && { username })
+      },
       create: {
         id: clerkUserId,
         email,
+        username,
       },
     })
   }

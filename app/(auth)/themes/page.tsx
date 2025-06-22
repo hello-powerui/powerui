@@ -3,14 +3,26 @@
 import { useRouter, redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { ThemeSharingControls, VisibilityBadge } from '@/components/theme-sharing-controls';
+import { VisibilityBadge } from '@/components/theme-sharing-controls';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from '@/components/ui/dropdown-menu';
+import { MoreVertical, Edit, Copy, Download, Globe, Users, Lock } from 'lucide-react';
 
 interface Theme {
   id: string;
   name: string;
   description: string | null;
   createdAt: string;
+  updatedAt: string;
   dataPalette: string;
   neutralPalette: string;
   fontFamily: string;
@@ -25,10 +37,12 @@ interface Theme {
   user?: {
     id: string;
     plan: 'PRO' | 'TEAM';
+    username?: string;
   };
   author?: {
     id: string;
     email: string;
+    username?: string;
   };
 }
 
@@ -46,12 +60,6 @@ const TrashIcon = () => (
   </svg>
 );
 
-// Icon for more options
-const MoreIcon = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-  </svg>
-);
 
 // Icon for duplicate
 const DuplicateIcon = () => (
@@ -175,64 +183,157 @@ export default function ThemesPage() {
     }
   };
 
-  const handleVisibilityChange = (themeId: string, newVisibility: 'PRIVATE' | 'ORGANIZATION' | 'PUBLIC') => {
-    // Update the local state to reflect the change
-    setMyThemes(themes => 
-      themes.map(theme => 
-        theme.id === themeId ? { ...theme, visibility: newVisibility } : theme
-      )
-    );
+  const handleVisibilityChange = async (themeId: string, newVisibility: 'PRIVATE' | 'ORGANIZATION' | 'PUBLIC') => {
+    try {
+      const response = await fetch(`/api/themes/${themeId}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visibility: newVisibility,
+          organizationId: newVisibility === 'ORGANIZATION' ? userOrganization?.id : null,
+        }),
+      });
+
+      if (response.ok) {
+        // Update the local state to reflect the change
+        setMyThemes(themes => 
+          themes.map(theme => 
+            theme.id === themeId ? { ...theme, visibility: newVisibility } : theme
+          )
+        );
+        
+        // If theme is now public, refresh public themes
+        if (newVisibility === 'PUBLIC') {
+          fetchAllThemes();
+        }
+      } else {
+        console.error('Failed to update theme visibility');
+      }
+    } catch (error) {
+      console.error('Error updating theme visibility:', error);
+    }
+  };
+
+  const handleDownloadTheme = async (theme: Theme) => {
+    const themeInput = theme.themeData as any;
     
-    // If theme is now public, refresh public themes
-    if (newVisibility === 'PUBLIC') {
-      fetchAllThemes();
+    const response = await fetch('/api/generate-theme', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(themeInput),
+    });
+    if (response.ok) {
+      const generatedTheme = await response.json();
+      // Download the theme
+      const blob = new Blob([JSON.stringify(generatedTheme, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
+      a.click();
+      URL.revokeObjectURL(url);
     }
   };
 
   const renderThemeCard = (theme: Theme, isOwner: boolean = true) => (
     <div key={theme.id} className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all group relative overflow-hidden">
-      {/* Delete button - only for owner */}
-      {isOwner && (
-        <button
-          onClick={() => handleDelete(theme.id, theme.name)}
-          disabled={deletingId === theme.id}
-          className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all opacity-0 group-hover:opacity-100 z-10"
-          title="Delete theme"
-        >
-          {deletingId === theme.id ? (
-            <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <TrashIcon />
-          )}
-        </button>
-      )}
       
       <div className="p-4">
-        {/* Visibility Badge */}
-        {theme.visibility && (
-          <div className="mb-2">
-            <VisibilityBadge visibility={theme.visibility} size="sm" />
-          </div>
-        )}
-        
-        {/* Title and metadata */}
-        <div className="mb-3">
-          <h3 className="font-medium text-gray-900 mb-1 pr-8">{theme.name}</h3>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span>
-              {new Date(theme.createdAt).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                year: 'numeric' 
-              })}
-            </span>
-            {theme.author && (
-              <>
-                <span>•</span>
-                <span>by {theme.author.email}</span>
-              </>
+        {/* Header with title and dropdown */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1">
+            <h3 className="font-medium text-gray-900 mb-1">{theme.name}</h3>
+            {theme.visibility && (
+              <VisibilityBadge visibility={theme.visibility} size="sm" />
             )}
           </div>
+          
+          {/* Dropdown menu */}
+          {(isOwner || (theme.visibility === 'ORGANIZATION' && theme.organization?.id === userOrganization?.id)) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-all">
+                  <MoreVertical className="w-4 h-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => router.push(`/themes/studio?themeId=${theme.id}`)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit theme
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDuplicate(theme.id)} disabled={duplicatingId === theme.id}>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDownloadTheme(theme)}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Download
+                </DropdownMenuItem>
+                {isOwner && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => handleDelete(theme.id, theme.name)} 
+                      disabled={deletingId === theme.id}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      <TrashIcon />
+                      Delete
+                    </DropdownMenuItem>
+                  </>
+                )}
+                
+                {/* Privacy section */}
+                {isOwner && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Privacy</DropdownMenuLabel>
+                    <DropdownMenuRadioGroup 
+                      value={theme.visibility || 'PRIVATE'} 
+                      onValueChange={(value) => handleVisibilityChange(theme.id, value as 'PRIVATE' | 'ORGANIZATION' | 'PUBLIC')}
+                    >
+                      <DropdownMenuRadioItem value="PRIVATE">
+                        <Lock className="mr-2 h-4 w-4" />
+                        Private
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="PUBLIC">
+                        <Globe className="mr-2 h-4 w-4" />
+                        Public
+                      </DropdownMenuRadioItem>
+                      {userPlan === 'TEAM' && userOrganization && (
+                        <DropdownMenuRadioItem value="ORGANIZATION">
+                          <Users className="mr-2 h-4 w-4" />
+                          {userOrganization.name}
+                        </DropdownMenuRadioItem>
+                      )}
+                    </DropdownMenuRadioGroup>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+        
+        {/* Metadata */}
+        <div className="space-y-1 mb-3 text-xs text-gray-500">
+          <div>Created {new Date(theme.createdAt).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric' 
+          })}</div>
+          {theme.updatedAt && theme.updatedAt !== theme.createdAt && (
+            <div>Modified {new Date(theme.updatedAt).toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric' 
+            })}</div>
+          )}
+          {theme.author && (
+            <div>by {theme.author.username ? `@${theme.author.username}` : theme.author.email.split('@')[0]}</div>
+          )}
         </div>
         
         {/* Color preview - more compact */}
@@ -263,120 +364,30 @@ export default function ThemesPage() {
           </span>
         </div>
         
-        {/* Actions */}
-        <div className="flex gap-1">
-          {(isOwner || (theme.visibility === 'ORGANIZATION' && theme.organization?.id === userOrganization?.id)) ? (
-            <>
-              <button 
-                onClick={() => router.push(`/themes/studio?themeId=${theme.id}`)}
-                className="flex-1 px-2 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
-              >
-                Edit
-              </button>
-              <button 
-                onClick={() => handleDuplicate(theme.id)}
-                disabled={duplicatingId === theme.id}
-                className="px-2 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Duplicate theme"
-              >
-                {duplicatingId === theme.id ? (
-                  <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
-                ) : (
+        {/* Actions for non-owners */}
+        {!isOwner && theme.visibility !== 'ORGANIZATION' && (
+          <div className="flex gap-2">
+            <button 
+              onClick={() => handleDuplicate(theme.id)}
+              disabled={duplicatingId === theme.id}
+              className="flex-1 px-3 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {duplicatingId === theme.id ? (
+                <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
                   <DuplicateIcon />
-                )}
-              </button>
-              <button 
-                className="px-2 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
-                title="Download theme"
-                onClick={async () => {
-                  const themeInput = theme.themeData as any;
-                  
-                  const response = await fetch('/api/generate-theme', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(themeInput),
-                  });
-                  if (response.ok) {
-                    const generatedTheme = await response.json();
-                    // Download the theme
-                    const blob = new Blob([JSON.stringify(generatedTheme, null, 2)], {
-                      type: 'application/json',
-                    });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }
-                }}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              </button>
-            </>
-          ) : (
-            <>
-              <button 
-                onClick={() => handleDuplicate(theme.id)}
-                disabled={duplicatingId === theme.id}
-                className="flex-1 px-3 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {duplicatingId === theme.id ? (
-                  <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <DuplicateIcon />
-                    <span>Use this theme</span>
-                  </>
-                )}
-              </button>
-              <button 
-                className="px-2 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
-                title="Download theme"
-                onClick={async () => {
-                  const themeInput = theme.themeData as any;
-                  
-                  const response = await fetch('/api/generate-theme', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(themeInput),
-                  });
-                  if (response.ok) {
-                    const generatedTheme = await response.json();
-                    // Download the theme
-                    const blob = new Blob([JSON.stringify(generatedTheme, null, 2)], {
-                      type: 'application/json',
-                    });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }
-                }}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              </button>
-            </>
-          )}
-        </div>
-        
-        {/* Sharing controls on separate row for owners and org members */}
-        {(isOwner || (theme.visibility === 'ORGANIZATION' && theme.organization?.id === userOrganization?.id)) && (
-          <div className="mt-2">
-            <ThemeSharingControls
-              themeId={theme.id}
-              currentVisibility={theme.visibility || 'PRIVATE'}
-              userPlan={userPlan}
-              organizationId={userOrganization?.id}
-              organizationName={userOrganization?.name}
-              onVisibilityChange={(newVisibility) => handleVisibilityChange(theme.id, newVisibility)}
-            />
+                  <span>Use this theme</span>
+                </>
+              )}
+            </button>
+            <button 
+              className="px-2 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+              title="Download theme"
+              onClick={() => handleDownloadTheme(theme)}
+            >
+              <Download className="w-4 h-4" />
+            </button>
           </div>
         )}
       </div>

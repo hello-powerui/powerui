@@ -33,6 +33,9 @@ function ThemeStudioContent() {
   const [showNeutralPaletteManager, setShowNeutralPaletteManager] = useState(false);
   const [isThemeLoading, setIsThemeLoading] = useState(false);
   
+  // Track loaded theme ID to prevent duplicate loading
+  const loadedThemeIdRef = useRef<string | null>(null);
+  
   // Visual styles panel width state
   const [visualStylesPanelWidth, setVisualStylesPanelWidth] = useState(350);
   const minPanelWidth = 350;
@@ -86,6 +89,11 @@ function ThemeStudioContent() {
   const themeId = searchParams.get('themeId');
   
   const loadTheme = useCallback(async (themeId: string) => {
+    // Prevent duplicate loading of the same theme
+    if (loadedThemeIdRef.current === themeId) {
+      return;
+    }
+    
     setIsThemeLoading(true);
     try {
       const response = await fetch(`/api/themes/${themeId}`);
@@ -93,6 +101,9 @@ function ThemeStudioContent() {
       
       const apiResponse = await response.json();
       themeStudio.loadTheme(apiResponse);
+      
+      // Mark this theme as loaded
+      loadedThemeIdRef.current = themeId;
       
       // If theme has visual styles, show the visual styles panel
       const themeData = apiResponse.themeData || {};
@@ -117,6 +128,7 @@ function ThemeStudioContent() {
       loadTheme(themeId);
     } else {
       // New theme - create a fresh one
+      loadedThemeIdRef.current = null; // Clear the loaded theme ref
       themeStudio.createNewTheme();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -126,9 +138,12 @@ function ThemeStudioContent() {
     try {
       await themeStudio.saveTheme();
       
-      // If it was a new theme, update the URL
+      // If it was a new theme, update the URL without triggering a reload
       if (!searchParams.get('themeId') && themeStudio.theme.id) {
-        router.push(`/themes/studio?themeId=${themeStudio.theme.id}`);
+        // Update the loaded theme ref to prevent reload
+        loadedThemeIdRef.current = themeStudio.theme.id;
+        // Use replace instead of push to avoid adding to history
+        router.replace(`/themes/studio?themeId=${themeStudio.theme.id}`, { scroll: false });
       }
     } catch (error) {
       console.error('Error saving theme:', error);
@@ -206,10 +221,12 @@ function ThemeStudioContent() {
                 onClick={() => {
                   if (themeStudio.isDirty) {
                     if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
+                      loadedThemeIdRef.current = null; // Clear loaded theme ref
                       themeStudio.resetTheme(); // Reset store when leaving
                       router.push('/themes');
                     }
                   } else {
+                    loadedThemeIdRef.current = null; // Clear loaded theme ref
                     themeStudio.resetTheme(); // Reset store when leaving
                     router.push('/themes');
                   }
@@ -220,13 +237,22 @@ function ThemeStudioContent() {
                 <BackIcon />
               </button>
               <div className="ml-3 pl-3 border-l border-gray-200">
-                <input
-                  type="text"
-                  value={themeStudio.theme.name}
-                  onChange={(e) => themeStudio.updateTheme({ name: e.target.value })}
-                  className="text-lg font-medium bg-transparent border-none outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-2 py-1 rounded"
-                  placeholder="Untitled Theme"
-                />
+                <div className="flex flex-col">
+                  <input
+                    type="text"
+                    value={themeStudio.theme.name}
+                    onChange={(e) => themeStudio.updateTheme({ name: e.target.value })}
+                    className="text-lg font-medium bg-transparent border-none outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-2 py-1 rounded"
+                    placeholder="Untitled Theme"
+                  />
+                  <input
+                    type="text"
+                    value={themeStudio.theme.description || ''}
+                    onChange={(e) => themeStudio.updateTheme({ description: e.target.value })}
+                    className="text-sm text-gray-600 bg-transparent border-none outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-2 py-0.5 rounded"
+                    placeholder="Add a description..."
+                  />
+                </div>
               </div>
               {themeStudio.isDirty && (
                 <div className="ml-3 flex items-center gap-1.5 text-sm text-gray-600">
