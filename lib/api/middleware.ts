@@ -106,7 +106,7 @@ export function withPaidUser<T = any>(
         userPlan: user?.plan 
       });
       
-      if (!user || !['PRO', 'TEAM'].includes(user.plan)) {
+      if (!user || !user.plan || !['PRO', 'TEAM'].includes(user.plan)) {
         console.log('[withPaidUser] User does not have paid plan, returning 403');
         return apiError('Pro or Team plan required', 403);
       }
