@@ -1,27 +1,18 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { PowerBITheme } from '@/lib/theme-studio/types';
 import { toast } from 'sonner';
 import JSONPretty from 'react-json-pretty';
-
-// Import all themes
 import 'react-json-pretty/themes/monikai.css';
-import 'react-json-pretty/themes/1337.css';
-import 'react-json-pretty/themes/acai.css';
-import 'react-json-pretty/themes/adventure_time.css';
 
 interface ThemeJsonViewProps {
   theme: PowerBITheme;
 }
 
 export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
-  const [selectedTheme, setSelectedTheme] = useState('monikai');
   
   const formattedJson = useMemo(() => {
-    // Debug logging
-    console.log('ThemeJsonView received theme:', theme);
-    
     if (!theme) {
       return JSON.stringify({ error: 'No theme data available' }, null, 2);
     }
@@ -50,20 +41,6 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
         <h3 className="text-sm font-medium text-gray-300">Theme JSON</h3>
         <div className="flex items-center gap-2">
-          {/* Theme Selector */}
-          <select
-            value={selectedTheme}
-            onChange={(e) => setSelectedTheme(e.target.value)}
-            className="px-2 py-1 text-xs bg-gray-800 text-gray-300 rounded border border-gray-700 focus:border-gray-600 focus:outline-none"
-          >
-            <option value="monikai">Monokai</option>
-            <option value="1337">1337</option>
-            <option value="acai">Acai</option>
-            <option value="adventure">Adventure Time</option>
-          </select>
-          
-          <div className="w-px h-4 bg-gray-700" />
-          
           <button
             onClick={handleCopy}
             className="px-3 py-1.5 text-xs bg-gray-800 text-gray-300 rounded hover:bg-gray-700 transition-colors flex items-center gap-1.5"
@@ -87,7 +64,7 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
 
       {/* JSON Content */}
       <div 
-        className="flex-1 overflow-auto p-4"
+        className="flex-1 overflow-auto p-4 __json-pretty-theme-monikai"
         style={{ 
           backgroundColor: 'rgb(17, 24, 39)',
           fontSize: '12px',
@@ -101,7 +78,6 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
           <JSONPretty 
             id="json-pretty"
             data={theme}
-            themeClassName={`__json-pretty-theme-${selectedTheme}`}
           />
           
           {/* Fallback: Show raw JSON if JSONPretty doesn't render */}
