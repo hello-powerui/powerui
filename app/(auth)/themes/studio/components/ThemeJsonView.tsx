@@ -19,6 +19,13 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
   const [selectedTheme, setSelectedTheme] = useState('monikai');
   
   const formattedJson = useMemo(() => {
+    // Debug logging
+    console.log('ThemeJsonView received theme:', theme);
+    
+    if (!theme) {
+      return JSON.stringify({ error: 'No theme data available' }, null, 2);
+    }
+    
     return JSON.stringify(theme, null, 2);
   }, [theme]);
 
@@ -96,6 +103,13 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
             data={theme}
             themeClassName={`__json-pretty-theme-${selectedTheme}`}
           />
+          
+          {/* Fallback: Show raw JSON if JSONPretty doesn't render */}
+          {!theme && (
+            <pre style={{ color: '#d1d5db', fontSize: '12px', fontFamily: 'monospace' }}>
+              {formattedJson}
+            </pre>
+          )}
         </div>
         
         <style jsx global>{`
@@ -114,6 +128,12 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
           
           #json-pretty .__json-string__ {
             word-break: break-all !important;
+          }
+          
+          /* Debug - ensure content is visible */
+          #json-pretty pre {
+            color: #d1d5db !important;
+            margin: 0 !important;
           }
         `}</style>
       </div>

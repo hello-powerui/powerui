@@ -377,7 +377,7 @@ function ThemeStudioContent() {
           <ErrorBoundaryWithLogging componentName={viewMode === 'preview' ? 'PowerBIPreview' : 'ThemeJsonView'}>
             {viewMode === 'json' ? (
               // JSON View Mode
-              <ThemeJsonView theme={themeStudio.previewTheme || themeStudio.exportTheme()} />
+              <ThemeJsonView theme={themeStudio.previewTheme || {}} />
             ) : (
               // Preview Mode
               <>
