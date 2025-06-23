@@ -8,6 +8,7 @@ import { VisualStylesPanel } from './components/VisualStylesPanel';
 import { PowerBIPreview } from '@/components/theme-studio/preview/PowerBIPreview';
 import { UnifiedPaletteManager } from '@/components/theme-studio/palette/UnifiedPaletteManager';
 import { ImportThemeModal } from '@/components/theme-studio/ui/import-theme-modal';
+import { ThemeJsonView } from './components/ThemeJsonView';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ErrorBoundaryWithLogging } from '@/components/debug/ErrorBoundaryWithLogging';
@@ -32,6 +33,7 @@ function ThemeStudioContent() {
   const [showPaletteManager, setShowPaletteManager] = useState(false);
   const [showNeutralPaletteManager, setShowNeutralPaletteManager] = useState(false);
   const [isThemeLoading, setIsThemeLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<'preview' | 'json'>('preview');
   
   // Track loaded theme ID to prevent duplicate loading
   const loadedThemeIdRef = useRef<string | null>(null);
@@ -260,6 +262,39 @@ function ThemeStudioContent() {
               )}
             </div>
             
+            {/* Center: View Mode Toggle */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('preview')}
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5",
+                  viewMode === 'preview' 
+                    ? "bg-white text-gray-900 shadow-sm" 
+                    : "text-gray-600 hover:text-gray-900"
+                )}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                Preview
+              </button>
+              <button
+                onClick={() => setViewMode('json')}
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5",
+                  viewMode === 'json' 
+                    ? "bg-white text-gray-900 shadow-sm" 
+                    : "text-gray-600 hover:text-gray-900"
+                )}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                JSON
+              </button>
+            </div>
+            
             {/* Right side: Actions */}
             <div className="flex items-center gap-2">
               <button
@@ -339,33 +374,41 @@ function ThemeStudioContent() {
 
         {/* Preview Panel - Center */}
         <div className="flex-1 overflow-hidden h-full">
-          <ErrorBoundaryWithLogging componentName="PowerBIPreview">
-            {/* Only render Power BI when theme is fully loaded and preview is generated */}
-            {(isThemeLoading || !themeStudio.previewTheme) ? (
-              <div className="flex items-center justify-center h-full bg-gray-50">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-                  <p className="text-sm text-gray-600">
-                    {isThemeLoading ? 'Loading theme...' : 'Generating preview...'}
-                  </p>
-                </div>
-              </div>
+          <ErrorBoundaryWithLogging componentName={viewMode === 'preview' ? 'PowerBIPreview' : 'ThemeJsonView'}>
+            {viewMode === 'json' ? (
+              // JSON View Mode
+              <ThemeJsonView theme={themeStudio.previewTheme || themeStudio.exportTheme()} />
             ) : (
-              <PowerBIPreview 
-                generatedTheme={themeStudio.previewTheme}
-                selectedVisualType={themeStudio.selectedVisual}
-                selectedVariant={themeStudio.selectedVariant}
-                onExitFocusMode={() => {
-                  setIsInFocusMode(false);
-                  // Don't change the selected visual - keep it selected
-                }}
-                onVariantChange={themeStudio.setSelectedVariant}
-                onReportReset={(resetFn) => {
-                  // Use setTimeout to avoid state update during render
-                  setTimeout(() => setReportResetFn(() => resetFn), 0);
-                }}
-                enterFocusMode={isInFocusMode}
-              />
+              // Preview Mode
+              <>
+                {/* Only render Power BI when theme is fully loaded and preview is generated */}
+                {(isThemeLoading || !themeStudio.previewTheme) ? (
+                  <div className="flex items-center justify-center h-full bg-gray-50">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                      <p className="text-sm text-gray-600">
+                        {isThemeLoading ? 'Loading theme...' : 'Generating preview...'}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <PowerBIPreview 
+                    generatedTheme={themeStudio.previewTheme}
+                    selectedVisualType={themeStudio.selectedVisual}
+                    selectedVariant={themeStudio.selectedVariant}
+                    onExitFocusMode={() => {
+                      setIsInFocusMode(false);
+                      // Don't change the selected visual - keep it selected
+                    }}
+                    onVariantChange={themeStudio.setSelectedVariant}
+                    onReportReset={(resetFn) => {
+                      // Use setTimeout to avoid state update during render
+                      setTimeout(() => setReportResetFn(() => resetFn), 0);
+                    }}
+                    enterFocusMode={isInFocusMode}
+                  />
+                )}
+              </>
             )}
           </ErrorBoundaryWithLogging>
         </div>
