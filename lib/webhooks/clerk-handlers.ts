@@ -173,11 +173,11 @@ export const organizationMembershipDeletedHandler: WebhookHandler = {
       },
     });
 
-    // If no personal purchase, revert to PRO plan
+    // If no personal purchase, remove plan access
     if (!personalPurchase) {
       await prisma.user.update({
         where: { id: public_user_data.user_id },
-        data: { plan: "PRO" },
+        data: { plan: null },
       });
     }
   },

@@ -16,9 +16,13 @@ export async function getUserPurchase(userId: string) {
 }
 
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
-  // Check direct purchase
-  const purchase = await getUserPurchase(userId);
-  if (purchase) return true;
+  // Check if user has a plan (indicating they've purchased)
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { plan: true },
+  });
+  
+  if (user?.plan) return true;
 
   // Check if user is part of an organization with active subscription
   const organizationMembership = await prisma.organizationMember.findFirst({

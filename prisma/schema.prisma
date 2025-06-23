@@ -75,7 +75,7 @@ model User {
   id                      String               @id
   email                   String               @unique
   username                String?              @unique
-  plan                    UserPlan             @default(PRO)
+  plan                    UserPlan?
   stripeCustomerId        String?              @unique
   createdAt               DateTime             @default(now())
   updatedAt               DateTime             @updatedAt

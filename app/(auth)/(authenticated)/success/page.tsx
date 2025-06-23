@@ -117,28 +117,27 @@ export default function SuccessPage() {
               {isTeamPurchase ? (
                 <>
                   <Button asChild size="lg">
-                    <Link href="/team-setup">
-                      <Users className="mr-2 h-4 w-4" />
-                      Set Up Your Team
+                    <Link href="/dashboard">
+                      Go to Dashboard
                     </Link>
                   </Button>
                   <Button asChild variant="outline" size="lg">
-                    <Link href={returnUrl || "/themes/studio"}>
-                      {returnUrl ? "Continue to Your Page" : "Open Theme Studio"}
+                    <Link href="/team-setup">
+                      <Users className="mr-2 h-4 w-4" />
+                      Set Up Your Team
                     </Link>
                   </Button>
                 </>
               ) : (
                 <>
                   <Button asChild size="lg">
-                    <Link href={returnUrl || "/themes/studio"}>
-                      {returnUrl ? "Continue" : "Open Theme Studio"}
+                    <Link href="/dashboard">
+                      Go to Dashboard
                     </Link>
                   </Button>
                   <Button asChild variant="outline" size="lg">
-                    <Link href="/dashboard">
-                      <Download className="mr-2 h-4 w-4" />
-                      Download Resources
+                    <Link href="/themes/studio">
+                      Open Theme Studio
                     </Link>
                   </Button>
                 </>

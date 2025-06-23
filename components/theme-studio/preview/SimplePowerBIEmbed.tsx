@@ -609,5 +609,12 @@ export default memo(SimplePowerBIEmbed, (prevProps, nextProps) => {
   
   // For theme comparison, we only care about properties that affect visual rendering
   // Name changes don't require re-render
-  return prevProps.generatedTheme.name !== nextProps.generatedTheme.name;
+  // Compare themes without the name property
+  const prevThemeWithoutName = { ...prevProps.generatedTheme };
+  const nextThemeWithoutName = { ...nextProps.generatedTheme };
+  delete prevThemeWithoutName.name;
+  delete nextThemeWithoutName.name;
+  
+  // Deep compare the visual properties
+  return JSON.stringify(prevThemeWithoutName) === JSON.stringify(nextThemeWithoutName);
 });

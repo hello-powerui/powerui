@@ -57,19 +57,6 @@ export async function POST(
 
     // Check if user is trying to set organization visibility
     if (visibility === "ORGANIZATION") {
-      // Get the current user's plan
-      const currentUser = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { plan: true },
-      });
-      
-      if (currentUser?.plan !== "TEAM") {
-        return new NextResponse(
-          "Organization sharing is only available for Team plan users",
-          { status: 403 }
-        );
-      }
-
       // Verify user is part of the organization
       if (organizationId) {
         const membership = await prisma.organizationMember.findFirst({
@@ -85,6 +72,11 @@ export async function POST(
             { status: 403 }
           );
         }
+      } else {
+        return new NextResponse(
+          "Organization ID is required for organization visibility",
+          { status: 400 }
+        );
       }
     }
 

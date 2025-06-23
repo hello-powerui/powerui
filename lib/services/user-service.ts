@@ -30,7 +30,6 @@ export class UserService extends BaseService {
         create: {
           id: userId,
           email: email || '',
-          plan: 'PRO', // Default plan for new users
         },
       });
       

@@ -303,7 +303,7 @@ export default function ThemesPage() {
                         <Globe className="mr-2 h-4 w-4" />
                         Public
                       </DropdownMenuRadioItem>
-                      {userPlan === 'TEAM' && userOrganization && (
+                      {userOrganization && (
                         <DropdownMenuRadioItem value="ORGANIZATION">
                           <Users className="mr-2 h-4 w-4" />
                           {userOrganization.name}
@@ -431,7 +431,7 @@ export default function ThemesPage() {
           <TabsList className="mb-6">
             <TabsTrigger value="my-themes">My Themes</TabsTrigger>
             <TabsTrigger value="public">Public Themes</TabsTrigger>
-            {userPlan === 'TEAM' && userOrganization && (
+            {userOrganization && (
               <TabsTrigger value="organization">Organization Themes</TabsTrigger>
             )}
           </TabsList>
@@ -509,7 +509,7 @@ export default function ThemesPage() {
             )}
           </TabsContent>
 
-          {userPlan === 'TEAM' && userOrganization && (
+          {userOrganization && (
             <TabsContent value="organization">
               {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

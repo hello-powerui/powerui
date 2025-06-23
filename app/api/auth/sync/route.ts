@@ -28,7 +28,8 @@ export async function GET() {
     
     const dbUser = await UserService.upsertUser(
       userId,
-      user.emailAddresses[0].emailAddress
+      user.emailAddresses[0].emailAddress,
+      user.username || undefined
     );
     
     return NextResponse.json({
@@ -37,6 +38,7 @@ export async function GET() {
       user: {
         id: dbUser.id,
         email: dbUser.email,
+        username: dbUser.username,
         createdAt: dbUser.createdAt,
         updatedAt: dbUser.updatedAt,
       }

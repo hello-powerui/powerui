@@ -110,8 +110,6 @@ function ThemeStudioContent() {
       if (themeData.visualStyles && Object.keys(themeData.visualStyles).length > 0) {
         setShowVisualStyles(true);
       }
-      
-      toast.success('Theme loaded successfully');
     } catch (error) {
       toast.error('Failed to load theme');
       console.error('Error loading theme:', error);
@@ -354,7 +352,6 @@ function ThemeStudioContent() {
               </div>
             ) : (
               <PowerBIPreview 
-                key={themeStudio.theme.id || 'new'} // Forces fresh mount when theme ID changes
                 generatedTheme={themeStudio.previewTheme}
                 selectedVisualType={themeStudio.selectedVisual}
                 selectedVariant={themeStudio.selectedVariant}

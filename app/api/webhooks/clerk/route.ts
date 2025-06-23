@@ -157,11 +157,7 @@ export async function POST(req: Request) {
           public_user_data.identifier || `user-${public_user_data.user_id}@org.com`
         )
 
-        // Grant user TEAM plan access
-        await prisma.user.update({
-          where: { id: public_user_data.user_id },
-          data: { plan: "TEAM" },
-        })
+        // No plan assignment needed - team members get access through organization membership
         
         // Add user to organization members table
         await prisma.organizationMember.upsert({
@@ -193,21 +189,22 @@ export async function POST(req: Request) {
     
     try {
       if (public_user_data?.user_id) {
-        // Check if user has their own purchase
-        const personalPurchase = await prisma.purchase.findFirst({
-          where: {
-            userId: public_user_data.user_id,
-            status: "COMPLETED",
-          },
+        // Remove user from organization members table
+        const org = await prisma.organization.findFirst({
+          where: { clerkOrgId: membershipData.organization.id },
         })
-
-        // If no personal purchase, revert to PRO plan
-        if (!personalPurchase) {
-          await prisma.user.update({
-            where: { id: public_user_data.user_id },
-            data: { plan: "PRO" },
+        
+        if (org) {
+          await prisma.organizationMember.delete({
+            where: {
+              organizationId_userId: {
+                userId: public_user_data.user_id,
+                organizationId: org.id,
+              },
+            },
+          }).catch(() => {
+            // Member might already be deleted, ignore error
           })
-
         }
       }
     } catch (error) {

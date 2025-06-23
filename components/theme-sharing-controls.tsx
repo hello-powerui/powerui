@@ -20,6 +20,7 @@ interface ThemeSharingControlsProps {
   userPlan: 'PRO' | 'TEAM';
   organizationId?: string;
   organizationName?: string;
+  hasOrganizationAccess?: boolean;
   onVisibilityChange?: (newVisibility: ThemeVisibility) => void;
 }
 
@@ -29,15 +30,16 @@ export function ThemeSharingControls({
   userPlan,
   organizationId,
   organizationName,
+  hasOrganizationAccess = false,
   onVisibilityChange,
 }: ThemeSharingControlsProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [visibility, setVisibility] = useState(currentVisibility);
 
   const handleVisibilityChange = async (newVisibility: ThemeVisibility) => {
-    // Don't allow PRO users to set organization visibility
-    if (userPlan === 'PRO' && newVisibility === 'ORGANIZATION') {
-      toast.error('Organization sharing is only available for Team plans');
+    // Don't allow users without organization access to set organization visibility
+    if (!hasOrganizationAccess && newVisibility === 'ORGANIZATION') {
+      toast.error('Organization sharing is only available for organization members');
       return;
     }
 
@@ -145,7 +147,7 @@ export function ThemeSharingControls({
           </div>
         </SelectItem>
 
-        {userPlan === 'TEAM' && organizationId && (
+        {hasOrganizationAccess && organizationId && (
           <SelectItem value="ORGANIZATION">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />

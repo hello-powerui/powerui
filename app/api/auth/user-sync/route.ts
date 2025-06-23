@@ -17,13 +17,14 @@ export async function GET() {
     const clerkUser = await currentUser();
     const email = clerkUser?.emailAddresses[0]?.emailAddress || `${userId}@user.local`;
     
-    const dbUser = await UserService.upsertUser(userId, email);
+    const dbUser = await UserService.upsertUser(userId, email, clerkUser?.username || undefined);
     
     return NextResponse.json({
       synced: true,
       user: {
         id: dbUser.id,
         email: dbUser.email,
+        username: dbUser.username,
       }
     });
   } catch (error) {
