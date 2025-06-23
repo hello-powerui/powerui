@@ -43,11 +43,6 @@ interface Theme {
   description: string | null;
   createdAt: string;
   updatedAt: string;
-  dataPalette: string;
-  neutralPalette: string;
-  fontFamily: string;
-  colorMode: string;
-  borders: string;
   themeData: any;
   organizationId?: string;
   organization?: {
@@ -128,6 +123,7 @@ export default function DashboardPage() {
       const response = await fetch('/api/themes');
       if (response.ok) {
         const data = await response.json();
+        
         // Separate personal and team themes
         const personalThemes = data.filter((t: Theme) => !t.organizationId);
         const orgThemes = data.filter((t: Theme) => t.organizationId);
@@ -213,39 +209,6 @@ export default function DashboardPage() {
                   <h3 className="font-medium text-gray-900 mb-1 group-hover:text-gray-700">{theme.name}</h3>
                   <p className="text-sm text-gray-500 mb-3">{getRelativeTime(theme.updatedAt)}</p>
                   
-                  {/* Color dots */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex gap-1">
-                      {theme.themeData?.dataColors ? (
-                        <>
-                          {theme.themeData.dataColors.slice(0, 5).map((color: string, i: number) => (
-                            <div
-                              key={i}
-                              className="w-4 h-4 rounded-full border border-gray-200"
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                          {theme.themeData.dataColors.length > 5 && (
-                            <div className="w-4 h-4 rounded-full border border-gray-200 bg-gray-100 text-[10px] flex items-center justify-center text-gray-600">
-                              +{theme.themeData.dataColors.length - 5}
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        // Fallback colors if no themeData
-                        <>
-                          {['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C'].map((color, i) => (
-                            <div
-                              key={i}
-                              className="w-4 h-4 rounded-full border border-gray-200"
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                        </>
-                      )}
-                    </div>
-                    <span className="text-xs text-gray-500">{theme.colorMode}</span>
-                  </div>
                 </Link>
               ))
             )}
@@ -283,39 +246,6 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-500 mb-1">{theme.organization?.name}</p>
                   <p className="text-sm text-gray-500 mb-3">{getRelativeTime(theme.updatedAt)}</p>
                   
-                  {/* Color dots */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex gap-1">
-                      {theme.themeData?.dataColors ? (
-                        <>
-                          {theme.themeData.dataColors.slice(0, 5).map((color: string, i: number) => (
-                            <div
-                              key={i}
-                              className="w-4 h-4 rounded-full border border-gray-200"
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                          {theme.themeData.dataColors.length > 5 && (
-                            <div className="w-4 h-4 rounded-full border border-gray-200 bg-gray-100 text-[10px] flex items-center justify-center text-gray-600">
-                              +{theme.themeData.dataColors.length - 5}
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        // Fallback colors if no themeData
-                        <>
-                          {['#2568E8', '#8338EC', '#FF006E', '#F95608', '#FFBE0C'].map((color, i) => (
-                            <div
-                              key={i}
-                              className="w-4 h-4 rounded-full border border-gray-200"
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                        </>
-                      )}
-                    </div>
-                    <span className="text-xs text-gray-500">{theme.colorMode}</span>
-                  </div>
                 </Link>
               ))}
               {teamThemes.length > 0 && (

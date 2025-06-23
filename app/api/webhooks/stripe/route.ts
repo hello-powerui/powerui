@@ -4,6 +4,7 @@ import { stripe, planToPurchasePlan, planToUserPlan, planToSeats, PlanType } fro
 import { prisma } from "@/lib/db/prisma";
 import { clerkClient } from "@clerk/nextjs/server";
 import Stripe from "stripe";
+import { updateContactPlan } from "@/lib/loops";
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -95,6 +96,11 @@ export async function POST(req: Request) {
               console.error("Failed to enable organization creation for user:", error);
               // Don't fail the webhook if this fails - user can contact support
             }
+          }
+          
+          // Update Loops contact with new plan
+          if (user.email) {
+            await updateContactPlan(user.email, planToUserPlan[plan] as string);
           }
         });
 

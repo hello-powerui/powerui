@@ -15,7 +15,8 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
-import { MoreVertical, Edit, Copy, Download, Globe, Users, Lock } from 'lucide-react';
+import { MoreVertical, Edit, Copy, Download, Globe, Users, Lock, Eye } from 'lucide-react';
+import { ThemePreviewModal } from '@/components/theme-preview-modal';
 
 interface Theme {
   id: string;
@@ -80,6 +81,7 @@ export default function ThemesPage() {
   const [activeTab, setActiveTab] = useState('my-themes');
   const [userPlan, setUserPlan] = useState<'PRO' | 'TEAM'>('PRO');
   const [userOrganization, setUserOrganization] = useState<{ id: string; name: string } | null>(null);
+  const [previewTheme, setPreviewTheme] = useState<Theme | null>(null);
   
   // Redirect to sign-in if not authenticated
   if (isLoaded && !isSignedIn) {
@@ -260,6 +262,10 @@ export default function ThemesPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => setPreviewTheme(theme)}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  Preview theme
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push(`/themes/studio?themeId=${theme.id}`)}>
                   <Edit className="mr-2 h-4 w-4" />
                   Edit theme
@@ -367,6 +373,13 @@ export default function ThemesPage() {
         {/* Actions for non-owners */}
         {!isOwner && theme.visibility !== 'ORGANIZATION' && (
           <div className="flex gap-2">
+            <button 
+              onClick={() => setPreviewTheme(theme)}
+              className="px-2 py-1.5 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+              title="Preview theme"
+            >
+              <Eye className="w-4 h-4" />
+            </button>
             <button 
               onClick={() => handleDuplicate(theme.id)}
               disabled={duplicatingId === theme.id}
@@ -545,6 +558,16 @@ export default function ThemesPage() {
           )}
         </Tabs>
       </main>
+      
+      {/* Preview Modal */}
+      {previewTheme && (
+        <ThemePreviewModal
+          isOpen={!!previewTheme}
+          onClose={() => setPreviewTheme(null)}
+          themeName={previewTheme.name}
+          themeData={previewTheme.themeData}
+        />
+      )}
     </div>
   )
 }

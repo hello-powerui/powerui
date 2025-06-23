@@ -4,6 +4,7 @@ import { Webhook } from 'svix'
 import { WebhookEvent } from '@clerk/nextjs/server'
 import { UserService } from '@/lib/db/services/user-service'
 import { prisma } from '@/lib/db/prisma'
+import { createOrUpdateContact, deleteContact } from '@/lib/loops'
 
 export async function POST(req: Request) {
   try {
@@ -49,12 +50,28 @@ export async function POST(req: Request) {
   const eventType = evt.type
 
   if (eventType === 'user.created' || eventType === 'user.updated') {
-    const { id, email_addresses, username } = evt.data
+    const { id, email_addresses, username, first_name, last_name } = evt.data
     const primaryEmail = email_addresses.find(email => email.id === evt.data.primary_email_address_id)
     
     if (primaryEmail) {
       try {
         await UserService.upsertUser(id, primaryEmail.email_address, username || undefined)
+        
+        // Get user's plan from database
+        const user = await prisma.user.findUnique({
+          where: { id },
+          select: { plan: true }
+        })
+        
+        // Sync to Loops
+        await createOrUpdateContact({
+          email: primaryEmail.email_address,
+          firstName: first_name || undefined,
+          lastName: last_name || undefined,
+          userId: id,
+          plan: user?.plan || undefined,
+          userGroup: user?.plan === 'TEAM' ? 'team' : user?.plan === 'PRO' ? 'pro' : undefined
+        })
         
       } catch (error) {
         console.error('Error syncing user to database:', error)
@@ -71,6 +88,17 @@ export async function POST(req: Request) {
 
   if (eventType === 'user.deleted') {
     try {
+      // Get user email before deletion
+      const user = await prisma.user.findUnique({
+        where: { id: evt.data.id! },
+        select: { email: true }
+      })
+      
+      if (user?.email) {
+        // Delete from Loops
+        await deleteContact(user.email)
+      }
+      
       await UserService.deleteUser(evt.data.id!)
       
     } catch (error) {
@@ -120,6 +148,15 @@ export async function POST(req: Request) {
             data: { plan: "TEAM" },
           })
 
+          // Add creator as organization admin
+          await prisma.organizationMember.create({
+            data: {
+              userId: creatorId,
+              organizationId: organization.id,
+              role: "ADMIN",
+            },
+          })
+
           // Update organization in Clerk with max allowed members
           // This ensures Clerk enforces the seat limit
           try {
@@ -157,9 +194,16 @@ export async function POST(req: Request) {
           public_user_data.identifier || `user-${public_user_data.user_id}@org.com`
         )
 
-        // No plan assignment needed - team members get access through organization membership
+        // Grant user TEAM plan access
+        await prisma.user.update({
+          where: { id: public_user_data.user_id },
+          data: { plan: "TEAM" },
+        });
         
         // Add user to organization members table
+        // Map Clerk roles to our database roles
+        const dbRole = membershipData.role === 'org:admin' ? 'ADMIN' : 'MEMBER';
+        
         await prisma.organizationMember.upsert({
           where: {
             organizationId_userId: {
@@ -168,12 +212,12 @@ export async function POST(req: Request) {
             },
           },
           update: {
-            role: membershipData.role || "member",
+            role: dbRole,
           },
           create: {
             userId: public_user_data.user_id,
             organizationId: org.id,
-            role: membershipData.role || "member",
+            role: dbRole,
           },
         })
 
@@ -205,6 +249,19 @@ export async function POST(req: Request) {
           }).catch(() => {
             // Member might already be deleted, ignore error
           })
+          
+          // Check if user is still a member of any other organizations
+          const remainingMemberships = await prisma.organizationMember.count({
+            where: { userId: public_user_data.user_id },
+          })
+          
+          // If user is not in any other teams, revoke their TEAM plan
+          if (remainingMemberships === 0) {
+            await prisma.user.update({
+              where: { id: public_user_data.user_id },
+              data: { plan: null },
+            })
+          }
         }
       }
     } catch (error) {
