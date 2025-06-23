@@ -14,14 +14,19 @@ export interface LoopsContact {
 
 export async function createOrUpdateContact(contact: LoopsContact) {
   try {
-    const response = await loops.createContact(contact.email, {
-      firstName: contact.firstName,
-      lastName: contact.lastName,
-      userGroup: contact.userGroup,
-      userId: contact.userId,
-      plan: contact.plan,
+    // Build the contact properties object, only including defined values
+    const contactProperties: Record<string, string | number | boolean | null> = {
       source: contact.source || "app",
-    });
+    };
+
+    // Only add properties if they're defined
+    if (contact.firstName !== undefined) contactProperties.firstName = contact.firstName;
+    if (contact.lastName !== undefined) contactProperties.lastName = contact.lastName;
+    if (contact.userGroup !== undefined) contactProperties.userGroup = contact.userGroup;
+    if (contact.userId !== undefined) contactProperties.userId = contact.userId;
+    if (contact.plan !== undefined) contactProperties.plan = contact.plan;
+
+    const response = await loops.createContact(contact.email, contactProperties);
     
     return { success: true, data: response };
   } catch (error) {

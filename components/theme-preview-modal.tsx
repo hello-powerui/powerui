@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PowerBIPreview } from '@/components/theme-studio/preview/PowerBIPreview';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-generator';
 import { usePaletteStore } from '@/lib/stores/palette-store';
 import type { PowerBITheme } from '@/lib/types/theme';
@@ -19,20 +19,7 @@ export function ThemePreviewModal({ isOpen, onClose, themeName, themeData }: The
   const [isGenerating, setIsGenerating] = useState(false);
   const { colorPalettes, neutralPalettes, loadPalettes } = usePaletteStore();
 
-  useEffect(() => {
-    // Ensure palettes are loaded
-    if (colorPalettes.length === 0 || neutralPalettes.length === 0) {
-      loadPalettes();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isOpen && themeData && colorPalettes.length > 0 && neutralPalettes.length > 0) {
-      generatePreview();
-    }
-  }, [isOpen, themeData, colorPalettes.length, neutralPalettes.length]);
-
-  const generatePreview = () => {
+  const generatePreview = useCallback(() => {
     setIsGenerating(true);
     try {
       // Find the color and neutral palettes
@@ -66,7 +53,20 @@ export function ThemePreviewModal({ isOpen, onClose, themeName, themeData }: The
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [themeData, themeName, colorPalettes, neutralPalettes]);
+
+  useEffect(() => {
+    // Ensure palettes are loaded
+    if (colorPalettes.length === 0 || neutralPalettes.length === 0) {
+      loadPalettes();
+    }
+  }, [colorPalettes.length, neutralPalettes.length, loadPalettes]);
+
+  useEffect(() => {
+    if (isOpen && themeData && colorPalettes.length > 0 && neutralPalettes.length > 0) {
+      generatePreview();
+    }
+  }, [isOpen, themeData, colorPalettes.length, neutralPalettes.length, generatePreview]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
