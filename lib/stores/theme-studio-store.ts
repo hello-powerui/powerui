@@ -90,7 +90,12 @@ interface ThemeStudioState {
   loadTheme: (themeData: any) => void;
   resetTheme: () => void;
   createNewTheme: () => void;
-  exportTheme: () => StudioTheme;
+  
+  // Clear section actions
+  clearTypography: () => void;
+  clearStructuralColors: () => void;
+  clearTextClasses: () => void;
+  clearVisualSection: (visual: string, variant: string, section: string) => void;
 }
 
 const defaultStudioTheme: StudioTheme = {
@@ -102,9 +107,7 @@ const defaultStudioTheme: StudioTheme = {
   fontFamily: 'Segoe UI',
   structuralColors: {},
   textClasses: {},
-  visualStyles: {
-    '*': { '*': {} }  // Initialize global properties structure
-  }
+  visualStyles: {}
 };
 
 const defaultResolvedData: ResolvedThemeData = {
@@ -351,13 +354,8 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         // Extract theme data, handling both old and new formats
         const loadedTheme = themeData.themeData || themeData;
         
-        // Ensure visualStyles has the proper structure for global properties
+        // Use visualStyles as-is from the loaded theme
         const visualStyles = loadedTheme.visualStyles || {};
-        if (!visualStyles['*']) {
-          visualStyles['*'] = { '*': {} };
-        } else if (!visualStyles['*']['*']) {
-          visualStyles['*']['*'] = {};
-        }
         
         // Ensure we have all required fields
         const theme: StudioTheme = {
@@ -396,10 +394,6 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         const newTheme = { ...defaultStudioTheme };
         delete newTheme.id; // Explicitly remove any ID
         
-        // Ensure global properties structure exists
-        if (!newTheme.visualStyles['*']) {
-          newTheme.visualStyles['*'] = { '*': {} };
-        }
         
         set({
           theme: newTheme,
@@ -413,7 +407,6 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         });
       },
 
-      exportTheme: () => get().theme,
     }),
     {
       name: 'theme-studio-store',

@@ -77,26 +77,30 @@ export function useThemePreviewGenerator() {
       const generatePreview = async () => {
         setIsGenerating(true);
         
+        // Prepare theme input for generator
+        const themeInput = {
+          name: theme.name,
+          mode: debouncedVisualProperties.mode,
+          dataColors: colorPalette!.colors as string[],
+          neutralPalette: neutralPalette!.colors as string[],
+          fontFamily: debouncedVisualProperties.fontFamily.toLowerCase().replace(/\s+/g, '-'),
+          visualStyles: debouncedVisualProperties.visualStyles,
+          structuralColors: debouncedVisualProperties.structuralColors && Object.keys(debouncedVisualProperties.structuralColors).length > 0 ? debouncedVisualProperties.structuralColors : undefined,
+          textClasses: debouncedVisualProperties.textClasses && Object.keys(debouncedVisualProperties.textClasses).length > 0 ? debouncedVisualProperties.textClasses : undefined
+        };
+        
         try {
-          // Prepare theme input for generator
-          const themeInput = {
-            name: theme.name,
-            mode: debouncedVisualProperties.mode,
-            dataColors: colorPalette!.colors as string[],
-            neutralPalette: neutralPalette!.colors as string[],
-            fontFamily: debouncedVisualProperties.fontFamily.toLowerCase().replace(/\s+/g, '-'),
-            visualStyles: debouncedVisualProperties.visualStyles,
-            structuralColors: debouncedVisualProperties.structuralColors && Object.keys(debouncedVisualProperties.structuralColors).length > 0 ? debouncedVisualProperties.structuralColors : undefined,
-            textClasses: debouncedVisualProperties.textClasses && Object.keys(debouncedVisualProperties.textClasses).length > 0 ? debouncedVisualProperties.textClasses : undefined
-          };
-          
           // Generate preview using client-side generator
           const previewGenerator = getPreviewGenerator();
           const previewTheme = previewGenerator.generatePreview(themeInput);
+          console.log('Preview theme generated successfully:', previewTheme);
           
           setPreviewTheme(previewTheme);
         } catch (error) {
           console.error('Failed to generate preview theme:', error);
+          console.error('Theme input was:', themeInput);
+          console.error('Color palette:', colorPalette);
+          console.error('Neutral palette:', neutralPalette);
           setPreviewTheme(null);
         } finally {
           setIsGenerating(false);

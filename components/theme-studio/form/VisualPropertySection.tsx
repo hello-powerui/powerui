@@ -57,26 +57,9 @@ export function VisualPropertySection({
       defaultOpen={false}
       hasChanges={hasChanges}
       changedCount={changedCount}
-      headerAction={
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleSectionReset();
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              e.stopPropagation();
-              handleSectionReset();
-            }
-          }}
-          className={`${THEME_STUDIO_TYPOGRAPHY.button.size} text-gray-600 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer`}
-        >
-          Reset Section
-        </div>
-      }
+      onClear={handleSectionReset}
+      hasContent={value[name] !== undefined && value[name] !== null}
+      clearMessage={`Clear all ${title.toLowerCase()} settings? This will remove any customizations and use default values.`}
     >
       <div className="space-y-2">
         {/* Show state indicator if this section has state support */}

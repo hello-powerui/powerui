@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { PropertyWrapper } from '../property-wrapper';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
+import { StudioSelect, StudioSelectContent, StudioSelectItem, StudioSelectTrigger, StudioSelectValue } from '@/components/theme-studio/ui/form-controls';
+import { StudioInput } from '@/components/theme-studio/ui/form-controls';
 import { Button } from '@/components/ui/button';
 import { FONT_SIZE_PRESETS, pointsToPixels } from '@/lib/theme-studio/font-registry';
 
@@ -59,31 +59,31 @@ export function FontSizeField({ schema, value, onChange, path }: FontSizeFieldPr
     >
       <div className="flex items-center gap-2 flex-1">
         {!isCustom ? (
-          <Select 
+          <StudioSelect 
             value={String(currentValue)} 
             onValueChange={handlePresetChange}
           >
-            <SelectTrigger className="w-full h-6 text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
+            <StudioSelectTrigger className="w-full">
+              <StudioSelectValue />
+            </StudioSelectTrigger>
+            <StudioSelectContent>
               {PRESET_SIZES.map(size => (
-                <SelectItem key={size.value} value={String(size.value)} className="text-xs">
+                <StudioSelectItem key={size.value} value={String(size.value)} className="text-xs">
                   {size.label}
-                </SelectItem>
+                </StudioSelectItem>
               ))}
-              <SelectItem value="custom" className="text-xs">Custom...</SelectItem>
-            </SelectContent>
-          </Select>
+              <StudioSelectItem value="custom" className="text-xs">Custom...</StudioSelectItem>
+            </StudioSelectContent>
+          </StudioSelect>
         ) : (
           <div className="flex gap-1 flex-1">
-            <Input
+            <StudioInput
               type="number"
               min="1"
               max="100"
               value={currentValue}
               onChange={handleCustomChange}
-              className="flex-1 h-6 text-sm px-2"
+              className="flex-1 px-2"
               title={`${currentValue}pt (${pixelValue}px)`}
             />
             <Button
@@ -97,7 +97,7 @@ export function FontSizeField({ schema, value, onChange, path }: FontSizeFieldPr
                 );
                 onChange(closest.value);
               }}
-              className="h-6 px-2 text-sm"
+              className="h-8 px-2 text-sm"
             >
               Presets
             </Button>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power BI Visual Discovery Tool</title>
+    <script src="https://app.powerbi.com/13.0.23829.90/scripts/powerbiloader.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .config-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 4px;
+            background: #e8f4f8;
+            color: #0066cc;
+        }
+        .error {
+            background: #fee;
+            color: #c00;
+        }
+        .success {
+            background: #efe;
+            color: #060;
+        }
+        .report-container {
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin: 20px 0;
+            height: 400px;
+            position: relative;
+            background: #fff;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .visual-item {
+            background: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        .visual-name {
+            font-weight: 600;
+            color: #0066cc;
+        }
+        .visual-type {
+            color: #666;
+            font-size: 14px;
+        }
+        .visual-title {
+            color: #333;
+            margin-top: 4px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .copy-button {
+            background: #28a745;
+            font-size: 14px;
+            padding: 5px 15px;
+            margin-top: 10px;
+        }
+        .copy-button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Power BI Visual Discovery Tool</h1>
+        
+        <div class="config-form">
+            <h2>Configuration</h2>
+            <div class="form-group">
+                <label for="embedUrl">Embed URL:</label>
+                <input type="text" id="embedUrl" placeholder="https://app.powerbi.com/reportEmbed?reportId=...">
+            </div>
+            <div class="form-group">
+                <label for="accessToken">Access Token:</label>
+                <input type="text" id="accessToken" placeholder="Your Power BI access token">
+            </div>
+            <button onclick="discoverVisuals()" id="discoverBtn">Discover Visuals</button>
+        </div>
+
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div id="reportContainer" class="report-container" style="display: none;"></div>
+        
+        <div id="results" class="results" style="display: none;">
+            <h2>Discovered Visuals</h2>
+            <div id="visualsList"></div>
+            <h3>Raw JSON</h3>
+            <pre id="jsonOutput"></pre>
+            <button class="copy-button" onclick="copyToClipboard()">Copy JSON to Clipboard</button>
+        </div>
+    </div>
+
+    <script>
+        let discoveredVisuals = [];
+
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.style.display = 'block';
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+        }
+
+        async function discoverVisuals() {
+            const embedUrl = document.getElementById('embedUrl').value;
+            const accessToken = document.getElementById('accessToken').value;
+
+            if (!embedUrl || !accessToken) {
+                updateStatus('Please provide both Embed URL and Access Token', 'error');
+                return;
+            }
+
+            document.getElementById('discoverBtn').disabled = true;
+            updateStatus('Loading Power BI report...');
+
+            try {
+                // Parse report ID from embed URL
+                const urlParams = new URL(embedUrl).searchParams;
+                const reportId = urlParams.get('reportId');
+
+                if (!reportId) {
+                    throw new Error('Could not extract report ID from embed URL');
+                }
+
+                // Show report container
+                const container = document.getElementById('reportContainer');
+                container.style.display = 'block';
+                container.innerHTML = '';
+
+                // Create embed configuration
+                const config = {
+                    type: 'report',
+                    id: reportId,
+                    embedUrl: embedUrl,
+                    accessToken: accessToken,
+                    tokenType: window.powerbi.models.TokenType.Embed,
+                    settings: {
+                        filterPaneEnabled: false,
+                        navContentPaneEnabled: false
+                    }
+                };
+
+                // Embed the report
+                const report = window.powerbi.embed(container, config);
+
+                // Wait for report to load
+                report.on('loaded', async function() {
+                    updateStatus('Report loaded! Discovering visuals...');
+                    
+                    setTimeout(async () => {
+                        try {
+                            const pages = await report.getPages();
+                            updateStatus(`Found ${pages.length} pages. Processing...`);
+                            
+                            discoveredVisuals = [];
+                            
+                            for (const page of pages) {
+                                await page.setActive();
+                                const visuals = await page.getVisuals();
+                                
+                                visuals.forEach(visual => {
+                                    discoveredVisuals.push({
+                                        pageName: page.name,
+                                        pageDisplayName: page.displayName || page.name,
+                                        visualName: visual.name,
+                                        visualTitle: visual.title || 'Untitled',
+                                        visualType: visual.type,
+                                        layout: visual.layout
+                                    });
+                                });
+                            }
+                            
+                            displayResults();
+                            updateStatus(`Discovery complete! Found ${discoveredVisuals.length} visuals.`, 'success');
+                            
+                        } catch (error) {
+                            updateStatus('Error discovering visuals: ' + error.message, 'error');
+                            console.error(error);
+                        }
+                    }, 2000);
+                });
+
+                report.on('error', function(event) {
+                    updateStatus('Report error: ' + (event.detail?.message || 'Unknown error'), 'error');
+                    console.error(event);
+                });
+
+            } catch (error) {
+                updateStatus('Error: ' + error.message, 'error');
+                console.error(error);
+            } finally {
+                document.getElementById('discoverBtn').disabled = false;
+            }
+        }
+
+        function displayResults() {
+            document.getElementById('results').style.display = 'block';
+            
+            // Display visual list
+            const listHtml = discoveredVisuals.map(v => `
+                <div class="visual-item">
+                    <div class="visual-name">${v.visualName}</div>
+                    <div class="visual-type">Type: ${v.visualType}</div>
+                    <div class="visual-title">Title: ${v.visualTitle}</div>
+                    <div class="visual-type">Page: ${v.pageDisplayName}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('visualsList').innerHTML = listHtml;
+            
+            // Display JSON
+            document.getElementById('jsonOutput').textContent = JSON.stringify(discoveredVisuals, null, 2);
+        }
+
+        function copyToClipboard() {
+            const text = JSON.stringify(discoveredVisuals, null, 2);
+            navigator.clipboard.writeText(text).then(() => {
+                updateStatus('JSON copied to clipboard!', 'success');
+            }).catch(err => {
+                updateStatus('Failed to copy: ' + err.message, 'error');
+            });
+        }
+
+        // Helper to get embed URL and token from your app
+        console.log(`
+To get the embed URL and access token, you can:
+1. Open your app's network tab
+2. Look for requests to Power BI
+3. Find the embed configuration
+
+Or use this in your app's console:
+- Embed URL: Check network requests or Power BI config
+- Access Token: Check Authorization headers
+        `);
+    </script>
+</body>
+</html>

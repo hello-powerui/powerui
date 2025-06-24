@@ -4,6 +4,21 @@ import Link from 'next/link'
 import { ArrowRightIcon, Sparkles, Palette, Zap, Globe, Shield, Users, ChevronRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+import dynamic from 'next/dynamic'
+import Script from 'next/script'
+
+const PowerBIVisualEmbed = dynamic(
+  () => import('@/components/landing/PowerBIVisualEmbed').then(mod => mod.PowerBIVisualEmbed),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-[400px] bg-gray-50 rounded-xl">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
+)
+
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -14,6 +29,19 @@ export default function Home() {
 
   return (
     <>
+      {/* Prefetch Power BI embed domain */}
+      <link rel="dns-prefetch" href="https://app.powerbi.com" />
+      <link rel="preconnect" href="https://app.powerbi.com" />
+      <link rel="preconnect" href="https://wabi-us-east2-redirect.analysis.windows.net" />
+      
+      <Script
+        src="https://app.powerbi.com/13.0.23829.90/scripts/powerbiloader.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          // Power BI script is loaded, resources will be preloaded when component mounts
+          console.log('Power BI script loaded');
+        }}
+      />
       {/* Header/Navigation */}
       <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -231,6 +259,59 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Live Demo Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              See the difference
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              A single Power BI donut chart with our professional theme applied. 
+              Clean, focused, and beautifully styled.
+            </p>
+          </div>
+          
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="bg-gray-900 text-white p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                </div>
+                <span className="text-sm font-medium">Live Power BI Report</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span>Live data</span>
+              </div>
+            </div>
+            <div className="p-8 bg-gray-50 flex justify-center">
+              <PowerBIVisualEmbed 
+                visualName="a514429d97b4ca4dc991"
+                pageName="97051b42cbd76adb2f5b"
+                width={300}
+                height={400}
+                className="rounded-lg shadow-inner"
+              />
+            </div>
+          </div>
+          
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-500 mb-4">
+              This is a real Power BI visual from our sample report
+            </p>
+            <Link
+              href="/themes/studio"
+              className="inline-flex items-center text-gray-900 font-medium hover:gap-3 gap-2 transition-all"
+            >
+              Try the theme studio <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>

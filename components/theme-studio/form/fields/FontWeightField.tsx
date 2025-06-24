@@ -2,7 +2,7 @@
 
 import { PropertyWrapper } from '../property-wrapper';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { StudioSelect, StudioSelectContent, StudioSelectItem, StudioSelectTrigger, StudioSelectValue } from '@/components/theme-studio/ui/form-controls';
 import { FONT_WEIGHTS, getAvailableWeights, getWeightLabel } from '@/lib/theme-studio/font-registry';
 
 interface FontWeightFieldProps {
@@ -36,23 +36,23 @@ export function FontWeightField({ schema, value, onChange, path, fontFamily = 'S
       path={path}
       inline={true}
     >
-      <Select 
+      <StudioSelect 
         value={isValidWeight ? currentValue : availableWeights.includes('400') ? '400' : availableWeights[0]} 
         onValueChange={onChange}
       >
-        <SelectTrigger className="w-full h-6 text-sm">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
+        <StudioSelectTrigger className="w-full">
+          <StudioSelectValue />
+        </StudioSelectTrigger>
+        <StudioSelectContent>
           {FONT_WEIGHTS.filter(weight => 
             availableWeights.includes(weight.value)
           ).map(weight => (
-            <SelectItem key={weight.value} value={weight.value} className="text-xs">
+            <StudioSelectItem key={weight.value} value={weight.value} className="text-xs">
               {weight.label} ({weight.value})
-            </SelectItem>
+            </StudioSelectItem>
           ))}
-        </SelectContent>
-      </Select>
+        </StudioSelectContent>
+      </StudioSelect>
     </PropertyWrapper>
   );
 }

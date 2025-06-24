@@ -5,6 +5,7 @@ import { PowerBITheme } from '@/lib/theme-studio/types';
 import { toast } from 'sonner';
 import JSONPretty from 'react-json-pretty';
 import 'react-json-pretty/themes/monikai.css';
+import { downloadThemeJson } from '@/lib/utils/theme-export';
 
 interface ThemeJsonViewProps {
   theme: PowerBITheme;
@@ -26,13 +27,7 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
   };
 
   const downloadJson = () => {
-    const blob = new Blob([formattedJson], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'theme.json';
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadThemeJson(theme);
   };
 
   return (

@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { CollapsibleSection } from '@/components/theme-studio/ui/collapsible-section';
 import { SchemaForm } from '@/components/theme-studio/form/schema-form';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
+import { hasActualContent } from '@/lib/utils/theme-helpers';
 
 interface CanvasLayoutSectionProps {
   visualSettings: Record<string, any>;
@@ -13,6 +14,7 @@ interface CanvasLayoutSectionProps {
   schemaLoader: SchemaLoader | null;
   schemaLoaded: boolean;
   canvasTypes: string[];
+  onClearSection?: (visual: string) => void;
 }
 
 export function CanvasLayoutSection({
@@ -23,6 +25,7 @@ export function CanvasLayoutSection({
   schemaLoader,
   schemaLoaded,
   canvasTypes,
+  onClearSection,
 }: CanvasLayoutSectionProps) {
   // Memoize handlers for canvas sections
   const createCanvasChangeHandler = useCallback((canvasType: string) => {
@@ -62,7 +65,9 @@ export function CanvasLayoutSection({
               title="Report Canvas"
               tooltip="Controls the overall report appearance and behavior"
               defaultOpen={false}
-              hasChanges={hasChanges(['visualStyles', 'report'])}
+              hasChanges={hasActualContent(visualSettings.report?.['*'])}
+              onClear={onClearSection ? () => onClearSection('report') : undefined}
+              hasContent={hasActualContent(visualSettings.report?.['*'])}
             >
               <SchemaForm
                 schema={schemaLoader?.getVisualSchema('report')?.properties?.['*'] || {}}
@@ -80,7 +85,9 @@ export function CanvasLayoutSection({
               title="Page Settings"
               tooltip="Configure page backgrounds, size, and layout options"
               defaultOpen={false}
-              hasChanges={hasChanges(['visualStyles', 'page'])}
+              hasChanges={hasActualContent(visualSettings.page?.['*'])}
+              onClear={onClearSection ? () => onClearSection('page') : undefined}
+              hasContent={hasActualContent(visualSettings.page?.['*'])}
             >
               <SchemaForm
                 schema={schemaLoader?.getVisualSchema('page')?.properties?.['*'] || {}}
@@ -98,7 +105,9 @@ export function CanvasLayoutSection({
               title="Filter Pane"
               tooltip="Customize the appearance of filter panes and cards"
               defaultOpen={false}
-              hasChanges={hasChanges(['visualStyles', 'filter'])}
+              hasChanges={hasActualContent(visualSettings.filter?.['*'])}
+              onClear={onClearSection ? () => onClearSection('filter') : undefined}
+              hasContent={hasActualContent(visualSettings.filter?.['*'])}
             >
               <SchemaForm
                 schema={schemaLoader?.getVisualSchema('filter')?.properties?.['*'] || {}}

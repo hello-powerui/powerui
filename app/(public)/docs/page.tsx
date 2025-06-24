@@ -24,43 +24,43 @@ const docsSections = [
     items: [
       { title: 'Introduction', href: '/docs/introduction', description: 'Learn what Power UI is and how it can help you' },
       { title: 'Quick Start', href: '/docs/quickstart', description: 'Get up and running in 5 minutes' },
-      { title: 'Installation', href: '/docs/installation', description: 'Installing and setting up Power UI' },
+      { title: 'Interface Overview', href: '/docs/interface-overview', description: 'Understanding the Theme Studio workspace' },
     ]
   },
   {
-    title: 'Theme Studio',
+    title: 'Theme Foundation',
     icon: Palette,
     items: [
-      { title: 'Creating Themes', href: '/docs/creating-themes', description: 'Build your first custom theme' },
-      { title: 'Color Palettes', href: '/docs/color-palettes', description: 'Working with colors and gradients' },
+      { title: 'Color Palettes', href: '/docs/color-palettes', description: 'Create and manage data color palettes' },
+      { title: 'Neutral Palettes', href: '/docs/neutral-palettes', description: 'AI-powered grayscale generation' },
       { title: 'Typography', href: '/docs/typography', description: 'Font families and text styling' },
-      { title: 'Export & Import', href: '/docs/export-import', description: 'Theme file management' },
+      { title: 'Light/Dark Mode', href: '/docs/light-dark-mode', description: 'Theme mode switching and customization' },
     ]
   },
   {
-    title: 'Figma Integration',
+    title: 'Visual Customization',
     icon: Layers,
     items: [
-      { title: 'Figma Setup', href: '/docs/figma-setup', description: 'Connect Figma to Power UI' },
-      { title: 'Design System', href: '/docs/design-system', description: 'Using the Power UI Figma library' },
-      { title: 'Workflow', href: '/docs/figma-workflow', description: 'Design to Power BI workflow' },
+      { title: 'Visual Styles & Variants', href: '/docs/visual-variants', description: 'Create multiple style variations per visual' },
+      { title: 'Real-Time Preview', href: '/docs/real-time-preview', description: 'Test themes with live Power BI reports' },
+      { title: 'Import & Export', href: '/docs/import-export', description: 'Theme file management and enhancement' },
     ]
   },
   {
-    title: 'Advanced',
+    title: 'Collaboration',
     icon: Code,
     items: [
-      { title: 'JSON Structure', href: '/docs/json-structure', description: 'Understanding theme JSON format' },
-      { title: 'Custom Properties', href: '/docs/custom-properties', description: 'Advanced theme customization' },
-      { title: 'API Reference', href: '/docs/api-reference', description: 'Programmatic theme generation' },
+      { title: 'Sharing Themes', href: '/docs/sharing', description: 'Public, private, and organization sharing' },
+      { title: 'JSON Editing', href: '/docs/json-editing', description: 'Direct JSON manipulation for developers' },
+      { title: 'Team Workflows', href: '/docs/team-workflows', description: 'Best practices for team collaboration' },
     ]
   },
   {
     title: 'Resources',
     icon: BookOpen,
     items: [
-      { title: 'Best Practices', href: '/docs/best-practices', description: 'Design guidelines and tips' },
-      { title: 'Examples', href: '/docs/examples', description: 'Real-world theme examples' },
+      { title: 'Keyboard Shortcuts', href: '/docs/keyboard-shortcuts', description: 'Speed up your workflow' },
+      { title: 'Best Practices', href: '/docs/best-practices', description: 'Design guidelines and pro tips' },
       { title: 'Troubleshooting', href: '/docs/troubleshooting', description: 'Common issues and solutions' },
     ]
   }
@@ -75,15 +75,15 @@ const popularGuides = [
     color: 'from-purple-500 to-pink-500'
   },
   {
-    title: 'Import from Figma',
-    description: 'Sync your Figma designs directly to Power BI themes',
-    href: '/docs/figma-workflow',
+    title: 'Visual Style Variants',
+    description: 'Create multiple style variations for each visual type - exclusive to Power UI',
+    href: '/docs/visual-variants',
     icon: Layers,
     color: 'from-blue-500 to-cyan-500'
   },
   {
-    title: 'Color palette guide',
-    description: 'Master color theory for effective data visualization',
+    title: 'Import from Coolors',
+    description: 'Import beautiful color palettes directly from Coolors.co',
     href: '/docs/color-palettes',
     icon: Palette,
     color: 'from-green-500 to-emerald-500'

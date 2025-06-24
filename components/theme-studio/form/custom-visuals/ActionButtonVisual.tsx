@@ -241,6 +241,9 @@ export function ActionButtonVisual({
                     defaultOpen={false}
                     hasChanges={hasChangesInSection([...path, 'fill'])}
                     changedCount={getChangedPropertiesCount([...path, 'fill'])}
+                    onClear={() => onChange({ ...value, fill: undefined })}
+                    hasContent={value?.fill !== undefined}
+                    clearMessage="Clear all fill properties?"
                   >
                 <StateAwarePropertySection
                   schema={fillSchemaWithoutShow}
@@ -263,6 +266,9 @@ export function ActionButtonVisual({
                     defaultOpen={false}
                     hasChanges={hasChangesInSection([...path, 'text'])}
                     changedCount={getChangedPropertiesCount([...path, 'text'])}
+                    onClear={() => onChange({ ...value, text: undefined })}
+                    hasContent={value?.text !== undefined}
+                    clearMessage="Clear all text properties?"
                   >
                 <StateAwarePropertySection
                   schema={textSchemaWithoutShow}
@@ -312,6 +318,9 @@ export function ActionButtonVisual({
                       defaultOpen={false}
                       hasChanges={hasChangesInSection([...path, propName])}
                       changedCount={getChangedPropertiesCount([...path, propName])}
+                      onClear={() => onChange({ ...value, [propName]: undefined })}
+                      hasContent={value?.[propName] !== undefined}
+                      clearMessage={`Clear all ${propSchema.title || formatGroupTitle(propName)} properties?`}
                     >
                   <StateAwarePropertySection
                     schema={modifiedSchema}
@@ -345,6 +354,9 @@ export function ActionButtonVisual({
                       defaultOpen={false}
                       hasChanges={hasChangesInSection([...path, propName])}
                       changedCount={getChangedPropertiesCount([...path, propName])}
+                      onClear={() => onChange({ ...value, [propName]: undefined })}
+                      hasContent={value?.[propName] !== undefined}
+                      clearMessage={`Clear all ${propSchema.title || formatGroupTitle(propName)} properties?`}
                     >
                       <div className="space-y-4">
                         {propSchema.items?.properties && (
@@ -389,6 +401,9 @@ export function ActionButtonVisual({
                       defaultOpen={false}
                       hasChanges={hasChangesInSection([...path, propName])}
                       changedCount={getChangedPropertiesCount([...path, propName])}
+                      onClear={() => onChange({ ...value, [propName]: undefined })}
+                      hasContent={value?.[propName] !== undefined}
+                      clearMessage={`Clear all ${propSchema.title || formatGroupTitle(propName)} properties?`}
                     >
                       <div className="space-y-4">
                         {propSchema.items?.properties && (

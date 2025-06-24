@@ -1,5 +1,5 @@
 import { WebhookEvent } from '@clerk/nextjs/server';
-import { services } from '@/lib/services';
+import { UserService } from '@/lib/db/services/user-service';
 import { prisma } from '@/lib/db/prisma';
 import { clerkClient } from '@clerk/nextjs/server';
 
@@ -20,7 +20,7 @@ export const userCreatedHandler: WebhookHandler = {
     );
     
     if (primaryEmail) {
-      await services.user.ensureUserExists(id, primaryEmail.email_address);
+      await UserService.upsertUser(id, primaryEmail.email_address);
     }
   },
 };
@@ -36,7 +36,7 @@ export const userUpdatedHandler: WebhookHandler = {
     );
     
     if (primaryEmail) {
-      await services.user.ensureUserExists(id, primaryEmail.email_address);
+      await UserService.upsertUser(id, primaryEmail.email_address);
     }
   },
 };
@@ -46,7 +46,7 @@ export const userDeletedHandler: WebhookHandler = {
   handle: async (evt: WebhookEvent) => {
     if (evt.type !== 'user.deleted' || !evt.data.id) return;
     
-    await services.user.deleteUser(evt.data.id);
+    await UserService.deleteUser(evt.data.id);
   },
 };
 
@@ -124,7 +124,7 @@ export const organizationMembershipCreatedHandler: WebhookHandler = {
     if (!org) return;
 
     // Ensure user exists in our database
-    await services.user.ensureUserExists(
+    await UserService.upsertUser(
       public_user_data.user_id,
       public_user_data.identifier || `user-${public_user_data.user_id}@org.com`
     );

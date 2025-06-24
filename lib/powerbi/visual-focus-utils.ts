@@ -27,15 +27,8 @@ export interface FocusLayoutConfig {
       };
     };
   };
-  panes?: {
-    filters?: {
-      visible?: boolean;
-    };
-    pageNavigation?: {
-      visible?: boolean;
-      position?: models.PageNavigationPosition;
-    };
-  };
+  filterPaneEnabled?: boolean;
+  navContentPaneEnabled?: boolean;
 }
 
 // Visual type mapping from theme studio to Power BI
@@ -180,15 +173,8 @@ export function generateFocusedVisualLayout(
         }
       }
     },
-    panes: {
-      filters: {
-        visible: false
-      },
-      pageNavigation: {
-        visible: true,
-        position: models.PageNavigationPosition.Bottom
-      }
-    }
+    filterPaneEnabled: false,
+    navContentPaneEnabled: false
   };
 }
 
@@ -215,14 +201,7 @@ export function generateDefaultLayout(pageId: string): FocusLayoutConfig {
         }
       }
     },
-    panes: {
-      filters: {
-        visible: false
-      },
-      pageNavigation: {
-        visible: true,
-        position: models.PageNavigationPosition.Bottom
-      }
-    }
+    filterPaneEnabled: true,
+    navContentPaneEnabled: false
   };
 }

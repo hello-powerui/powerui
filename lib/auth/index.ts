@@ -1,6 +1,6 @@
 import { auth, clerkClient } from '@clerk/nextjs/server'
-import { services } from '@/lib/services'
-import { hasActiveSubscription } from './permissions'
+import { UserService } from '@/lib/db/services/user-service'
+import { hasActiveSubscription } from '@/lib/user-permissions'
 import { 
   AuthenticationError, 
   SubscriptionRequiredError 
@@ -31,7 +31,7 @@ export async function getCurrentUser(): Promise<User | null> {
   const { userId } = await auth();
   if (!userId) return null;
   
-  return services.user.getUserById(userId);
+  return UserService.getUserById(userId);
 }
 
 /**
@@ -43,7 +43,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
   
   const [clerkUser, dbUser] = await Promise.all([
     (await clerkClient()).users.getUser(userId),
-    services.user.ensureUserExists(userId)
+    UserService.ensureUserExists(userId)
   ]);
   
   return { clerkUser, dbUser };
@@ -94,4 +94,4 @@ export async function requireAuthUserId(): Promise<string> {
 }
 
 // Re-export permissions
-export * from './permissions';
+export * from '@/lib/user-permissions';

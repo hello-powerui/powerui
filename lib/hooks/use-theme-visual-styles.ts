@@ -46,6 +46,37 @@ export function useThemeVisualStyles() {
     return variants.length > 1 || (variants.length === 1 && variants[0] !== '*');
   }, [visualStyles]);
 
+  // Clear visual section for a specific variant
+  const clearVisualSection = useCallback((visual: string, variant: string, section: string) => {
+    const currentStyles = visualStyles?.[visual]?.[variant] || {};
+    const newStyles = { ...currentStyles };
+    
+    // Define section property mappings
+    const sectionPropertyPrefixes: Record<string, string[]> = {
+      background: ['background', 'fill'],
+      border: ['border', 'outline'],
+      text: ['font', 'text', 'color'],
+      spacing: ['padding', 'margin'],
+      effects: ['shadow', 'opacity', 'filter']
+    };
+    
+    const prefixes = sectionPropertyPrefixes[section] || [section];
+    
+    // Remove properties that match the section
+    Object.keys(newStyles).forEach(key => {
+      if (prefixes.some(prefix => key.toLowerCase().includes(prefix))) {
+        delete newStyles[key];
+      }
+    });
+    
+    updateVisualStyle(visual, variant, newStyles);
+  }, [visualStyles, updateVisualStyle]);
+
+  // Clear all styles for a visual variant
+  const clearVisualVariant = useCallback((visual: string, variant: string) => {
+    updateVisualStyle(visual, variant, {});
+  }, [updateVisualStyle]);
+
   return {
     // Data
     visualStyles,
@@ -56,6 +87,10 @@ export function useThemeVisualStyles() {
     
     // Utilities
     getVisualStyle,
-    hasVariants
+    hasVariants,
+    
+    // Clear actions
+    clearVisualSection,
+    clearVisualVariant
   };
 }

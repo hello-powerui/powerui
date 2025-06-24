@@ -58,7 +58,7 @@ export function NumberControl({
             min={isPercentage ? 0 : min}
             max={isPercentage ? 100 : max}
             step={isPercentage ? 1 : step}
-            className="h-8 text-sm px-2.5 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="h-8 text-sm px-2.5 hover:border-gray-400 focus:ring-2 focus:ring-black focus:border-blue-500 transition-colors"
             title={description}
           />
           {isPercentage && (
@@ -93,7 +93,7 @@ export function NumberControl({
           min={isPercentage ? 0 : min}
           max={isPercentage ? 100 : max}
           step={isPercentage ? 1 : step}
-          className="flex-1 h-8 text-sm px-2.5 hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          className="flex-1 h-8 text-sm px-2.5 hover:border-gray-400 focus:ring-2 focus:ring-black focus:border-blue-500 transition-colors"
         />
         {isPercentage && (
           <span className="text-sm text-gray-600">%</span>

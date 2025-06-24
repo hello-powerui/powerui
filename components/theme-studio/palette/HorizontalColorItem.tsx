@@ -32,7 +32,7 @@ export function HorizontalColorItem({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: isDragging ? undefined : 'none',
   };
 
   return (
@@ -41,16 +41,15 @@ export function HorizontalColorItem({
       style={style}
       className={cn(
         "group relative flex flex-col items-center gap-2",
-        isDragging && "opacity-50",
-        "transition-opacity"
+        isDragging && "opacity-50"
       )}
-      {...attributes}
-      {...listeners}
     >
       <div className="relative">
         <div
-          className="w-14 h-14 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-gray-400 transition-all hover:shadow-md"
+          className="w-14 h-14 rounded-lg border-2 border-gray-200 cursor-grab active:cursor-grabbing hover:border-gray-400 transition-all hover:shadow-md"
           style={{ backgroundColor: color }}
+          {...attributes}
+          {...listeners}
         >
           <input
             type="color"
@@ -60,18 +59,19 @@ export function HorizontalColorItem({
           />
         </div>
         
-        <Button
-          variant="ghost"
-          size="icon"
+        <button
+          type="button"
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             onRemove();
           }}
           disabled={disabled}
-          className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-white border border-gray-200 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 hover:border-red-200"
+          className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-white border border-gray-200 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 hover:border-red-200 flex items-center justify-center"
+          style={{ zIndex: 10 }}
         >
-          <X className="h-3 w-3 text-gray-600 hover:text-red-600" />
-        </Button>
+          <X className="h-3 w-3 text-gray-600" />
+        </button>
       </div>
       
       <span className="text-xs font-mono text-gray-600">{color}</span>

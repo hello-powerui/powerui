@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { Plus, Palette, Grid3x3, Trash2 } from 'lucide-react';
 import { usePaletteStore } from '@/lib/stores/palette-store';
 import { ModernPaletteEditor } from './ModernPaletteEditor';
-import { CompactPaletteDisplay } from './CompactPaletteDisplay';
+import { CompactPaletteDisplayWithActions } from './CompactPaletteDisplayWithActions';
 import type { ColorPalette, NeutralPalette } from '@/lib/types/unified-palette';
 import { toast } from 'sonner';
 
@@ -25,6 +25,8 @@ interface UnifiedPaletteManagerProps {
   selectedNeutralPaletteId?: string;
 }
 
+type ColorPaletteTab = 'my' | 'trending' | 'organization';
+
 export function UnifiedPaletteManager({
   open,
   onOpenChange,
@@ -37,6 +39,7 @@ export function UnifiedPaletteManager({
   const [activeTab, setActiveTab] = useState<'color' | 'neutral'>(
     paletteType === 'neutral' ? 'neutral' : 'color'
   );
+  const [colorPaletteTab, setColorPaletteTab] = useState<ColorPaletteTab>('my');
   const [editingPalette, setEditingPalette] = useState<
     { type: 'color'; palette: ColorPalette } | 
     { type: 'neutral'; palette: NeutralPalette } | 
@@ -74,6 +77,14 @@ export function UnifiedPaletteManager({
     onOpenChange(false);
   };
 
+  const handleEditPalette = (palette: ColorPalette | NeutralPalette, type: 'color' | 'neutral') => {
+    if (type === 'color') {
+      setEditingPalette({ type: 'color', palette: palette as ColorPalette });
+    } else {
+      setEditingPalette({ type: 'neutral', palette: palette as NeutralPalette });
+    }
+  };
+
   const renderColorPalettes = () => {
     if (isLoading) {
       return (
@@ -108,83 +119,123 @@ export function UnifiedPaletteManager({
     const builtInPalettes = colorPalettes.filter(p => p.isBuiltIn);
     const userPalettes = colorPalettes.filter(p => !p.isBuiltIn);
 
+    // Filter palettes based on active tab
+    let displayPalettes: ColorPalette[] = [];
+    if (colorPaletteTab === 'my') {
+      displayPalettes = userPalettes;
+    } else if (colorPaletteTab === 'trending') {
+      displayPalettes = builtInPalettes;
+    } else if (colorPaletteTab === 'organization') {
+      // For now, organization palettes will be empty
+      // This can be implemented when org features are added
+      displayPalettes = [];
+    }
+
     return (
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setCreatingType('color')}
-            className="h-8 -ml-1 text-xs"
-          >
-            <Plus className="h-3.5 w-3.5 mr-1" />
-            New palette
-          </Button>
-        </div>
-        <ScrollArea className="h-[360px] -mx-6 px-6">
-          <div className="space-y-1 pr-2">
-            {/* Built-in Palettes */}
-            {builtInPalettes.length > 0 && (
-              <div className="space-y-1.5 mb-4">
-                <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Built-in</h4>
-                {builtInPalettes.map((palette) => (
-                  <CompactPaletteDisplay
-                    key={palette.id}
-                    name={palette.name}
-                    colors={palette.colors as string[]}
-                    isSelected={selectedColorPaletteId === palette.id}
-                    onClick={() => handleColorPaletteClick({
-                      ...palette,
-                      colors: palette.colors as string[]
-                    })}
-                    type="color"
-                  />
-                ))}
-              </div>
+        {/* Tab switcher for color palettes */}
+        <div className="flex items-center gap-1 border-b border-gray-100 -mx-6 px-6">
+          <button
+            onClick={() => setColorPaletteTab('my')}
+            className={cn(
+              "px-3 py-2 text-sm font-medium transition-colors relative",
+              colorPaletteTab === 'my'
+                ? "text-gray-900"
+                : "text-gray-500 hover:text-gray-700"
             )}
+          >
+            My Palettes
+            {colorPaletteTab === 'my' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900" />
+            )}
+          </button>
+          <button
+            onClick={() => setColorPaletteTab('trending')}
+            className={cn(
+              "px-3 py-2 text-sm font-medium transition-colors relative",
+              colorPaletteTab === 'trending'
+                ? "text-gray-900"
+                : "text-gray-500 hover:text-gray-700"
+            )}
+          >
+            Trending
+            {colorPaletteTab === 'trending' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900" />
+            )}
+          </button>
+          <button
+            onClick={() => setColorPaletteTab('organization')}
+            className={cn(
+              "px-3 py-2 text-sm font-medium transition-colors relative",
+              colorPaletteTab === 'organization'
+                ? "text-gray-900"
+                : "text-gray-500 hover:text-gray-700"
+            )}
+          >
+            Organization
+            {colorPaletteTab === 'organization' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900" />
+            )}
+          </button>
+        </div>
 
-            {/* User Palettes */}
-            {userPalettes.length > 0 ? (
-              <div className="space-y-1.5">
-                <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Your Palettes</h4>
-                {userPalettes.map((palette) => (
-                  <div key={palette.id} className="group relative">
-                    <CompactPaletteDisplay
-                      name={palette.name}
-                      colors={palette.colors as string[]}
-                      isSelected={selectedColorPaletteId === palette.id}
-                      onClick={() => handleColorPaletteClick({
-                        ...palette,
-                        colors: palette.colors as string[]
-                      })}
-                      type="color"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        if (confirm(`Delete palette "${palette.name}"? This cannot be undone.`)) {
-                          try {
-                            await deleteColorPalette(palette.id);
-                            toast.success('Palette deleted');
-                          } catch (error) {
-                            toast.error('Failed to delete palette');
-                          }
-                        }
-                      }}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 text-gray-400 hover:text-red-600" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
+        <div className="flex items-center justify-between">
+          {colorPaletteTab === 'my' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCreatingType('color')}
+              className="h-8 -ml-1 text-xs"
+            >
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              New palette
+            </Button>
+          )}
+        </div>
+
+        <ScrollArea className="h-[320px] -mx-6 px-6">
+          <div className="space-y-1 pr-3 pl-1">
+            {displayPalettes.length > 0 ? (
+              displayPalettes.map((palette) => (
+                <CompactPaletteDisplayWithActions
+                  key={palette.id}
+                  name={palette.name}
+                  colors={palette.colors as string[]}
+                  isSelected={selectedColorPaletteId === palette.id}
+                  onClick={() => handleColorPaletteClick({
+                    ...palette,
+                    colors: palette.colors as string[]
+                  })}
+                  onEdit={() => handleEditPalette(palette, 'color')}
+                  onDelete={!palette.isBuiltIn ? async () => {
+                    if (confirm(`Delete palette "${palette.name}"? This cannot be undone.`)) {
+                      try {
+                        await deleteColorPalette(palette.id);
+                        toast.success('Palette deleted');
+                      } catch (error) {
+                        toast.error('Failed to delete palette');
+                      }
+                    }
+                  } : undefined}
+                  type="color"
+                  showActions={!palette.isBuiltIn}
+                />
+              ))
             ) : (
               <div className="text-center py-12 text-gray-500">
-                <Palette className="h-10 w-10 mx-auto mb-3 text-gray-300" />
-                <p className="text-sm mb-1">No custom palettes</p>
-                <p className="text-xs text-gray-400">Create your first color palette</p>
+                {colorPaletteTab === 'my' ? (
+                  <>
+                    <Palette className="h-10 w-10 mx-auto mb-3 text-gray-300" />
+                    <p className="text-sm mb-1">No custom palettes</p>
+                    <p className="text-xs text-gray-400">Create your first color palette</p>
+                  </>
+                ) : colorPaletteTab === 'organization' ? (
+                  <>
+                    <Palette className="h-10 w-10 mx-auto mb-3 text-gray-300" />
+                    <p className="text-sm mb-1">No organization palettes</p>
+                    <p className="text-xs text-gray-400">Organization palettes will appear here</p>
+                  </>
+                ) : null}
               </div>
             )}
           </div>
@@ -241,19 +292,21 @@ export function UnifiedPaletteManager({
           </Button>
         </div>
         <ScrollArea className="h-[360px] -mx-6 px-6">
-          <div className="space-y-1 pr-2">
+          <div className="space-y-1 pr-3 pl-1">
             {/* Built-in Palettes */}
             {builtInPalettes.length > 0 && (
               <div className="space-y-1.5 mb-4">
                 <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Built-in</h4>
                 {builtInPalettes.map((palette) => (
-                  <CompactPaletteDisplay
+                  <CompactPaletteDisplayWithActions
                     key={palette.id}
                     name={palette.name}
                     colors={palette.colors}
                     isSelected={selectedNeutralPaletteId === palette.id}
                     onClick={() => handleNeutralPaletteClick(palette)}
+                    onEdit={() => handleEditPalette(palette, 'neutral')}
                     type="neutral"
+                    showActions={false}
                   />
                 ))}
               </div>
@@ -264,33 +317,26 @@ export function UnifiedPaletteManager({
               <div className="space-y-1.5">
                 <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Your Palettes</h4>
                 {userPalettes.map((palette) => (
-                  <div key={palette.id} className="group relative">
-                    <CompactPaletteDisplay
-                      name={palette.name}
-                      colors={palette.colors}
-                      isSelected={selectedNeutralPaletteId === palette.id}
-                      onClick={() => handleNeutralPaletteClick(palette)}
-                      type="neutral"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        if (confirm(`Delete palette "${palette.name}"? This cannot be undone.`)) {
-                          try {
-                            await deleteNeutralPalette(palette.id);
-                            toast.success('Palette deleted');
-                          } catch (error) {
-                            toast.error('Failed to delete palette');
-                          }
+                  <CompactPaletteDisplayWithActions
+                    key={palette.id}
+                    name={palette.name}
+                    colors={palette.colors}
+                    isSelected={selectedNeutralPaletteId === palette.id}
+                    onClick={() => handleNeutralPaletteClick(palette)}
+                    onEdit={() => handleEditPalette(palette, 'neutral')}
+                    onDelete={async () => {
+                      if (confirm(`Delete palette "${palette.name}"? This cannot be undone.`)) {
+                        try {
+                          await deleteNeutralPalette(palette.id);
+                          toast.success('Palette deleted');
+                        } catch (error) {
+                          toast.error('Failed to delete palette');
                         }
-                      }}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 text-gray-400 hover:text-red-600" />
-                    </Button>
-                  </div>
+                      }
+                    }}
+                    type="neutral"
+                    showActions={true}
+                  />
                 ))}
               </div>
             ) : (

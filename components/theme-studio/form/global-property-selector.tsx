@@ -8,6 +8,7 @@ import { X, Plus, Search, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SchemaForm } from './schema-form';
 import { CollapsibleSection } from '../ui/collapsible-section';
+import { hasActualContent } from '@/lib/utils/theme-helpers';
 
 interface GlobalPropertySelectorProps {
   schemaLoader: SchemaLoader;
@@ -82,7 +83,7 @@ export function GlobalPropertySelector({
   // Helper to check if a property has changes
   const hasPropertyChanges = (propertyName: string): boolean => {
     const value = visualStyles?.['*']?.['*']?.[propertyName];
-    return value !== undefined && value !== null;
+    return hasActualContent(value);
   };
 
   // Helper to reset a property
@@ -183,11 +184,32 @@ export function GlobalPropertySelector({
               const sectionTitle = sectionSchema.title || 
                 key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim();
               
+              const hasContent = hasActualContent(visualStyles?.['*']?.['*']?.[key]);
+              
               return (
                 <CollapsibleSection
                   key={key}
                   title={sectionTitle}
                   defaultOpen={false}
+                  hasChanges={hasContent}
+                  onClear={() => {
+                    // Clear this structured property
+                    if (onVisualStylesChange) {
+                      const newVisualStyles = {
+                        ...visualStyles,
+                        '*': {
+                          ...visualStyles?.['*'],
+                          '*': {
+                            ...visualStyles?.['*']?.['*'],
+                            [key]: undefined
+                          }
+                        }
+                      };
+                      onVisualStylesChange(newVisualStyles);
+                    }
+                  }}
+                  hasContent={hasContent}
+                  clearMessage={`Clear all ${sectionTitle.toLowerCase()} settings?`}
                 >
                   <SchemaForm
                     schema={sectionSchema || {}}
@@ -254,7 +276,7 @@ export function GlobalPropertySelector({
                         placeholder="Search properties..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-black focus:border-blue-500"
                         onClick={(e) => e.stopPropagation()}
                         autoFocus
                       />
@@ -306,46 +328,28 @@ export function GlobalPropertySelector({
                 title={propertyName}  // Always use property name
                 defaultOpen={false}
                 hasChanges={hasChanges}
+                onClear={() => handleResetProperty(propertyName)}
+                hasContent={hasActualContent(visualStyles?.['*']?.['*']?.[propertyName])}
+                clearMessage={`Clear all ${propertyName} settings?`}
                 headerAction={
-                  <div className="flex items-center gap-2">
-                    {hasChanges && (
-                      <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleResetProperty(propertyName);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleResetProperty(propertyName);
-                          }
-                        }}
-                        className="text-xs text-gray-600 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
-                      >
-                        Reset
-                      </div>
-                    )}
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => {
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveComplexProperty(propertyName);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
                         e.stopPropagation();
                         handleRemoveComplexProperty(propertyName);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleRemoveComplexProperty(propertyName);
-                        }
-                      }}
-                      className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer"
-                    >
-                      <X className="w-4 h-4" />
-                    </div>
+                      }
+                    }}
+                    className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+                    title="Remove property"
+                  >
+                    <X className="w-4 h-4" />
                   </div>
                 }
               >

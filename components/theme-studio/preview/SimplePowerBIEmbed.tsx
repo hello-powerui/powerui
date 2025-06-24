@@ -26,11 +26,7 @@ interface SimplePowerBIEmbedProps {
   enterFocusMode?: boolean;
 }
 
-declare global {
-  interface Window {
-    report: Report;
-  }
-}
+// Global types are defined in types/global.d.ts
 
 function SimplePowerBIEmbed({ 
   generatedTheme, 
@@ -54,6 +50,7 @@ function SimplePowerBIEmbed({
   const [isReportReady, setIsReportReady] = useState(false);
   const isInitialLoad = useRef(true);
   const [isResetting, setIsResetting] = useState(false);
+  const hasLoadedReport = useRef(false);
 
   // Generate theme with selected variant as default
   const variantPreviewTheme = useMemo(() => {
@@ -103,12 +100,13 @@ function SimplePowerBIEmbed({
   // Load report only when theme is ready - one time only
   useEffect(() => {
     // Only load once when we first get a valid theme
-    if (!variantPreviewTheme || embedConfig) {
+    if (!variantPreviewTheme || hasLoadedReport.current) {
       return;
     }
 
     const loadReport = async () => {
       try {
+        hasLoadedReport.current = true; // Mark as loaded immediately to prevent double execution
         setIsLoading(true);
         setError(null);
         
@@ -132,14 +130,8 @@ function SimplePowerBIEmbed({
           accessToken: config.accessToken,
           tokenType: models.TokenType.Embed,
           settings: {
-            panes: {
-              filters: {
-                visible: false
-              },
-              pageNavigation: {
-                visible: false
-              }
-            },
+            filterPaneEnabled: true,
+            navContentPaneEnabled: false,
             layoutType: models.LayoutType.Custom,
             customLayout: {
               displayOption: models.DisplayOption.FitToPage
@@ -157,6 +149,7 @@ function SimplePowerBIEmbed({
         setRetryCount(0); // Reset retry count on success
       } catch (err) {
         console.error('Error loading Power BI report:', err);
+        hasLoadedReport.current = false; // Reset on error to allow retry
         const errorMessage = err instanceof Error ? err.message : 'Failed to load Power BI report';
         
         // Check if we should retry
@@ -177,7 +170,7 @@ function SimplePowerBIEmbed({
     };
 
     loadReport();
-  }, [variantPreviewTheme, powerBIService, embedConfig]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [variantPreviewTheme, retryCount, powerBIService])
 
   // Apply theme when it changes after initial load
   useEffect(() => {
@@ -288,12 +281,14 @@ function SimplePowerBIEmbed({
     // Force a complete reload of the report (like the reload button does)
     // This ensures the layout is properly reset
     isInitialLoad.current = true;
+    hasLoadedReport.current = false; // Reset the loaded flag to allow reload
     setEmbedConfig(null);
     setIsLoading(true);
     
     setTimeout(() => {
       const loadReport = async () => {
         try {
+          hasLoadedReport.current = true; // Mark as loaded immediately
           const config = await powerBIService.getEmbedConfigWithTheme(
             powerBIConfig.reportId,
             powerBIConfig.workspaceId,
@@ -307,12 +302,8 @@ function SimplePowerBIEmbed({
             accessToken: config.accessToken,
             tokenType: models.TokenType.Embed,
             settings: {
-              panes: {
-                filters: { visible: false },
-                pageNavigation: {
-                  visible: false
-                }
-              },
+              filterPaneEnabled: true,
+              navContentPaneEnabled: false,
               layoutType: models.LayoutType.Custom,
               customLayout: { displayOption: models.DisplayOption.FitToPage },
               bars: { actionBar: { visible: false } }
@@ -324,6 +315,7 @@ function SimplePowerBIEmbed({
           isInitialLoad.current = false;
         } catch (err) {
           console.error('Error reloading report:', err);
+          hasLoadedReport.current = false; // Reset on error
           setError(err instanceof Error ? err.message : 'Failed to reload report');
         } finally {
           setIsLoading(false);
@@ -510,11 +502,13 @@ function SimplePowerBIEmbed({
       <button
         onClick={() => {
           isInitialLoad.current = true;
+          hasLoadedReport.current = false; // Reset the loaded flag to allow reload
           setEmbedConfig(null);
           setIsLoading(true);
           setTimeout(() => {
             const loadReport = async () => {
               try {
+                hasLoadedReport.current = true; // Mark as loaded immediately
                 const config = await powerBIService.getEmbedConfigWithTheme(
                   powerBIConfig.reportId,
                   powerBIConfig.workspaceId,
@@ -528,12 +522,8 @@ function SimplePowerBIEmbed({
                   accessToken: config.accessToken,
                   tokenType: models.TokenType.Embed,
                   settings: {
-                    panes: {
-                      filters: { visible: false },
-                      pageNavigation: {
-                        visible: false
-                      }
-                    },
+                    filterPaneEnabled: true,
+                    navContentPaneEnabled: false,
                     layoutType: models.LayoutType.Custom,
                     customLayout: { displayOption: models.DisplayOption.FitToPage },
                     bars: { actionBar: { visible: false } }
@@ -545,6 +535,7 @@ function SimplePowerBIEmbed({
                 isInitialLoad.current = false;
               } catch (err) {
                 // console.error('Error reloading report:', err);
+                hasLoadedReport.current = false; // Reset on error
                 setError(err instanceof Error ? err.message : 'Failed to reload report');
               } finally {
                 setIsLoading(false);

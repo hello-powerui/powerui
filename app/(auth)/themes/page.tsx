@@ -217,26 +217,18 @@ export default function ThemesPage() {
   };
 
   const handleDownloadTheme = async (theme: Theme) => {
-    const themeInput = theme.themeData as any;
+    const themeData = theme.themeData;
     
-    const response = await fetch('/api/generate-theme', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(themeInput),
+    // Download the raw theme data directly
+    const blob = new Blob([JSON.stringify(themeData, null, 2)], {
+      type: 'application/json',
     });
-    if (response.ok) {
-      const generatedTheme = await response.json();
-      // Download the theme
-      const blob = new Blob([JSON.stringify(generatedTheme, null, 2)], {
-        type: 'application/json',
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const renderThemeCard = (theme: Theme, isOwner: boolean = true) => (

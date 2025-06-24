@@ -150,25 +150,40 @@ export function StructuralColorsTab() {
       </div>
       
       <div className="-space-y-px">
-        {Object.entries(STRUCTURAL_COLOR_GROUPS).map(([groupName, { colors, description }]) => (
-          <CollapsibleSection
-            key={groupName}
-            title={groupName}
-            tooltip={description}
-            defaultOpen={false}
-            badge={colors.length}
-          >
+        {Object.entries(STRUCTURAL_COLOR_GROUPS).map(([groupName, { colors, description }]) => {
+          // Check if any colors in this group have custom values
+          const hasCustomColors = colors.some(colorKey => (structuralColors as any)[colorKey] !== undefined);
+          
+          return (
+            <CollapsibleSection
+              key={groupName}
+              title={groupName}
+              tooltip={description}
+              defaultOpen={false}
+              badge={colors.length}
+              hasChanges={hasCustomColors}
+              onClear={() => {
+                // Clear all colors in this group
+                const updatedColors = { ...structuralColors } as any;
+                colors.forEach(colorKey => {
+                  delete updatedColors[colorKey];
+                });
+                setStructuralColors(updatedColors);
+              }}
+              hasContent={hasCustomColors}
+              clearMessage={`Clear all color customizations in the ${groupName} group?`}
+            >
             <div className={`${THEME_STUDIO_SPACING.propertyGap} pt-2`}>
               {colors.map((colorKey, index) => {
                 // Skip if this color doesn't exist in the theme
-                if (!STRUCTURAL_COLOR_NAMES[colorKey]) return null;
+                if (!(STRUCTURAL_COLOR_NAMES as any)[colorKey]) return null;
                 
                 const isLast = index === colors.length - 1;
                 
                 return (
                   <ConnectedProperty key={colorKey} isLast={isLast}>
                     <FillControl
-                      label={STRUCTURAL_COLOR_NAMES[colorKey]}
+                      label={(STRUCTURAL_COLOR_NAMES as any)[colorKey]}
                       value={{ solid: { color: getColorValue(colorKey) } }}
                       onChange={(value) => handleColorChange(colorKey, value)}
                       path={[colorKey]}
@@ -179,7 +194,8 @@ export function StructuralColorsTab() {
               })}
             </div>
           </CollapsibleSection>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -1,14 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  StudioLabel as Label,
+  StudioInput as Input,
+  StudioSelect as Select,
+  StudioSelectContent as SelectContent,
+  StudioSelectItem as SelectItem,
+  StudioSelectTrigger as SelectTrigger,
+  StudioSelectValue as SelectValue
+} from '@/components/theme-studio/ui/form-controls';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { FONT_WEIGHTS, getAvailableWeights } from '@/lib/theme-studio/font-registry';
 import { resolveToken } from '@/lib/theme-generation/token-registry';
 import { CollapsibleSection } from '@/components/theme-studio/ui/collapsible-section';
+import { hasActualContent } from '@/lib/utils/theme-helpers';
 import { ConnectedProperty } from '@/components/theme-studio/ui/connected-property';
 import { PropertyWrapper } from '@/components/theme-studio/form/property-wrapper';
 import { FillControl } from '@/components/theme-studio/form/controls/fill-control-modern';
@@ -151,7 +158,7 @@ export function TypographyTab() {
   const handleFontSizeChange = (className: string, value: string) => {
     const fontSize = parseInt(value);
     if (!isNaN(fontSize) && fontSize > 0) {
-      const updatedClass = { ...localTextClasses[className], fontSize };
+      const updatedClass = { ...(localTextClasses as any)[className], fontSize };
       setLocalTextClasses(prev => ({
         ...prev,
         [className]: updatedClass
@@ -183,7 +190,7 @@ export function TypographyTab() {
       color = '#000000';
     }
     
-    const updatedClass = { ...localTextClasses[className], color };
+    const updatedClass = { ...(localTextClasses as any)[className], color };
     setLocalTextClasses(prev => ({
       ...prev,
       [className]: updatedClass
@@ -196,7 +203,7 @@ export function TypographyTab() {
   };
 
   const handleFontWeightChange = (className: string, weight: string) => {
-    const updatedClass = { ...localTextClasses[className], fontWeight: weight };
+    const updatedClass = { ...(localTextClasses as any)[className], fontWeight: weight };
     setLocalTextClasses(prev => ({
       ...prev,
       [className]: updatedClass
@@ -255,7 +262,7 @@ export function TypographyTab() {
         
         {/* Font Family Selector */}
         <div className="bg-gray-50 rounded-md p-3 mt-3">
-          <Label htmlFor="font-family" className="text-xs font-medium text-gray-700 mb-2 block">
+          <Label htmlFor="font-family" className="mb-2 block">
             Font Family
           </Label>
           <Select value={fontFamily} onValueChange={(value) => useThemeStudioStore.getState().setFontFamily(value)}>
@@ -275,7 +282,7 @@ export function TypographyTab() {
               <SelectItem value="Lato">Lato</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 mt-1">
             This font will be applied to all text classes
           </p>
         </div>
@@ -283,9 +290,11 @@ export function TypographyTab() {
       
       <div className="-space-y-px">
         {TEXT_CLASS_INFO.map(({ name, description, usage }) => {
-          const textClass = localTextClasses[name] || {};
+          const textClass = (localTextClasses as any)[name] || {};
           const colorValue = getColorValue(textClass.color);
           const availableWeights = getAvailableWeights(fontFamily || 'Segoe UI');
+          
+          const hasCustomization = hasActualContent((textClasses as any)?.[name]);
           
           return (
             <CollapsibleSection
@@ -293,6 +302,23 @@ export function TypographyTab() {
               title={name}
               tooltip={`${description} - Used in: ${usage}`}
               defaultOpen={false}
+              hasChanges={hasCustomization}
+              onClear={() => {
+                // Clear this specific text class
+                const updatedTextClasses = { ...textClasses } as any;
+                delete updatedTextClasses[name];
+                setTextClasses(updatedTextClasses);
+                
+                // Reset local state to default
+                const resetClass = { ...(DEFAULT_TEXT_CLASSES as any)[name] };
+                resetClass.fontFace = fontFamily;
+                setLocalTextClasses(prev => ({
+                  ...prev,
+                  [name]: resetClass
+                }));
+              }}
+              hasContent={hasCustomization}
+              clearMessage={`Clear all customizations for the ${name} text class?`}
               headerAction={
                 <div
                   style={{
@@ -317,9 +343,9 @@ export function TypographyTab() {
                         max="72"
                         value={textClass.fontSize || 12}
                         onChange={(e) => handleFontSizeChange(name, e.target.value)}
-                        className="w-20 h-7 text-xs"
+                        className="w-20"
                       />
-                      <span className="text-xs text-gray-500">pt</span>
+                      <span className="text-sm text-gray-500">pt</span>
                     </div>
                   </PropertyWrapper>
                 </ConnectedProperty>
@@ -330,14 +356,14 @@ export function TypographyTab() {
                       value={textClass.fontWeight || "400"} 
                       onValueChange={(value) => handleFontWeightChange(name, value)}
                     >
-                      <SelectTrigger className="h-7 text-xs">
+                      <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {FONT_WEIGHTS.filter(weight => 
                           availableWeights.includes(weight.value)
                         ).map(weight => (
-                          <SelectItem key={weight.value} value={weight.value} className="text-xs">
+                          <SelectItem key={weight.value} value={weight.value}>
                             {weight.label} ({weight.value})
                           </SelectItem>
                         ))}

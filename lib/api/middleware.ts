@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { services } from '@/lib/services';
+import { UserService } from '@/lib/db/services/user-service';
 import { AppError, AuthenticationError, ValidationError } from '@/lib/errors';
 import { z } from 'zod';
 
@@ -77,7 +77,7 @@ export function withAuth<T = any>(
       }
 
       console.log('[withAuth] Ensuring user exists in database');
-      const dbUser = await services.user.ensureUserExists(userId);
+      const dbUser = await UserService.ensureUserExists(userId);
       console.log('[withAuth] Database userId:', dbUser.id);
       
       return handler(req, { userId, dbUserId: dbUser.id });
@@ -98,7 +98,7 @@ export function withPaidUser<T = any>(
   return withAuth(async (req, context) => {
     try {
       console.log('[withPaidUser] Checking paid user status for:', context.dbUserId);
-      const user = await services.user.getUserById(context.dbUserId);
+      const user = await UserService.getUserById(context.dbUserId);
       
       console.log('[withPaidUser] User check:', { 
         dbUserId: context.dbUserId, 

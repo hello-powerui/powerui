@@ -24,7 +24,7 @@ export function StringSchemaField({ schema, value, onChange, path, inline = true
           <select
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
-            className="flex-1 h-6 rounded border border-gray-200 bg-white px-2 py-0 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            className="flex-1 h-8 rounded border border-gray-300 bg-white px-2 py-0 text-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors"
             title={schema.description}
           >
             {schema.oneOf.map(option => (
@@ -63,7 +63,7 @@ export function StringSchemaField({ schema, value, onChange, path, inline = true
           <select
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
-            className="flex-1 h-6 rounded border border-gray-200 bg-white px-2 py-0 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            className="flex-1 h-8 rounded border border-gray-300 bg-white px-2 py-0 text-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors"
             title={schema.description}
           >
             {schema.enum.map(val => (
@@ -99,7 +99,7 @@ export function StringSchemaField({ schema, value, onChange, path, inline = true
           type="text"
           value={value || ''}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full h-6 rounded border border-gray-200 bg-white px-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+          className="w-full h-8 rounded border border-gray-300 bg-white px-2 text-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-colors"
           title={schema.description}
         />
       </PropertyWrapper>

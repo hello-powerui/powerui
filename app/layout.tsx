@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="font-segoe">
         <Providers>
-          <main>{children}</main>
+          {children}
           <Toaster position="bottom-right" />
           <Analytics />
           <SpeedInsights />

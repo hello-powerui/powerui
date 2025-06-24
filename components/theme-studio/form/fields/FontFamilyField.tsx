@@ -2,7 +2,7 @@
 
 import { PropertyWrapper } from '../property-wrapper';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { StudioSelect, StudioSelectContent, StudioSelectItem, StudioSelectTrigger, StudioSelectValue } from '@/components/theme-studio/ui/form-controls';
 import { FONT_AVAILABLE_WEIGHTS } from '@/lib/theme-studio/font-registry';
 
 interface FontFamilyFieldProps {
@@ -21,18 +21,18 @@ export function FontFamilyField({ schema, value, onChange, path }: FontFamilyFie
       path={path}
       inline={true}
     >
-      <Select value={value || 'Segoe UI'} onValueChange={onChange}>
-        <SelectTrigger className="w-full h-6 text-sm">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
+      <StudioSelect value={value || 'Segoe UI'} onValueChange={onChange}>
+        <StudioSelectTrigger className="w-full">
+          <StudioSelectValue />
+        </StudioSelectTrigger>
+        <StudioSelectContent>
           {FONT_FAMILIES.map(font => (
-            <SelectItem key={font} value={font} className="text-xs">
+            <StudioSelectItem key={font} value={font} className="text-xs">
               {font}
-            </SelectItem>
+            </StudioSelectItem>
           ))}
-        </SelectContent>
-      </Select>
+        </StudioSelectContent>
+      </StudioSelect>
     </PropertyWrapper>
   );
 }

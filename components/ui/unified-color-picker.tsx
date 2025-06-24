@@ -479,7 +479,7 @@ export function UnifiedColorPicker({
                   {PRESET_COLORS.map((color) => (
                     <button
                       key={color}
-                      className="h-8 w-full rounded border-2 border-gray-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="h-8 w-full rounded border-2 border-gray-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
                       style={{ backgroundColor: color }}
                       onClick={() => handleColorChange(color)}
                     />

@@ -120,7 +120,13 @@ export function useThemeStudio() {
     loadTheme: persistence.loadTheme,
     resetTheme: persistence.resetTheme,
     createNewTheme: persistence.createNewTheme,
-    exportTheme: persistence.exportTheme,
+    
+    // Clear actions
+    clearTypography: themeData.clearTypography,
+    clearStructuralColors: themeData.clearStructuralColors,
+    clearTextClasses: themeData.clearTextClasses,
+    clearVisualSection: visualStyles.clearVisualSection,
+    clearVisualVariant: visualStyles.clearVisualVariant,
   }), [
     themeData.theme,
     previewTheme,
@@ -154,6 +160,10 @@ export function useThemeStudio() {
     persistence.loadTheme,
     persistence.resetTheme,
     persistence.createNewTheme,
-    persistence.exportTheme
+    themeData.clearTypography,
+    themeData.clearStructuralColors,
+    themeData.clearTextClasses,
+    visualStyles.clearVisualSection,
+    visualStyles.clearVisualVariant,
   ]);
 }

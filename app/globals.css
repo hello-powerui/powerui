@@ -29,6 +29,11 @@
   body {
     @apply bg-white text-gray-900 antialiased;
   }
+  
+  /* Theme Studio specific styles */
+  body:has(.theme-studio-page) {
+    @apply overflow-hidden;
+  }
 
   /* Smooth animations */
   * {

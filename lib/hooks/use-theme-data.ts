@@ -33,6 +33,22 @@ export function useThemeData() {
   const setStructuralColors = useThemeStudioStore((state) => state.setStructuralColors);
   const setTextClasses = useThemeStudioStore((state) => state.setTextClasses);
 
+  // Clear actions
+  const clearTypography = useCallback(() => {
+    updateTheme({ 
+      fontFamily: 'Segoe UI',
+      textClasses: {} 
+    });
+  }, [updateTheme]);
+
+  const clearStructuralColors = useCallback(() => {
+    updateTheme({ structuralColors: {} });
+  }, [updateTheme]);
+
+  const clearTextClasses = useCallback(() => {
+    updateTheme({ textClasses: {} });
+  }, [updateTheme]);
+
   return {
     // Full theme object (use sparingly)
     theme,
@@ -56,6 +72,11 @@ export function useThemeData() {
     setThemeMode,
     setFontFamily,
     setStructuralColors,
-    setTextClasses
+    setTextClasses,
+    
+    // Clear actions
+    clearTypography,
+    clearStructuralColors,
+    clearTextClasses
   };
 }

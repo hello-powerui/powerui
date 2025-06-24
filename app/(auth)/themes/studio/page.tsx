@@ -12,6 +12,10 @@ import { ThemeJsonView } from './components/ThemeJsonView';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ErrorBoundaryWithLogging } from '@/components/debug/ErrorBoundaryWithLogging';
+import { downloadThemeJson } from '@/lib/utils/theme-export';
+import Script from 'next/script';
+
+// Global types are defined in types/global.d.ts
 
 // Icons
 const BackIcon = () => (
@@ -123,9 +127,13 @@ function ThemeStudioContent() {
   // Load theme on mount
   useEffect(() => {
     if (themeId) {
-      // Reset store state before loading new theme to prevent stale data
-      themeStudio.resetTheme();
-      loadTheme(themeId);
+      // Only load the theme if it's different from what we already have loaded
+      // This prevents resetting when we're just updating the URL after save
+      if (loadedThemeIdRef.current !== themeId) {
+        // Reset store state before loading new theme to prevent stale data
+        themeStudio.resetTheme();
+        loadTheme(themeId);
+      }
     } else {
       // New theme - create a fresh one
       loadedThemeIdRef.current = null; // Clear the loaded theme ref
@@ -159,16 +167,13 @@ function ThemeStudioContent() {
   };
   
   const handleExport = () => {
-    const theme = themeStudio.exportTheme();
-    const blob = new Blob([JSON.stringify(theme, null, 2)], {
-      type: 'application/json'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${themeStudio.theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    if (!themeStudio.previewTheme) {
+      toast.error('Please generate a preview first');
+      return;
+    }
+    
+    const filename = `${themeStudio.theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
+    downloadThemeJson(themeStudio.previewTheme, filename);
     toast.success('Theme exported');
   };
   
@@ -190,7 +195,7 @@ function ThemeStudioContent() {
   };
   
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="theme-studio-page flex flex-col h-screen bg-gray-50 overflow-hidden">
       {/* Loading Bar */}
       {isThemeLoading && (
         <div className="fixed top-0 left-0 right-0 z-50">
@@ -212,7 +217,7 @@ function ThemeStudioContent() {
       )}
       
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+      <header className="bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
         <div className="max-w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Left side: Back button and theme name */}
@@ -375,29 +380,20 @@ function ThemeStudioContent() {
         {/* Preview Panel - Center */}
         <div className="flex-1 overflow-hidden h-full">
           <ErrorBoundaryWithLogging componentName={viewMode === 'preview' ? 'PowerBIPreview' : 'ThemeJsonView'}>
-            {viewMode === 'json' ? (
-              // JSON View Mode
-              themeStudio.previewTheme ? (
-                <ThemeJsonView theme={themeStudio.previewTheme} />
-              ) : (
-                <div className="flex items-center justify-center h-full bg-gray-50">
-                  <p className="text-sm text-gray-500">Generate a preview to see the JSON</p>
+            {/* Keep Power BI component mounted but hidden when in JSON mode */}
+            {(isThemeLoading || !themeStudio.previewTheme) ? (
+              <div className="flex items-center justify-center h-full bg-gray-50">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                  <p className="text-sm text-gray-600">
+                    {isThemeLoading ? 'Loading theme...' : 'Generating preview...'}
+                  </p>
                 </div>
-              )
+              </div>
             ) : (
-              // Preview Mode
               <>
-                {/* Only render Power BI when theme is fully loaded and preview is generated */}
-                {(isThemeLoading || !themeStudio.previewTheme) ? (
-                  <div className="flex items-center justify-center h-full bg-gray-50">
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-                      <p className="text-sm text-gray-600">
-                        {isThemeLoading ? 'Loading theme...' : 'Generating preview...'}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
+                {/* Power BI Preview - Keep mounted but use CSS to show/hide */}
+                <div style={{ display: viewMode === 'preview' ? 'block' : 'none', height: '100%' }}>
                   <PowerBIPreview 
                     generatedTheme={themeStudio.previewTheme}
                     selectedVisualType={themeStudio.selectedVisual}
@@ -413,6 +409,13 @@ function ThemeStudioContent() {
                     }}
                     enterFocusMode={isInFocusMode}
                   />
+                </div>
+                
+                {/* JSON View - Show when in JSON mode */}
+                {viewMode === 'json' && (
+                  <div style={{ height: '100%' }}>
+                    <ThemeJsonView theme={themeStudio.previewTheme} />
+                  </div>
                 )}
               </>
             )}
@@ -489,8 +492,8 @@ function ThemeStudioContent() {
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onImport={(importedTheme) => {
-          // Handle theme import
-          toast.info('Import functionality to be implemented');
+          // Theme import is handled by the modal itself
+          toast.success('Theme imported successfully');
           setShowImportModal(false);
         }}
       />
@@ -500,12 +503,24 @@ function ThemeStudioContent() {
 
 export default function UnifiedThemeStudioNew() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    }>
-      <ThemeStudioContent />
-    </Suspense>
+    <>
+      <Script
+        src="https://app.powerbi.com/13.0.23829.90/scripts/powerbiloader.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          // Preload Power BI resources after the script loads
+          if (typeof window !== 'undefined' && window.powerbi && 'preloadResource' in window.powerbi) {
+            (window.powerbi as any).preloadResource('report');
+          }
+        }}
+      />
+      <Suspense fallback={
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      }>
+        <ThemeStudioContent />
+      </Suspense>
+    </>
   );
 }

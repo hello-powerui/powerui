@@ -16,7 +16,6 @@ export function useThemePersistence() {
   const loadThemeAction = useThemeStudioStore((state) => state.loadTheme);
   const resetThemeAction = useThemeStudioStore((state) => state.resetTheme);
   const createNewThemeAction = useThemeStudioStore((state) => state.createNewTheme);
-  const exportTheme = useThemeStudioStore((state) => state.exportTheme);
 
   // Get change tracking functions from the changes store
   const { clearChanges } = useThemeChanges();
@@ -72,7 +71,6 @@ export function useThemePersistence() {
     saveTheme,
     loadTheme,
     resetTheme,
-    createNewTheme,
-    exportTheme
+    createNewTheme
   };
 }

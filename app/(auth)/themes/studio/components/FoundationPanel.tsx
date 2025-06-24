@@ -13,10 +13,12 @@ import {
 import { ChevronLeft, ChevronRight, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ChangeIndicator } from '@/components/theme-studio/ui/change-indicator';
+import { HelpTooltip } from '@/components/theme-studio/HelpTooltip';
 import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 import { THEME_STUDIO_TYPOGRAPHY } from '@/components/theme-studio/constants/typography';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { CanvasLayoutSection } from './CanvasLayoutSection';
+import Link from 'next/link';
 
 interface FoundationPanelProps {
   theme: any;
@@ -130,6 +132,9 @@ function FoundationPanelComponent({
               <div>
                 <div className="flex items-center gap-1.5">
                   <Label className={`${THEME_STUDIO_TYPOGRAPHY.label.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight}`}>Data Colors</Label>
+                  <HelpTooltip 
+                    content="Data colors are used for charts, graphs, and other data visualizations in your Power BI reports. Each color in the palette is automatically assigned to different data series."
+                  />
                   <ChangeIndicator hasChanged={hasChanges(['colorPaletteId'])} />
                 </div>
                 <p className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color} mt-0.5`}>{colorPalette?.name || 'Custom'} • {colorPalette?.colors?.length || 0} colors</p>
@@ -168,6 +173,16 @@ function FoundationPanelComponent({
           <div className="bg-white rounded-md border border-gray-200 p-4">
             <div className="flex items-center gap-1.5 mb-2">
               <Label className={`${THEME_STUDIO_TYPOGRAPHY.label.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight}`}>Theme Mode</Label>
+              <HelpTooltip 
+                content={
+                  <div>
+                    <p>Theme modes work with token usage to dynamically switch between light and dark color schemes in your reports.</p>
+                    <Link href="/blog/building-power-bi-design-system" className="text-primary hover:underline mt-2 inline-block">
+                      Learn more about using tokens →
+                    </Link>
+                  </div>
+                }
+              />
               <ChangeIndicator hasChanged={hasChanges(['mode'])} />
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -240,6 +255,13 @@ function FoundationPanelComponent({
             schemaLoader={schemaLoader}
             schemaLoaded={schemaLoaded}
             canvasTypes={canvasTypes}
+            onClearSection={(visual) => {
+              // Clear the visual section by removing it from visualSettings
+              const updatedSettings = { ...visualSettings };
+              delete updatedSettings[visual];
+              onVisualSettingsChange(updatedSettings);
+              trackChange(['visualStyles', visual]);
+            }}
           />
 
         </div>
