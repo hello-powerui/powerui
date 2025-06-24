@@ -1,177 +1,52 @@
 'use client';
 
 import Link from 'next/link'
-import { CheckIcon, ArrowRightIcon, Sparkles, Palette, BookOpen, Bot, Users } from 'lucide-react'
-import { useState } from 'react'
-
-const testimonials = [
-  {
-    quote: "Power UI enables me to quickly deliver polished, app-like reports, saving me a tremendous amount of time and effort...",
-    author: "Kimberlee Jelly",
-    role: "Product Manager, Microsoft",
-  },
-  {
-    quote: "A huge thank you for Power UI! It's been critical to reducing the time I spend on formatting while improving report quality.",
-    author: "Mitchell Telatnik",
-    role: "Founder, SecureMetrics.io",
-  },
-  {
-    quote: "Thank you for all you do - you helped me land my dream job!!",
-    author: "Sophia C.",
-  },
-  {
-    quote: "Your e-book was amazing. Finally, dashboard design principles that actually make sense.",
-    author: "Muhammad K.",
-  },
-];
-
-const features = [
-  {
-    icon: "⚡",
-    title: "Theme Generator",
-    description: "Generate professional Power BI themes instantly. No more wrestling with JSON files or inconsistent styling across reports.",
-  },
-  {
-    icon: "🎨",
-    title: "Figma Design System",
-    badge: "New!",
-    description: "Design and iterate in Figma, then apply identical styling in Power BI. Perfect pixel alignment every time.",
-  },
-  {
-    icon: "📚",
-    title: "Expert Design Resources",
-    description: "100+ page design guide, 1,500+ dashboard icons, and proven templates from seasoned Power BI professionals.",
-  },
-];
-
-const customizationOptions = [
-  {
-    icon: "🌙",
-    title: "Light & Dark Themes",
-    description: "Switch between light and dark modes instantly. Colors adjust automatically across your entire report.",
-  },
-  {
-    icon: "🎯",
-    title: "55+ Style Presets",
-    description: "Choose from professionally designed themes that work for any industry. Each preset follows proven design principles.",
-  },
-  {
-    icon: "🎨",
-    title: "Brand Color Integration",
-    description: "Match your company colors perfectly with smart palette suggestions and real-time preview.",
-  },
-  {
-    icon: "✨",
-    title: "Consistent Typography",
-    description: "Professional font combinations and sizing that work together seamlessly across all your reports.",
-  },
-];
-
-const resources = [
-  {
-    icon: "📖",
-    title: "Complete Design Guide",
-    description: "100+ pages of dashboard design principles with real examples. Learn what makes reports effective vs. overwhelming.",
-  },
-  {
-    icon: "🔧",
-    title: "Figma Workflow System",
-    description: "Design faster by prototyping in Figma first. Get stakeholder buy-in before you build, then apply identical styling in Power BI.",
-  },
-  {
-    icon: "🔍",
-    title: "Professional Icon Library",
-    description: "1,500+ carefully crafted icons for navigation, KPIs, and visual hierarchy. Available as URLs or Figma components.",
-  },
-  {
-    icon: "🤖",
-    title: "AI Assistant (Free)",
-    description: "Generate DAX formulas, optimize visuals, and get instant answers to Power BI questions.",
-    cta: "Try the GPT →",
-  },
-];
-
-const userTypes = [
-  {
-    icon: "📈",
-    title: "Data Analysts & BI Developers",
-    description: "Speed up report creation and ensure consistent branding across all deliverables.",
-  },
-  {
-    icon: "💼",
-    title: "Consultants & Agencies",
-    description: "Deliver premium-looking reports that justify higher rates and win more clients.",
-  },
-  {
-    icon: "👥",
-    title: "Enterprise Data Teams",
-    description: "Standardize report design across departments and maintain brand consistency at scale.",
-  },
-];
-
-const faqs = [
-  {
-    question: "What exactly is Power UI?",
-    answer: "Power UI is a complete toolkit for creating professional Power BI reports. It includes a theme generator, Figma design system, expert guides, and 1,500+ icons.",
-  },
-  {
-    question: "Do I need Power BI experience to use this?",
-    answer: "Yes, Power UI is designed for people who already use Power BI. If you can create basic reports, you can use Power UI to make them look amazing.",
-  },
-  {
-    question: "How is this different from free theme generators?",
-    answer: "Power UI combines professional design principles with practical tools. You get themes that actually look good, plus the knowledge to use them effectively.",
-  },
-  {
-    question: "Is this really lifetime access?",
-    answer: "Yes. One payment gets you lifetime access to Power UI plus all future updates and new resources we add.",
-  },
-  {
-    question: "Can I use this for client work?",
-    answer: "Absolutely. Power UI includes commercial usage rights for unlimited personal and client projects.",
-  },
-  {
-    question: "What if I don't know Figma?",
-    answer: "The Figma system is optional. You can create beautiful reports using just the theme generator and design guide.",
-  },
-];
+import { ArrowRightIcon, Sparkles, Palette, Zap, Globe, Shield, Users, ChevronRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { cn } from '@/lib/utils'
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState(0);
-  const [activeResourceTab, setActiveResourceTab] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
       {/* Header/Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
+      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-              <Link href="/" className="text-xl font-bold text-gray-900">
+              <Link href="/" className="text-xl font-semibold text-gray-900">
                 Power UI
               </Link>
               <div className="hidden md:flex space-x-6">
-                <Link href="#examples" className="text-gray-600 hover:text-gray-900 text-sm">
+                <Link href="/themes" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
+                  Themes
+                </Link>
+                <Link href="/docs" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
+                  Docs
+                </Link>
+                <Link href="/examples" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
                   Examples
                 </Link>
-                <Link href="#resources" className="text-gray-600 hover:text-gray-900 text-sm">
-                  Resources
-                </Link>
-                <Link href="/blog" className="text-gray-600 hover:text-gray-900 text-sm">
-                  Blog
-                </Link>
-                <Link href="/pricing" className="text-gray-600 hover:text-gray-900 text-sm">
+                <Link href="/pricing" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
                   Pricing
+                </Link>
+                <Link href="/blog" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
+                  Blog
                 </Link>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/sign-in" className="text-gray-600 hover:text-gray-900 text-sm">
+              <Link href="/sign-in" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
                 Sign In
               </Link>
               <Link
                 href="/sign-up"
-                className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors"
+                className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-all hover:shadow-lg"
               >
                 Get Started
               </Link>
@@ -181,437 +56,268 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50 -z-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-100/20 via-transparent to-transparent -z-10" />
+        
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            Stop wrestling with Power BI formatting
-          </h1>
-          <h2 className="text-3xl md:text-4xl font-semibold text-gray-700 mb-6">
-            Create dashboard themes that actually look professional
-          </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Skip the tedious styling work. Power UI gives you everything needed to build beautiful, consistent Power BI reports in minutes, not hours.
-          </p>
-          <div className="flex items-center justify-center space-x-8 mb-8 text-sm text-gray-600">
-            <div className="flex items-center">
-              <span className="text-yellow-500">⭐</span>
-              <span className="ml-1 font-semibold">5.0</span>
-              <span className="ml-1">from 20+ reviews</span>
-            </div>
-            <div className="flex items-center">
-              <span className="font-semibold">1,000+</span>
-              <span className="ml-1">analysts already using Power UI</span>
-            </div>
+          <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium mb-8">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Introducing Power UI 2.0</span>
           </div>
-          <Link
-            href="/sign-up"
-            className="inline-flex items-center bg-gray-900 text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-gray-800 transition-colors"
-          >
-            Start Building Beautiful Dashboards
-            <ArrowRightIcon className="ml-2 h-5 w-5" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Social Proof */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-6xl mx-auto text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Trusted by data teams at 200+ companies
-          </h3>
-          <p className="text-gray-600">From Fortune 500s to fast-growing startups</p>
-        </div>
-      </section>
-
-      {/* Meet Power UI Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">
-              Everything you need for stunning Power BI dashboards
-            </h2>
-            <h3 className="text-2xl text-gray-600 mb-6">
-              Design system, theme generator, and expert resources—all in one toolkit
-            </h3>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Transform your reports from functional to exceptional. Power UI handles the design complexity so you can focus on delivering insights that matter.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="bg-white p-8 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between mb-4">
-                  <span className="text-4xl">{feature.icon}</span>
-                  {feature.badge && (
-                    <span className="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">
-                      {feature.badge}
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Theme Customization Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">
-              Build Power BI themes in 5 minutes (not 5 hours)
-            </h2>
-            <p className="text-lg text-gray-600">
-              No technical expertise required. Our generator applies design best practices automatically—you just pick colors and click apply.
-            </p>
-          </div>
-
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
-            <div className="flex flex-wrap gap-2 mb-8">
-              {customizationOptions.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveTab(index)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === index
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <span className="mr-2">{option.icon}</span>
-                  {option.title}
-                </button>
-              ))}
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-2xl font-semibold">
-                {customizationOptions[activeTab].title}
-              </h3>
-              <p className="text-gray-600 text-lg">
-                {customizationOptions[activeTab].description}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Examples Section */}
-      <section id="examples" className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-4">See Power UI in action</h2>
-          <h3 className="text-2xl text-gray-600 mb-8">Real reports from real companies</h3>
-          <p className="text-lg text-gray-600 mb-8">
-            Download 15+ example dashboards and see exactly how to structure layouts for maximum impact.
-          </p>
-          <Link
-            href="/examples"
-            className="inline-flex items-center text-gray-900 font-medium hover:underline"
-          >
-            Browse All Examples
-            <ArrowRightIcon className="ml-2 h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Analytics Resources Section */}
-      <section id="resources" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">
-              Master dashboard design with expert guidance
-            </h2>
-            <h3 className="text-2xl text-gray-600 mb-6">
-              Everything you need to create reports that executives actually want to look at
-            </h3>
-            <p className="text-lg text-gray-600">
-              Stop guessing about design decisions. Get proven frameworks, tested layouts, and professional assets.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {resources.map((resource, index) => (
-              <div
-                key={index}
-                className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => setActiveResourceTab(index)}
-              >
-                <div className="flex items-start">
-                  <span className="text-3xl mr-4">{resource.icon}</span>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold mb-2">{resource.title}</h3>
-                    <p className="text-gray-600 text-sm mb-3">{resource.description}</p>
-                    {resource.cta && (
-                      <Link
-                        href="#"
-                        className="inline-flex items-center text-sm text-gray-900 font-medium hover:underline"
-                      >
-                        {resource.cta}
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Roadmap Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">We&apos;re constantly improving Power UI</h2>
-            <h3 className="text-2xl text-gray-600 mb-6">New features every month based on user feedback</h3>
-            <p className="text-lg text-gray-600">
-              Stay ahead of design trends with regular updates. Your one-time purchase includes all future enhancements and new resources.
-            </p>
-          </div>
-
-          <div className="bg-gray-50 rounded-xl p-8">
-            <h3 className="text-xl font-semibold mb-6">What&apos;s Coming</h3>
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <span className="text-green-500 mr-3">✅</span>
-                <span className="font-medium">In Progress:</span>
-                <span className="ml-2 text-gray-600">Enhanced API, advanced customization options</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-gray-400 mr-3">📅</span>
-                <span className="font-medium">February 2025:</span>
-                <span className="ml-2 text-gray-600">Figma Design System v2.0 with component variants</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-gray-400 mr-3">📅</span>
-                <span className="font-medium">Q1 2025:</span>
-                <span className="ml-2 text-gray-600">Team collaboration features and shared theme libraries</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">What our customers say</h2>
-            <h3 className="text-2xl text-gray-600">Real feedback from data professionals like you</h3>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white p-8 rounded-xl border border-gray-200">
-                <p className="text-gray-700 mb-4 italic">&quot;{testimonial.quote}&quot;</p>
-                <div>
-                  <p className="font-semibold">{testimonial.author}</p>
-                  {testimonial.role && (
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Choose the plan that fits your team</h2>
-            <h3 className="text-2xl text-gray-600">One-time payment. Lifetime access. No subscriptions.</h3>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Personal Plan */}
-            <div className="bg-white p-8 rounded-xl border border-gray-200">
-              <h3 className="text-2xl font-bold mb-2">Personal</h3>
-              <div className="mb-4">
-                <span className="text-4xl font-bold">$119</span>
-              </div>
-              <p className="text-gray-600 mb-6">Perfect for individual analysts and consultants</p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Complete theme generator access</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">15+ example reports with source files</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">100+ page design guide (PDF)</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Figma design system</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">1,500+ professional icons</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">All future updates included</span>
-                </li>
-              </ul>
-              <Link
-                href="/checkout?plan=personal"
-                className="block w-full text-center bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                Get Personal Access →
-              </Link>
-            </div>
-
-            {/* Team Plan */}
-            <div className="bg-white p-8 rounded-xl border-2 border-gray-900 relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-3 py-1 rounded-full text-sm font-medium">
-                Best Value
-              </div>
-              <h3 className="text-2xl font-bold mb-2">Team</h3>
-              <div className="mb-4">
-                <span className="text-4xl font-bold">$399</span>
-              </div>
-              <p className="text-gray-600 mb-6">Best for small teams (2-10 people)</p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Everything in Personal</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm font-semibold">5 transferable licenses</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Team member management portal</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Priority email support</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Team training resources</span>
-                </li>
-              </ul>
-              <Link
-                href="/checkout?plan=team"
-                className="block w-full text-center bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                Get Team Access →
-              </Link>
-            </div>
-
-            {/* Enterprise Plan */}
-            <div className="bg-white p-8 rounded-xl border border-gray-200">
-              <h3 className="text-2xl font-bold mb-2">Enterprise</h3>
-              <div className="mb-4">
-                <span className="text-4xl font-bold">$699</span>
-              </div>
-              <p className="text-gray-600 mb-6">For organizations needing scale and support</p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Everything in Team</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm font-semibold">10 transferable licenses</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Priority support with 24hr response</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Custom theme consultation</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Volume licensing available</span>
-                </li>
-              </ul>
-              <Link
-                href="/contact-sales"
-                className="block w-full text-center bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                Contact Sales →
-              </Link>
-            </div>
-          </div>
-
-          <p className="text-center text-gray-600 mt-8">
-            All plans include lifetime updates and 30-day money-back guarantee
-          </p>
-        </div>
-      </section>
-
-      {/* Who Uses Power UI */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">
-              Join 1,000+ analysts creating reports that get noticed
-            </h2>
-            <h3 className="text-2xl text-gray-600">
-              Whether you&apos;re building your first dashboard or your hundredth, Power UI adapts to your skill level
-            </h3>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {userTypes.map((type, index) => (
-              <div key={index} className="bg-white p-8 rounded-xl border border-gray-200">
-                <span className="text-3xl mb-4 block">{type.icon}</span>
-                <h3 className="text-xl font-semibold mb-3">{type.title}</h3>
-                <p className="text-gray-600">{type.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12">Common questions answered</h2>
           
-          <div className="space-y-8">
-            {faqs.map((faq, index) => (
-              <div key={index} className="border-b border-gray-200 pb-8">
-                <h3 className="text-lg font-semibold mb-3">Q: {faq.question}</h3>
-                <p className="text-gray-600">A: {faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto text-center">
-          <h3 className="text-2xl font-bold mb-4">Questions? We&apos;re here to help.</h3>
-          <p className="mb-8">
-            Email us at{' '}
-            <a href="mailto:hello@powerui.com" className="underline">
-              hello@powerui.com
-            </a>{' '}
-            for quick answers
+          <h1 className="text-6xl md:text-7xl font-bold tracking-tight mb-6 bg-gradient-to-b from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            Beautiful Power BI themes
+            <br />
+            in seconds, not hours
+          </h1>
+          
+          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            The complete design system for creating stunning Power BI dashboards. 
+            Stop wrestling with JSON files and start shipping.
           </p>
-          <div className="text-sm text-gray-400">
-            © 2025 Power UI •{' '}
-            <Link href="/privacy" className="hover:text-white">
-              Privacy Policy
-            </Link>{' '}
-            •{' '}
-            <Link href="/terms" className="hover:text-white">
-              Terms of Service
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/sign-up"
+              className="group inline-flex items-center bg-gray-900 text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-800 transition-all hover:shadow-xl"
+            >
+              Start Building for Free
+              <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="/examples"
+              className="inline-flex items-center text-gray-700 px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-100 transition-all"
+            >
+              View Examples
             </Link>
           </div>
+
+          <div className="flex items-center justify-center gap-8 mt-12 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <div className="flex -space-x-2">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full bg-gray-300 border-2 border-white" />
+                ))}
+              </div>
+              <span>1,000+ analysts</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-yellow-500">★★★★★</span>
+              <span>5.0 (20+ reviews)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Bento Grid Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Everything you need to design like a pro
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              A complete toolkit that transforms how you create Power BI reports
+            </p>
+          </div>
+
+          {/* Bento Grid */}
+          <div className={cn(
+            "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
+            mounted && "animate-in fade-in duration-500"
+          )}>
+            {/* Theme Generator - Large Card */}
+            <div className="md:col-span-2 lg:col-span-2 group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-8 text-white hover:shadow-2xl transition-all duration-300">
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+              <div className="relative z-10">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-xl mb-4">
+                  <Palette className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2">Theme Studio</h3>
+                <p className="text-white/90 mb-4">
+                  Generate professional themes instantly. Pick your colors, preview live, and export to Power BI.
+                </p>
+                <Link 
+                  href="/themes/studio" 
+                  className="inline-flex items-center text-white font-medium group-hover:gap-3 gap-2 transition-all"
+                >
+                  Try it now <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700" />
+            </div>
+
+            {/* Figma Integration */}
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-8 text-white hover:shadow-2xl transition-all duration-300">
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+              <div className="relative z-10">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-xl mb-4">
+                  <Globe className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Figma System</h3>
+                <p className="text-white/90 text-sm">
+                  Design in Figma, deploy to Power BI. Perfect alignment guaranteed.
+                </p>
+              </div>
+            </div>
+
+            {/* Fast Generation */}
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 p-8 text-white hover:shadow-2xl transition-all duration-300">
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+              <div className="relative z-10">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-xl mb-4">
+                  <Zap className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">5-Min Setup</h3>
+                <p className="text-white/90 text-sm">
+                  From zero to beautiful theme in minutes, not hours.
+                </p>
+              </div>
+            </div>
+
+            {/* Icon Library */}
+            <div className="group relative overflow-hidden rounded-2xl bg-gray-900 p-8 text-white hover:shadow-2xl transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900" />
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-2">1,500+ Icons</h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Professional icons for every use case
+                </p>
+                <div className="grid grid-cols-4 gap-2">
+                  {[...Array(8)].map((_, i) => (
+                    <div key={i} className="w-10 h-10 bg-gray-800 rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Templates */}
+            <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 hover:shadow-2xl transition-all duration-300">
+              <h3 className="text-xl font-bold mb-2">55+ Templates</h3>
+              <p className="text-gray-600 text-sm mb-4">
+                Industry-specific themes ready to use
+              </p>
+              <div className="flex -space-x-2">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="w-12 h-8 bg-gray-200 rounded border-2 border-white" />
+                ))}
+              </div>
+            </div>
+
+            {/* Enterprise Features */}
+            <div className="md:col-span-2 group relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 p-8 hover:shadow-2xl transition-all duration-300">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-900 text-white rounded-xl mb-4">
+                    <Shield className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Enterprise Ready</h3>
+                  <p className="text-gray-600 mb-4">
+                    Team collaboration, version control, and brand consistency at scale.
+                  </p>
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      Team licenses
+                    </span>
+                    <span>SSO support</span>
+                    <span>API access</span>
+                  </div>
+                </div>
+                <div className="hidden lg:block">
+                  <div className="w-32 h-32 bg-gray-200 rounded-xl" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Bar */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 border-y border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-wrap items-center justify-center gap-8 text-gray-400">
+            <span className="text-sm font-medium">Trusted by teams at</span>
+            {['Microsoft', 'Deloitte', 'PwC', 'EY', 'Accenture'].map((company) => (
+              <span key={company} className="text-gray-600 font-medium">{company}</span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials - Simplified */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Loved by data professionals</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                quote: "Power UI transformed how our team creates reports. What used to take hours now takes minutes.",
+                author: "Sarah Chen",
+                role: "Lead Analyst, Microsoft"
+              },
+              {
+                quote: "The Figma integration is a game-changer. Design approval is so much faster now.",
+                author: "Marcus Johnson",
+                role: "BI Developer, Spotify"
+              },
+              {
+                quote: "Finally, Power BI themes that actually look professional. Worth every penny.",
+                author: "Emma Rodriguez",
+                role: "Data Consultant"
+              }
+            ].map((testimonial, i) => (
+              <div key={i} className="bg-gray-50 rounded-xl p-6">
+                <p className="text-gray-700 mb-4">{testimonial.quote}</p>
+                <div>
+                  <p className="font-semibold text-sm">{testimonial.author}</p>
+                  <p className="text-sm text-gray-500">{testimonial.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Simple CTA */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900 text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-4">
+            Start creating beautiful reports today
+          </h2>
+          <p className="text-xl text-gray-400 mb-8">
+            Join 1,000+ analysts building better dashboards with Power UI
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/sign-up"
+              className="inline-flex items-center bg-white text-gray-900 px-8 py-4 rounded-xl font-medium hover:bg-gray-100 transition-all"
+            >
+              Get Started Free
+              <ArrowRightIcon className="ml-2 h-5 w-5" />
+            </Link>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center text-white px-8 py-4 rounded-xl font-medium hover:bg-gray-800 transition-all"
+            >
+              View Pricing
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Minimal Footer */}
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-gray-200">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between">
+          <div className="flex items-center gap-6 mb-4 md:mb-0">
+            <span className="font-semibold">Power UI</span>
+            <Link href="/privacy" className="text-sm text-gray-600 hover:text-gray-900">Privacy</Link>
+            <Link href="/terms" className="text-sm text-gray-600 hover:text-gray-900">Terms</Link>
+            <a href="mailto:hello@powerui.com" className="text-sm text-gray-600 hover:text-gray-900">Contact</a>
+          </div>
+          <p className="text-sm text-gray-500">© 2025 Power UI. All rights reserved.</p>
         </div>
       </footer>
     </>

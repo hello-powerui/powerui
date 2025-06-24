@@ -8,7 +8,9 @@ export default function PublicLayout({
   return (
     <>
       <PublicHeader />
-      {children}
+      <div className="pt-16">
+        {children}
+      </div>
     </>
   )
 }
