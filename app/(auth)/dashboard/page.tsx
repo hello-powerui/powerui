@@ -6,16 +6,13 @@ import { useUser } from '@clerk/nextjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { WelcomeModal } from '@/components/ui/welcome-modal';
 
+import { ExampleReportsShowcase } from '@/components/example-reports/ExampleReportsShowcase';
+import { ThemeCard } from '@/components/theme-card';
+
 // Icons
 const PlusIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-  </svg>
-);
-
-const TeamIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
   </svg>
 );
 
@@ -37,6 +34,12 @@ const BookIcon = () => (
   </svg>
 );
 
+const IconLibraryIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);
+
 interface Theme {
   id: string;
   name: string;
@@ -44,26 +47,38 @@ interface Theme {
   createdAt: string;
   updatedAt: string;
   themeData: any;
+  visibility?: 'PRIVATE' | 'ORGANIZATION' | 'PUBLIC';
   organizationId?: string;
   organization?: {
     id: string;
     name: string;
   };
+  user?: {
+    id: string;
+    plan: 'PRO' | 'TEAM';
+    username?: string;
+  };
+  previewColors?: string[];
 }
 
-const mockAssets = [
-  { id: 1, name: 'Dashboard Design in Power BI', type: 'PDF', size: '107MB', icon: BookIcon },
-  { id: 2, name: 'Power UI Figma Design System', type: 'FIG', size: '7MB', icon: FileIcon },
-  { id: 3, name: 'Spacing Grids', type: 'PBIX', size: '209KB', icon: FileIcon },
-  { id: 4, name: 'Icon Pack', type: 'ZIP', size: '22KB', icon: FileIcon },
+interface Asset {
+  id: number;
+  name: string;
+  type: string;
+  size: string;
+  icon: () => React.ReactElement;
+  isLink?: boolean;
+  href?: string;
+  isDownloadable?: boolean;
+  downloadPath?: string;
+}
+
+const mockAssets: Asset[] = [
+  { id: 1, name: 'Power UI Figma Design System', type: 'FIG', size: '7MB', icon: FileIcon },
+  { id: 2, name: 'Spacing Grids', type: 'PBIX', size: '209KB', icon: FileIcon, isDownloadable: true, downloadPath: '/downloads/assets/SpacingGrids.pbix' },
+  { id: 3, name: 'Icon Library', type: 'WEB', size: '1,400+ icons', icon: IconLibraryIcon, isLink: true, href: '/icons' },
 ];
 
-const mockReports = [
-  { id: 1, name: 'Sales Dashboard', preview: '🎨' },
-  { id: 2, name: 'Financial Overview', preview: '📊' },
-  { id: 3, name: 'HR Analytics', preview: '👥' },
-  { id: 4, name: 'Marketing Metrics', preview: '📈' },
-];
 
 // Helper function to get relative time
 function getRelativeTime(date: string) {
@@ -87,13 +102,12 @@ function getRelativeTime(date: string) {
 }
 
 export default function DashboardPage() {
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [themes, setThemes] = useState<Theme[]>([]);
-  const [teamThemes, setTeamThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
-  const [hasTeamAccess, setHasTeamAccess] = useState(false);
+  const [userOrganization, setUserOrganization] = useState<{ id: string; name: string } | null>(null);
   const [isNewUser, setIsNewUser] = useState(false);
   
   // Check for successful payment redirect
@@ -116,7 +130,20 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchThemes();
+    fetchUserDetails();
   }, []);
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await fetch('/api/user/me');
+      if (response.ok) {
+        const data = await response.json();
+        setUserOrganization(data.organization || null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user details:', error);
+    }
+  };
 
   const fetchThemes = async () => {
     try {
@@ -124,18 +151,8 @@ export default function DashboardPage() {
       if (response.ok) {
         const data = await response.json();
         
-        // Separate personal and team themes
-        const personalThemes = data.filter((t: Theme) => !t.organizationId);
-        const orgThemes = data.filter((t: Theme) => t.organizationId);
-        
-        // Only show the first 3 personal themes
-        setThemes(personalThemes.slice(0, 3));
-        // Show team themes
-        setTeamThemes(orgThemes.slice(0, 3));
-        
-        if (orgThemes.length > 0) {
-          setHasTeamAccess(true);
-        }
+        // Show first 3 themes (includes both personal and organization themes)
+        setThemes(data.slice(0, 3));
         
         // Check if user is new (no themes created)
         if (data.length === 0) {
@@ -171,14 +188,31 @@ export default function DashboardPage() {
         </div>
         
         {/* My Themes Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium text-gray-900">My Themes</h2>
-            <Link href="/themes/studio" className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors">
-              <PlusIcon />
-              <span>New Theme</span>
-            </Link>
+        <div className="mb-8 relative">
+          {/* Geometric Pattern Background */}
+          <div className="absolute inset-0 -inset-x-4 sm:-inset-x-6 lg:-inset-x-8 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden">
+            <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="geometric-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M0 20 L20 0 L40 20 L20 40 Z" fill="none" stroke="rgba(156, 163, 175, 0.2)" strokeWidth="0.5"/>
+                  <circle cx="20" cy="20" r="2" fill="rgba(156, 163, 175, 0.1)"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#geometric-pattern)" />
+            </svg>
           </div>
+          
+          <div className="relative p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900">My Themes</h2>
+                <p className="text-sm text-gray-600 mt-1">Create and manage your Power BI themes</p>
+              </div>
+              <Link href="/themes/studio" className="flex items-center gap-1.5 px-4 py-2 text-sm bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all shadow-sm">
+                <PlusIcon />
+                <span>New Theme</span>
+              </Link>
+            </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {loading ? (
@@ -205,57 +239,32 @@ export default function DashboardPage() {
             ) : (
               // Show actual themes
               themes.map((theme) => (
-                <Link key={theme.id} href={`/themes/studio?themeId=${theme.id}`} className="bg-white p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all group">
-                  <h3 className="font-medium text-gray-900 mb-1 group-hover:text-gray-700">{theme.name}</h3>
-                  <p className="text-sm text-gray-500 mb-3">{getRelativeTime(theme.updatedAt)}</p>
-                  
-                </Link>
+                <ThemeCard
+                  key={theme.id}
+                  theme={theme}
+                  isOwner={theme.user?.id === user?.id}
+                  currentUserId={user?.id}
+                  userOrganization={userOrganization}
+                  onDelete={async (themeId, themeName) => {
+                    // Delegate to themes page for deletion
+                    router.push('/themes');
+                  }}
+                  onDuplicate={async (themeId) => {
+                    // Delegate to themes page for duplication
+                    router.push('/themes');
+                  }}
+                />
               ))
             )}
             {themes.length > 0 && (
-              <Link href="/themes" className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all flex items-center justify-center text-sm text-gray-600 hover:text-gray-900">
+              <Link href="/themes" className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50 hover:border-gray-300 hover:shadow-md transition-all flex items-center justify-center text-sm text-gray-600 hover:text-gray-900">
                 View all themes →
               </Link>
             )}
           </div>
+          </div>
         </div>
 
-        {/* Team Themes Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <TeamIcon />
-            <h2 className="text-lg font-medium text-gray-900">Team Themes</h2>
-          </div>
-          
-          {!hasTeamAccess ? (
-            <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
-              <TeamIcon />
-              <p className="mt-2 text-sm text-gray-600">No team access</p>
-              <p className="text-xs text-gray-500 mt-1">Join a team to access shared themes</p>
-            </div>
-          ) : teamThemes.length === 0 ? (
-            <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
-              <p className="text-sm text-gray-600">No team themes shared yet</p>
-              <p className="text-xs text-gray-500 mt-1">Share themes with your team from the theme editor</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {teamThemes.map((theme) => (
-                <Link key={theme.id} href={`/themes/studio?themeId=${theme.id}`} className="bg-white p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all group">
-                  <h3 className="font-medium text-gray-900 mb-1 group-hover:text-gray-700">{theme.name}</h3>
-                  <p className="text-sm text-gray-500 mb-1">{theme.organization?.name}</p>
-                  <p className="text-sm text-gray-500 mb-3">{getRelativeTime(theme.updatedAt)}</p>
-                  
-                </Link>
-              ))}
-              {teamThemes.length > 0 && (
-                <Link href="/themes?filter=team" className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all flex items-center justify-center text-sm text-gray-600 hover:text-gray-900">
-                  View all team themes →
-                </Link>
-              )}
-            </div>
-          )}
-        </div>
 
         {/* Power UI Assets */}
         <div className="mb-8">
@@ -274,37 +283,35 @@ export default function DashboardPage() {
                       <p className="text-xs text-gray-500">{asset.type} • {asset.size}</p>
                     </div>
                   </div>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                    <DownloadIcon />
-                    <span>Download</span>
-                  </button>
+                  {asset.isLink ? (
+                    <Link href={asset.href!} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                      <span>View →</span>
+                    </Link>
+                  ) : asset.isDownloadable ? (
+                    <a 
+                      href={asset.downloadPath} 
+                      download 
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+                    >
+                      <DownloadIcon />
+                      <span>Download</span>
+                    </a>
+                  ) : (
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors opacity-50 cursor-not-allowed" disabled>
+                      <DownloadIcon />
+                      <span>Coming Soon</span>
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Sample Reports */}
+        {/* Example Reports */}
         <div>
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Sample Reports</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {mockReports.map((report) => (
-              <div key={report.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-gray-300 transition-all cursor-pointer">
-                <div className="aspect-video bg-gray-100 flex items-center justify-center text-4xl">
-                  {report.preview}
-                </div>
-                <div className="p-4">
-                  <h3 className="text-sm font-medium text-gray-900">{report.name}</h3>
-                  <div className="flex items-center gap-2 mt-2">
-                    <button className="text-xs text-gray-600 hover:text-gray-900">Preview</button>
-                    <span className="text-gray-300">•</span>
-                    <button className="text-xs text-gray-600 hover:text-gray-900">Download</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <h2 className="text-lg font-medium text-gray-900 mb-4">Example Reports</h2>
+          <ExampleReportsShowcase />
         </div>
       </div>
     </div>

@@ -14,7 +14,8 @@ import {
   Search,
   Menu,
   X,
-  ExternalLink
+  ExternalLink,
+  Image
 } from 'lucide-react'
 
 const docsSections = [
@@ -44,6 +45,7 @@ const docsSections = [
       { title: 'Visual Styles & Variants', href: '/docs/visual-variants', description: 'Create multiple style variations per visual' },
       { title: 'Real-Time Preview', href: '/docs/real-time-preview', description: 'Test themes with live Power BI reports' },
       { title: 'Import & Export', href: '/docs/import-export', description: 'Theme file management and enhancement' },
+      { title: 'Icon Library', href: '/docs/icons', description: 'Access 1000+ icons for your Power BI reports' },
     ]
   },
   {
@@ -75,10 +77,10 @@ const popularGuides = [
     color: 'from-purple-500 to-pink-500'
   },
   {
-    title: 'Visual Style Variants',
-    description: 'Create multiple style variations for each visual type - exclusive to Power UI',
-    href: '/docs/visual-variants',
-    icon: Layers,
+    title: 'Icon Library',
+    description: 'Add professional icons to your Power BI reports with custom colors',
+    href: '/docs/icons',
+    icon: Image,
     color: 'from-blue-500 to-cyan-500'
   },
   {

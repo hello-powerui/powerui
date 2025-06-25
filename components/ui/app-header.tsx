@@ -11,6 +11,8 @@ export function AppHeader() {
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/themes', label: 'Themes' },
     { href: '/themes/studio', label: 'Studio' },
+    { href: '/icons', label: 'Icons' },
+    { href: '/docs', label: 'Docs' },
   ]
 
   return (

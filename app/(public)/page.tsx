@@ -1,23 +1,16 @@
 'use client';
 
 import Link from 'next/link'
-import { ArrowRightIcon, Sparkles, Palette, Zap, Globe, Shield, Users, ChevronRight } from 'lucide-react'
+import { ArrowRightIcon, Sparkles, ChevronRight, Moon, Sun, Users, Share2, PlayCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
-import dynamic from 'next/dynamic'
-import Script from 'next/script'
-
-const PowerBIVisualEmbed = dynamic(
-  () => import('@/components/landing/PowerBIVisualEmbed').then(mod => mod.PowerBIVisualEmbed),
-  { 
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center h-[400px] bg-gray-50 rounded-xl">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    )
-  }
-)
+import { BentoGrid, BentoCard } from '@/components/landing/bento-grid'
+import { AnimatedHeroBackground } from '@/components/landing/animated-hero-background'
+import { PricingCards } from '@/components/pricing-cards'
+import { FAQSection } from '@/components/faq-section'
+import { ConstantImprovements } from '@/components/landing/constant-improvements'
+import Image from 'next/image'
+import './page.css'
 
 
 export default function Home() {
@@ -29,108 +22,46 @@ export default function Home() {
 
   return (
     <>
-      {/* Prefetch Power BI embed domain */}
-      <link rel="dns-prefetch" href="https://app.powerbi.com" />
-      <link rel="preconnect" href="https://app.powerbi.com" />
-      <link rel="preconnect" href="https://wabi-us-east2-redirect.analysis.windows.net" />
-      
-      <Script
-        src="https://app.powerbi.com/13.0.23829.90/scripts/powerbiloader.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          // Power BI script is loaded, resources will be preloaded when component mounts
-          console.log('Power BI script loaded');
-        }}
-      />
-      {/* Header/Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <Link href="/" className="text-xl font-semibold text-gray-900">
-                Power UI
-              </Link>
-              <div className="hidden md:flex space-x-6">
-                <Link href="/themes" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
-                  Themes
-                </Link>
-                <Link href="/docs" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
-                  Docs
-                </Link>
-                <Link href="/examples" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
-                  Examples
-                </Link>
-                <Link href="/pricing" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
-                  Pricing
-                </Link>
-                <Link href="/blog" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
-                  Blog
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/sign-in" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
-                Sign In
-              </Link>
-              <Link
-                href="/sign-up"
-                className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-all hover:shadow-lg"
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50 -z-10" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-100/20 via-transparent to-transparent -z-10" />
+      <section className="pt-16 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {/* Animated Background */}
+        <AnimatedHeroBackground className="-z-10" />
         
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium mb-8">
-            <Sparkles className="w-3.5 h-3.5" />
+        <div className="max-w-6xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm text-gray-700 px-3 py-1 rounded-full text-sm font-medium mb-8 animate-slide-down">
+            <Sparkles className="w-3.5 h-3.5 animate-pulse-slow" />
             <span>Introducing Power UI 2.0</span>
           </div>
           
-          <h1 className="text-6xl md:text-7xl font-bold tracking-tight mb-6 bg-gradient-to-b from-gray-900 to-gray-600 bg-clip-text text-transparent">
+          <h1 className="text-6xl md:text-7xl font-bold tracking-tight mb-6 bg-gradient-to-b from-gray-900 to-gray-600 bg-clip-text text-transparent animate-slide-up">
             Beautiful Power BI themes
             <br />
             in seconds, not hours
           </h1>
           
-          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed animate-slide-up animation-delay-100">
             The complete design system for creating stunning Power BI dashboards. 
             Stop wrestling with JSON files and start shipping.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-scale-in" style={{ animationDelay: '200ms' }}>
             <Link
               href="/sign-up"
-              className="group inline-flex items-center bg-gray-900 text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-800 transition-all hover:shadow-xl"
+              className="group inline-flex items-center bg-gray-900 text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-800 transition-all hover:shadow-xl hover:scale-105"
             >
               Start Building for Free
               <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/examples"
-              className="inline-flex items-center text-gray-700 px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-100 transition-all"
+              className="inline-flex items-center text-gray-700 bg-white/60 backdrop-blur-sm px-8 py-4 rounded-xl text-lg font-medium hover:bg-white/80 transition-all"
             >
               View Examples
             </Link>
           </div>
 
-          <div className="flex items-center justify-center gap-8 mt-12 text-sm text-gray-500">
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-2">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-gray-300 border-2 border-white" />
-                ))}
-              </div>
-              <span>1,000+ analysts</span>
-            </div>
+          <div className="flex items-center justify-center gap-8 mt-12 text-sm text-gray-500 animate-fade-in" style={{ animationDelay: '400ms' }}>
+            <span>Trusted by 1,000+ analysts</span>
             <div className="flex items-center gap-1">
               <span className="text-yellow-500">★★★★★</span>
               <span>5.0 (20+ reviews)</span>
@@ -140,7 +71,7 @@ export default function Home() {
       </section>
 
       {/* Bento Grid Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
@@ -152,167 +83,224 @@ export default function Home() {
           </div>
 
           {/* Bento Grid */}
-          <div className={cn(
-            "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
-            mounted && "animate-in fade-in duration-500"
-          )}>
-            {/* Theme Generator - Large Card */}
-            <div className="md:col-span-2 lg:col-span-2 group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-8 text-white hover:shadow-2xl transition-all duration-300">
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-              <div className="relative z-10">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-xl mb-4">
-                  <Palette className="w-6 h-6" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">Theme Studio</h3>
-                <p className="text-white/90 mb-4">
+          <BentoGrid className={mounted ? "animate-in fade-in duration-500" : ""}>
+            {/* Theme Studio - Large Card */}
+            <BentoCard className="md:col-span-3 lg:col-span-3 row-span-2 p-6">
+              <div className="flex flex-col h-full">
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Featured</span>
+                <h3 className="text-2xl font-bold mb-3 text-gray-900">Theme Studio</h3>
+                <p className="text-gray-600 mb-6 flex-grow">
                   Generate professional themes instantly. Pick your colors, preview live, and export to Power BI.
                 </p>
-                <Link 
-                  href="/themes/studio" 
-                  className="inline-flex items-center text-white font-medium group-hover:gap-3 gap-2 transition-all"
-                >
-                  Try it now <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700" />
-            </div>
-
-            {/* Figma Integration */}
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-8 text-white hover:shadow-2xl transition-all duration-300">
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-              <div className="relative z-10">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-xl mb-4">
-                  <Globe className="w-6 h-6" />
+                <div className="mt-auto">
+                  <Link 
+                    href="/themes/studio" 
+                    className="inline-flex items-center text-gray-700 font-medium hover:text-gray-900 hover:gap-3 gap-2 transition-all"
+                  >
+                    Launch Studio <ChevronRight className="w-4 h-4" />
+                  </Link>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Figma System</h3>
-                <p className="text-white/90 text-sm">
-                  Design in Figma, deploy to Power BI. Perfect alignment guaranteed.
-                </p>
-              </div>
-            </div>
-
-            {/* Fast Generation */}
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 p-8 text-white hover:shadow-2xl transition-all duration-300">
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-              <div className="relative z-10">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-xl mb-4">
-                  <Zap className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">5-Min Setup</h3>
-                <p className="text-white/90 text-sm">
-                  From zero to beautiful theme in minutes, not hours.
-                </p>
-              </div>
-            </div>
-
-            {/* Icon Library */}
-            <div className="group relative overflow-hidden rounded-2xl bg-gray-900 p-8 text-white hover:shadow-2xl transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900" />
-              <div className="relative z-10">
-                <h3 className="text-xl font-bold mb-2">1,500+ Icons</h3>
-                <p className="text-gray-400 text-sm mb-4">
-                  Professional icons for every use case
-                </p>
-                <div className="grid grid-cols-4 gap-2">
-                  {[...Array(8)].map((_, i) => (
-                    <div key={i} className="w-10 h-10 bg-gray-800 rounded-lg" />
-                  ))}
+                {/* Studio Preview */}
+                <div className="mt-6 flex gap-3">
+                  <div className="relative h-64 w-1/3 rounded-xl overflow-hidden bg-gray-50 border border-gray-200">
+                    <Image
+                      src="/landingpageimages/foundation panel.png"
+                      alt="Foundation Panel"
+                      fill
+                      className="object-cover object-top"
+                    />
+                  </div>
+                  <div className="relative h-64 flex-1 rounded-xl overflow-hidden bg-gray-50 border border-gray-200">
+                    <Image
+                      src="/landingpageimages/studio.png"
+                      alt="Theme Studio Preview"
+                      fill
+                      className="object-cover object-top"
+                    />
+                  </div>
+                  <div className="relative h-64 w-1/3 rounded-xl overflow-hidden bg-gray-50 border border-gray-200">
+                    <Image
+                      src="/landingpageimages/visual style panel.png"
+                      alt="Visual Style Panel"
+                      fill
+                      className="object-cover object-top"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            </BentoCard>
+
+            {/* Style Presets */}
+            <BentoCard className="p-6">
+              <div className="flex flex-col h-full">
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Visual Variants</span>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">Style Presets</h3>
+                <p className="text-gray-600 text-sm flex-grow">
+                  Choose from multiple visual styles for your data.
+                </p>
+                {/* Visual Style Preview */}
+                <div className="mt-4 relative h-24 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
+                  <Image
+                    src="/landingpageimages/visual style panel.png"
+                    alt="Visual Style Panel"
+                    fill
+                    className="object-cover object-top"
+                  />
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Live Power BI Preview */}
+            <BentoCard className="p-6">
+              <div className="flex flex-col h-full">
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Live Preview</span>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">Power BI Embedded</h3>
+                <p className="text-gray-600 text-sm flex-grow">
+                  See real Power BI visuals update as you design.
+                </p>
+                {/* Dashboard Preview */}
+                <div className="mt-4 relative h-24 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
+                  <Image
+                    src="/landingpageimages/dashboard.png"
+                    alt="Power BI Dashboard"
+                    fill
+                    className="object-cover object-top"
+                  />
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Light & Dark Mode */}
+            <BentoCard className="p-6">
+              <div className="flex flex-col h-full">
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">One Click</span>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">Light & Dark Mode</h3>
+                <p className="text-gray-600 text-sm flex-grow">
+                  Switch between themes instantly. No manual adjustments.
+                </p>
+                {/* Placeholder visual */}
+                <div className="mt-4 flex gap-2">
+                  <div className="flex-1 h-20 bg-white border border-gray-200 rounded-lg flex items-center justify-center">
+                    <Sun className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <div className="flex-1 h-20 bg-gray-900 rounded-lg flex items-center justify-center">
+                    <Moon className="w-5 h-5 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Theme Sharing */}
+            <BentoCard className="p-6">
+              <div className="flex flex-col h-full">
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Collaboration</span>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">Theme Sharing</h3>
+                <p className="text-gray-600 text-sm flex-grow">
+                  Share themes with your team or the community.
+                </p>
+                {/* Placeholder visual */}
+                <div className="mt-4">
+                  <div className="bg-gray-50 rounded-lg p-3 flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-gray-400" />
+                    <span className="text-xs text-gray-500">Share link copied</span>
+                  </div>
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Organization Features - Wide Card */}
+            <BentoCard className="md:col-span-2 p-6">
+              <div className="flex items-start justify-between h-full">
+                <div className="flex-grow">
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full mb-4 inline-block">Teams</span>
+                  <h3 className="text-xl font-bold mb-3 text-gray-900">Organization Themes & Palettes</h3>
+                  <p className="text-gray-600 mb-6">
+                    Centralize your brand colors and themes. Ensure consistency across all reports.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-3 text-sm">
+                    <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-full text-gray-700">
+                      <Users className="w-3.5 h-3.5" />
+                      Team workspace
+                    </span>
+                    <span className="bg-gray-50 px-3 py-1.5 rounded-full text-gray-700">Version control</span>
+                    <span className="bg-gray-50 px-3 py-1.5 rounded-full text-gray-700">Brand library</span>
+                  </div>
+                </div>
+                {/* Foundation Panel Preview */}
+                <div className="hidden lg:block ml-8">
+                  <div className="relative w-32 h-32 rounded-xl overflow-hidden bg-gray-50 border border-gray-200">
+                    <Image
+                      src="/landingpageimages/foundation panel.png"
+                      alt="Foundation Panel"
+                      fill
+                      className="object-cover object-top"
+                    />
+                  </div>
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Icons */}
+            <BentoCard className="p-6">
+              <div className="flex flex-col h-full">
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Assets</span>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">1,500+ Icons</h3>
+                <p className="text-gray-600 text-sm">
+                  Professional icons for every metric and KPI.
+                </p>
+                {/* Icons Preview */}
+                <div className="mt-4 relative h-20 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
+                  <Image
+                    src="/landingpageimages/icons.png"
+                    alt="Icon Library"
+                    fill
+                    className="object-cover object-top"
+                  />
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Figma Plugin */}
+            <BentoCard className="p-6">
+              <div className="flex flex-col h-full">
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Integration</span>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">Figma Plugin</h3>
+                <p className="text-gray-600 text-sm">
+                  Design in Figma, export to Power BI seamlessly.
+                </p>
+                {/* Placeholder visual */}
+                <div className="mt-auto">
+                  <div className="bg-gray-50 rounded-lg p-4 mt-4">
+                    <div className="flex items-center gap-2 justify-center">
+                      <div className="w-6 h-6 bg-purple-200 rounded"></div>
+                      <span className="text-xs text-gray-400">→</span>
+                      <div className="w-6 h-6 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </BentoCard>
 
             {/* Templates */}
-            <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 hover:shadow-2xl transition-all duration-300">
-              <h3 className="text-xl font-bold mb-2">55+ Templates</h3>
-              <p className="text-gray-600 text-sm mb-4">
-                Industry-specific themes ready to use
-              </p>
-              <div className="flex -space-x-2">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="w-12 h-8 bg-gray-200 rounded border-2 border-white" />
-                ))}
-              </div>
-            </div>
-
-            {/* Enterprise Features */}
-            <div className="md:col-span-2 group relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 p-8 hover:shadow-2xl transition-all duration-300">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-900 text-white rounded-xl mb-4">
-                    <Shield className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Enterprise Ready</h3>
-                  <p className="text-gray-600 mb-4">
-                    Team collaboration, version control, and brand consistency at scale.
-                  </p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      Team licenses
-                    </span>
-                    <span>SSO support</span>
-                    <span>API access</span>
-                  </div>
-                </div>
-                <div className="hidden lg:block">
-                  <div className="w-32 h-32 bg-gray-200 rounded-xl" />
+            <BentoCard className="md:col-span-2 p-6">
+              <div className="flex flex-col h-full">
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Templates</span>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">55+ Templates</h3>
+                <p className="text-gray-600 text-sm flex-grow">
+                  Industry-specific themes ready to use.
+                </p>
+                {/* Examples Preview */}
+                <div className="mt-4 relative h-32 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
+                  <Image
+                    src="/landingpageimages/examples.png"
+                    alt="Template Examples"
+                    fill
+                    className="object-cover object-top"
+                  />
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Demo Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              See the difference
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              A single Power BI donut chart with our professional theme applied. 
-              Clean, focused, and beautifully styled.
-            </p>
-          </div>
-          
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div className="bg-gray-900 text-white p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                </div>
-                <span className="text-sm font-medium">Live Power BI Report</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-gray-400">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span>Live data</span>
-              </div>
-            </div>
-            <div className="p-8 bg-gray-50 flex justify-center">
-              <PowerBIVisualEmbed 
-                visualName="a514429d97b4ca4dc991"
-                pageName="97051b42cbd76adb2f5b"
-                width={300}
-                height={400}
-                className="rounded-lg shadow-inner"
-              />
-            </div>
-          </div>
-          
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-500 mb-4">
-              This is a real Power BI visual from our sample report
-            </p>
-            <Link
-              href="/themes/studio"
-              className="inline-flex items-center text-gray-900 font-medium hover:gap-3 gap-2 transition-all"
-            >
-              Try the theme studio <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
+            </BentoCard>
+          </BentoGrid>
         </div>
       </section>
 
@@ -326,6 +314,46 @@ export default function Home() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Video Demo Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">See Power UI in Action</h2>
+          <p className="text-xl text-gray-600 mb-8">
+            Watch how easy it is to create beautiful Power BI themes in minutes
+          </p>
+          <div className="relative bg-gray-900 rounded-2xl overflow-hidden aspect-video">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <button className="bg-white/10 backdrop-blur-sm p-6 rounded-full hover:bg-white/20 transition-all group">
+                <PlayCircle className="w-16 h-16 text-white group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
+            <div className="absolute bottom-4 left-4 text-white/80 text-sm">
+              Video demo coming soon
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Simple, One-Time Pricing
+            </h2>
+            <p className="text-xl text-gray-600">
+              No subscriptions. Pay once, use forever. 30-day money-back guarantee.
+            </p>
+          </div>
+          <PricingCards />
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <FAQSection />
       </section>
 
       {/* Testimonials - Simplified */}
@@ -361,6 +389,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Constant Improvements Section */}
+      <ConstantImprovements />
 
       {/* Simple CTA */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900 text-white">

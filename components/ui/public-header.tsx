@@ -2,24 +2,28 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
 export function PublicHeader() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { isSignedIn } = useUser()
   
-  // Don't show header on homepage (it has its own navigation)
-  if (pathname === '/') return null
   
   const navLinks = [
-    { href: '/themes', label: 'Themes' },
-    { href: '/docs', label: 'Docs' },
     { href: '/examples', label: 'Examples' },
-    { href: '/pricing', label: 'Pricing' },
+    { href: '/icons', label: 'Icons' },
     { href: '/blog', label: 'Blog' },
+    { href: '/docs', label: 'Docs' },
+    { href: '/pricing', label: 'Pricing' },
   ]
+  
+  // Add themes link only if signed in
+  if (isSignedIn) {
+    navLinks.unshift({ href: '/themes', label: 'Themes' })
+  }
   
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 z-50">

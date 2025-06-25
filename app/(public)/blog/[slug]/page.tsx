@@ -64,8 +64,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound()
   }
   
+  // If it's a TSX post, redirect to the TSX page
+  if (post.isTsx) {
+    return notFound() // The TSX pages handle their own routing
+  }
+  
   // Use marked to convert markdown to HTML
-  const htmlContent = marked(post.content)
+  const htmlContent = marked(post.content || '')
   
   return (
     <article className="container mx-auto px-4 py-16 max-w-4xl">
