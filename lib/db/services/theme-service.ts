@@ -3,9 +3,51 @@ import type { Theme, Prisma } from '@prisma/client'
 
 export class ThemeService {
   /**
+   * Helper function to extract preview colors from theme data
+   */
+  private static async extractPreviewColors(theme: Theme): Promise<string[] | undefined> {
+    if (!theme.themeData || typeof theme.themeData !== 'object') {
+      return undefined;
+    }
+    
+    const themeDataObj = theme.themeData as any;
+    
+    // Check for dataColors array (Power BI theme structure)
+    if (themeDataObj.dataColors && Array.isArray(themeDataObj.dataColors)) {
+      return themeDataObj.dataColors.slice(0, 5);
+    }
+    
+    // Check for palette colors (alternative structure)
+    if (themeDataObj.palette && themeDataObj.palette.colors && Array.isArray(themeDataObj.palette.colors)) {
+      return themeDataObj.palette.colors.slice(0, 5);
+    }
+    
+    // Check for colorPalette
+    if (themeDataObj.colorPalette && Array.isArray(themeDataObj.colorPalette)) {
+      return themeDataObj.colorPalette.slice(0, 5);
+    }
+    
+    // Check for colorPaletteId and fetch from ColorPalette table
+    if (themeDataObj.colorPaletteId) {
+      try {
+        const colorPalette = await prisma.colorPalette.findUnique({
+          where: { id: themeDataObj.colorPaletteId },
+          select: { colors: true }
+        });
+        if (colorPalette && colorPalette.colors && Array.isArray(colorPalette.colors)) {
+          return (colorPalette.colors as string[]).slice(0, 5);
+        }
+      } catch (error) {
+        console.error('Failed to fetch color palette:', error);
+      }
+    }
+    
+    return undefined;
+  }
+  /**
    * Get all themes for a user (including organization themes)
    */
-  static async getUserThemes(userId: string): Promise<Theme[]> {
+  static async getUserThemes(userId: string): Promise<(Theme & { previewColors?: string[] })[]> {
     // Get user's organization memberships
     const memberships = await prisma.organizationMember.findMany({
       where: { userId },
@@ -14,7 +56,7 @@ export class ThemeService {
     
     const organizationIds = memberships.map(m => m.organizationId);
     
-    return prisma.theme.findMany({
+    const themes = await prisma.theme.findMany({
       where: {
         OR: [
           { userId }, // User's own themes
@@ -36,7 +78,16 @@ export class ThemeService {
           },
         },
       },
-    })
+    });
+
+    // Extract preview colors from themeData
+    const themesWithColors = await Promise.all(themes.map(async theme => {
+      const themeWithColors = { ...theme } as Theme & { previewColors?: string[] };
+      themeWithColors.previewColors = await this.extractPreviewColors(theme);
+      return themeWithColors;
+    }));
+    
+    return themesWithColors;
   }
 
   /**
@@ -190,8 +241,8 @@ export class ThemeService {
   /**
    * Get organization themes
    */
-  static async getOrganizationThemes(organizationId: string): Promise<Theme[]> {
-    return prisma.theme.findMany({
+  static async getOrganizationThemes(organizationId: string): Promise<(Theme & { previewColors?: string[] })[]> {
+    const themes = await prisma.theme.findMany({
       where: {
         organizationId,
         visibility: 'ORGANIZATION',
@@ -200,7 +251,16 @@ export class ThemeService {
       include: {
         user: true,
       },
-    })
+    });
+
+    // Extract preview colors from themeData
+    const themesWithColors = await Promise.all(themes.map(async theme => {
+      const themeWithColors = { ...theme } as Theme & { previewColors?: string[] };
+      themeWithColors.previewColors = await this.extractPreviewColors(theme);
+      return themeWithColors;
+    }));
+    
+    return themesWithColors;
   }
 
   /**
