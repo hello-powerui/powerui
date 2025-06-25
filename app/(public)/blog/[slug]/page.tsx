@@ -49,10 +49,8 @@ const components = {
 }
 
 export async function generateStaticParams() {
-  const slugs = getBlogSlugs()
-  return slugs.map((slug) => ({
-    slug: slug,
-  }))
+  // Return empty array since we're using TSX pages for all blog posts
+  return []
 }
 
 
