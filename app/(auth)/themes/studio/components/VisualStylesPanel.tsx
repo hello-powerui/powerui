@@ -184,7 +184,9 @@ function VisualStylesPanelComponent({
       
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
-        {renderSection()}
+        <div className="pb-20">
+          {renderSection()}
+        </div>
       </div>
     </div>
   );

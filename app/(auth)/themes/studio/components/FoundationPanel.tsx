@@ -124,7 +124,7 @@ function FoundationPanelComponent({
         </div>
         
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 pb-20 space-y-4">
           
           {/* Data Colors */}
           <div className="bg-white rounded-md border border-gray-200 p-4">

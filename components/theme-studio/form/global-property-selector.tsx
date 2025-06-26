@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { cn } from '@/lib/utils';
@@ -34,6 +34,8 @@ export function GlobalPropertySelector({
   const [showPropertyPicker, setShowPropertyPicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedComplexProperties, setSelectedComplexProperties] = useState<string[]>([]);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<'above' | 'below'>('below');
 
   // Dynamically extract structured and complex properties
   const { structuredProperties, complexProperties } = useMemo(() => {
@@ -127,6 +129,25 @@ export function GlobalPropertySelector({
       (schema as any).description?.toLowerCase().includes(query)
     );
   }, [complexProperties, searchQuery]);
+
+  // Calculate dropdown position when opening
+  useEffect(() => {
+    if (showPropertyPicker && buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const dropdownHeight = 400; // Approximate height of dropdown
+      
+      // Check if there's enough space below
+      const spaceBelow = viewportHeight - buttonRect.bottom;
+      const spaceAbove = buttonRect.top;
+      
+      if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
+        setDropdownPosition('above');
+      } else {
+        setDropdownPosition('below');
+      }
+    }
+  }, [showPropertyPicker]);
 
   const handleAddComplexProperty = (propertyName: string) => {
     if (!selectedComplexProperties.includes(propertyName)) {
@@ -255,6 +276,7 @@ export function GlobalPropertySelector({
           <h4 className="text-sm font-medium text-gray-700">Custom Global Properties</h4>
           <div className="relative">
             <button
+              ref={buttonRef}
               onClick={() => setShowPropertyPicker(!showPropertyPicker)}
               className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
               title="Add global property"
@@ -274,7 +296,10 @@ export function GlobalPropertySelector({
                   }}
                 />
                 
-                <div className="absolute top-full right-0 mt-2 bg-white rounded-md shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden w-80">
+                <div className={cn(
+                  "absolute right-0 bg-white rounded-md shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden w-80",
+                  dropdownPosition === 'above' ? "bottom-full mb-2" : "top-full mt-2"
+                )}>
                   {/* Search bar */}
                   <div className="p-3 border-b border-gray-200">
                     <div className="relative">
