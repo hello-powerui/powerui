@@ -65,6 +65,7 @@ const config: Config = {
         'in': 'fadeIn 150ms ease-out',
         'fade-in': 'fadeIn 150ms ease-out',
         'zoom-in': 'zoomIn 150ms ease-out',
+        'slide-in-from-right': 'slideInFromRight 200ms ease-out',
         'collapsible-down': 'collapsible-down 200ms ease-out',
         'collapsible-up': 'collapsible-up 200ms ease-out',
         'float': 'float 6s ease-in-out infinite',
@@ -115,6 +116,10 @@ const config: Config = {
         dataFlow: {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
+        },
+        slideInFromRight: {
+          '0%': { transform: 'translateX(10px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
         },
       },
     },

@@ -8,7 +8,7 @@ import { X, Plus, Search, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SchemaForm } from './schema-form';
 import { CollapsibleSection } from '../ui/collapsible-section';
-import { hasActualContent } from '@/lib/utils/theme-helpers';
+import { hasActualContent, cleanupVisualStyles } from '@/lib/utils/theme-helpers';
 
 interface GlobalPropertySelectorProps {
   schemaLoader: SchemaLoader;
@@ -99,7 +99,7 @@ export function GlobalPropertySelector({
           '*': newGlobalProps
         }
       };
-      onVisualStylesChange(newVisualStyles);
+      onVisualStylesChange(cleanupVisualStyles(newVisualStyles));
     }
   };
 
@@ -145,7 +145,7 @@ export function GlobalPropertySelector({
             }
           }
         };
-        onVisualStylesChange(newVisualStyles);
+        onVisualStylesChange(cleanupVisualStyles(newVisualStyles));
       }
     }
     setShowPropertyPicker(false);
@@ -167,7 +167,7 @@ export function GlobalPropertySelector({
           '*': newGlobalProps
         }
       };
-      onVisualStylesChange(newVisualStyles);
+      onVisualStylesChange(cleanupVisualStyles(newVisualStyles));
     }
   };
 
@@ -195,17 +195,25 @@ export function GlobalPropertySelector({
                   onClear={() => {
                     // Clear this structured property
                     if (onVisualStylesChange) {
-                      const newVisualStyles = {
-                        ...visualStyles,
-                        '*': {
-                          ...visualStyles?.['*'],
+                      const newGlobalProps = { ...visualStyles?.['*']?.['*'] };
+                      delete newGlobalProps[key];
+                      
+                      // Check if global props is now empty
+                      if (Object.keys(newGlobalProps).length === 0) {
+                        // Remove the entire * visual if no global props remain
+                        const newVisualStyles = { ...visualStyles };
+                        delete newVisualStyles['*'];
+                        onVisualStylesChange(newVisualStyles);
+                      } else {
+                        const newVisualStyles = {
+                          ...visualStyles,
                           '*': {
-                            ...visualStyles?.['*']?.['*'],
-                            [key]: undefined
+                            ...visualStyles?.['*'],
+                            '*': newGlobalProps
                           }
-                        }
-                      };
-                      onVisualStylesChange(newVisualStyles);
+                        };
+                        onVisualStylesChange(newVisualStyles);
+                      }
                     }
                   }}
                   hasContent={hasContent}
@@ -227,7 +235,7 @@ export function GlobalPropertySelector({
                             }
                           }
                         };
-                        onVisualStylesChange(newVisualStyles);
+                        onVisualStylesChange(cleanupVisualStyles(newVisualStyles));
                       }
                     }}
                     schemaLoader={schemaLoader}
@@ -369,7 +377,7 @@ export function GlobalPropertySelector({
                           }
                         }
                       };
-                      onVisualStylesChange(newVisualStyles);
+                      onVisualStylesChange(cleanupVisualStyles(newVisualStyles));
                     }
                   }}
                   schemaLoader={schemaLoader}

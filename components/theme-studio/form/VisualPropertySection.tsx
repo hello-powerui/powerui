@@ -8,6 +8,7 @@ import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 import { getContextualTitle } from '@/lib/theme-studio/utils/schema-form-utils';
 import { THEME_STUDIO_TYPOGRAPHY } from '../constants/typography';
+import { hasActualContent } from '@/lib/utils/theme-helpers';
 
 interface VisualPropertySectionProps {
   name: string;
@@ -50,15 +51,18 @@ export function VisualPropertySection({
   // Import SchemaForm here to avoid circular dependency
   const { SchemaForm } = require('./schema-form');
   
+  // Check if section has actual content
+  const sectionHasContent = hasActualContent(value[name]);
+  
   return (
     <CollapsibleSection
       id={`${path.join('-')}-${name}`}
       title={title}
       defaultOpen={false}
-      hasChanges={hasChanges}
+      hasChanges={sectionHasContent}
       changedCount={changedCount}
       onClear={handleSectionReset}
-      hasContent={value[name] !== undefined && value[name] !== null}
+      hasContent={sectionHasContent}
       clearMessage={`Clear all ${title.toLowerCase()} settings? This will remove any customizations and use default values.`}
     >
       <div className="space-y-2">

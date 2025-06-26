@@ -5,6 +5,7 @@ import { ColorPalette, NeutralPalette } from '@prisma/client';
 import { StructuralColors, TextClasses } from '@/lib/theme-generation/types';
 import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
 import isEqual from 'fast-deep-equal';
+import { cleanupVisualStyles } from '@/lib/utils/theme-helpers';
 
 // Single unified theme structure
 interface StudioTheme {
@@ -192,19 +193,37 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         })),
         
       updateVisualStyles: (visualStyles) =>
-        set((state) => ({
-          theme: { ...state.theme, visualStyles }
-        })),
+        set((state) => {
+          const cleanedVisualStyles = cleanupVisualStyles(visualStyles);
+          return {
+            theme: { ...state.theme, visualStyles: cleanedVisualStyles }
+          };
+        }),
         
       updateVisualStyle: (visual, variant, value) =>
         set((state) => {
           const newVisualStyles = { ...state.theme.visualStyles };
           
-          if (!newVisualStyles[visual]) {
-            newVisualStyles[visual] = {};
-          }
+          // Check if value is empty or should be removed
+          const isEmpty = !value || (typeof value === 'object' && Object.keys(value).length === 0);
           
-          newVisualStyles[visual][variant] = value;
+          if (isEmpty) {
+            // Remove the variant if it exists
+            if (newVisualStyles[visual]?.[variant]) {
+              delete newVisualStyles[visual][variant];
+              
+              // Clean up empty visual object
+              if (Object.keys(newVisualStyles[visual]).length === 0) {
+                delete newVisualStyles[visual];
+              }
+            }
+          } else {
+            // Add or update the value
+            if (!newVisualStyles[visual]) {
+              newVisualStyles[visual] = {};
+            }
+            newVisualStyles[visual][variant] = value;
+          }
           
           return {
             theme: { ...state.theme, visualStyles: newVisualStyles }
