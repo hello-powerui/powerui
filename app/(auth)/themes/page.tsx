@@ -242,6 +242,29 @@ export default function ThemesPage() {
                         onDelete={handleDelete}
                         onDuplicate={handleDuplicate}
                         onVisibilityChange={handleVisibilityChange}
+                        onUpdate={async (themeId, name, description) => {
+                          try {
+                            const response = await fetch(`/api/themes/${themeId}`, {
+                              method: 'PUT',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({ 
+                                name, 
+                                description,
+                                themeData: theme.themeData // Include existing themeData
+                              }),
+                            });
+                            if (response.ok) {
+                              // Update the theme in local state
+                              setMyThemes(myThemes.map(t => 
+                                t.id === themeId ? { ...t, name, description } : t
+                              ));
+                            }
+                          } catch (error) {
+                            console.error('Failed to update theme:', error);
+                          }
+                        }}
                       />
                     ))}
                   </div>

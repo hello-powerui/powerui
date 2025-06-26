@@ -253,6 +253,48 @@ export default function DashboardPage() {
                     // Delegate to themes page for duplication
                     router.push('/themes');
                   }}
+                  onUpdate={async (themeId, name, description) => {
+                    try {
+                      const response = await fetch(`/api/themes/${themeId}`, {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                          name, 
+                          description,
+                          themeData: theme.themeData // Include existing themeData
+                        }),
+                      });
+                      if (response.ok) {
+                        // Update the theme in local state
+                        setThemes(themes.map(t => 
+                          t.id === themeId ? { ...t, name, description } : t
+                        ));
+                      }
+                    } catch (error) {
+                      console.error('Failed to update theme:', error);
+                    }
+                  }}
+                  onVisibilityChange={async (themeId, visibility) => {
+                    try {
+                      const response = await fetch(`/api/themes/${themeId}/visibility`, {
+                        method: 'PATCH',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ visibility }),
+                      });
+                      if (response.ok) {
+                        // Update the theme in local state
+                        setThemes(themes.map(t => 
+                          t.id === themeId ? { ...t, visibility } : t
+                        ));
+                      }
+                    } catch (error) {
+                      console.error('Failed to update theme visibility:', error);
+                    }
+                  }}
                 />
               ))
             )}

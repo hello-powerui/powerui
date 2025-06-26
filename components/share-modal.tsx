@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,9 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Lock, Globe, Users, CheckCircle } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Lock, Globe, Users, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ShareModalProps {
@@ -34,6 +36,12 @@ export function ShareModal({ isOpen, onClose, theme, userOrganization, onVisibil
     theme.visibility || 'PRIVATE'
   );
   const [isUpdating, setIsUpdating] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedVisibility(theme.visibility || 'PRIVATE');
+    }
+  }, [isOpen, theme.visibility]);
 
   const handleSave = async () => {
     if (selectedVisibility === theme.visibility) {
@@ -59,10 +67,7 @@ export function ShareModal({ isOpen, onClose, theme, userOrganization, onVisibil
       icon: Lock,
       title: 'Private',
       description: 'Only you can see and edit this theme',
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-      borderColor: 'border-gray-200',
-      selectedBorderColor: 'border-gray-600',
+      iconColor: 'text-gray-500',
     },
     {
       value: 'ORGANIZATION' as const,
@@ -71,10 +76,7 @@ export function ShareModal({ isOpen, onClose, theme, userOrganization, onVisibil
       description: userOrganization 
         ? `All members of ${userOrganization.name} can view and use this theme. Team members can also edit it.`
         : 'Join an organization to share themes with your team',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
-      selectedBorderColor: 'border-blue-600',
+      iconColor: 'text-blue-600',
       disabled: !userOrganization,
     },
     {
@@ -82,60 +84,64 @@ export function ShareModal({ isOpen, onClose, theme, userOrganization, onVisibil
       icon: Globe,
       title: 'Public',
       description: 'Anyone can view and use this theme. Only you can edit it.',
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200',
-      selectedBorderColor: 'border-green-600',
+      iconColor: 'text-green-600',
     },
   ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Share "{theme.name}"</DialogTitle>
+          <DialogTitle>Change Theme Visibility</DialogTitle>
           <DialogDescription>
-            Choose who can access this theme
+            Choose who can access "{theme.name}"
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-3 py-4">
+        <RadioGroup 
+          value={selectedVisibility} 
+          onValueChange={(value) => setSelectedVisibility(value as typeof selectedVisibility)}
+          className="space-y-3 py-4"
+        >
           {options.map((option) => {
             const Icon = option.icon;
-            const isSelected = selectedVisibility === option.value;
+            const isDisabled = option.disabled || false;
             
             return (
-              <button
-                key={option.value}
-                onClick={() => !option.disabled && setSelectedVisibility(option.value)}
-                disabled={option.disabled}
-                className={`
-                  w-full p-4 rounded-lg border-2 text-left transition-all
-                  ${option.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-sm'}
-                  ${isSelected 
-                    ? `${option.bgColor} ${option.selectedBorderColor}` 
-                    : `bg-white ${option.borderColor} hover:${option.bgColor}`
-                  }
-                `}
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`mt-0.5 ${option.color}`}>
+              <div key={option.value} className={isDisabled ? 'opacity-50' : ''}>
+                <Label
+                  htmlFor={option.value}
+                  className={`
+                    flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all
+                    ${isDisabled ? 'cursor-not-allowed' : 'hover:bg-gray-50'}
+                    ${selectedVisibility === option.value 
+                      ? 'border-gray-900 bg-gray-50' 
+                      : 'border-gray-200'
+                    }
+                  `}
+                >
+                  <RadioGroupItem 
+                    value={option.value} 
+                    id={option.value}
+                    disabled={isDisabled}
+                    className="mt-0.5"
+                  />
+                  <div className={`mt-0.5 ${option.iconColor}`}>
                     <Icon className="w-5 h-5" />
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-medium text-gray-900">{option.title}</h4>
-                      {isSelected && (
-                        <CheckCircle className={`w-4 h-4 ${option.color}`} />
-                      )}
+                    <div className="font-medium text-gray-900 mb-0.5">
+                      {option.title}
                     </div>
-                    <p className="text-sm text-gray-600 mt-0.5">{option.description}</p>
+                    <p className="text-sm text-gray-600">
+                      {option.description}
+                    </p>
                   </div>
-                </div>
-              </button>
+                </Label>
+              </div>
             );
           })}
-        </div>
+        </RadioGroup>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isUpdating}>
@@ -144,9 +150,15 @@ export function ShareModal({ isOpen, onClose, theme, userOrganization, onVisibil
           <Button 
             onClick={handleSave} 
             disabled={isUpdating || selectedVisibility === theme.visibility}
-            className="bg-gray-900 hover:bg-gray-800 text-white"
           >
-            {isUpdating ? 'Updating...' : 'Save changes'}
+            {isUpdating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              'Save Changes'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

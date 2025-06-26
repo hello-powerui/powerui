@@ -12,34 +12,34 @@ export class ThemeService {
     
     const themeDataObj = theme.themeData as any;
     
-    // Check for dataColors array (Power BI theme structure)
-    if (themeDataObj.dataColors && Array.isArray(themeDataObj.dataColors)) {
-      return themeDataObj.dataColors.slice(0, 5);
-    }
-    
-    // Check for palette colors (alternative structure)
-    if (themeDataObj.palette && themeDataObj.palette.colors && Array.isArray(themeDataObj.palette.colors)) {
-      return themeDataObj.palette.colors.slice(0, 5);
-    }
-    
-    // Check for colorPalette
-    if (themeDataObj.colorPalette && Array.isArray(themeDataObj.colorPalette)) {
-      return themeDataObj.colorPalette.slice(0, 5);
-    }
-    
-    // Check for colorPaletteId and fetch from ColorPalette table
-    if (themeDataObj.colorPaletteId) {
+    // Check for colorPaletteId at root level (new theme studio structure)
+    if (typeof themeDataObj === 'object' && 'colorPaletteId' in themeDataObj && themeDataObj.colorPaletteId) {
       try {
         const colorPalette = await prisma.colorPalette.findUnique({
           where: { id: themeDataObj.colorPaletteId },
           select: { colors: true }
         });
         if (colorPalette && colorPalette.colors && Array.isArray(colorPalette.colors)) {
-          return (colorPalette.colors as string[]).slice(0, 5);
+          return (colorPalette.colors as string[]).slice(0, 10); // Return up to 10 colors for display
         }
       } catch (error) {
         console.error('Failed to fetch color palette:', error);
       }
+    }
+    
+    // Check for dataColors array (Power BI theme structure)
+    if (themeDataObj.dataColors && Array.isArray(themeDataObj.dataColors)) {
+      return themeDataObj.dataColors.slice(0, 10);
+    }
+    
+    // Check for palette colors (alternative structure)
+    if (themeDataObj.palette && themeDataObj.palette.colors && Array.isArray(themeDataObj.palette.colors)) {
+      return themeDataObj.palette.colors.slice(0, 10);
+    }
+    
+    // Check for colorPalette
+    if (themeDataObj.colorPalette && Array.isArray(themeDataObj.colorPalette)) {
+      return themeDataObj.colorPalette.slice(0, 10);
     }
     
     return undefined;

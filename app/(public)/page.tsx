@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link'
-import { ArrowRightIcon, Sparkles, ChevronRight, Moon, Sun, Users, Share2, PlayCircle } from 'lucide-react'
+import { ArrowRightIcon, Sparkles, ChevronRight, Moon, Sun, Users, Share2, PlayCircle, TrendingUp, BarChart3, PieChart, Activity, Target, Zap, Shield, Globe, Database, GitBranch, Layers, Palette, LineChart, DollarSign, Package, ShoppingCart, Calendar, Clock, Mail, Phone, MapPin, Briefcase, Settings, FileText, FolderOpen, Download, Upload, Heart, Star, Award, Flag, AlertCircle, CheckCircle, XCircle, Info, Eye } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { BentoGrid, BentoCard } from '@/components/landing/bento-grid'
@@ -9,6 +9,9 @@ import { AnimatedHeroBackground } from '@/components/landing/animated-hero-backg
 import { PricingCards } from '@/components/pricing-cards'
 import { FAQSection } from '@/components/faq-section'
 import { ConstantImprovements } from '@/components/landing/constant-improvements'
+import { ThemeStudioSkeleton, VisualStyleSkeleton, ThemeModeSkeleton, TeamSkeleton, TemplateGridSkeleton, FigmaIntegrationSkeleton, MiniExampleReports } from '@/components/landing/bento-skeletons'
+import { ThemeStudioPreview } from '@/components/landing/theme-studio-preview'
+import { JsonPreview } from '@/components/landing/json-preview'
 import Image from 'next/image'
 import './page.css'
 
@@ -46,10 +49,10 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-scale-in" style={{ animationDelay: '200ms' }}>
             <Link
-              href="/sign-up"
+              href="/pricing"
               className="group inline-flex items-center bg-gray-900 text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-gray-800 transition-all hover:shadow-xl hover:scale-105"
             >
-              Start Building for Free
+              Get Started
               <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
@@ -60,20 +63,24 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="flex items-center justify-center gap-8 mt-12 text-sm text-gray-500 animate-fade-in" style={{ animationDelay: '400ms' }}>
-            <span>Trusted by 1,000+ analysts</span>
-            <div className="flex items-center gap-1">
-              <span className="text-yellow-500">★★★★★</span>
-              <span>5.0 (20+ reviews)</span>
+          <div className="flex items-center justify-center gap-3 mt-12 text-sm text-gray-500 animate-fade-in" style={{ animationDelay: '400ms' }}>
+            {/* Overlapping profile pictures */}
+            <div className="flex -space-x-2">
+              <div className="w-8 h-8 rounded-full bg-gray-300 border-2 border-white"></div>
+              <div className="w-8 h-8 rounded-full bg-gray-400 border-2 border-white"></div>
+              <div className="w-8 h-8 rounded-full bg-gray-500 border-2 border-white"></div>
+              <div className="w-8 h-8 rounded-full bg-gray-600 border-2 border-white"></div>
+              <div className="w-8 h-8 rounded-full bg-gray-700 border-2 border-white"></div>
             </div>
+            <span>Trusted by 1,000+ developers</span>
           </div>
         </div>
       </section>
 
       {/* Bento Grid Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50/50">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50/50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               Everything you need to design like a pro
             </h2>
@@ -85,234 +92,219 @@ export default function Home() {
           {/* Bento Grid */}
           <BentoGrid className={mounted ? "animate-in fade-in duration-500" : ""}>
             {/* Theme Studio - Large Card */}
-            <BentoCard className="md:col-span-3 lg:col-span-3 row-span-2 p-6">
-              <div className="flex flex-col h-full">
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Featured</span>
-                <h3 className="text-2xl font-bold mb-3 text-gray-900">Theme Studio</h3>
-                <p className="text-gray-600 mb-6 flex-grow">
-                  Generate professional themes instantly. Pick your colors, preview live, and export to Power BI.
-                </p>
-                <div className="mt-auto">
-                  <Link 
-                    href="/themes/studio" 
-                    className="inline-flex items-center text-gray-700 font-medium hover:text-gray-900 hover:gap-3 gap-2 transition-all"
-                  >
-                    Launch Studio <ChevronRight className="w-4 h-4" />
-                  </Link>
+            <BentoCard className="md:col-span-2 lg:col-span-2 row-span-2 p-3 group">
+              <Link href="/themes/studio" className="flex flex-col h-full cursor-pointer">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-xl font-bold text-gray-900">Theme Studio</h3>
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                 </div>
-                {/* Studio Preview */}
-                <div className="mt-6 flex gap-3">
-                  <div className="relative h-64 w-1/3 rounded-xl overflow-hidden bg-gray-50 border border-gray-200">
-                    <Image
-                      src="/landingpageimages/foundation panel.png"
-                      alt="Foundation Panel"
-                      fill
-                      className="object-cover object-top"
-                    />
-                  </div>
-                  <div className="relative h-64 flex-1 rounded-xl overflow-hidden bg-gray-50 border border-gray-200">
-                    <Image
-                      src="/landingpageimages/studio.png"
-                      alt="Theme Studio Preview"
-                      fill
-                      className="object-cover object-top"
-                    />
-                  </div>
-                  <div className="relative h-64 w-1/3 rounded-xl overflow-hidden bg-gray-50 border border-gray-200">
-                    <Image
-                      src="/landingpageimages/visual style panel.png"
-                      alt="Visual Style Panel"
-                      fill
-                      className="object-cover object-top"
-                    />
-                  </div>
+                <p className="text-gray-600 text-sm mb-2">
+                  Customize every aspect of your Power BI theme - colors, fonts, borders, shadows, and 100+ visual properties.
+                </p>
+                {/* Studio Preview - Interactive Demo */}
+                <div className="flex-grow">
+                  <ThemeStudioPreview />
+                </div>
+              </Link>
+            </BentoCard>
+
+            {/* Live JSON Preview */}
+            <BentoCard className="row-span-2 p-4">
+              <div className="flex flex-col h-full">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Live JSON Preview</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Real-time theme JSON.
+                </p>
+                {/* JSON Preview */}
+                <div className="flex-grow">
+                  <JsonPreview />
                 </div>
               </div>
             </BentoCard>
 
-            {/* Style Presets */}
-            <BentoCard className="p-6">
+            {/* Style Presets - Expanded */}
+            <BentoCard className="md:row-span-2 p-4">
               <div className="flex flex-col h-full">
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Visual Variants</span>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">Style Presets</h3>
-                <p className="text-gray-600 text-sm flex-grow">
-                  Choose from multiple visual styles for your data.
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Style Presets</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Transform your visuals with different styling options that you can toggle right from Power BI.
                 </p>
-                {/* Visual Style Preview */}
-                <div className="mt-4 relative h-24 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
-                  <Image
-                    src="/landingpageimages/visual style panel.png"
-                    alt="Visual Style Panel"
-                    fill
-                    className="object-cover object-top"
-                  />
+                {/* Visual Style Preview - Using Skeleton */}
+                <div className="flex-grow">
+                  <VisualStyleSkeleton />
                 </div>
               </div>
             </BentoCard>
 
             {/* Live Power BI Preview */}
-            <BentoCard className="p-6">
+            <BentoCard className="p-4">
               <div className="flex flex-col h-full">
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Live Preview</span>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">Power BI Embedded</h3>
-                <p className="text-gray-600 text-sm flex-grow">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-xl font-bold text-gray-900">Power BI Embedded</h3>
+                  <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded-full font-medium">NEW</span>
+                </div>
+                <p className="text-gray-600 text-sm mb-4">
                   See real Power BI visuals update as you design.
                 </p>
-                {/* Dashboard Preview */}
-                <div className="mt-4 relative h-24 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
-                  <Image
-                    src="/landingpageimages/dashboard.png"
-                    alt="Power BI Dashboard"
-                    fill
-                    className="object-cover object-top"
-                  />
-                </div>
-              </div>
-            </BentoCard>
-
-            {/* Light & Dark Mode */}
-            <BentoCard className="p-6">
-              <div className="flex flex-col h-full">
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">One Click</span>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">Light & Dark Mode</h3>
-                <p className="text-gray-600 text-sm flex-grow">
-                  Switch between themes instantly. No manual adjustments.
-                </p>
-                {/* Placeholder visual */}
-                <div className="mt-4 flex gap-2">
-                  <div className="flex-1 h-20 bg-white border border-gray-200 rounded-lg flex items-center justify-center">
-                    <Sun className="w-5 h-5 text-gray-400" />
-                  </div>
-                  <div className="flex-1 h-20 bg-gray-900 rounded-lg flex items-center justify-center">
-                    <Moon className="w-5 h-5 text-gray-400" />
-                  </div>
-                </div>
-              </div>
-            </BentoCard>
-
-            {/* Theme Sharing */}
-            <BentoCard className="p-6">
-              <div className="flex flex-col h-full">
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Collaboration</span>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">Theme Sharing</h3>
-                <p className="text-gray-600 text-sm flex-grow">
-                  Share themes with your team or the community.
-                </p>
-                {/* Placeholder visual */}
-                <div className="mt-4">
-                  <div className="bg-gray-50 rounded-lg p-3 flex items-center gap-2">
-                    <Share2 className="w-4 h-4 text-gray-400" />
-                    <span className="text-xs text-gray-500">Share link copied</span>
-                  </div>
-                </div>
-              </div>
-            </BentoCard>
-
-            {/* Organization Features - Wide Card */}
-            <BentoCard className="md:col-span-2 p-6">
-              <div className="flex items-start justify-between h-full">
-                <div className="flex-grow">
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full mb-4 inline-block">Teams</span>
-                  <h3 className="text-xl font-bold mb-3 text-gray-900">Organization Themes & Palettes</h3>
-                  <p className="text-gray-600 mb-6">
-                    Centralize your brand colors and themes. Ensure consistency across all reports.
-                  </p>
-                  <div className="flex flex-wrap items-center gap-3 text-sm">
-                    <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-full text-gray-700">
-                      <Users className="w-3.5 h-3.5" />
-                      Team workspace
-                    </span>
-                    <span className="bg-gray-50 px-3 py-1.5 rounded-full text-gray-700">Version control</span>
-                    <span className="bg-gray-50 px-3 py-1.5 rounded-full text-gray-700">Brand library</span>
-                  </div>
-                </div>
-                {/* Foundation Panel Preview */}
-                <div className="hidden lg:block ml-8">
-                  <div className="relative w-32 h-32 rounded-xl overflow-hidden bg-gray-50 border border-gray-200">
-                    <Image
-                      src="/landingpageimages/foundation panel.png"
-                      alt="Foundation Panel"
-                      fill
-                      className="object-cover object-top"
-                    />
-                  </div>
-                </div>
-              </div>
-            </BentoCard>
-
-            {/* Icons */}
-            <BentoCard className="p-6">
-              <div className="flex flex-col h-full">
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Assets</span>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">1,500+ Icons</h3>
-                <p className="text-gray-600 text-sm">
-                  Professional icons for every metric and KPI.
-                </p>
-                {/* Icons Preview */}
-                <div className="mt-4 relative h-20 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
-                  <Image
-                    src="/landingpageimages/icons.png"
-                    alt="Icon Library"
-                    fill
-                    className="object-cover object-top"
-                  />
-                </div>
-              </div>
-            </BentoCard>
-
-            {/* Figma Plugin */}
-            <BentoCard className="p-6">
-              <div className="flex flex-col h-full">
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Integration</span>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">Figma Plugin</h3>
-                <p className="text-gray-600 text-sm">
-                  Design in Figma, export to Power BI seamlessly.
-                </p>
-                {/* Placeholder visual */}
-                <div className="mt-auto">
-                  <div className="bg-gray-50 rounded-lg p-4 mt-4">
-                    <div className="flex items-center gap-2 justify-center">
-                      <div className="w-6 h-6 bg-purple-200 rounded"></div>
-                      <span className="text-xs text-gray-400">→</span>
-                      <div className="w-6 h-6 bg-gray-200 rounded"></div>
+                {/* Live embedded preview */}
+                <div className="flex-grow relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden flex items-center justify-center">
+                  <div className="flex items-center gap-4">
+                    {/* Power BI Logo with pulsing background */}
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-yellow-300 rounded-full animate-pulse" />
+                      <div className="relative bg-yellow-100 rounded-full p-2">
+                        <img src="/icons/pbi-logo.svg" alt="Power BI" className="h-5 w-5" />
+                      </div>
+                    </div>
+                    
+                    {/* Connection lines with heartbeat */}
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <div className="w-8 h-0.5 bg-gray-300" />
+                      <Activity className="w-4 h-4 animate-pulse" />
+                      <div className="w-8 h-0.5 bg-gray-300" />
+                    </div>
+                    
+                    {/* Live indicator */}
+                    <div className="flex items-center gap-1.5 bg-white rounded-full px-2.5 py-1 shadow-sm">
+                      <Eye className="h-3 w-3 text-red-500" />
+                      <div className="h-1.5 w-1.5 bg-red-500 rounded-full animate-pulse" />
+                      <span className="text-xs font-medium text-gray-700">LIVE</span>
                     </div>
                   </div>
                 </div>
               </div>
             </BentoCard>
 
-            {/* Templates */}
-            <BentoCard className="md:col-span-2 p-6">
+            {/* Light & Dark Mode */}
+            <BentoCard className="p-4">
               <div className="flex flex-col h-full">
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full self-start mb-4">Templates</span>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">55+ Templates</h3>
-                <p className="text-gray-600 text-sm flex-grow">
-                  Industry-specific themes ready to use.
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Light & Dark Mode</h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  Switch between themes instantly. No manual adjustments.
                 </p>
-                {/* Examples Preview */}
-                <div className="mt-4 relative h-32 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
-                  <Image
-                    src="/landingpageimages/examples.png"
-                    alt="Template Examples"
-                    fill
-                    className="object-cover object-top"
-                  />
+                {/* Theme Mode Preview - Using Skeletons */}
+                <div className="mt-4 flex gap-2">
+                  <div className="flex-1">
+                    <ThemeModeSkeleton mode="light" />
+                  </div>
+                  <div className="flex-1">
+                    <ThemeModeSkeleton mode="dark" />
+                  </div>
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Theme Sharing */}
+            <BentoCard className="p-4">
+              <div className="flex flex-col h-full">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Theme Sharing</h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  Share themes with your team or the community.
+                </p>
+                {/* Share Preview */}
+                <div className="mt-3 space-y-1.5">
+                  <div className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Share2 className="w-4 h-4 text-gray-400" />
+                      <span className="text-xs text-gray-600 font-mono">powerui.com/t/...</span>
+                    </div>
+                    <button className="text-xs bg-gray-900 text-white px-2 py-1 rounded hover:bg-gray-800 transition-colors">
+                      Copy
+                    </button>
+                  </div>
+                  <div className="flex -space-x-2">
+                    <div className="w-6 h-6 rounded-full bg-gray-300 border-2 border-white"></div>
+                    <div className="w-6 h-6 rounded-full bg-gray-400 border-2 border-white"></div>
+                    <div className="w-6 h-6 rounded-full bg-gray-500 border-2 border-white flex items-center justify-center">
+                      <span className="text-[8px] text-white font-bold">+3</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Organization Features - Wide Card */}
+            <BentoCard className="md:col-span-2 p-4">
+              <div className="flex items-center justify-between h-full">
+                <div className="flex-grow">
+                  <h3 className="text-xl font-bold mb-2 text-gray-900">Organization Themes & Palettes</h3>
+                  <p className="text-gray-600 text-sm mb-6">
+                    Centralize your brand colors and themes. Team members can collaborate and ensure consistency across all reports.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-full text-gray-700">
+                      <Users className="w-3.5 h-3.5" />
+                      Team workspace
+                    </span>
+                  </div>
+                </div>
+                {/* Team Preview - Using Skeleton */}
+                <div className="hidden lg:block ml-6">
+                  <TeamSkeleton />
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Icons */}
+            <BentoCard className="p-4">
+              <div className="flex flex-col h-full">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">1,500+ Icons</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Professional icons for every metric and KPI.
+                </p>
+                {/* Actual Icons Preview */}
+                <div className="mt-2">
+                  <div className="grid grid-cols-6 gap-2 mb-3">
+                    {[TrendingUp, BarChart3, PieChart, Activity, Target, Zap, Shield, Globe, Database, GitBranch, Layers, Palette].map((Icon, i) => (
+                      <div key={i} className="bg-gray-50 rounded p-2 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                        <Icon className="w-4 h-4 text-gray-600" />
+                      </div>
+                    ))}
+                  </div>
+                  <Link 
+                    href="/icons" 
+                    className="text-xs text-gray-500 hover:text-gray-700 inline-flex items-center gap-1 transition-colors"
+                  >
+                    View all icons <ChevronRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Figma Design System */}
+            <BentoCard className="p-4">
+              <div className="flex flex-col h-full">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Figma Design System</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Complete UI kit for Power BI design.
+                </p>
+                {/* Figma Integration Preview - Using Skeleton */}
+                <div className="flex-grow">
+                  <FigmaIntegrationSkeleton />
+                </div>
+              </div>
+            </BentoCard>
+
+            {/* Templates */}
+            <BentoCard className="md:col-span-2 p-4">
+              <div className="flex flex-col h-full">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">55+ Example Reports</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Production-ready Power BI reports across industries.
+                </p>
+                {/* Mini Examples Preview */}
+                <div className="mt-2">
+                  <MiniExampleReports />
+                  <Link 
+                    href="/examples" 
+                    className="mt-3 text-xs text-gray-500 hover:text-gray-700 inline-flex items-center gap-1 transition-colors"
+                  >
+                    View all example reports <ChevronRight className="w-3 h-3" />
+                  </Link>
                 </div>
               </div>
             </BentoCard>
           </BentoGrid>
-        </div>
-      </section>
-
-      {/* Social Proof Bar */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 border-y border-gray-100">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap items-center justify-center gap-8 text-gray-400">
-            <span className="text-sm font-medium">Trusted by teams at</span>
-            {['Microsoft', 'Deloitte', 'PwC', 'EY', 'Accenture'].map((company) => (
-              <span key={company} className="text-gray-600 font-medium">{company}</span>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -336,24 +328,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Simple, One-Time Pricing
-            </h2>
-            <p className="text-xl text-gray-600">
-              No subscriptions. Pay once, use forever. 30-day money-back guarantee.
-            </p>
+      {/* Social Proof Bar */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 border-y border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-wrap items-center justify-center gap-8 text-gray-400">
+            <span className="text-sm font-medium">Trusted by teams at</span>
+            {['Microsoft', 'Deloitte', 'PwC', 'EY', 'Accenture'].map((company) => (
+              <span key={company} className="text-gray-600 font-medium">{company}</span>
+            ))}
           </div>
-          <PricingCards />
         </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <FAQSection />
       </section>
 
       {/* Testimonials - Simplified */}
@@ -390,6 +374,26 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Simple, One-Time Pricing
+            </h2>
+            <p className="text-xl text-gray-600">
+              No subscriptions. Pay once, use forever. 30-day money-back guarantee.
+            </p>
+          </div>
+          <PricingCards />
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <FAQSection />
+      </section>
+
       {/* Constant Improvements Section */}
       <ConstantImprovements />
 
@@ -404,10 +408,10 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/sign-up"
+              href="/pricing"
               className="inline-flex items-center bg-white text-gray-900 px-8 py-4 rounded-xl font-medium hover:bg-gray-100 transition-all"
             >
-              Get Started Free
+              Get Started
               <ArrowRightIcon className="ml-2 h-5 w-5" />
             </Link>
             <Link
