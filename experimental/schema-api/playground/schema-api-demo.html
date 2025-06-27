@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema API Demo - Power BI Theme Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .json-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+        }
+        .property-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto p-6 max-w-6xl">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Schema API Demo</h1>
+            <p class="text-gray-600">Build Power BI themes with the intelligent Schema API</p>
+            <div class="mt-4 flex items-center space-x-4 text-sm">
+                <span class="flex items-center text-green-600">
+                    <span class="w-2 h-2 bg-green-600 rounded-full mr-2"></span>
+                    API Connected
+                </span>
+                <span id="stats" class="text-gray-500"></span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6">
+            <!-- Left: Visual Selector -->
+            <div class="col-span-1">
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <h2 class="font-semibold mb-4">1. Select Visual</h2>
+                    <select id="visualSelect" class="w-full p-2 border rounded-lg" onchange="selectVisual(this.value)">
+                        <option value="">Choose a visual...</option>
+                    </select>
+                    
+                    <div id="visualInfo" class="mt-4 p-3 bg-gray-50 rounded hidden">
+                        <p class="text-sm font-medium">Properties: <span id="propCount">0</span></p>
+                    </div>
+                </div>
+
+                <!-- Theme Basics -->
+                <div class="bg-white rounded-lg shadow-sm p-4 mt-4">
+                    <h2 class="font-semibold mb-4">Theme Basics</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-sm text-gray-600">Theme Name</label>
+                            <input id="themeName" type="text" value="My Theme" class="w-full p-2 border rounded" onchange="updateTheme()">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Primary Color</label>
+                            <input id="primaryColor" type="color" value="#0078D4" class="w-full h-10 border rounded cursor-pointer" onchange="updateTheme()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center: Properties -->
+            <div class="col-span-1">
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <h2 class="font-semibold mb-4">2. Set Properties</h2>
+                    <div id="properties" class="space-y-3">
+                        <p class="text-gray-500 text-sm">Select a visual to see properties</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Generated Theme -->
+            <div class="col-span-1">
+                <div class="bg-white rounded-lg shadow-sm">
+                    <div class="p-4 border-b flex justify-between">
+                        <h2 class="font-semibold">3. Generated Theme</h2>
+                        <button onclick="copyTheme()" class="text-sm text-blue-600 hover:text-blue-700">Copy</button>
+                    </div>
+                    <div id="themeOutput" class="json-output p-4 rounded-b-lg h-96 overflow-auto">
+                        <pre>{
+  "name": "My Theme"
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Examples -->
+                <div class="bg-white rounded-lg shadow-sm p-4 mt-4">
+                    <h3 class="font-semibold mb-3">Quick Examples</h3>
+                    <div class="space-y-2">
+                        <button onclick="loadExample('card')" class="w-full text-left p-2 border rounded hover:bg-gray-50 text-sm">
+                            Card with Pink Background
+                        </button>
+                        <button onclick="loadExample('slicer')" class="w-full text-left p-2 border rounded hover:bg-gray-50 text-sm">
+                            Slicer with Blue Theme
+                        </button>
+                        <button onclick="loadExample('chart')" class="w-full text-left p-2 border rounded hover:bg-gray-50 text-sm">
+                            Chart with Dark Colors
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001';
+        let currentVisual = '';
+        let visualProperties = {};
+        let theme = {
+            name: 'My Theme'
+        };
+
+        // Initialize
+        async function init() {
+            try {
+                // Load stats
+                const statsRes = await fetch(`${API_URL}/api/stats`);
+                const stats = await statsRes.json();
+                document.getElementById('stats').textContent = `${stats.totalProperties} properties • ${stats.totalVisuals} visuals`;
+
+                // Load visuals
+                await loadVisuals();
+            } catch (error) {
+                console.error('Failed to initialize:', error);
+            }
+        }
+
+        // Load visual list
+        async function loadVisuals() {
+            try {
+                // Get stats to know available visuals
+                const statsRes = await fetch(`${API_URL}/api/stats`);
+                const stats = await statsRes.json();
+                
+                // Define the visuals we know have properties
+                const knownVisuals = [
+                    'card', 'slicer', 'barChart', 'columnChart', 'lineChart',
+                    'pieChart', 'donutChart', 'gauge', 'kpi', 'map',
+                    'tableEx', 'pivotTable', 'treemap', 'scatterChart',
+                    'multiRowCard', 'textbox', 'shape', 'image'
+                ];
+
+                const select = document.getElementById('visualSelect');
+                knownVisuals.forEach(visual => {
+                    const option = document.createElement('option');
+                    option.value = visual;
+                    option.textContent = formatVisualName(visual);
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Failed to load visuals:', error);
+            }
+        }
+
+        // Select a visual
+        async function selectVisual(visual) {
+            if (!visual) return;
+            
+            currentVisual = visual;
+            document.getElementById('visualInfo').classList.remove('hidden');
+            
+            try {
+                // Load properties for this visual
+                const res = await fetch(`${API_URL}/api/properties?visual=${visual}&limit=20`);
+                const data = await res.json();
+                
+                document.getElementById('propCount').textContent = data.total || data.results.length;
+                
+                // Display properties
+                const container = document.getElementById('properties');
+                container.innerHTML = '';
+                
+                // Show more diverse properties
+                const propertiesToShow = selectInterestingProperties(data.results);
+                propertiesToShow.forEach(prop => {
+                    const div = document.createElement('div');
+                    div.className = 'border rounded p-3 property-card transition-all';
+                    
+                    if (prop.category === 'color' || prop.path.includes('background') || prop.path.includes('border')) {
+                        // Color property
+                        div.innerHTML = `
+                            <label class="text-sm font-medium">${prop.title}</label>
+                            <p class="text-xs text-gray-600 mb-2">${prop.description || ''}</p>
+                            <input type="color" 
+                                   id="prop-${prop.id}" 
+                                   value="#FFFFFF" 
+                                   onchange="setProperty('${prop.id}', '${prop.path}', this.value)"
+                                   class="w-full h-8 border rounded cursor-pointer">
+                        `;
+                    } else if (prop.type === 'number') {
+                        // Number property
+                        div.innerHTML = `
+                            <label class="text-sm font-medium">${prop.title}</label>
+                            <p class="text-xs text-gray-600 mb-2">${prop.description || ''}</p>
+                            <input type="number" 
+                                   id="prop-${prop.id}" 
+                                   value="12" 
+                                   onchange="setProperty('${prop.id}', '${prop.path}', this.value)"
+                                   class="w-full p-1 border rounded">
+                        `;
+                    } else if (prop.type === 'boolean') {
+                        // Boolean property
+                        div.innerHTML = `
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" 
+                                       id="prop-${prop.id}" 
+                                       onchange="setProperty('${prop.id}', '${prop.path}', this.checked)"
+                                       class="rounded">
+                                <span class="text-sm font-medium">${prop.title}</span>
+                            </label>
+                            <p class="text-xs text-gray-600 mt-1">${prop.description || ''}</p>
+                        `;
+                    } else if (prop.type === 'string' || prop.path.includes('font') || prop.path.includes('text')) {
+                        // String/text property
+                        div.innerHTML = `
+                            <label class="text-sm font-medium">${prop.title}</label>
+                            <p class="text-xs text-gray-600 mb-2">${prop.description || ''}</p>
+                            <input type="text" 
+                                   id="prop-${prop.id}" 
+                                   value="${prop.path.includes('font') ? 'Arial' : ''}" 
+                                   onchange="setProperty('${prop.id}', '${prop.path}', this.value)"
+                                   placeholder="${prop.path.includes('font') ? 'Font family' : 'Enter text'}"
+                                   class="w-full p-1 border rounded">
+                        `;
+                    } else {
+                        // Generic property - show as text input
+                        div.innerHTML = `
+                            <label class="text-sm font-medium">${prop.title}</label>
+                            <p class="text-xs text-gray-600 mb-2">${prop.description || ''}</p>
+                            <input type="text" 
+                                   id="prop-${prop.id}" 
+                                   onchange="setProperty('${prop.id}', '${prop.path}', this.value)"
+                                   placeholder="Enter value"
+                                   class="w-full p-1 border rounded">
+                        `;
+                    }
+                    
+                    container.appendChild(div);
+                });
+
+                if (data.results.length > propertiesToShow.length) {
+                    const more = document.createElement('p');
+                    more.className = 'text-sm text-gray-500 text-center mt-3';
+                    more.textContent = `Showing ${propertiesToShow.length} of ${data.results.length} properties`;
+                    container.appendChild(more);
+                }
+            } catch (error) {
+                console.error('Failed to load properties:', error);
+            }
+        }
+
+        // Set property value
+        function setProperty(propId, propPath, value) {
+            const propName = propPath.split('.').pop();
+            
+            if (!visualProperties[currentVisual]) {
+                visualProperties[currentVisual] = {};
+            }
+            
+            // Format based on property type
+            let formatted;
+            if (propPath.includes('background') || propPath.includes('border') || propPath.includes('Color') || 
+                propPath.includes('color')) {
+                // Color properties need the color.solid.color structure
+                formatted = [{
+                    "color": {
+                        "solid": {
+                            "color": value
+                        }
+                    }
+                }];
+            } else if (propPath.includes('font') || propPath.includes('Family')) {
+                // Font properties
+                formatted = [{ "value": value }];
+            } else if (propPath.includes('size') || propPath.includes('width') || propPath.includes('height') ||
+                      propPath.includes('padding') || propPath.includes('spacing')) {
+                // Size properties
+                formatted = [{ "value": parseFloat(value) || 0 }];
+            } else if (typeof value === 'number') {
+                formatted = [{ "value": parseFloat(value) }];
+            } else if (typeof value === 'boolean') {
+                formatted = [{ "value": value }];
+            } else if (propPath.includes('show') || propPath.includes('enabled')) {
+                // Boolean-like properties
+                formatted = [{ "value": value === 'true' || value === true }];
+            } else {
+                // Default string formatting
+                formatted = [{ "value": value }];
+            }
+            
+            visualProperties[currentVisual][propName] = formatted;
+            updateTheme();
+        }
+
+        // Update theme JSON
+        function updateTheme() {
+            theme.name = document.getElementById('themeName').value;
+            theme.dataColors = [document.getElementById('primaryColor').value];
+            
+            if (Object.keys(visualProperties).length > 0) {
+                theme.visualStyles = {};
+                
+                for (const [visual, props] of Object.entries(visualProperties)) {
+                    if (Object.keys(props).length > 0) {
+                        theme.visualStyles[visual] = {
+                            "*": props
+                        };
+                    }
+                }
+            }
+            
+            document.getElementById('themeOutput').innerHTML = `<pre>${JSON.stringify(theme, null, 2)}</pre>`;
+        }
+
+        // Load example
+        function loadExample(type) {
+            visualProperties = {};
+            
+            switch (type) {
+                case 'card':
+                    document.getElementById('visualSelect').value = 'card';
+                    selectVisual('card');
+                    visualProperties.card = {
+                        background: [{
+                            "color": {
+                                "solid": {
+                                    "color": "#EC4899"
+                                }
+                            }
+                        }],
+                        border: [{
+                            "color": {
+                                "solid": {
+                                    "color": "#DB2777"
+                                }
+                            }
+                        }]
+                    };
+                    break;
+                    
+                case 'slicer':
+                    document.getElementById('visualSelect').value = 'slicer';
+                    selectVisual('slicer');
+                    visualProperties.slicer = {
+                        background: [{
+                            "color": {
+                                "solid": {
+                                    "color": "#EFF6FF"
+                                }
+                            }
+                        }],
+                        border: [{
+                            "color": {
+                                "solid": {
+                                    "color": "#3B82F6"
+                                }
+                            }
+                        }]
+                    };
+                    break;
+                    
+                case 'chart':
+                    document.getElementById('visualSelect').value = 'barChart';
+                    selectVisual('barChart');
+                    theme.dataColors = ['#1F2937', '#374151', '#4B5563', '#6B7280', '#9CA3AF'];
+                    break;
+            }
+            
+            updateTheme();
+        }
+
+        // Copy theme
+        function copyTheme() {
+            navigator.clipboard.writeText(JSON.stringify(theme, null, 2)).then(() => {
+                alert('Theme copied to clipboard!');
+            });
+        }
+
+        // Select interesting properties to show
+        function selectInterestingProperties(properties) {
+            const selected = [];
+            const categories = {
+                color: [],
+                text: [],
+                number: [],
+                boolean: [],
+                other: []
+            };
+            
+            // Categorize properties
+            properties.forEach(prop => {
+                if (prop.path.includes('background') || prop.path.includes('border') || 
+                    prop.path.includes('color') || prop.path.includes('Color')) {
+                    categories.color.push(prop);
+                } else if (prop.path.includes('font') || prop.path.includes('text') || 
+                          prop.path.includes('label') || prop.path.includes('title')) {
+                    categories.text.push(prop);
+                } else if (prop.type === 'number' || prop.path.includes('size') || 
+                          prop.path.includes('width') || prop.path.includes('height')) {
+                    categories.number.push(prop);
+                } else if (prop.type === 'boolean' || prop.path.includes('show') || 
+                          prop.path.includes('enabled')) {
+                    categories.boolean.push(prop);
+                } else {
+                    categories.other.push(prop);
+                }
+            });
+            
+            // Select diverse properties
+            if (categories.color.length > 0) selected.push(...categories.color.slice(0, 3));
+            if (categories.text.length > 0) selected.push(...categories.text.slice(0, 2));
+            if (categories.number.length > 0) selected.push(...categories.number.slice(0, 2));
+            if (categories.boolean.length > 0) selected.push(...categories.boolean.slice(0, 2));
+            if (categories.other.length > 0) selected.push(...categories.other.slice(0, 1));
+            
+            // Return up to 10 properties
+            return selected.slice(0, 10);
+        }
+
+        // Format visual name
+        function formatVisualName(name) {
+            return name
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^./, str => str.toUpperCase())
+                .trim();
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

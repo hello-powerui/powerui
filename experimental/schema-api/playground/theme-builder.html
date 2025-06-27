@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power BI Theme Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        .color-input {
+            width: 60px;
+            height: 40px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .json-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .property-valid { border-color: #10b981; }
+        .property-invalid { border-color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div x-data="themeBuilder()" x-init="init()" class="container mx-auto p-6 max-w-7xl">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Power BI Theme Builder</h1>
+            <p class="text-gray-600">Build valid Power BI themes with schema validation</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left: Theme Builder -->
+            <div class="space-y-6">
+                <!-- Basic Settings -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Basic Settings</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Theme Name</label>
+                            <input 
+                                type="text" 
+                                x-model="theme.name"
+                                @input="updateTheme()"
+                                class="w-full p-2 border rounded-lg"
+                                placeholder="My Custom Theme"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Colors -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Data Colors</h2>
+                    <div class="grid grid-cols-4 gap-3 mb-4">
+                        <template x-for="(color, index) in theme.dataColors" :key="index">
+                            <div class="relative">
+                                <input 
+                                    type="color" 
+                                    :value="color"
+                                    @input="theme.dataColors[index] = $event.target.value; updateTheme()"
+                                    class="color-input w-full"
+                                >
+                                <div class="text-xs text-center mt-1 font-mono" x-text="color"></div>
+                                <button 
+                                    @click="removeDataColor(index)"
+                                    class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs hover:bg-red-600"
+                                >×</button>
+                            </div>
+                        </template>
+                    </div>
+                    <button 
+                        @click="addDataColor()"
+                        class="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400"
+                    >+ Add Color</button>
+                </div>
+
+                <!-- Page Settings -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Page Settings</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Page Background (outspace)
+                                <span class="text-xs text-gray-500 ml-2">The area outside report pages</span>
+                            </label>
+                            <div class="flex items-center space-x-2">
+                                <input 
+                                    type="color" 
+                                    x-model="pageSettings.outspaceColor"
+                                    @input="updatePageSettings()"
+                                    class="color-input"
+                                >
+                                <input 
+                                    type="text" 
+                                    x-model="pageSettings.outspaceColor"
+                                    @input="updatePageSettings()"
+                                    class="flex-1 p-2 border rounded-lg font-mono text-sm"
+                                    placeholder="#84CC16"
+                                >
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Page Background Color
+                                <span class="text-xs text-gray-500 ml-2">The actual page background</span>
+                            </label>
+                            <div class="flex items-center space-x-2">
+                                <input 
+                                    type="color" 
+                                    x-model="pageSettings.backgroundColor"
+                                    @input="updatePageSettings()"
+                                    class="color-input"
+                                >
+                                <input 
+                                    type="text" 
+                                    x-model="pageSettings.backgroundColor"
+                                    @input="updatePageSettings()"
+                                    class="flex-1 p-2 border rounded-lg font-mono text-sm"
+                                    placeholder="#FFFFFF"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Styles -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Visual Styles</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Select Visual Type</label>
+                            <select 
+                                x-model="selectedVisual"
+                                @change="loadVisualProperties()"
+                                class="w-full p-2 border rounded-lg"
+                            >
+                                <option value="">Choose a visual to customize</option>
+                                <option value="card">Card</option>
+                                <option value="slicer">Slicer</option>
+                                <option value="table">Table</option>
+                                <option value="matrix">Matrix</option>
+                                <option value="barChart">Bar Chart</option>
+                                <option value="columnChart">Column Chart</option>
+                                <option value="lineChart">Line Chart</option>
+                                <option value="pieChart">Pie Chart</option>
+                            </select>
+                        </div>
+
+                        <!-- Common Visual Properties -->
+                        <div x-show="selectedVisual" class="space-y-3">
+                            <h3 class="font-medium text-sm text-gray-700">Common Properties</h3>
+                            
+                            <!-- Background -->
+                            <div>
+                                <label class="text-xs text-gray-600">Background Color</label>
+                                <div class="flex items-center space-x-2">
+                                    <input 
+                                        type="color"
+                                        x-model="visualProperties.background"
+                                        @input="updateVisualProperty('background', $event.target.value)"
+                                        class="color-input"
+                                    >
+                                    <input 
+                                        type="text"
+                                        x-model="visualProperties.background"
+                                        @input="updateVisualProperty('background', $event.target.value)"
+                                        class="flex-1 p-1 border rounded text-sm font-mono"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Border -->
+                            <div>
+                                <label class="text-xs text-gray-600">Border Color</label>
+                                <div class="flex items-center space-x-2">
+                                    <input 
+                                        type="color"
+                                        x-model="visualProperties.border"
+                                        @input="updateVisualProperty('border', $event.target.value)"
+                                        class="color-input"
+                                    >
+                                    <input 
+                                        type="text"
+                                        x-model="visualProperties.border"
+                                        @input="updateVisualProperty('border', $event.target.value)"
+                                        class="flex-1 p-1 border rounded text-sm font-mono"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Font Color -->
+                            <div>
+                                <label class="text-xs text-gray-600">Font Color</label>
+                                <div class="flex items-center space-x-2">
+                                    <input 
+                                        type="color"
+                                        x-model="visualProperties.fontColor"
+                                        @input="updateVisualProperty('fontColor', $event.target.value)"
+                                        class="color-input"
+                                    >
+                                    <input 
+                                        type="text"
+                                        x-model="visualProperties.fontColor"
+                                        @input="updateVisualProperty('fontColor', $event.target.value)"
+                                        class="flex-1 p-1 border rounded text-sm font-mono"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Font Size -->
+                            <div>
+                                <label class="text-xs text-gray-600">Font Size</label>
+                                <input 
+                                    type="number"
+                                    x-model="visualProperties.fontSize"
+                                    @input="updateVisualProperty('fontSize', parseInt($event.target.value))"
+                                    class="w-full p-1 border rounded text-sm"
+                                    min="8"
+                                    max="32"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Generated Theme -->
+            <div class="space-y-6">
+                <!-- Theme JSON -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">Generated Theme JSON</h2>
+                        <button 
+                            @click="copyTheme()"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                        >
+                            Copy JSON
+                        </button>
+                    </div>
+                    <div class="json-output p-4 rounded-lg overflow-x-auto max-h-[600px] overflow-y-auto">
+                        <pre x-text="generatedTheme"></pre>
+                    </div>
+                </div>
+
+                <!-- Validation Results -->
+                <div x-show="validation.errors.length > 0 || validation.warnings.length > 0" 
+                     class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Validation</h2>
+                    
+                    <div x-show="validation.errors.length > 0" class="mb-4">
+                        <h3 class="text-sm font-medium text-red-600 mb-2">Errors</h3>
+                        <ul class="space-y-1">
+                            <template x-for="error in validation.errors">
+                                <li class="text-sm text-red-600">• <span x-text="error"></span></li>
+                            </template>
+                        </ul>
+                    </div>
+                    
+                    <div x-show="validation.warnings.length > 0">
+                        <h3 class="text-sm font-medium text-yellow-600 mb-2">Warnings</h3>
+                        <ul class="space-y-1">
+                            <template x-for="warning in validation.warnings">
+                                <li class="text-sm text-yellow-600">• <span x-text="warning"></span></li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Quick Actions</h2>
+                    <div class="space-y-3">
+                        <button 
+                            @click="loadPreset('light')"
+                            class="w-full py-2 px-4 border rounded-lg hover:bg-gray-50"
+                        >Load Light Theme Preset</button>
+                        <button 
+                            @click="loadPreset('dark')"
+                            class="w-full py-2 px-4 border rounded-lg hover:bg-gray-50"
+                        >Load Dark Theme Preset</button>
+                        <button 
+                            @click="loadPreset('colorful')"
+                            class="w-full py-2 px-4 border rounded-lg hover:bg-gray-50"
+                        >Load Colorful Theme Preset</button>
+                        <button 
+                            @click="resetTheme()"
+                            class="w-full py-2 px-4 border border-red-300 text-red-600 rounded-lg hover:bg-red-50"
+                        >Reset Theme</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function themeBuilder() {
+            return {
+                apiUrl: 'http://localhost:3001',
+                
+                // Theme data
+                theme: {
+                    name: 'My Custom Theme',
+                    dataColors: [
+                        '#2568E8',
+                        '#8338EC',
+                        '#FF006E',
+                        '#F95608',
+                        '#FFBE0C',
+                        '#2ACF56'
+                    ]
+                },
+                
+                // Page settings
+                pageSettings: {
+                    outspaceColor: '#F3F4F6',
+                    backgroundColor: '#FFFFFF'
+                },
+                
+                // Visual customization
+                selectedVisual: '',
+                visualProperties: {
+                    background: '',
+                    border: '',
+                    fontColor: '',
+                    fontSize: 12
+                },
+                visualStyles: {},
+                
+                // Generated theme
+                generatedTheme: '{}',
+                
+                // Validation
+                validation: {
+                    errors: [],
+                    warnings: []
+                },
+                
+                init() {
+                    this.updateTheme();
+                },
+                
+                updateTheme() {
+                    const theme = {
+                        name: this.theme.name,
+                        dataColors: this.theme.dataColors
+                    };
+                    
+                    // Add visual styles if any
+                    if (Object.keys(this.visualStyles).length > 0 || this.pageSettings.outspaceColor || this.pageSettings.backgroundColor) {
+                        theme.visualStyles = {};
+                        
+                        // Add page settings
+                        if (this.pageSettings.outspaceColor || this.pageSettings.backgroundColor) {
+                            theme.visualStyles.page = {
+                                "*": {}
+                            };
+                            
+                            if (this.pageSettings.outspaceColor) {
+                                theme.visualStyles.page["*"].outspace = [{
+                                    "color": {
+                                        "solid": {
+                                            "color": this.pageSettings.outspaceColor
+                                        }
+                                    }
+                                }];
+                            }
+                            
+                            if (this.pageSettings.backgroundColor) {
+                                theme.visualStyles.page["*"].background = [{
+                                    "color": {
+                                        "solid": {
+                                            "color": this.pageSettings.backgroundColor
+                                        }
+                                    }
+                                }];
+                            }
+                        }
+                        
+                        // Add other visual styles
+                        Object.assign(theme.visualStyles, this.visualStyles);
+                    }
+                    
+                    this.generatedTheme = JSON.stringify(theme, null, 2);
+                    this.validateTheme(theme);
+                },
+                
+                updatePageSettings() {
+                    this.updateTheme();
+                },
+                
+                addDataColor() {
+                    this.theme.dataColors.push('#000000');
+                    this.updateTheme();
+                },
+                
+                removeDataColor(index) {
+                    this.theme.dataColors.splice(index, 1);
+                    this.updateTheme();
+                },
+                
+                loadVisualProperties() {
+                    // Reset properties when changing visual
+                    this.visualProperties = {
+                        background: '',
+                        border: '',
+                        fontColor: '',
+                        fontSize: 12
+                    };
+                },
+                
+                updateVisualProperty(property, value) {
+                    if (!this.selectedVisual) return;
+                    
+                    // Initialize visual styles if needed
+                    if (!this.visualStyles[this.selectedVisual]) {
+                        this.visualStyles[this.selectedVisual] = { "*": {} };
+                    }
+                    
+                    // Format the property value based on type
+                    let formattedValue;
+                    
+                    if (property.includes('Color') || property === 'background' || property === 'border') {
+                        // Color properties
+                        formattedValue = [{
+                            "solid": {
+                                "color": value
+                            }
+                        }];
+                    } else if (property === 'fontSize') {
+                        // Numeric properties
+                        formattedValue = [{ "value": value }];
+                    } else {
+                        // String properties
+                        formattedValue = [{ "value": value }];
+                    }
+                    
+                    // Only add if value is not empty
+                    if (value) {
+                        this.visualStyles[this.selectedVisual]["*"][property] = formattedValue;
+                    } else {
+                        delete this.visualStyles[this.selectedVisual]["*"][property];
+                    }
+                    
+                    // Clean up empty visual styles
+                    if (Object.keys(this.visualStyles[this.selectedVisual]["*"]).length === 0) {
+                        delete this.visualStyles[this.selectedVisual];
+                    }
+                    
+                    this.updateTheme();
+                },
+                
+                validateTheme(theme) {
+                    this.validation.errors = [];
+                    this.validation.warnings = [];
+                    
+                    // Basic validation
+                    if (!theme.name || theme.name.trim() === '') {
+                        this.validation.errors.push('Theme name is required');
+                    }
+                    
+                    // Validate colors
+                    if (theme.dataColors) {
+                        theme.dataColors.forEach((color, index) => {
+                            if (!this.isValidColor(color)) {
+                                this.validation.errors.push(`Data color ${index + 1} is not a valid hex color`);
+                            }
+                        });
+                    }
+                    
+                    // More validation could be added here using the Schema API
+                },
+                
+                isValidColor(color) {
+                    return /^#[0-9A-F]{6}$/i.test(color);
+                },
+                
+                copyTheme() {
+                    navigator.clipboard.writeText(this.generatedTheme).then(() => {
+                        alert('Theme JSON copied to clipboard!');
+                    });
+                },
+                
+                loadPreset(preset) {
+                    switch (preset) {
+                        case 'light':
+                            this.theme.name = 'Light Professional';
+                            this.theme.dataColors = ['#0078D4', '#40E0D0', '#107C10', '#FFB900', '#D83B01', '#5C2D91'];
+                            this.pageSettings.outspaceColor = '#F3F4F6';
+                            this.pageSettings.backgroundColor = '#FFFFFF';
+                            break;
+                            
+                        case 'dark':
+                            this.theme.name = 'Dark Mode';
+                            this.theme.dataColors = ['#00BCF2', '#00D4A3', '#FFB900', '#FF6900', '#E3008C', '#5C2D91'];
+                            this.pageSettings.outspaceColor = '#1E1E1E';
+                            this.pageSettings.backgroundColor = '#2D2D30';
+                            break;
+                            
+                        case 'colorful':
+                            this.theme.name = 'Vibrant';
+                            this.theme.dataColors = ['#FF006E', '#8338EC', '#3A86FF', '#06FFA5', '#FFBE0B', '#FB5607'];
+                            this.pageSettings.outspaceColor = '#FFF3E0';
+                            this.pageSettings.backgroundColor = '#FFFBF5';
+                            break;
+                    }
+                    
+                    this.visualStyles = {};
+                    this.updateTheme();
+                },
+                
+                resetTheme() {
+                    this.theme = {
+                        name: 'My Custom Theme',
+                        dataColors: ['#2568E8']
+                    };
+                    this.pageSettings = {
+                        outspaceColor: '',
+                        backgroundColor: ''
+                    };
+                    this.visualStyles = {};
+                    this.selectedVisual = '';
+                    this.updateTheme();
+                }
+            };
+        }
+    </script>
+</body>
+</html>
