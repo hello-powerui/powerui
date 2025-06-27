@@ -137,7 +137,7 @@ export function PageSettingsPanel({
         <CollapsibleSection
           title="Default Settings"
           tooltip="Core page configuration and general settings"
-          defaultOpen={true}
+          defaultOpen={false}
           hasChanges={getChangedPropertiesCount([...basePath, '*', '*']) > 0}
           indicatorCount={getChangedPropertiesCount([...basePath, '*', '*'])}
           onClear={hasActualContent(starValue['*']) ? () => handleClearSection('*') : undefined}

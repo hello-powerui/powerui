@@ -70,7 +70,7 @@ export async function POST(req: Request) {
           lastName: last_name || undefined,
           userId: id,
           plan: user?.plan || undefined,
-          userGroup: user?.plan === 'TEAM' ? 'team' : user?.plan === 'PRO' ? 'pro' : undefined
+          userGroup: user?.plan === 'TEAM' ? 'Team Customer' : user?.plan === 'PRO' ? 'Pro Customer' : 'Free User'
         })
         
       } catch (error) {

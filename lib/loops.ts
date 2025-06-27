@@ -17,18 +17,45 @@ export async function createOrUpdateContact(contact: LoopsContact) {
     // Build the contact properties object, only including defined values
     const contactProperties: Record<string, string | number | boolean | null> = {
       source: contact.source || "app",
+      lastUpdated: new Date().toISOString(),
     };
 
     // Only add properties if they're defined
     if (contact.firstName !== undefined) contactProperties.firstName = contact.firstName;
     if (contact.lastName !== undefined) contactProperties.lastName = contact.lastName;
-    if (contact.userGroup !== undefined) contactProperties.userGroup = contact.userGroup;
     if (contact.userId !== undefined) contactProperties.userId = contact.userId;
-    if (contact.plan !== undefined) contactProperties.plan = contact.plan;
-
-    const response = await loops.createContact(contact.email, contactProperties);
     
-    return { success: true, data: response };
+    // Updated plan logic - use empty string for free users
+    if (contact.plan !== undefined) {
+      contactProperties.plan = contact.plan === 'PRO' || contact.plan === 'TEAM' ? contact.plan : '';
+    }
+    
+    // Updated userGroup logic to match our migration
+    if (contact.userGroup !== undefined) {
+      contactProperties.userGroup = contact.userGroup;
+    } else if (contact.plan) {
+      // Auto-determine userGroup based on plan
+      if (contact.plan === 'TEAM') {
+        contactProperties.userGroup = 'Team Customer';
+      } else if (contact.plan === 'PRO') {
+        contactProperties.userGroup = 'Pro Customer';
+      } else {
+        contactProperties.userGroup = 'Free User';
+      }
+    }
+
+    // Try to update first, create if it fails
+    try {
+      const response = await loops.updateContact(contact.email, contactProperties);
+      return { success: true, data: response };
+    } catch (error: any) {
+      // If update fails because contact doesn't exist, create it
+      if (error.message?.includes('not found') || error.message?.includes('does not exist')) {
+        const response = await loops.createContact(contact.email, contactProperties);
+        return { success: true, data: response };
+      }
+      throw error;
+    }
   } catch (error) {
     console.error("Error creating/updating Loops contact:", error);
     return { success: false, error };
@@ -37,10 +64,20 @@ export async function createOrUpdateContact(contact: LoopsContact) {
 
 export async function updateContactPlan(email: string, plan: string) {
   try {
-    const userGroup = plan === 'TEAM' ? 'team' : 'pro';
+    // Determine user group based on plan
+    let userGroup: string;
+    if (plan === 'TEAM') {
+      userGroup = 'Team Customer';
+    } else if (plan === 'PRO') {
+      userGroup = 'Pro Customer';
+    } else {
+      userGroup = 'Free User';
+    }
+    
     const response = await loops.updateContact(email, { 
-      plan,
-      userGroup 
+      plan: plan === 'PRO' || plan === 'TEAM' ? plan : '',
+      userGroup,
+      lastUpdated: new Date().toISOString()
     });
     return { success: true, data: response };
   } catch (error) {
