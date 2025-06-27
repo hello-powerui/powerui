@@ -302,7 +302,7 @@ export function TypographyTab() {
               title={name}
               tooltip={`${description} - Used in: ${usage}`}
               defaultOpen={false}
-              hasChanges={hasCustomization}
+              hasContent={hasCustomization}
               onClear={() => {
                 // Clear this specific text class
                 const updatedTextClasses = { ...textClasses } as any;

@@ -19,8 +19,6 @@ interface VisualPropertySectionProps {
   schemaLoader: SchemaLoader;
   path: string[];
   level: number;
-  hasChanges: boolean;
-  changedCount: number;
 }
 
 export function VisualPropertySection({
@@ -31,9 +29,7 @@ export function VisualPropertySection({
   onChange,
   schemaLoader,
   path,
-  level,
-  hasChanges,
-  changedCount
+  level
 }: VisualPropertySectionProps) {
   const trackChangeRef = useThemeChanges(state => state.trackChange);
   
@@ -59,8 +55,6 @@ export function VisualPropertySection({
       id={`${path.join('-')}-${name}`}
       title={title}
       defaultOpen={false}
-      hasChanges={sectionHasContent}
-      changedCount={changedCount}
       onClear={handleSectionReset}
       hasContent={sectionHasContent}
       clearMessage={`Clear all ${title.toLowerCase()} settings? This will remove any customizations and use default values.`}

@@ -22,8 +22,6 @@ interface CollapsibleSectionProps {
   badge?: string | number;
   className?: string;
   headerAction?: React.ReactNode;
-  hasChanges?: boolean;
-  changedCount?: number;
   onClear?: () => void;
   clearMessage?: string;
   hasContent?: boolean;
@@ -39,8 +37,6 @@ export function CollapsibleSection({
   badge,
   className = "",
   headerAction,
-  hasChanges = false,
-  changedCount,
   onClear,
   clearMessage = 'Clear all settings in this section?',
   hasContent = true
@@ -49,11 +45,6 @@ export function CollapsibleSection({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  
-  // Force re-render when props change
-  useEffect(() => {
-    // This will help debug if the component is receiving prop updates
-  }, [hasChanges, title]);
 
   const handleClear = () => {
     onClear?.();
@@ -90,8 +81,8 @@ export function CollapsibleSection({
             <h3 className={`${THEME_STUDIO_TYPOGRAPHY.sectionHeader.size} text-gray-800 ${
               isOpen ? THEME_STUDIO_TYPOGRAPHY.sectionHeader.weightExpanded : THEME_STUDIO_TYPOGRAPHY.sectionHeader.weight
             }`}>{title}</h3>
-            {hasChanges && (
-              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" title={`${changedCount || ''} ${changedCount === 1 ? 'change' : 'changes'}`} />
+            {hasContent && onClear && (
+              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" title="This section has content" />
             )}
             {badge !== undefined && (
               <span className={`px-1.5 py-0.5 ${THEME_STUDIO_TYPOGRAPHY.metadata.size} ${THEME_STUDIO_TYPOGRAPHY.metadata.color}`}>

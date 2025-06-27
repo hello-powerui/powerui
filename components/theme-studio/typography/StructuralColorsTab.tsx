@@ -161,7 +161,7 @@ export function StructuralColorsTab() {
               tooltip={description}
               defaultOpen={false}
               badge={colors.length}
-              hasChanges={hasCustomColors}
+              hasContent={hasCustomColors}
               onClear={() => {
                 // Clear all colors in this group
                 const updatedColors = { ...structuralColors } as any;

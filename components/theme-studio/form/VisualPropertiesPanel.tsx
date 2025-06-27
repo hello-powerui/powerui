@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
-import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 import { formatGroupTitle, getImportantSections } from '@/lib/theme-studio/utils/schema-form-utils';
 import { TAB_TYPES } from '@/lib/theme-studio/utils/schema-form-constants';
 import { VisualPropertySection } from './VisualPropertySection';
@@ -11,6 +10,10 @@ import { customVisualComponents } from './custom-visuals';
 import { THEME_STUDIO_TYPOGRAPHY } from '../constants/typography';
 import { VisualStates } from './VisualStates';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
+import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
+import { CollapsibleSection } from '../ui/collapsible-section';
+import { SchemaField } from './fields';
+import { StateAwarePropertySection } from './fields/StateAwarePropertySection';
 
 interface VisualPropertiesPanelProps {
   schema: SchemaProperty;
@@ -30,10 +33,10 @@ export function VisualPropertiesPanel({
   level 
 }: VisualPropertiesPanelProps) {
   const [activeTab, setActiveTab] = useState<'specific' | 'general'>(TAB_TYPES.SPECIFIC);
-  const hasChangesInSection = useThemeChanges(state => state.hasChangesInSection);
-  const getChangedPropertiesCount = useThemeChanges(state => state.getChangedPropertiesCount);
   const selectedState = useThemeStudioStore(state => state.selectedState);
   const setSelectedState = useThemeStudioStore(state => state.setSelectedState);
+  const hasChangesInSection = useThemeChanges(state => state.hasChangesInSection);
+  const getChangedPropertiesCount = useThemeChanges(state => state.getChangedPropertiesCount);
   
   // Check if we have a custom component for this visual type
   // The path structure can be:
@@ -60,6 +63,154 @@ export function VisualPropertiesPanel({
         level={level}
       />
     );
+  }
+  
+  // Handle canvas types (page, report, filter) specially
+  const isCanvasType = ['page', 'report', 'filter'].includes(visualType);
+  
+  // Define sections for page properties
+  const pageSections = [
+    { key: '*', title: 'Default Settings', propertyKey: '*' },
+    { key: 'background', title: 'Page Background', propertyKey: 'background' },
+    { key: 'displayArea', title: 'Page Alignment', propertyKey: 'displayArea' },
+    { key: 'filterCard', title: 'Filter Cards', propertyKey: 'filterCard' },
+    { key: 'outspace', title: 'Wallpaper', propertyKey: 'outspace' },
+    { key: 'outspacePane', title: 'Filter Pane', propertyKey: 'outspacePane' },
+    { key: 'pageInformation', title: 'Page Information', propertyKey: 'pageInformation' },
+    { key: 'pageRefresh', title: 'Page Refresh', propertyKey: 'pageRefresh' },
+    { key: 'pageSize', title: 'Canvas Settings', propertyKey: 'pageSize' },
+    { key: 'personalizeVisual', title: 'Personalize Visual', propertyKey: 'personalizeVisual' }
+  ];
+  
+  // Handle canvas types with single allOf element
+  if (isCanvasType && schema.allOf && schema.allOf.length === 1) {
+    const canvasSchema = schema.allOf[0];
+    let properties = canvasSchema.properties;
+    
+    // Resolve reference if needed
+    if (canvasSchema.$ref) {
+      const resolved = schemaLoader.resolveRef(canvasSchema.$ref);
+      if (resolved?.properties) {
+        properties = resolved.properties;
+      }
+    }
+    
+    // Special handling for page type with collapsible sections
+    if (visualType === 'page' && properties) {
+      return (
+        <div className="space-y-2">
+          {pageSections.map((section) => {
+            const prop = properties[section.propertyKey];
+            if (!prop) return null;
+            
+            const propPath = [...path, 'allOf', '0', 'properties', section.propertyKey];
+            const propValue = value?.['*']?.[section.propertyKey];
+            const changeCount = getChangedPropertiesCount(propPath);
+            // Check if this property has state-driven options (has $id in items.properties)
+            const hasStateOptions = prop.type === 'array' && prop.items?.properties?.$id;
+            
+            return (
+              <CollapsibleSection
+                key={section.key}
+                title={section.title}
+                defaultOpen={section.key === '*'}
+                className="bg-muted/50"
+                indicatorCount={changeCount > 0 ? changeCount : undefined}
+              >
+                {hasStateOptions ? (
+                  <StateAwarePropertySection
+                    property={prop}
+                    path={propPath}
+                    value={propValue}
+                    onChange={(newValue) => {
+                      const updatedValue = {
+                        ...value,
+                        '*': {
+                          ...value?.['*'],
+                          [section.propertyKey]: newValue
+                        }
+                      }
+                      onChange(updatedValue);
+                    }}
+                    schema={schema}
+                  />
+                ) : (
+                  <SchemaField
+                    schema={prop}
+                    path={propPath}
+                    value={propValue}
+                    onChange={(newValue) => {
+                      const updatedValue = {
+                        ...value,
+                        '*': {
+                          ...value?.['*'],
+                          [section.propertyKey]: newValue
+                        }
+                      }
+                      onChange(updatedValue);
+                    }}
+                    parentPath={path}
+                  />
+                )}
+              </CollapsibleSection>
+            );
+          })}
+        </div>
+      );
+    }
+    
+    // Default handling for other canvas types (report, filter)
+    if (properties) {
+      return (
+        <div className="space-y-4">
+          {Object.entries(properties).map(([key, prop]) => {
+            const propPath = [...path, 'allOf', '0', 'properties', key];
+            // Check if this property has state-driven options (has $id in items.properties)
+            const hasStateOptions = prop.type === 'array' && prop.items?.properties?.$id;
+            
+            return (
+              <div key={key}>
+                {hasStateOptions ? (
+                  <StateAwarePropertySection
+                    property={prop}
+                    path={propPath}
+                    value={value?.['*']?.[key]}
+                    onChange={(newValue) => {
+                      const updatedValue = {
+                        ...value,
+                        '*': {
+                          ...value?.['*'],
+                          [key]: newValue
+                        }
+                      }
+                      onChange(updatedValue);
+                    }}
+                    schema={schema}
+                  />
+                ) : (
+                  <SchemaField
+                    schema={prop}
+                    path={propPath}
+                    value={value?.['*']?.[key]}
+                    onChange={(newValue) => {
+                      const updatedValue = {
+                        ...value,
+                        '*': {
+                          ...value?.['*'],
+                          [key]: newValue
+                        }
+                      }
+                      onChange(updatedValue);
+                    }}
+                    parentPath={path}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
   }
   
   // For visual definitions, we want to process both commonCards and visual-specific properties
@@ -213,8 +364,6 @@ export function VisualPropertiesPanel({
                       schemaLoader={schemaLoader}
                       path={path}
                       level={level}
-                      hasChanges={hasChangesInSection([...path, name])}
-                      changedCount={getChangedPropertiesCount([...path, name])}
                     />
                   ))}
                 </div>

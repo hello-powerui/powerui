@@ -70,11 +70,17 @@ export function CanvasLayoutSection({
               hasContent={hasActualContent(visualSettings.report?.['*'])}
             >
               <SchemaForm
-                schema={schemaLoader?.getVisualSchema('report')?.properties?.['*'] || {}}
-                value={visualSettings.report?.['*'] || {}}
-                onChange={createCanvasChangeHandler('report')}
+                schema={schemaLoader?.getVisualSchema('report') || {}}
+                value={visualSettings.report || {}}
+                onChange={(value: any) => {
+                  onVisualSettingsChange({
+                    ...visualSettings,
+                    report: value
+                  });
+                  trackChange(['visualStyles', 'report']);
+                }}
                 schemaLoader={schemaLoader}
-                path={['visualStyles', 'report', '*']}
+                path={['visualStyles', 'report']}
               />
             </CollapsibleSection>
           )}
@@ -90,11 +96,17 @@ export function CanvasLayoutSection({
               hasContent={hasActualContent(visualSettings.page?.['*'])}
             >
               <SchemaForm
-                schema={schemaLoader?.getVisualSchema('page')?.properties?.['*'] || {}}
-                value={visualSettings.page?.['*'] || {}}
-                onChange={createCanvasChangeHandler('page')}
+                schema={schemaLoader?.getVisualSchema('page') || {}}
+                value={visualSettings.page || {}}
+                onChange={(value: any) => {
+                  onVisualSettingsChange({
+                    ...visualSettings,
+                    page: value
+                  });
+                  trackChange(['visualStyles', 'page']);
+                }}
                 schemaLoader={schemaLoader}
-                path={['visualStyles', 'page', '*']}
+                path={['visualStyles', 'page']}
               />
             </CollapsibleSection>
           )}
@@ -110,11 +122,17 @@ export function CanvasLayoutSection({
               hasContent={hasActualContent(visualSettings.filter?.['*'])}
             >
               <SchemaForm
-                schema={schemaLoader?.getVisualSchema('filter')?.properties?.['*'] || {}}
-                value={visualSettings.filter?.['*'] || {}}
-                onChange={createCanvasChangeHandler('filter')}
+                schema={schemaLoader?.getVisualSchema('filter') || {}}
+                value={visualSettings.filter || {}}
+                onChange={(value: any) => {
+                  onVisualSettingsChange({
+                    ...visualSettings,
+                    filter: value
+                  });
+                  trackChange(['visualStyles', 'filter']);
+                }}
                 schemaLoader={schemaLoader}
-                path={['visualStyles', 'filter', '*']}
+                path={['visualStyles', 'filter']}
               />
             </CollapsibleSection>
           )}

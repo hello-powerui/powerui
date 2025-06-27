@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
-import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { CollapsibleSection } from '../../ui/collapsible-section';
 import { StateAwarePropertySection } from '../fields/StateAwarePropertySection';
@@ -29,8 +28,6 @@ export function ActionButtonVisual({
   level
 }: ActionButtonVisualProps) {
   const [activeTab, setActiveTab] = useState<'specific' | 'general'>(TAB_TYPES.SPECIFIC);
-  const hasChangesInSection = useThemeChanges(state => state.hasChangesInSection);
-  const getChangedPropertiesCount = useThemeChanges(state => state.getChangedPropertiesCount);
   const globalSelectedState = useThemeStudioStore(state => state.selectedState) || 'default';
   const setSelectedState = useThemeStudioStore(state => state.setSelectedState);
   
@@ -239,8 +236,6 @@ export function ActionButtonVisual({
                     id={`${path.join('-')}-fill`}
                     title="Fill Properties"
                     defaultOpen={false}
-                    hasChanges={hasChangesInSection([...path, 'fill'])}
-                    changedCount={getChangedPropertiesCount([...path, 'fill'])}
                     onClear={() => onChange({ ...value, fill: undefined })}
                     hasContent={value?.fill !== undefined}
                     clearMessage="Clear all fill properties?"
@@ -264,8 +259,6 @@ export function ActionButtonVisual({
                     id={`${path.join('-')}-text`}
                     title="Text Properties"
                     defaultOpen={false}
-                    hasChanges={hasChangesInSection([...path, 'text'])}
-                    changedCount={getChangedPropertiesCount([...path, 'text'])}
                     onClear={() => onChange({ ...value, text: undefined })}
                     hasContent={value?.text !== undefined}
                     clearMessage="Clear all text properties?"
@@ -316,8 +309,6 @@ export function ActionButtonVisual({
                       id={`${path.join('-')}-${propName}`}
                       title={propSchema.title || formatGroupTitle(propName)}
                       defaultOpen={false}
-                      hasChanges={hasChangesInSection([...path, propName])}
-                      changedCount={getChangedPropertiesCount([...path, propName])}
                       onClear={() => onChange({ ...value, [propName]: undefined })}
                       hasContent={value?.[propName] !== undefined}
                       clearMessage={`Clear all ${propSchema.title || formatGroupTitle(propName)} properties?`}
@@ -352,8 +343,6 @@ export function ActionButtonVisual({
                       id={`${path.join('-')}-${propName}`}
                       title={propSchema.title || formatGroupTitle(propName)}
                       defaultOpen={false}
-                      hasChanges={hasChangesInSection([...path, propName])}
-                      changedCount={getChangedPropertiesCount([...path, propName])}
                       onClear={() => onChange({ ...value, [propName]: undefined })}
                       hasContent={value?.[propName] !== undefined}
                       clearMessage={`Clear all ${propSchema.title || formatGroupTitle(propName)} properties?`}
@@ -399,8 +388,6 @@ export function ActionButtonVisual({
                       id={`${path.join('-')}-${propName}`}
                       title={propSchema.title || formatGroupTitle(propName)}
                       defaultOpen={false}
-                      hasChanges={hasChangesInSection([...path, propName])}
-                      changedCount={getChangedPropertiesCount([...path, propName])}
                       onClear={() => onChange({ ...value, [propName]: undefined })}
                       hasContent={value?.[propName] !== undefined}
                       clearMessage={`Clear all ${propSchema.title || formatGroupTitle(propName)} properties?`}

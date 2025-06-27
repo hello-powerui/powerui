@@ -212,7 +212,7 @@ export function GlobalPropertySelector({
                   key={key}
                   title={sectionTitle}
                   defaultOpen={false}
-                  hasChanges={hasContent}
+                  hasContent={hasContent}
                   onClear={() => {
                     // Clear this structured property
                     if (onVisualStylesChange) {
@@ -353,16 +353,15 @@ export function GlobalPropertySelector({
             if (!schema) return null;
             
             const sectionSchema = schema as any;
-            const hasChanges = hasPropertyChanges(propertyName);
+            const hasPropertyContent = hasPropertyChanges(propertyName);
             
             return (
               <CollapsibleSection
                 key={propertyName}
                 title={propertyName}  // Always use property name
                 defaultOpen={false}
-                hasChanges={hasChanges}
                 onClear={() => handleResetProperty(propertyName)}
-                hasContent={hasActualContent(visualStyles?.['*']?.['*']?.[propertyName])}
+                hasContent={hasPropertyContent}
                 clearMessage={`Clear all ${propertyName} settings?`}
                 headerAction={
                   <div

@@ -7,6 +7,7 @@ import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { isVisualPropertySection } from '@/lib/theme-studio/utils/schema-form-utils';
 import { StateAwarePropertySection } from './StateAwarePropertySection';
 import { PropertySection } from './PropertySection';
+import { FilterCardStateField } from './FilterCardStateField';
 
 interface ArraySchemaFieldProps {
   schema: SchemaProperty;
@@ -56,18 +57,37 @@ export function ArraySchemaField({
     const hasStateSupport = schema.items.properties.$id !== undefined;
     
     if (hasStateSupport) {
-      return (
-        <StateAwarePropertySection
-          schema={schema}
-          value={value}
-          onChange={onChange}
-          schemaLoader={schemaLoader}
-          path={path}
-          level={level}
-          hideTitle={hideTitle}
-          SchemaForm={SchemaForm}
-        />
-      );
+      // Check if this is the filterCard property with Available/Applied states
+      const isFilterCard = path[path.length - 1] === 'filterCard' && 
+        schema.items.properties.$id?.anyOf?.[0]?.enum?.includes('Available');
+      
+      if (isFilterCard) {
+        return (
+          <FilterCardStateField
+            schema={schema}
+            value={value}
+            onChange={onChange}
+            schemaLoader={schemaLoader}
+            path={path}
+            level={level}
+            hideTitle={hideTitle}
+            SchemaForm={SchemaForm}
+          />
+        );
+      } else {
+        return (
+          <StateAwarePropertySection
+            schema={schema}
+            value={value}
+            onChange={onChange}
+            schemaLoader={schemaLoader}
+            path={path}
+            level={level}
+            hideTitle={hideTitle}
+            SchemaForm={SchemaForm}
+          />
+        );
+      }
     } else {
       return (
         <PropertySection
