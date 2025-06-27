@@ -43,7 +43,7 @@ function ThemeStudioContent() {
   const loadedThemeIdRef = useRef<string | null>(null);
   
   // Visual styles panel width - fixed
-  const visualStylesPanelWidth = 450;
+  const visualStylesPanelWidth = 380;
   
   // Get visual styles directly from the store
   const visualSettings = themeStudio.theme.visualStyles || {};
