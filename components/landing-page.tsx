@@ -13,7 +13,7 @@ import { ThemeStudioSkeleton, VisualStyleSkeleton, ThemeModeSkeleton, TeamSkelet
 import { ThemeStudioPreview } from '@/components/landing/theme-studio-preview'
 import { JsonPreview } from '@/components/landing/json-preview'
 import Image from 'next/image'
-import '@/app/(public)/page.css'
+import './landing-page.css'
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
