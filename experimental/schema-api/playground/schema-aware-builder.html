@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema-Aware Theme Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .property-tree { font-family: 'Monaco', 'Consolas', monospace; font-size: 13px; }
+        .tree-node { margin-left: 20px; }
+        .tree-key { color: #0969da; cursor: pointer; }
+        .tree-type { color: #6e7781; font-size: 11px; }
+        .tree-required { color: #cf222e; }
+        .json-output { background: #1e1e1e; color: #d4d4d4; }
+        .property-value { margin-top: 8px; }
+        .oneOf-option { 
+            border: 2px solid transparent; 
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .oneOf-option:hover { border-color: #e5e7eb; }
+        .oneOf-option.selected { border-color: #3b82f6; background: #eff6ff; }
+        .enum-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            margin: 2px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+        }
+        .enum-pill.selected {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        .nested-properties {
+            background: #f9fafb;
+            border-left: 3px solid #e5e7eb;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <div class="bg-white border-b sticky top-0 z-50">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold">Schema-Aware Theme Builder</h1>
+                        <p class="text-sm text-gray-600">Fully dynamic property editing based on Power BI schema</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="loadSchema()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                            Load Schema
+                        </button>
+                        <button onclick="exportTheme()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            Export Theme
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-6 py-6">
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Visual Selector -->
+                <div class="col-span-3">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="p-4 border-b">
+                            <h2 class="font-semibold">Visuals</h2>
+                        </div>
+                        <div id="visualList" class="max-h-[600px] overflow-y-auto">
+                            <div class="p-4 text-gray-500 text-sm">Loading schema...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property Tree -->
+                <div class="col-span-6">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="p-4 border-b">
+                            <h2 class="font-semibold">Properties</h2>
+                            <p class="text-sm text-gray-600 mt-1" id="visualName">Select a visual to explore its properties</p>
+                        </div>
+                        <div id="propertyTree" class="p-4 property-tree max-h-[600px] overflow-y-auto">
+                            <!-- Dynamically generated property tree -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Output -->
+                <div class="col-span-3">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="p-4 border-b">
+                            <h2 class="font-semibold">Theme JSON</h2>
+                        </div>
+                        <pre id="themeOutput" class="json-output p-4 text-xs max-h-[600px] overflow-auto">{
+  "name": "My Theme",
+  "visualStyles": {}
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Editor Modal -->
+        <div id="propertyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h3 id="modalTitle" class="font-semibold">Edit Property</h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+                <div id="modalContent" class="p-4 overflow-y-auto max-h-[60vh]">
+                    <!-- Dynamic content -->
+                </div>
+                <div class="p-4 border-t flex justify-end space-x-2">
+                    <button onclick="closeModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button onclick="saveProperty()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import schema resolver
+        const SCHEMA_URL = 'http://localhost:3001/api/schema/full';
+        let schema = null;
+        let resolver = null;
+        let currentVisual = null;
+        let currentProperty = null;
+        let theme = {
+            name: "My Theme",
+            visualStyles: {}
+        };
+
+        // Schema Resolver class (inline for demo)
+        class SchemaResolver {
+            constructor(schema) {
+                this.schema = schema;
+                this.definitions = schema.definitions || {};
+                this.cache = new Map();
+            }
+
+            resolve(node, path = '') {
+                const cacheKey = JSON.stringify(node) + path;
+                if (this.cache.has(cacheKey)) {
+                    return this.cache.get(cacheKey);
+                }
+
+                let resolved;
+
+                if (node.$ref) {
+                    const refPath = node.$ref;
+                    const definition = this.getDefinition(refPath);
+                    if (definition) {
+                        resolved = {
+                            ...this.resolve(definition, refPath),
+                            refPath,
+                            title: node.title || definition.title,
+                            description: node.description || definition.description
+                        };
+                    } else {
+                        resolved = { ...node, resolvedType: 'ref', refPath };
+                    }
+                }
+                else if (node.oneOf) {
+                    resolved = {
+                        ...node,
+                        resolvedType: 'oneOf',
+                        options: node.oneOf.map((option, i) => 
+                            this.resolve(option, `${path}/oneOf[${i}]`)
+                        )
+                    };
+                }
+                else if (node.allOf) {
+                    const merged = this.mergeAllOf(node.allOf);
+                    resolved = this.resolve(merged, path);
+                }
+                else if (node.enum) {
+                    resolved = {
+                        ...node,
+                        resolvedType: 'enum',
+                        enumValues: node.enum
+                    };
+                }
+                else if (node.type === 'object' || node.properties) {
+                    resolved = {
+                        ...node,
+                        resolvedType: 'object',
+                        children: {}
+                    };
+
+                    if (node.properties) {
+                        for (const [key, value] of Object.entries(node.properties)) {
+                            resolved.children[key] = this.resolve(value, `${path}/properties/${key}`);
+                        }
+                    }
+                }
+                else if (node.type === 'array') {
+                    resolved = {
+                        ...node,
+                        resolvedType: 'array',
+                        items: node.items ? this.resolve(node.items, `${path}/items`) : undefined
+                    };
+                }
+                else {
+                    const type = Array.isArray(node.type) ? node.type[0] : node.type;
+                    resolved = {
+                        ...node,
+                        resolvedType: type || 'string'
+                    };
+                }
+
+                this.cache.set(cacheKey, resolved);
+                return resolved;
+            }
+
+            getDefinition(ref) {
+                if (!ref.startsWith('#/definitions/')) return null;
+                const defName = ref.replace('#/definitions/', '');
+                return this.definitions[defName];
+            }
+
+            mergeAllOf(schemas) {
+                const merged = {
+                    type: 'object',
+                    properties: {},
+                    required: []
+                };
+
+                for (const schema of schemas) {
+                    const resolved = schema.$ref ? this.getDefinition(schema.$ref) : schema;
+                    if (!resolved) continue;
+
+                    if (resolved.properties) {
+                        Object.assign(merged.properties, resolved.properties);
+                    }
+                    if (resolved.required) {
+                        merged.required.push(...resolved.required);
+                    }
+                }
+
+                return merged;
+            }
+
+            getVisualTypes() {
+                const visualStyles = this.schema.properties?.visualStyles;
+                if (!visualStyles?.properties) return [];
+                
+                return Object.keys(visualStyles.properties).filter(
+                    key => key !== '*' && !key.startsWith('$')
+                );
+            }
+
+            getVisualSchema(visualType) {
+                const visualStyles = this.schema.properties?.visualStyles;
+                if (!visualStyles?.properties?.[visualType]) return null;
+
+                return this.resolve(
+                    visualStyles.properties[visualType],
+                    `visualStyles/${visualType}`
+                );
+            }
+        }
+
+        // Load schema
+        window.loadSchema = async function() {
+            try {
+                const response = await fetch(SCHEMA_URL);
+                schema = await response.json();
+                resolver = new SchemaResolver(schema);
+                
+                // Load visual list
+                const visuals = resolver.getVisualTypes();
+                const visualList = document.getElementById('visualList');
+                visualList.innerHTML = '';
+                
+                visuals.forEach(visual => {
+                    const div = document.createElement('div');
+                    div.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
+                    div.textContent = formatVisualName(visual);
+                    div.onclick = () => selectVisual(visual);
+                    visualList.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Failed to load schema:', error);
+                alert('Failed to load schema');
+            }
+        }
+
+        // Select visual
+        window.selectVisual = function(visual) {
+            currentVisual = visual;
+            document.getElementById('visualName').textContent = `${formatVisualName(visual)} Properties`;
+            
+            const visualSchema = resolver.getVisualSchema(visual);
+            if (!visualSchema) return;
+            
+            const tree = document.getElementById('propertyTree');
+            tree.innerHTML = '';
+            
+            // Render property tree
+            renderPropertyTree(visualSchema, tree, []);
+        }
+
+        // Render property tree
+        function renderPropertyTree(schema, container, path) {
+            if (schema.resolvedType === 'object' && schema.children) {
+                // Special handling for * property
+                if (schema.children['*']) {
+                    renderPropertyTree(schema.children['*'], container, [...path, '*']);
+                } else {
+                    for (const [key, childSchema] of Object.entries(schema.children)) {
+                        renderPropertyNode(key, childSchema, container, [...path, key]);
+                    }
+                }
+            } else if (schema.resolvedType === 'array' && schema.items) {
+                // Check if this is a state-driven array
+                if (schema.items.properties && schema.items.properties.$id) {
+                    const stateDiv = document.createElement('div');
+                    stateDiv.className = 'tree-node bg-yellow-50 p-2 rounded mb-2';
+                    stateDiv.innerHTML = `
+                        <div class="text-sm font-medium text-yellow-800 mb-1">State-driven property</div>
+                        <div class="text-xs text-yellow-700">
+                            States: ${getStateOptions(schema.items.properties.$id).join(', ')}
+                        </div>
+                    `;
+                    container.appendChild(stateDiv);
+                }
+                
+                const itemsDiv = document.createElement('div');
+                itemsDiv.className = 'tree-node';
+                itemsDiv.innerHTML = '<span class="tree-type">[array items]</span>';
+                container.appendChild(itemsDiv);
+                renderPropertyTree(schema.items, itemsDiv, path);
+            }
+        }
+        
+        // Get state options from $id schema
+        function getStateOptions(idSchema) {
+            if (idSchema.enum) {
+                return idSchema.enum;
+            }
+            if (idSchema.anyOf) {
+                const options = [];
+                idSchema.anyOf.forEach(option => {
+                    if (option.enum) {
+                        options.push(...option.enum);
+                    }
+                });
+                return options;
+            }
+            return ['default', 'hover', 'selected', 'disabled'];
+        }
+
+        // Render individual property node
+        function renderPropertyNode(key, schema, container, path) {
+            const nodeDiv = document.createElement('div');
+            nodeDiv.className = 'tree-node mb-2';
+            
+            const header = document.createElement('div');
+            header.className = 'flex items-center space-x-2';
+            
+            const keySpan = document.createElement('span');
+            keySpan.className = 'tree-key';
+            keySpan.textContent = key;
+            keySpan.onclick = () => editProperty(path, schema);
+            
+            const typeSpan = document.createElement('span');
+            typeSpan.className = 'tree-type';
+            typeSpan.textContent = getTypeDescription(schema);
+            
+            header.appendChild(keySpan);
+            header.appendChild(typeSpan);
+            
+            if (schema.required && schema.required.includes(key)) {
+                const reqSpan = document.createElement('span');
+                reqSpan.className = 'tree-required';
+                reqSpan.textContent = '*';
+                header.appendChild(reqSpan);
+            }
+            
+            if (schema.title) {
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'text-gray-600 text-xs';
+                titleSpan.textContent = `// ${schema.title}`;
+                header.appendChild(titleSpan);
+            }
+            
+            nodeDiv.appendChild(header);
+            
+            // Show current value if set
+            const currentValue = getThemeValue(path);
+            if (currentValue !== undefined) {
+                const valueDiv = document.createElement('div');
+                valueDiv.className = 'text-xs text-green-600 ml-4';
+                valueDiv.textContent = `= ${JSON.stringify(currentValue)}`;
+                nodeDiv.appendChild(valueDiv);
+            }
+            
+            container.appendChild(nodeDiv);
+            
+            // Render children for complex types
+            if (schema.resolvedType === 'object' && schema.children) {
+                const childContainer = document.createElement('div');
+                childContainer.className = 'ml-4 border-l-2 border-gray-200 pl-2';
+                nodeDiv.appendChild(childContainer);
+                renderPropertyTree(schema, childContainer, path);
+            }
+        }
+
+        // Get type description
+        function getTypeDescription(schema) {
+            if (schema.resolvedType === 'oneOf') {
+                return `oneOf[${schema.options.length}]`;
+            }
+            if (schema.resolvedType === 'enum') {
+                return `enum[${schema.enumValues.length}]`;
+            }
+            if (schema.refPath) {
+                return `→ ${schema.refPath.replace('#/definitions/', '')}`;
+            }
+            return schema.resolvedType;
+        }
+
+        // Edit property
+        window.editProperty = function(path, schema) {
+            currentProperty = { path, schema };
+            
+            const modal = document.getElementById('propertyModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalTitle.textContent = `Edit: ${path.join(' → ')}`;
+            modalContent.innerHTML = '';
+            
+            // Add description if available
+            if (schema.description) {
+                const desc = document.createElement('p');
+                desc.className = 'text-sm text-gray-600 mb-4';
+                desc.textContent = schema.description;
+                modalContent.appendChild(desc);
+            }
+            
+            // Render appropriate editor based on type
+            renderPropertyEditor(schema, modalContent, path);
+            
+            modal.classList.remove('hidden');
+        }
+
+        // Render property editor
+        function renderPropertyEditor(schema, container, path) {
+            // Check if this is a state-driven array
+            if (schema.resolvedType === 'array' && schema.items?.properties?.$id) {
+                const states = getStateOptions(schema.items.properties.$id);
+                
+                const stateContainer = document.createElement('div');
+                stateContainer.className = 'bg-blue-50 p-4 rounded-lg mb-4';
+                stateContainer.innerHTML = `
+                    <h4 class="font-medium text-blue-900 mb-2">State-driven Values</h4>
+                    <p class="text-sm text-blue-700 mb-3">Define values for different states:</p>
+                `;
+                
+                states.forEach(state => {
+                    const stateDiv = document.createElement('div');
+                    stateDiv.className = 'mb-3';
+                    stateDiv.innerHTML = `
+                        <label class="block text-sm font-medium mb-1">${state}:</label>
+                    `;
+                    
+                    const inputDiv = document.createElement('div');
+                    inputDiv.id = `state-${state}`;
+                    renderPropertyEditor(schema.items.properties.value || schema.items, inputDiv, [...path, state]);
+                    stateDiv.appendChild(inputDiv);
+                    
+                    stateContainer.appendChild(stateDiv);
+                });
+                
+                container.appendChild(stateContainer);
+                return;
+            }
+            
+            if (schema.resolvedType === 'oneOf') {
+                // OneOf selector
+                const label = document.createElement('label');
+                label.className = 'block text-sm font-medium mb-2';
+                label.textContent = 'Select type:';
+                container.appendChild(label);
+                
+                schema.options.forEach((option, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'oneOf-option p-3 mb-2 border rounded-lg';
+                    optionDiv.onclick = () => selectOneOfOption(index);
+                    
+                    const optionLabel = getOneOfLabel(option);
+                    optionDiv.innerHTML = `
+                        <div class="font-medium">${optionLabel}</div>
+                        <div class="text-xs text-gray-600">${getTypeDescription(option)}</div>
+                    `;
+                    
+                    container.appendChild(optionDiv);
+                });
+            }
+            else if (schema.resolvedType === 'enum') {
+                // Enum selector
+                const label = document.createElement('label');
+                label.className = 'block text-sm font-medium mb-2';
+                label.textContent = 'Select value:';
+                container.appendChild(label);
+                
+                const enumContainer = document.createElement('div');
+                enumContainer.className = 'flex flex-wrap';
+                
+                schema.enumValues.forEach(value => {
+                    const pill = document.createElement('span');
+                    pill.className = 'enum-pill';
+                    pill.textContent = value;
+                    pill.onclick = () => {
+                        document.querySelectorAll('.enum-pill').forEach(p => p.classList.remove('selected'));
+                        pill.classList.add('selected');
+                    };
+                    enumContainer.appendChild(pill);
+                });
+                
+                container.appendChild(enumContainer);
+            }
+            else if (schema.resolvedType === 'string') {
+                // String input
+                if (schema.pattern && schema.pattern.includes('#[0-9a-fA-F]')) {
+                    // Color input
+                    const label = document.createElement('label');
+                    label.className = 'block text-sm font-medium mb-2';
+                    label.textContent = 'Color:';
+                    container.appendChild(label);
+                    
+                    const input = document.createElement('input');
+                    input.type = 'color';
+                    input.className = 'w-full h-10 border rounded cursor-pointer';
+                    input.id = 'propertyValue';
+                    container.appendChild(input);
+                } else {
+                    // Text input
+                    const label = document.createElement('label');
+                    label.className = 'block text-sm font-medium mb-2';
+                    label.textContent = 'Value:';
+                    container.appendChild(label);
+                    
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'w-full px-3 py-2 border rounded-lg';
+                    input.id = 'propertyValue';
+                    container.appendChild(input);
+                }
+            }
+            else if (schema.resolvedType === 'number') {
+                // Number input
+                const label = document.createElement('label');
+                label.className = 'block text-sm font-medium mb-2';
+                label.textContent = 'Value:';
+                container.appendChild(label);
+                
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'w-full px-3 py-2 border rounded-lg';
+                input.id = 'propertyValue';
+                if (schema.minimum !== undefined) input.min = schema.minimum;
+                if (schema.maximum !== undefined) input.max = schema.maximum;
+                container.appendChild(input);
+            }
+            else if (schema.resolvedType === 'boolean') {
+                // Boolean toggle
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-2 cursor-pointer';
+                label.innerHTML = `
+                    <input type="checkbox" id="propertyValue" class="rounded">
+                    <span class="text-sm font-medium">Enabled</span>
+                `;
+                container.appendChild(label);
+            }
+            else if (schema.resolvedType === 'object' && schema.children) {
+                // Object editor
+                const info = document.createElement('p');
+                info.className = 'text-sm text-gray-600 mb-4';
+                info.textContent = 'Configure object properties:';
+                container.appendChild(info);
+                
+                const objContainer = document.createElement('div');
+                objContainer.className = 'nested-properties';
+                container.appendChild(objContainer);
+                
+                for (const [key, childSchema] of Object.entries(schema.children)) {
+                    const fieldDiv = document.createElement('div');
+                    fieldDiv.className = 'mb-4';
+                    
+                    const fieldLabel = document.createElement('label');
+                    fieldLabel.className = 'block text-sm font-medium mb-1';
+                    fieldLabel.textContent = key;
+                    fieldDiv.appendChild(fieldLabel);
+                    
+                    renderPropertyEditor(childSchema, fieldDiv, [...path, key]);
+                    objContainer.appendChild(fieldDiv);
+                }
+            }
+        }
+
+        // Get OneOf option label
+        function getOneOfLabel(option) {
+            if (option.properties?.solid) return 'Solid Color';
+            if (option.properties?.gradient) return 'Gradient';
+            if (option.properties?.pattern) return 'Pattern';
+            if (option.properties?.image) return 'Image';
+            if (option.properties?.expr) return 'Expression';
+            if (option.required) {
+                return option.required.join(', ');
+            }
+            if (option.properties) {
+                return Object.keys(option.properties).join(', ');
+            }
+            return JSON.stringify(option).substring(0, 50) + '...';
+        }
+
+        // Save property
+        window.saveProperty = function() {
+            if (!currentProperty) return;
+            
+            const { path, schema } = currentProperty;
+            let value;
+            
+            // Check if this is a state-driven property
+            if (schema.resolvedType === 'array' && schema.items?.properties?.$id) {
+                const states = getStateOptions(schema.items.properties.$id);
+                value = [];
+                
+                states.forEach(state => {
+                    const stateInput = document.querySelector(`#state-${state} input, #state-${state} select`);
+                    if (stateInput) {
+                        const stateValue = stateInput.type === 'checkbox' ? stateInput.checked : stateInput.value;
+                        value.push({
+                            $id: state,
+                            value: stateValue
+                        });
+                    }
+                });
+            }
+            // Get value based on editor type
+            else if (schema.resolvedType === 'oneOf') {
+                // Handle oneOf selection
+                const selected = document.querySelector('.oneOf-option.selected');
+                if (!selected) return;
+                // For now, implement solid color
+                value = { solid: { color: '#000000' } };
+            } 
+            else if (schema.resolvedType === 'enum') {
+                // Get selected enum value
+                const selected = document.querySelector('.enum-pill.selected');
+                if (selected) {
+                    value = selected.textContent;
+                }
+            }
+            else {
+                const input = document.getElementById('propertyValue');
+                if (!input) return;
+                value = input.type === 'checkbox' ? input.checked : input.value;
+            }
+            
+            // Build proper structure for theme
+            setThemeValue(path, value, schema);
+            updateThemeOutput();
+            closeModal();
+            
+            // Refresh property tree
+            selectVisual(currentVisual);
+        }
+
+        // Set theme value
+        function setThemeValue(path, value, schema) {
+            if (!currentVisual) return;
+            
+            if (!theme.visualStyles[currentVisual]) {
+                theme.visualStyles[currentVisual] = { "*": {} };
+            }
+            
+            // Get property name (last in path)
+            const propName = path[path.length - 1];
+            
+            // Format value based on schema
+            let formatted;
+            if (schema.resolvedType === 'array' && schema.items?.properties?.$id) {
+                // State-driven array - value is already properly formatted
+                formatted = value;
+            } else if (schema.resolvedType === 'array') {
+                formatted = [{ value }];
+            } else if (schema.refPath?.includes('fill')) {
+                formatted = [{
+                    color: {
+                        solid: {
+                            color: value
+                        }
+                    }
+                }];
+            } else {
+                formatted = value;
+            }
+            
+            theme.visualStyles[currentVisual]["*"][propName] = formatted;
+        }
+
+        // Get theme value
+        function getThemeValue(path) {
+            if (!currentVisual || !theme.visualStyles[currentVisual]) return undefined;
+            const propName = path[path.length - 1];
+            return theme.visualStyles[currentVisual]["*"][propName];
+        }
+
+        // Update theme output
+        function updateThemeOutput() {
+            document.getElementById('themeOutput').textContent = JSON.stringify(theme, null, 2);
+        }
+
+        // Close modal
+        window.closeModal = function() {
+            document.getElementById('propertyModal').classList.add('hidden');
+            currentProperty = null;
+        }
+
+        // Export theme
+        window.exportTheme = function() {
+            const blob = new Blob([JSON.stringify(theme, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'theme.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Format visual name
+        function formatVisualName(name) {
+            return name
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^./, str => str.toUpperCase())
+                .trim();
+        }
+
+        // Initialize
+        loadSchema();
+    </script>
+</body>
+</html>

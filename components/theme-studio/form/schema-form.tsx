@@ -74,25 +74,19 @@ export function SchemaForm({
     if (starProperty.$ref) {
       const resolvedSchema = schemaLoader.resolveRef(starProperty.$ref);
       if (resolvedSchema) {
-        // Check if this is a visual definition with allOf or a page/report/filter schema
-        if (resolvedSchema.allOf && resolvedSchema.allOf.length >= 1) {
-          // Check if this is a page/report/filter type (which have allOf with single element)
-          // or a visual type (which have allOf with multiple elements)
-          const isCanvasType = path.length >= 2 && ['page', 'report', 'filter'].includes(path[1]);
-          
-          if (resolvedSchema.allOf.length > 1 || isCanvasType) {
-            // Render visual properties directly
-            return (
-              <VisualPropertiesPanel
-                schema={resolvedSchema}
-                value={value['*'] || value || {}}
-                onChange={handleStarPropertyChange}
-                schemaLoader={schemaLoader}
-                path={[...path, '*']}
-                level={level}
-              />
-            );
-          }
+        // Check if this is a visual definition with allOf
+        if (resolvedSchema.allOf && resolvedSchema.allOf.length > 1) {
+          // Render visual properties directly
+          return (
+            <VisualPropertiesPanel
+              schema={resolvedSchema}
+              value={value['*'] || value || {}}
+              onChange={handleStarPropertyChange}
+              schemaLoader={schemaLoader}
+              path={[...path, '*']}
+              level={level}
+            />
+          );
         }
         
         // Not a visual definition, render normally

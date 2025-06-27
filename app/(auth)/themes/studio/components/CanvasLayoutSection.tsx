@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import { CollapsibleSection } from '@/components/theme-studio/ui/collapsible-section';
 import { SchemaForm } from '@/components/theme-studio/form/schema-form';
+import { PageSettingsPanel } from '@/components/theme-studio/form/PageSettingsPanel';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { hasActualContent } from '@/lib/utils/theme-helpers';
 
@@ -85,30 +86,21 @@ export function CanvasLayoutSection({
             </CollapsibleSection>
           )}
           
-          {/* Page Settings */}
+          {/* Page Settings - Now with multiple collapsible sections */}
           {schemaLoaded && schemaLoader && canvasTypes.includes('page') && (
-            <CollapsibleSection
-              title="Page Settings"
-              tooltip="Configure page backgrounds, size, and layout options"
-              defaultOpen={false}
-              hasChanges={hasActualContent(visualSettings.page?.['*'])}
-              onClear={onClearSection ? () => onClearSection('page') : undefined}
-              hasContent={hasActualContent(visualSettings.page?.['*'])}
-            >
-              <SchemaForm
-                schema={schemaLoader?.getVisualSchema('page') || {}}
-                value={visualSettings.page || {}}
-                onChange={(value: any) => {
-                  onVisualSettingsChange({
-                    ...visualSettings,
-                    page: value
-                  });
-                  trackChange(['visualStyles', 'page']);
-                }}
-                schemaLoader={schemaLoader}
-                path={['visualStyles', 'page']}
-              />
-            </CollapsibleSection>
+            <PageSettingsPanel
+              schema={schemaLoader?.getVisualSchema('page') || {}}
+              value={visualSettings.page || {}}
+              onChange={(value: any) => {
+                onVisualSettingsChange({
+                  ...visualSettings,
+                  page: value
+                });
+              }}
+              schemaLoader={schemaLoader}
+              basePath={['visualStyles', 'page']}
+              trackChange={trackChange}
+            />
           )}
           
           {/* Filter Pane */}

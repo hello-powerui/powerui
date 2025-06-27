@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Schema Builder - Power BI Themes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .property-tree { font-family: 'Monaco', 'Consolas', monospace; font-size: 13px; }
+        .tree-node { margin-left: 20px; }
+        .tree-key { color: #0969da; cursor: pointer; }
+        .tree-key:hover { text-decoration: underline; }
+        .tree-type { color: #6e7781; font-size: 11px; }
+        .tree-required { color: #cf222e; }
+        .json-output { background: #1e1e1e; color: #d4d4d4; }
+        .state-tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-bottom: none;
+            transition: all 0.2s;
+        }
+        .state-tab.active {
+            background: white;
+            border-color: #3b82f6;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        .state-content {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0 8px 8px 8px;
+            padding: 16px;
+        }
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .color-preview:hover {
+            transform: scale(1.05);
+            border-color: #3b82f6;
+        }
+        .oneOf-card {
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .oneOf-card:hover {
+            border-color: #e5e7eb;
+            transform: translateY(-1px);
+        }
+        .oneOf-card.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <div class="bg-white border-b sticky top-0 z-50">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold">Full Schema Builder</h1>
+                        <p class="text-sm text-gray-600">Complete Power BI theme editor with state support</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="toggleCommonCards()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                            <span id="commonCardsToggle">Show CommonCards</span>
+                        </button>
+                        <button onclick="exportTheme()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            Export Theme
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-6 py-6">
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Visual & Common Cards Selector -->
+                <div class="col-span-3">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="p-4 border-b">
+                            <div class="flex items-center justify-between">
+                                <h2 class="font-semibold">Components</h2>
+                                <span class="text-xs bg-gray-100 px-2 py-1 rounded" id="componentCount">0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Tabs -->
+                        <div class="flex border-b">
+                            <button onclick="showVisuals()" class="flex-1 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600" id="visualsTab">
+                                Visuals
+                            </button>
+                            <button onclick="showCommonCards()" class="flex-1 py-2 text-sm font-medium text-gray-600" id="commonCardsTab">
+                                Common
+                            </button>
+                        </div>
+                        
+                        <div id="componentList" class="max-h-[600px] overflow-y-auto">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property Editor -->
+                <div class="col-span-6">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="p-4 border-b">
+                            <h2 class="font-semibold">Properties</h2>
+                            <p class="text-sm text-gray-600 mt-1" id="componentName">Select a component to edit</p>
+                        </div>
+                        <div id="propertyTree" class="p-4 property-tree max-h-[600px] overflow-y-auto">
+                            <!-- Property tree -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Output -->
+                <div class="col-span-3">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="p-4 border-b flex justify-between items-center">
+                            <h2 class="font-semibold">Theme JSON</h2>
+                            <button onclick="copyTheme()" class="text-sm text-blue-600 hover:text-blue-700">Copy</button>
+                        </div>
+                        <pre id="themeOutput" class="json-output p-4 text-xs max-h-[600px] overflow-auto">{
+  "name": "My Theme"
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Property Editor Modal -->
+        <div id="propertyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-hidden">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <div>
+                        <h3 id="modalTitle" class="font-semibold">Edit Property</h3>
+                        <p id="modalPath" class="text-sm text-gray-600"></p>
+                    </div>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+                <div id="modalContent" class="p-4 overflow-y-auto max-h-[70vh]">
+                    <!-- Dynamic content -->
+                </div>
+                <div class="p-4 border-t flex justify-end space-x-2">
+                    <button onclick="closeModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button onclick="saveProperty()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Global state
+        let schema = null;
+        let resolver = null;
+        let currentComponent = null;
+        let currentProperty = null;
+        let showingCommonCards = false;
+        let currentState = 'default';
+        let theme = {
+            name: "My Theme"
+        };
+
+        // Schema Resolver (enhanced)
+        class SchemaResolver {
+            constructor(schema) {
+                this.schema = schema;
+                this.definitions = schema.definitions || {};
+                this.cache = new Map();
+            }
+
+            resolve(node, path = '') {
+                const cacheKey = JSON.stringify(node) + path;
+                if (this.cache.has(cacheKey)) {
+                    return this.cache.get(cacheKey);
+                }
+
+                let resolved;
+
+                if (node.$ref) {
+                    const refPath = node.$ref;
+                    const definition = this.getDefinition(refPath);
+                    if (definition) {
+                        resolved = {
+                            ...this.resolve(definition, refPath),
+                            refPath,
+                            title: node.title || definition.title,
+                            description: node.description || definition.description
+                        };
+                    } else {
+                        resolved = { ...node, resolvedType: 'ref', refPath };
+                    }
+                }
+                else if (node.oneOf) {
+                    resolved = {
+                        ...node,
+                        resolvedType: 'oneOf',
+                        options: node.oneOf.map((option, i) => 
+                            this.resolve(option, `${path}/oneOf[${i}]`)
+                        )
+                    };
+                }
+                else if (node.allOf) {
+                    const merged = this.mergeAllOf(node.allOf);
+                    resolved = this.resolve(merged, path);
+                }
+                else if (node.enum) {
+                    resolved = {
+                        ...node,
+                        resolvedType: 'enum',
+                        enumValues: node.enum
+                    };
+                }
+                else if (node.type === 'object' || node.properties) {
+                    resolved = {
+                        ...node,
+                        resolvedType: 'object',
+                        children: {}
+                    };
+
+                    if (node.properties) {
+                        for (const [key, value] of Object.entries(node.properties)) {
+                            resolved.children[key] = this.resolve(value, `${path}/properties/${key}`);
+                        }
+                    }
+                }
+                else if (node.type === 'array') {
+                    resolved = {
+                        ...node,
+                        resolvedType: 'array',
+                        items: node.items ? this.resolve(node.items, `${path}/items`) : undefined
+                    };
+                }
+                else {
+                    const type = Array.isArray(node.type) ? node.type[0] : node.type;
+                    resolved = {
+                        ...node,
+                        resolvedType: type || 'string'
+                    };
+                }
+
+                this.cache.set(cacheKey, resolved);
+                return resolved;
+            }
+
+            getDefinition(ref) {
+                if (!ref.startsWith('#/definitions/')) return null;
+                const defName = ref.replace('#/definitions/', '');
+                return this.definitions[defName];
+            }
+
+            mergeAllOf(schemas) {
+                const merged = {
+                    type: 'object',
+                    properties: {},
+                    required: []
+                };
+
+                for (const schema of schemas) {
+                    const resolved = schema.$ref ? this.getDefinition(schema.$ref) : schema;
+                    if (!resolved) continue;
+
+                    if (resolved.properties) {
+                        Object.assign(merged.properties, resolved.properties);
+                    }
+                    if (resolved.required) {
+                        merged.required.push(...resolved.required);
+                    }
+                }
+
+                return merged;
+            }
+
+            getVisualTypes() {
+                const visualStyles = this.schema.properties?.visualStyles;
+                if (!visualStyles?.properties) return [];
+                
+                return Object.keys(visualStyles.properties).filter(
+                    key => key !== '*' && !key.startsWith('$')
+                );
+            }
+
+            getCommonCardTypes() {
+                const commonCards = this.schema.properties?.commonCards;
+                if (!commonCards?.properties) return [];
+                
+                return Object.keys(commonCards.properties);
+            }
+
+            getComponentSchema(type, isCommonCard = false) {
+                const root = isCommonCard ? 
+                    this.schema.properties?.commonCards : 
+                    this.schema.properties?.visualStyles;
+                    
+                if (!root?.properties?.[type]) return null;
+
+                return this.resolve(
+                    root.properties[type],
+                    `${isCommonCard ? 'commonCards' : 'visualStyles'}/${type}`
+                );
+            }
+        }
+
+        // Initialize
+        window.onload = async function() {
+            try {
+                const response = await fetch('http://localhost:3001/api/schema/full');
+                schema = await response.json();
+                resolver = new SchemaResolver(schema);
+                
+                loadComponents();
+            } catch (error) {
+                console.error('Failed to load schema:', error);
+                alert('Failed to load schema. Make sure the API server is running.');
+            }
+        }
+
+        // Load components (visuals or common cards)
+        function loadComponents() {
+            const components = showingCommonCards ? 
+                resolver.getCommonCardTypes() : 
+                resolver.getVisualTypes();
+                
+            const container = document.getElementById('componentList');
+            container.innerHTML = '';
+            
+            document.getElementById('componentCount').textContent = components.length;
+            
+            components.forEach(component => {
+                const div = document.createElement('div');
+                div.className = 'px-4 py-3 hover:bg-gray-50 cursor-pointer border-b';
+                div.innerHTML = `
+                    <div class="font-medium text-sm">${formatName(component)}</div>
+                    <div class="text-xs text-gray-500">${component}</div>
+                `;
+                div.onclick = () => selectComponent(component);
+                container.appendChild(div);
+            });
+        }
+
+        // Select component
+        window.selectComponent = function(component) {
+            currentComponent = component;
+            const componentSchema = resolver.getComponentSchema(component, showingCommonCards);
+            
+            document.getElementById('componentName').textContent = 
+                `${formatName(component)} ${showingCommonCards ? '(Common Card)' : '(Visual)'}`;
+            
+            const tree = document.getElementById('propertyTree');
+            tree.innerHTML = '';
+            
+            if (componentSchema) {
+                renderPropertyTree(componentSchema, tree, []);
+            }
+        }
+
+        // Render property tree
+        function renderPropertyTree(schema, container, path) {
+            if (schema.resolvedType === 'object' && schema.children) {
+                if (schema.children['*']) {
+                    renderPropertyTree(schema.children['*'], container, [...path, '*']);
+                } else {
+                    for (const [key, childSchema] of Object.entries(schema.children)) {
+                        renderPropertyNode(key, childSchema, container, [...path, key]);
+                    }
+                }
+            } else if (schema.resolvedType === 'array' && schema.items) {
+                // Check for state-driven properties
+                if (schema.items.properties?.$id) {
+                    const stateIndicator = document.createElement('div');
+                    stateIndicator.className = 'bg-yellow-50 p-3 rounded-lg mb-2';
+                    stateIndicator.innerHTML = `
+                        <div class="flex items-center">
+                            <span class="text-yellow-600 mr-2">⚡</span>
+                            <span class="text-sm font-medium text-yellow-800">State-driven property</span>
+                        </div>
+                    `;
+                    container.appendChild(stateIndicator);
+                }
+                
+                renderPropertyTree(schema.items, container, path);
+            }
+        }
+
+        // Render property node
+        function renderPropertyNode(key, schema, container, path) {
+            const nodeDiv = document.createElement('div');
+            nodeDiv.className = 'tree-node mb-3';
+            
+            const header = document.createElement('div');
+            header.className = 'flex items-center space-x-2 mb-1';
+            
+            const keySpan = document.createElement('span');
+            keySpan.className = 'tree-key';
+            keySpan.textContent = key;
+            keySpan.onclick = () => editProperty(path, schema);
+            
+            const typeSpan = document.createElement('span');
+            typeSpan.className = 'tree-type';
+            typeSpan.textContent = getTypeDescription(schema);
+            
+            header.appendChild(keySpan);
+            header.appendChild(typeSpan);
+            
+            if (schema.required && schema.required.includes(key)) {
+                const reqSpan = document.createElement('span');
+                reqSpan.className = 'tree-required';
+                reqSpan.textContent = '*';
+                header.appendChild(reqSpan);
+            }
+            
+            if (schema.title) {
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'text-gray-600 text-xs';
+                titleSpan.textContent = `// ${schema.title}`;
+                header.appendChild(titleSpan);
+            }
+            
+            nodeDiv.appendChild(header);
+            
+            // Show current value
+            const value = getThemeValue(path);
+            if (value !== undefined) {
+                const valueDiv = document.createElement('div');
+                valueDiv.className = 'text-xs text-green-600 ml-4';
+                valueDiv.textContent = `= ${JSON.stringify(value).substring(0, 50)}...`;
+                nodeDiv.appendChild(valueDiv);
+            }
+            
+            container.appendChild(nodeDiv);
+            
+            // Render children
+            if (schema.resolvedType === 'object' && schema.children) {
+                const childContainer = document.createElement('div');
+                childContainer.className = 'ml-4 border-l-2 border-gray-200 pl-2';
+                nodeDiv.appendChild(childContainer);
+                renderPropertyTree(schema, childContainer, path);
+            }
+        }
+
+        // Edit property
+        window.editProperty = function(path, schema) {
+            currentProperty = { path, schema };
+            
+            const modal = document.getElementById('propertyModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalPath = document.getElementById('modalPath');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalTitle.textContent = schema.title || path[path.length - 1];
+            modalPath.textContent = path.join(' → ');
+            modalContent.innerHTML = '';
+            
+            if (schema.description) {
+                const desc = document.createElement('p');
+                desc.className = 'text-sm text-gray-600 mb-4';
+                desc.textContent = schema.description;
+                modalContent.appendChild(desc);
+            }
+            
+            renderPropertyEditor(schema, modalContent, path);
+            modal.classList.remove('hidden');
+        }
+
+        // Render property editor (enhanced for states)
+        function renderPropertyEditor(schema, container, path) {
+            // State-driven array
+            if (schema.resolvedType === 'array' && schema.items?.properties?.$id) {
+                const states = getStateOptions(schema.items.properties.$id);
+                
+                // State tabs
+                const tabsDiv = document.createElement('div');
+                tabsDiv.className = 'flex space-x-2 mb-4';
+                
+                states.forEach(state => {
+                    const tab = document.createElement('button');
+                    tab.className = `state-tab ${state === currentState ? 'active' : ''}`;
+                    tab.textContent = state.charAt(0).toUpperCase() + state.slice(1);
+                    tab.onclick = () => selectState(state);
+                    tabsDiv.appendChild(tab);
+                });
+                
+                container.appendChild(tabsDiv);
+                
+                // State content
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'state-content';
+                contentDiv.id = 'stateContent';
+                
+                // Render editor for current state
+                renderStateEditor(schema.items, contentDiv, currentState);
+                
+                container.appendChild(contentDiv);
+            }
+            // OneOf type
+            else if (schema.resolvedType === 'oneOf') {
+                schema.options.forEach((option, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'oneOf-card p-4 mb-3 border rounded-lg';
+                    card.onclick = () => {
+                        document.querySelectorAll('.oneOf-card').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        renderOneOfContent(option, index);
+                    };
+                    
+                    card.innerHTML = `
+                        <div class="font-medium">${getOneOfLabel(option)}</div>
+                        <div class="text-xs text-gray-600 mt-1">${getTypeDescription(option)}</div>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.id = 'oneOfContent';
+                contentDiv.className = 'mt-4';
+                container.appendChild(contentDiv);
+            }
+            // Color type
+            else if (schema.refPath?.includes('fill') || schema.resolvedType === 'string' && schema.pattern?.includes('#')) {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'flex items-center space-x-4';
+                
+                const preview = document.createElement('div');
+                preview.className = 'color-preview';
+                preview.style.backgroundColor = '#000000';
+                preview.id = 'colorPreview';
+                
+                const input = document.createElement('input');
+                input.type = 'color';
+                input.id = 'colorValue';
+                input.value = '#000000';
+                input.oninput = (e) => {
+                    preview.style.backgroundColor = e.target.value;
+                };
+                input.style.display = 'none';
+                
+                preview.onclick = () => input.click();
+                
+                const hexInput = document.createElement('input');
+                hexInput.type = 'text';
+                hexInput.id = 'hexValue';
+                hexInput.value = '#000000';
+                hexInput.className = 'px-3 py-2 border rounded-lg font-mono text-sm';
+                hexInput.oninput = (e) => {
+                    if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                        input.value = e.target.value;
+                        preview.style.backgroundColor = e.target.value;
+                    }
+                };
+                
+                colorDiv.appendChild(preview);
+                colorDiv.appendChild(input);
+                colorDiv.appendChild(hexInput);
+                container.appendChild(colorDiv);
+            }
+            // Other types
+            else {
+                renderBasicEditor(schema, container);
+            }
+        }
+
+        // Render state editor
+        function renderStateEditor(schema, container, state) {
+            container.innerHTML = '';
+            
+            const stateDiv = document.createElement('div');
+            stateDiv.innerHTML = `<h4 class="font-medium mb-3">Configure "${state}" state:</h4>`;
+            
+            // Get the value schema (skip $id)
+            const valueSchema = schema.properties?.value || 
+                                Object.entries(schema.properties || {})
+                                    .find(([k, v]) => k !== '$id')?.[1];
+            
+            if (valueSchema) {
+                renderPropertyEditor(valueSchema, stateDiv, [state]);
+            }
+            
+            container.appendChild(stateDiv);
+        }
+
+        // Render OneOf content
+        function renderOneOfContent(option, index) {
+            const container = document.getElementById('oneOfContent');
+            container.innerHTML = '';
+            
+            if (option.properties?.solid) {
+                // Solid color
+                renderPropertyEditor(
+                    { refPath: '#/definitions/fill', pattern: '^#[0-9a-fA-F]{6}$' },
+                    container,
+                    ['solid']
+                );
+            } else if (option.properties) {
+                // Render all properties
+                Object.entries(option.properties).forEach(([key, prop]) => {
+                    const propDiv = document.createElement('div');
+                    propDiv.className = 'mb-4';
+                    propDiv.innerHTML = `<label class="block text-sm font-medium mb-2">${key}:</label>`;
+                    renderPropertyEditor(prop, propDiv, [key]);
+                    container.appendChild(propDiv);
+                });
+            }
+        }
+
+        // Render basic editor
+        function renderBasicEditor(schema, container) {
+            if (schema.resolvedType === 'string') {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'propertyValue';
+                input.className = 'w-full px-3 py-2 border rounded-lg';
+                container.appendChild(input);
+            } else if (schema.resolvedType === 'number') {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = 'propertyValue';
+                input.className = 'w-full px-3 py-2 border rounded-lg';
+                container.appendChild(input);
+            } else if (schema.resolvedType === 'boolean') {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-2';
+                label.innerHTML = `
+                    <input type="checkbox" id="propertyValue" class="rounded">
+                    <span>Enabled</span>
+                `;
+                container.appendChild(label);
+            } else if (schema.resolvedType === 'enum') {
+                const select = document.createElement('select');
+                select.id = 'propertyValue';
+                select.className = 'w-full px-3 py-2 border rounded-lg';
+                
+                schema.enumValues.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                });
+                
+                container.appendChild(select);
+            }
+        }
+
+        // Save property
+        window.saveProperty = function() {
+            if (!currentProperty) return;
+            
+            const { path, schema } = currentProperty;
+            let value;
+            
+            // State-driven property
+            if (schema.resolvedType === 'array' && schema.items?.properties?.$id) {
+                const states = getStateOptions(schema.items.properties.$id);
+                value = [];
+                
+                // Collect values for all states
+                states.forEach(state => {
+                    // Temporarily render state to get value
+                    currentState = state;
+                    const tempDiv = document.createElement('div');
+                    renderStateEditor(schema.items, tempDiv, state);
+                    
+                    // Get the value from the state
+                    const colorInput = document.getElementById('colorValue');
+                    const hexInput = document.getElementById('hexValue');
+                    const basicInput = document.getElementById('propertyValue');
+                    
+                    let stateValue;
+                    if (colorInput) {
+                        stateValue = {
+                            color: {
+                                solid: {
+                                    color: hexInput?.value || colorInput.value
+                                }
+                            }
+                        };
+                    } else if (basicInput) {
+                        stateValue = basicInput.type === 'checkbox' ? 
+                            basicInput.checked : basicInput.value;
+                    }
+                    
+                    if (stateValue !== undefined) {
+                        value.push({
+                            $id: state,
+                            ...stateValue
+                        });
+                    }
+                });
+            }
+            // OneOf property
+            else if (schema.resolvedType === 'oneOf') {
+                const selected = document.querySelector('.oneOf-card.selected');
+                if (selected) {
+                    const colorInput = document.getElementById('colorValue');
+                    if (colorInput) {
+                        value = [{
+                            color: {
+                                solid: {
+                                    color: document.getElementById('hexValue')?.value || colorInput.value
+                                }
+                            }
+                        }];
+                    }
+                }
+            }
+            // Color property
+            else if (document.getElementById('colorValue')) {
+                value = [{
+                    color: {
+                        solid: {
+                            color: document.getElementById('hexValue')?.value || 
+                                   document.getElementById('colorValue').value
+                        }
+                    }
+                }];
+            }
+            // Basic property
+            else {
+                const input = document.getElementById('propertyValue');
+                if (input) {
+                    value = input.type === 'checkbox' ? input.checked : input.value;
+                    
+                    // Wrap in array if needed
+                    if (schema.resolvedType === 'array') {
+                        value = [{ value }];
+                    }
+                }
+            }
+            
+            setThemeValue(path, value, schema);
+            updateThemeOutput();
+            closeModal();
+            selectComponent(currentComponent);
+        }
+
+        // Set theme value
+        function setThemeValue(path, value, schema) {
+            if (!currentComponent) return;
+            
+            const root = showingCommonCards ? 'commonCards' : 'visualStyles';
+            
+            if (!theme[root]) theme[root] = {};
+            if (!theme[root][currentComponent]) theme[root][currentComponent] = {};
+            
+            // Handle nested paths
+            let current = theme[root][currentComponent];
+            
+            // Skip the component name in path
+            const propPath = path.slice(path[0] === currentComponent ? 1 : 0);
+            
+            // Handle * in path
+            if (propPath[0] === '*') {
+                if (!current['*']) current['*'] = {};
+                current = current['*'];
+                propPath.shift();
+            }
+            
+            // Set the value
+            if (propPath.length === 0) {
+                // Root level
+                theme[root][currentComponent] = value;
+            } else {
+                // Navigate to parent
+                for (let i = 0; i < propPath.length - 1; i++) {
+                    if (!current[propPath[i]]) current[propPath[i]] = {};
+                    current = current[propPath[i]];
+                }
+                
+                // Set final value
+                current[propPath[propPath.length - 1]] = value;
+            }
+        }
+
+        // Get theme value
+        function getThemeValue(path) {
+            if (!currentComponent) return undefined;
+            
+            const root = showingCommonCards ? 'commonCards' : 'visualStyles';
+            if (!theme[root]?.[currentComponent]) return undefined;
+            
+            let current = theme[root][currentComponent];
+            const propPath = path.slice(path[0] === currentComponent ? 1 : 0);
+            
+            for (const segment of propPath) {
+                if (!current[segment]) return undefined;
+                current = current[segment];
+            }
+            
+            return current;
+        }
+
+        // Helper functions
+        function selectState(state) {
+            currentState = state;
+            document.querySelectorAll('.state-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.textContent.toLowerCase() === state);
+            });
+            
+            const contentDiv = document.getElementById('stateContent');
+            if (contentDiv && currentProperty) {
+                renderStateEditor(currentProperty.schema.items, contentDiv, state);
+            }
+        }
+
+        function getStateOptions(idSchema) {
+            if (idSchema.enum) return idSchema.enum;
+            if (idSchema.anyOf) {
+                const options = [];
+                idSchema.anyOf.forEach(option => {
+                    if (option.enum) options.push(...option.enum);
+                });
+                return options;
+            }
+            return ['default', 'hover', 'selected', 'disabled'];
+        }
+
+        function getTypeDescription(schema) {
+            if (schema.resolvedType === 'oneOf') return `oneOf[${schema.options.length}]`;
+            if (schema.resolvedType === 'enum') return `enum[${schema.enumValues.length}]`;
+            if (schema.refPath) return `→ ${schema.refPath.replace('#/definitions/', '')}`;
+            return schema.resolvedType;
+        }
+
+        function getOneOfLabel(option) {
+            if (option.properties?.solid) return 'Solid Color';
+            if (option.properties?.gradient) return 'Gradient';
+            if (option.properties?.pattern) return 'Pattern';
+            if (option.properties?.image) return 'Image';
+            if (option.properties?.expr) return 'Expression';
+            if (option.properties) return Object.keys(option.properties).join(', ');
+            return 'Custom';
+        }
+
+        function formatName(name) {
+            return name
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^./, str => str.toUpperCase())
+                .trim();
+        }
+
+        function updateThemeOutput() {
+            document.getElementById('themeOutput').textContent = JSON.stringify(theme, null, 2);
+        }
+
+        // UI functions
+        window.showVisuals = function() {
+            showingCommonCards = false;
+            document.getElementById('visualsTab').className = 'flex-1 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600';
+            document.getElementById('commonCardsTab').className = 'flex-1 py-2 text-sm font-medium text-gray-600';
+            loadComponents();
+        }
+
+        window.showCommonCards = function() {
+            showingCommonCards = true;
+            document.getElementById('visualsTab').className = 'flex-1 py-2 text-sm font-medium text-gray-600';
+            document.getElementById('commonCardsTab').className = 'flex-1 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600';
+            loadComponents();
+        }
+
+        window.closeModal = function() {
+            document.getElementById('propertyModal').classList.add('hidden');
+            currentProperty = null;
+            currentState = 'default';
+        }
+
+        window.exportTheme = function() {
+            const blob = new Blob([JSON.stringify(theme, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'theme.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        window.copyTheme = function() {
+            navigator.clipboard.writeText(JSON.stringify(theme, null, 2));
+            alert('Theme copied to clipboard!');
+        }
+    </script>
+</body>
+</html>

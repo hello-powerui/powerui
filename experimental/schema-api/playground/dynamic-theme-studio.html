@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Theme Studio - Powered by Schema API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .json-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+        .property-input:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 1px;
+        }
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .complex-property {
+            border-left: 3px solid #6366f1;
+            padding-left: 12px;
+        }
+        .nested-property {
+            margin-left: 20px;
+            border-left: 2px dotted #d1d5db;
+            padding-left: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <div class="bg-white border-b sticky top-0 z-50">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold">Dynamic Theme Studio</h1>
+                        <p class="text-sm text-gray-600">Real-time theme generation with Schema API</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span id="apiStatus" class="flex items-center text-sm">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                            <span id="propertyCount">Loading...</span>
+                        </span>
+                        <button onclick="copyTheme()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            Export Theme
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-6 py-6">
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Left: Visual Explorer -->
+                <div class="col-span-3">
+                    <div class="bg-white rounded-lg shadow-sm sticky top-20">
+                        <div class="p-4 border-b">
+                            <h2 class="font-semibold mb-3">Visual Explorer</h2>
+                            <input 
+                                type="text" 
+                                id="visualSearch" 
+                                placeholder="Search visuals..."
+                                class="w-full px-3 py-2 border rounded-lg text-sm"
+                                oninput="filterVisuals()"
+                            >
+                        </div>
+                        <div id="visualList" class="max-h-96 overflow-y-auto p-2">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center: Property Editor -->
+                <div class="col-span-6">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="p-4 border-b">
+                            <h2 class="font-semibold">Property Editor</h2>
+                            <p class="text-sm text-gray-600 mt-1" id="currentVisual">Select a visual to begin</p>
+                        </div>
+                        
+                        <!-- Property Categories -->
+                        <div class="p-4">
+                            <div class="flex space-x-2 mb-4 border-b">
+                                <button onclick="showCategory('all')" class="category-tab px-3 py-2 text-sm font-medium border-b-2 border-blue-600">All</button>
+                                <button onclick="showCategory('color')" class="category-tab px-3 py-2 text-sm font-medium">Colors</button>
+                                <button onclick="showCategory('text')" class="category-tab px-3 py-2 text-sm font-medium">Text</button>
+                                <button onclick="showCategory('layout')" class="category-tab px-3 py-2 text-sm font-medium">Layout</button>
+                                <button onclick="showCategory('data')" class="category-tab px-3 py-2 text-sm font-medium">Data</button>
+                            </div>
+                            
+                            <div id="propertyList" class="space-y-4 max-h-96 overflow-y-auto">
+                                <!-- Dynamically populated -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Live Preview -->
+                <div class="col-span-3">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="p-4 border-b">
+                            <h2 class="font-semibold">Theme Preview</h2>
+                        </div>
+                        <div class="json-output p-4 max-h-96 overflow-auto">
+                            <pre id="themePreview">{
+  "name": "My Theme",
+  "visualStyles": {}
+}</pre>
+                        </div>
+                    </div>
+
+                    <!-- Property Info -->
+                    <div class="bg-white rounded-lg shadow-sm mt-4">
+                        <div class="p-4">
+                            <h3 class="font-semibold mb-2">Property Info</h3>
+                            <div id="propertyInfo" class="text-sm text-gray-600">
+                                <p>Hover over a property to see details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001';
+        let allVisuals = [];
+        let currentVisual = null;
+        let visualProperties = {};
+        let theme = {
+            name: "My Theme",
+            visualStyles: {}
+        };
+        let currentCategory = 'all';
+
+        // Initialize
+        async function init() {
+            try {
+                // Get properties and extract visuals from paths
+                const [propsRes, statsRes] = await Promise.all([
+                    fetch(`${API_URL}/api/properties?limit=5000`),
+                    fetch(`${API_URL}/api/stats`)
+                ]);
+                
+                const propsData = await propsRes.json();
+                const stats = await statsRes.json();
+                
+                // Extract visuals from property paths (visualStyles.{visual}.*.*)
+                const visualMap = new Map();
+                propsData.results.forEach(prop => {
+                    if (prop.path && prop.path.includes('visualStyles.')) {
+                        const match = prop.path.match(/visualStyles\.([^.]+)\./);
+                        if (match && match[1]) {
+                            const visual = match[1];
+                            if (!visualMap.has(visual)) {
+                                visualMap.set(visual, 0);
+                            }
+                            visualMap.set(visual, visualMap.get(visual) + 1);
+                        }
+                    }
+                });
+                
+                // Convert to array format
+                allVisuals = Array.from(visualMap.entries())
+                    .map(([name, count]) => ({
+                        id: name,
+                        name: name,
+                        displayName: name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim(),
+                        propertyCount: count
+                    }))
+                    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+                
+                document.getElementById('propertyCount').textContent = `${stats.totalProperties} properties • ${allVisuals.length} visuals`;
+                
+                renderVisualList();
+            } catch (error) {
+                console.error('Failed to initialize:', error);
+                document.getElementById('apiStatus').innerHTML = '<span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>API Error';
+            }
+        }
+
+        // Render visual list
+        function renderVisualList() {
+            const container = document.getElementById('visualList');
+            container.innerHTML = '';
+            
+            const searchTerm = document.getElementById('visualSearch').value.toLowerCase();
+            const filtered = allVisuals.filter(v => 
+                v.name.toLowerCase().includes(searchTerm) || 
+                v.displayName.toLowerCase().includes(searchTerm)
+            );
+            
+            filtered.forEach(visual => {
+                const div = document.createElement('div');
+                div.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer rounded text-sm';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span>${visual.displayName}</span>
+                        <span class="text-xs text-gray-400">${visual.propertyCount}</span>
+                    </div>
+                `;
+                div.onclick = () => selectVisual(visual.name);
+                if (visual.name === currentVisual) {
+                    div.className += ' bg-blue-50 text-blue-600 font-medium';
+                }
+                container.appendChild(div);
+            });
+        }
+
+        // Select visual
+        async function selectVisual(visual) {
+            currentVisual = visual;
+            document.getElementById('currentVisual').textContent = `Editing: ${formatVisualName(visual)}`;
+            renderVisualList();
+            
+            // Show loading state
+            const propContainer = document.getElementById('propertyList');
+            propContainer.innerHTML = '<div class="loading-skeleton h-20 rounded mb-3"></div>'.repeat(5);
+            
+            try {
+                // Search for properties by visual name in path
+                const searchQuery = `visualStyles.${visual}`;
+                const res = await fetch(`${API_URL}/api/properties?text=${searchQuery}&limit=200`);
+                const data = await res.json();
+                
+                // Filter to only this visual's properties
+                const visualProps = data.results.filter(prop => 
+                    prop.path && prop.path.includes(`visualStyles.${visual}.`)
+                );
+                
+                // Group properties by category
+                const grouped = groupProperties(visualProps);
+                renderProperties(grouped);
+            } catch (error) {
+                console.error('Failed to load properties:', error);
+                propContainer.innerHTML = '<p class="text-red-500">Failed to load properties</p>';
+            }
+        }
+
+        // Group properties by category/type
+        function groupProperties(properties) {
+            const groups = {
+                color: [],
+                text: [],
+                layout: [],
+                data: [],
+                other: []
+            };
+            
+            properties.forEach(prop => {
+                if (prop.path.includes('color') || prop.path.includes('Color') || 
+                    prop.path.includes('background') || prop.path.includes('border') ||
+                    prop.category === 'color') {
+                    groups.color.push(prop);
+                } else if (prop.path.includes('font') || prop.path.includes('text') || 
+                          prop.path.includes('label') || prop.title.includes('Text')) {
+                    groups.text.push(prop);
+                } else if (prop.path.includes('padding') || prop.path.includes('margin') ||
+                          prop.path.includes('size') || prop.path.includes('width') ||
+                          prop.path.includes('height') || prop.path.includes('position')) {
+                    groups.layout.push(prop);
+                } else if (prop.path.includes('data') || prop.path.includes('value') ||
+                          prop.path.includes('format')) {
+                    groups.data.push(prop);
+                } else {
+                    groups.other.push(prop);
+                }
+            });
+            
+            return groups;
+        }
+
+        // Render properties
+        function renderProperties(grouped) {
+            const container = document.getElementById('propertyList');
+            container.innerHTML = '';
+            
+            let propsToShow = [];
+            if (currentCategory === 'all') {
+                // Show a mix of all categories
+                Object.values(grouped).forEach(group => {
+                    propsToShow.push(...group.slice(0, 5));
+                });
+            } else {
+                propsToShow = grouped[currentCategory] || [];
+            }
+            
+            // Remove duplicates and limit
+            const seen = new Set();
+            propsToShow = propsToShow.filter(prop => {
+                if (seen.has(prop.path)) return false;
+                seen.add(prop.path);
+                return true;
+            }).slice(0, 30);
+            
+            propsToShow.forEach(prop => {
+                const div = createPropertyInput(prop);
+                container.appendChild(div);
+            });
+            
+            if (propsToShow.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">No properties in this category</p>';
+            }
+        }
+
+        // Create property input based on type
+        function createPropertyInput(prop) {
+            const div = document.createElement('div');
+            div.className = 'border rounded-lg p-3 hover:border-blue-300 transition-colors';
+            
+            // Check if it's a complex property
+            const isComplex = prop.type === 'array' && !prop.path.includes('*');
+            if (isComplex) {
+                div.className += ' complex-property';
+            }
+            
+            // Property header
+            const header = document.createElement('div');
+            header.className = 'flex items-start justify-between mb-2';
+            header.innerHTML = `
+                <div>
+                    <h4 class="font-medium text-sm">${prop.title}</h4>
+                    ${prop.description ? `<p class="text-xs text-gray-600 mt-1">${prop.description}</p>` : ''}
+                </div>
+                <span class="text-xs text-gray-400">${prop.type}</span>
+            `;
+            div.appendChild(header);
+            
+            // Create appropriate input
+            const input = createInput(prop);
+            div.appendChild(input);
+            
+            // Add hover info
+            div.onmouseenter = () => showPropertyInfo(prop);
+            
+            return div;
+        }
+
+        // Create input element
+        function createInput(prop) {
+            const wrapper = document.createElement('div');
+            const propPath = prop.path;
+            const propId = prop.id;
+            
+            // Determine input type based on property characteristics
+            if (prop.category === 'color' || propPath.includes('color') || propPath.includes('Color') ||
+                propPath.includes('background') || propPath.includes('border') || propPath.includes('fill')) {
+                // Color input with preview
+                const defaultColor = propPath.includes('background') ? '#FFFFFF' : '#000000';
+                wrapper.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <input type="color" 
+                               id="${propId}" 
+                               value="${defaultColor}" 
+                               onchange="updateProperty('${propId}', '${propPath}', this.value, 'color')"
+                               class="w-10 h-10 border rounded cursor-pointer">
+                        <input type="text" 
+                               value="${defaultColor}" 
+                               onchange="document.getElementById('${propId}').value = this.value; updateProperty('${propId}', '${propPath}', this.value, 'color')"
+                               class="flex-1 px-2 py-1 border rounded text-sm font-mono">
+                    </div>
+                `;
+            } else if (prop.type === 'boolean' || propPath.includes('show') || propPath.includes('enabled') ||
+                      propPath.includes('visible') || propPath.includes('hide')) {
+                // Toggle switch
+                wrapper.innerHTML = `
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" 
+                               onchange="updateProperty('${propId}', '${propPath}', this.checked, 'boolean')"
+                               class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <span class="ml-3 text-sm">Enabled</span>
+                    </label>
+                `;
+            } else if (prop.type === 'number' || propPath.includes('size') || propPath.includes('width')) {
+                // Number input with slider
+                wrapper.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <input type="range" 
+                               min="0" max="100" value="12"
+                               oninput="this.nextElementSibling.value = this.value; updateProperty('${propId}', '${propPath}', this.value, 'number')"
+                               class="flex-1">
+                        <input type="number" 
+                               value="12" 
+                               onchange="this.previousElementSibling.value = this.value; updateProperty('${propId}', '${propPath}', this.value, 'number')"
+                               class="w-16 px-2 py-1 border rounded text-sm">
+                    </div>
+                `;
+            } else if (propPath.includes('font') || propPath.includes('Family')) {
+                // Font selector
+                const fonts = ['Arial', 'Helvetica', 'Georgia', 'Times New Roman', 'Courier New', 'Verdana', 
+                              'Segoe UI', 'Roboto', 'Open Sans', 'Montserrat', 'Lato'];
+                wrapper.innerHTML = `
+                    <select onchange="updateProperty('${propId}', '${propPath}', this.value, 'string')"
+                            class="w-full px-2 py-1 border rounded text-sm">
+                        ${fonts.map(f => `<option value="${f}">${f}</option>`).join('')}
+                    </select>
+                `;
+            } else if (propPath.includes('position') || propPath.includes('align') || propPath.includes('placement')) {
+                // Position/alignment selector
+                const positions = propPath.includes('align') ? 
+                    ['left', 'center', 'right', 'justify'] : 
+                    ['top', 'bottom', 'left', 'right', 'center'];
+                wrapper.innerHTML = `
+                    <select onchange="updateProperty('${propId}', '${propPath}', this.value, 'string')"
+                            class="w-full px-2 py-1 border rounded text-sm">
+                        ${positions.map(p => `<option value="${p}">${p.charAt(0).toUpperCase() + p.slice(1)}</option>`).join('')}
+                    </select>
+                `;
+            } else if (propPath.includes('style') || propPath.includes('preset')) {
+                // Style preset selector
+                const styles = ['default', 'minimal', 'modern', 'classic', 'bold'];
+                wrapper.innerHTML = `
+                    <select onchange="updateProperty('${propId}', '${propPath}', this.value, 'string')"
+                            class="w-full px-2 py-1 border rounded text-sm">
+                        ${styles.map(s => `<option value="${s}">${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join('')}
+                    </select>
+                `;
+            } else if (propPath.includes('transparency') || propPath.includes('opacity')) {
+                // Transparency slider
+                wrapper.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <input type="range" 
+                               min="0" max="100" value="100"
+                               oninput="this.nextElementSibling.value = this.value + '%'; updateProperty('${propId}', '${propPath}', this.value, 'number')"
+                               class="flex-1">
+                        <input type="text" 
+                               value="100%" 
+                               readonly
+                               class="w-16 px-2 py-1 border rounded text-sm text-center bg-gray-50">
+                    </div>
+                `;
+            } else {
+                // Default text input
+                wrapper.innerHTML = `
+                    <input type="text" 
+                           placeholder="Enter value"
+                           onchange="updateProperty('${propId}', '${propPath}', this.value, 'string')"
+                           class="w-full px-2 py-1 border rounded text-sm property-input">
+                `;
+            }
+            
+            return wrapper;
+        }
+
+        // Update property
+        function updateProperty(propId, propPath, value, type) {
+            const pathParts = propPath.split('.');
+            const propName = pathParts[pathParts.length - 1];
+            const visual = pathParts[1]; // visualStyles.{visual}.*.*
+            
+            if (!theme.visualStyles[visual]) {
+                theme.visualStyles[visual] = { "*": {} };
+            }
+            
+            // Format value based on type
+            let formatted;
+            if (type === 'color') {
+                formatted = [{
+                    color: {
+                        solid: {
+                            color: value
+                        }
+                    }
+                }];
+            } else if (type === 'number') {
+                formatted = [{ value: parseFloat(value) }];
+            } else if (type === 'boolean') {
+                formatted = [{ value: value }];
+            } else if (type === 'string') {
+                formatted = [{ value: value }];
+            } else {
+                formatted = value;
+            }
+            
+            theme.visualStyles[visual]["*"][propName] = formatted;
+            updateThemePreview();
+        }
+
+        // Update theme preview
+        function updateThemePreview() {
+            // Clean up empty visual styles
+            Object.keys(theme.visualStyles).forEach(visual => {
+                if (Object.keys(theme.visualStyles[visual]["*"]).length === 0) {
+                    delete theme.visualStyles[visual];
+                }
+            });
+            
+            document.getElementById('themePreview').textContent = JSON.stringify(theme, null, 2);
+        }
+
+        // Show property info
+        function showPropertyInfo(prop) {
+            const info = document.getElementById('propertyInfo');
+            info.innerHTML = `
+                <p class="font-medium">${prop.title}</p>
+                <p class="text-xs mt-1">Path: ${prop.path}</p>
+                <p class="text-xs">Type: ${Array.isArray(prop.type) ? prop.type.join(' | ') : prop.type}</p>
+                ${prop.constraints && Object.keys(prop.constraints).length > 0 ? 
+                    `<p class="text-xs">Constraints: ${JSON.stringify(prop.constraints)}</p>` : ''}
+            `;
+        }
+
+        // Show category
+        function showCategory(category) {
+            currentCategory = category;
+            
+            // Update tab styles
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.className = 'category-tab px-3 py-2 text-sm font-medium';
+            });
+            event.target.className = 'category-tab px-3 py-2 text-sm font-medium border-b-2 border-blue-600';
+            
+            // Re-render properties
+            if (currentVisual) {
+                selectVisual(currentVisual);
+            }
+        }
+
+        // Filter visuals
+        function filterVisuals() {
+            renderVisualList();
+        }
+
+        // Copy theme
+        function copyTheme() {
+            navigator.clipboard.writeText(JSON.stringify(theme, null, 2)).then(() => {
+                // Show success message
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.className = 'px-4 py-2 bg-green-600 text-white rounded-lg';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700';
+                }, 2000);
+            });
+        }
+
+        // Format visual name
+        function formatVisualName(name) {
+            return name
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^./, str => str.toUpperCase())
+                .trim();
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

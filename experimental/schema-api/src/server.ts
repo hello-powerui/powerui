@@ -158,6 +158,29 @@ app.post('/api/query', (req, res) => {
   res.json(results);
 });
 
+// Get all visuals with property counts
+app.get('/api/visuals', (req, res) => {
+  const properties = api.searchProperties({ limit: 5000 });
+  const visualSet = new Set<string>();
+  
+  if (properties && properties.results) {
+    properties.results.forEach(prop => {
+      if (prop.visuals && Array.isArray(prop.visuals)) {
+        prop.visuals.forEach(v => visualSet.add(v));
+      }
+    });
+  }
+  
+  const visuals = Array.from(visualSet).sort().map(v => ({
+    id: v,
+    name: v,
+    displayName: v.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim(),
+    propertyCount: properties.results.filter(p => p.visuals && p.visuals.includes(v)).length
+  }));
+  
+  res.json({ visuals, total: visuals.length });
+});
+
 // Get related properties
 app.get('/api/properties/:id/related', (req, res) => {
   const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
@@ -185,6 +208,49 @@ app.get('/api/properties/:id/examples', (req, res) => {
 app.get('/api/stats', (req, res) => {
   const stats = api.getStats();
   res.json(stats);
+});
+
+// Get full schema
+app.get('/api/schema/full', async (req, res) => {
+  try {
+    // Load the full schema
+    const schemaPath = path.join(__dirname, '../../../public/theme-schemas/reportThemeSchema-2.143.json');
+    const schemaData = await fs.readFile(schemaPath, 'utf-8');
+    const schema = JSON.parse(schemaData);
+    
+    res.json(schema);
+  } catch (error) {
+    console.error('Error loading schema:', error);
+    res.status(500).json({ error: 'Failed to load schema' });
+  }
+});
+
+// Get resolved schema for a visual
+app.get('/api/schema/visual/:visual', async (req, res) => {
+  const { visual } = req.params;
+  
+  try {
+    // Load the full schema
+    const schemaPath = path.join(__dirname, '../../../public/theme-schemas/reportThemeSchema-2.143.json');
+    const schemaData = await fs.readFile(schemaPath, 'utf-8');
+    const schema = JSON.parse(schemaData);
+    
+    // Get visual schema
+    const visualSchema = schema.properties?.visualStyles?.properties?.[visual];
+    if (!visualSchema) {
+      return res.status(404).json({ error: 'Visual not found' });
+    }
+    
+    // Return with definitions for client-side resolution
+    res.json({
+      visual,
+      schema: visualSchema,
+      definitions: schema.definitions
+    });
+  } catch (error) {
+    console.error('Error loading visual schema:', error);
+    res.status(500).json({ error: 'Failed to load schema' });
+  }
 });
 
 // Start server

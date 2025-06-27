@@ -356,7 +356,7 @@ function ThemeStudioContent() {
             ) : (
               <>
                 {/* Power BI Preview - Keep mounted but use CSS to show/hide */}
-                <div style={{ display: viewMode === 'preview' ? 'block' : 'none', height: '100%' }}>
+                <div style={{ display: viewMode === 'preview' ? 'block' : 'none', height: '100%', position: 'relative' }}>
                   <PowerBIPreview 
                     generatedTheme={themeStudio.previewTheme}
                     selectedVisualType={themeStudio.selectedVisual}
