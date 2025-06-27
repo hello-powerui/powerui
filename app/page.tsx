@@ -1,7 +1,6 @@
 import { headers } from 'next/headers';
 import ComingSoonPage from '@/components/coming-soon';
 import LandingPage from '@/components/landing-page';
-import './(public)/page.css';
 
 export default async function Page() {
   // Check if we're in coming soon mode
