@@ -3,7 +3,7 @@ import ComingSoonPage from '@/components/coming-soon';
 import dynamic from 'next/dynamic';
 
 // Dynamically import the landing page to avoid build issues
-const LandingPage = dynamic(() => import('./(public)/page'), {
+const LandingPage = dynamic(() => import('@/components/landing-page'), {
   ssr: true
 });
 
