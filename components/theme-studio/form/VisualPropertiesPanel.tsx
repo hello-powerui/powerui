@@ -231,8 +231,6 @@ export function VisualPropertiesPanel({
                     schemaLoader={schemaLoader}
                     path={path}
                     level={level}
-                    hasChanges={hasChangesInSection([...path, name])}
-                    changedCount={getChangedPropertiesCount([...path, name])}
                   />
                 ))}
               </div>
@@ -257,8 +255,6 @@ export function VisualPropertiesPanel({
                   schemaLoader={schemaLoader}
                   path={path}
                   level={level}
-                  hasChanges={hasChangesInSection([...path, name])}
-                  changedCount={getChangedPropertiesCount([...path, name])}
                 />
               ))
             ) : (

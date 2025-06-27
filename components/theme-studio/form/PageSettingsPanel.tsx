@@ -138,8 +138,6 @@ export function PageSettingsPanel({
           title="Default Settings"
           tooltip="Core page configuration and general settings"
           defaultOpen={false}
-          hasChanges={getChangedPropertiesCount([...basePath, '*', '*']) > 0}
-          indicatorCount={getChangedPropertiesCount([...basePath, '*', '*'])}
           onClear={hasActualContent(starValue['*']) ? () => handleClearSection('*') : undefined}
           hasContent={hasActualContent(starValue['*'])}
         >
@@ -169,8 +167,6 @@ export function PageSettingsPanel({
             title={section.title}
             tooltip={section.tooltip}
             defaultOpen={false}
-            hasChanges={changeCount > 0}
-            indicatorCount={changeCount}
             onClear={hasActualContent(sectionValue) ? () => handleClearSection(section.propertyKey) : undefined}
             hasContent={hasActualContent(sectionValue)}
           >

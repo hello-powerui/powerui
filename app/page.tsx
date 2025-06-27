@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import ComingSoonClient from './(coming-soon)/page';
+import ComingSoonPage from '@/components/coming-soon';
 import LandingPage from './(public)/page';
 
 export default async function Page() {
@@ -13,7 +13,7 @@ export default async function Page() {
     const hasAdminAccess = cookie?.includes('admin-access=true');
     
     if (!hasAdminAccess) {
-      return <ComingSoonClient />;
+      return <ComingSoonPage />;
     }
   }
   

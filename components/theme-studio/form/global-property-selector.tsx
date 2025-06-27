@@ -237,7 +237,6 @@ export function GlobalPropertySelector({
                       }
                     }
                   }}
-                  hasContent={hasContent}
                   clearMessage={`Clear all ${sectionTitle.toLowerCase()} settings?`}
                 >
                   <SchemaForm

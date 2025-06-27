@@ -170,7 +170,6 @@ export function StructuralColorsTab() {
                 });
                 setStructuralColors(updatedColors);
               }}
-              hasContent={hasCustomColors}
               clearMessage={`Clear all color customizations in the ${groupName} group?`}
             >
             <div className={`${THEME_STUDIO_SPACING.propertyGap} pt-2`}>

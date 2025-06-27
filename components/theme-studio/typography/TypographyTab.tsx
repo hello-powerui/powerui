@@ -317,7 +317,6 @@ export function TypographyTab() {
                   [name]: resetClass
                 }));
               }}
-              hasContent={hasCustomization}
               clearMessage={`Clear all customizations for the ${name} text class?`}
               headerAction={
                 <div

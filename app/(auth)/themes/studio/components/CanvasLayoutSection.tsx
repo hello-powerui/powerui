@@ -66,7 +66,6 @@ export function CanvasLayoutSection({
               title="Report Canvas"
               tooltip="Controls the overall report appearance and behavior"
               defaultOpen={false}
-              hasChanges={hasActualContent(visualSettings.report?.['*'])}
               onClear={onClearSection ? () => onClearSection('report') : undefined}
               hasContent={hasActualContent(visualSettings.report?.['*'])}
             >
@@ -109,7 +108,6 @@ export function CanvasLayoutSection({
               title="Filter Pane"
               tooltip="Customize the appearance of filter panes and cards"
               defaultOpen={false}
-              hasChanges={hasActualContent(visualSettings.filter?.['*'])}
               onClear={onClearSection ? () => onClearSection('filter') : undefined}
               hasContent={hasActualContent(visualSettings.filter?.['*'])}
             >
