@@ -77,7 +77,7 @@ function FoundationPanelComponent({
     if (theme.brandColor && theme.brandColor !== brandColor) {
       setBrandColor(theme.brandColor);
     }
-  }, [theme.brandColor]);
+  }, [theme.brandColor, brandColor]);
   const [isGeneratingBrand, setIsGeneratingBrand] = useState(false);
   
   // Convert state palettes to hex for display
