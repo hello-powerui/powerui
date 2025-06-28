@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateNeutralPalette } from '@/lib/theme-generation/neutral-palette';
-import { NeutralPaletteGenerationInput } from '@/lib/theme-generation/types';
+import { generateBrandPaletteWithName } from '@/lib/theme-generation/brand-palette';
+import { BrandPaletteGenerationInput } from '@/lib/theme-generation/brand-palette';
 import { requireUser } from '@/lib/utils/get-current-user';
 
 export async function POST(req: NextRequest) {
@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     await requireUser();
 
     // Parse request body
-    const data: NeutralPaletteGenerationInput = await req.json();
+    const data: BrandPaletteGenerationInput = await req.json();
 
     if (!data.hexColor) {
       return NextResponse.json(
@@ -19,12 +19,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate palette using our enhanced algorithm
-    const result = await generateNeutralPalette(data);
+    const result = await generateBrandPaletteWithName(data);
     return NextResponse.json(result);
   } catch (error) {
-    // console.error('Error generating neutral palette:', error);
+    // console.error('Error generating brand palette:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to generate neutral palette' },
+      { error: error instanceof Error ? error.message : 'Failed to generate brand palette' },
       { status: 500 }
     );
   }
