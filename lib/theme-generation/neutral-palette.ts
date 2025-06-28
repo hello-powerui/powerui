@@ -85,6 +85,7 @@ export function generateNeutralPaletteOffline(hexColor: string): ColorPalette {
   const baseColor = hexToOklch(hexColor);
   
   // Define shade mappings with perceptually uniform lightness values
+  // Adjusted dark end values for better distinction
   const shadeConfig = [
     { name: '25', lightnessTarget: 0.98, chromaFactor: 0.1 },
     { name: '50', lightnessTarget: 0.96, chromaFactor: 0.15 },
@@ -94,10 +95,10 @@ export function generateNeutralPaletteOffline(hexColor: string): ColorPalette {
     { name: '400', lightnessTarget: 0.61, chromaFactor: 0.8 },
     { name: '500', lightnessTarget: 0.48, chromaFactor: 1.0 },
     { name: '600', lightnessTarget: 0.38, chromaFactor: 0.9 },
-    { name: '700', lightnessTarget: 0.28, chromaFactor: 0.7 },
-    { name: '800', lightnessTarget: 0.19, chromaFactor: 0.5 },
-    { name: '900', lightnessTarget: 0.11, chromaFactor: 0.3 },
-    { name: '950', lightnessTarget: 0.05, chromaFactor: 0.2 }
+    { name: '700', lightnessTarget: 0.30, chromaFactor: 0.7 },
+    { name: '800', lightnessTarget: 0.22, chromaFactor: 0.5 },
+    { name: '900', lightnessTarget: 0.14, chromaFactor: 0.3 },
+    { name: '950', lightnessTarget: 0.07, chromaFactor: 0.2 }
   ];
 
   const palette: ColorPalette = {};
@@ -118,7 +119,8 @@ export function generateNeutralPaletteOffline(hexColor: string): ColorPalette {
     
     // Subtle hue shift for more natural neutrals
     // Cooler (bluer) at light end, warmer at dark end
-    const hueShift = (config.lightnessTarget - 0.5) * -15;
+    // Increased shift for darker colors to help with distinction
+    const hueShift = (config.lightnessTarget - 0.5) * -20;
     const adjustedHue = (baseColor.h + hueShift + 360) % 360;
     
     // Ensure values are within valid ranges

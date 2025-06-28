@@ -9,6 +9,7 @@ export function generateBrandPalette(hexColor: string): ColorPalette {
   
   // Define shade mappings with perceptually uniform lightness values
   // Brand colors typically have higher chroma than neutrals
+  // Adjusted dark end for better distinction
   const shadeConfig = [
     { name: '25', lightnessTarget: 0.97, chromaFactor: 0.15 },
     { name: '50', lightnessTarget: 0.95, chromaFactor: 0.25 },
@@ -18,10 +19,10 @@ export function generateBrandPalette(hexColor: string): ColorPalette {
     { name: '400', lightnessTarget: 0.58, chromaFactor: 0.9 },
     { name: '500', lightnessTarget: 0.45, chromaFactor: 1.0 }, // Base color
     { name: '600', lightnessTarget: 0.36, chromaFactor: 0.95 },
-    { name: '700', lightnessTarget: 0.27, chromaFactor: 0.85 },
-    { name: '800', lightnessTarget: 0.19, chromaFactor: 0.7 },
-    { name: '900', lightnessTarget: 0.12, chromaFactor: 0.5 },
-    { name: '950', lightnessTarget: 0.06, chromaFactor: 0.3 }
+    { name: '700', lightnessTarget: 0.28, chromaFactor: 0.85 },
+    { name: '800', lightnessTarget: 0.21, chromaFactor: 0.7 },
+    { name: '900', lightnessTarget: 0.14, chromaFactor: 0.5 },
+    { name: '950', lightnessTarget: 0.08, chromaFactor: 0.3 }
   ];
 
   const palette: ColorPalette = {};
