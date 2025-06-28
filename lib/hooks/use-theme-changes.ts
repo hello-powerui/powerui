@@ -9,6 +9,8 @@ interface ThemeChangesState {
   // Actions
   trackChange: (path: string[]) => void;
   clearChanges: () => void;
+  clearChangesForPath: (path: string[]) => void;
+  clearChangesForSection: (sectionPath: string[]) => void;
   hasChanges: (path?: string[]) => boolean;
   hasChangesInSection: (sectionPath: string[]) => boolean;
   setOriginalTheme: (theme: any) => void;
@@ -28,6 +30,25 @@ export const useThemeChanges = create<ThemeChangesState>((set, get) => ({
   
   clearChanges: () => {
     set({ changedPaths: new Set() });
+  },
+  
+  clearChangesForPath: (path: string[]) => {
+    const pathString = path.join('.');
+    set((state) => {
+      const newPaths = new Set(Array.from(state.changedPaths));
+      newPaths.delete(pathString);
+      return { changedPaths: newPaths };
+    });
+  },
+  
+  clearChangesForSection: (sectionPath: string[]) => {
+    const sectionPathString = sectionPath.join('.');
+    set((state) => {
+      const newPaths = new Set(
+        Array.from(state.changedPaths).filter(path => !path.startsWith(sectionPathString))
+      );
+      return { changedPaths: newPaths };
+    });
   },
   
   hasChanges: (path?: string[]) => {

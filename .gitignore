@@ -31,6 +31,9 @@ yarn-error.log*
 
 # local env files
 .env
+.env.local
+.env.development
+.env.production
 .env*.local
 
 # vercel
@@ -43,4 +46,14 @@ next-env.d.ts
 
 # development env files
 .env.dev
+
+# customer analysis data
+customer-analysis/
+
+# memberstack export data
+memberstack-export/
+
+# experimental folder - keep local only
+experimental/
+
 # Trigger deployment Sun Jun 22 15:32:32 EDT 2025

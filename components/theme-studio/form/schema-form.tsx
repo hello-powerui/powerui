@@ -87,20 +87,20 @@ export function SchemaForm({
               level={level}
             />
           );
-        } else {
-          // Not a visual definition, render normally
-          return (
-            <SchemaForm
-              schema={resolvedSchema}
-              value={value['*'] || value || {}}
-              onChange={handleStarPropertyChange}
-              schemaLoader={schemaLoader}
-              path={[...path, '*']}
-              level={level}
-              hideTitle={hideTitle}
-            />
-          );
         }
+        
+        // Not a visual definition, render normally
+        return (
+          <SchemaForm
+            schema={resolvedSchema}
+            value={value['*'] || value || {}}
+            onChange={handleStarPropertyChange}
+            schemaLoader={schemaLoader}
+            path={[...path, '*']}
+            level={level}
+            hideTitle={hideTitle}
+          />
+        );
       } else {
         // console.error('Failed to resolve visual schema:', starProperty.$ref);
       }

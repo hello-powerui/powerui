@@ -43,7 +43,7 @@ function ThemeStudioContent() {
   const loadedThemeIdRef = useRef<string | null>(null);
   
   // Visual styles panel width - fixed
-  const visualStylesPanelWidth = 450;
+  const visualStylesPanelWidth = 380;
   
   // Get visual styles directly from the store
   const visualSettings = themeStudio.theme.visualStyles || {};
@@ -181,7 +181,7 @@ function ThemeStudioContent() {
       
       {/* Header */}
       <header className="bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
-        <div className="max-w-full px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-6">
           <div className="flex items-center justify-between h-16">
             {/* Left side: Back button and theme name */}
             <div className="flex items-center">
@@ -320,11 +320,14 @@ function ThemeStudioContent() {
               theme={themeStudio.theme}
               colorPalette={themeStudio.colorPalette}
               neutralPalette={themeStudio.neutralPalette}
+              brandPalette={themeStudio.theme.brandPalette}
               visualSettings={visualSettings}
               hasChanges={(path) => themeStudio.changedPaths.has(path.join('.'))}
               onThemeChange={themeStudio.updateTheme}
               onColorPaletteChange={themeStudio.setColorPaletteId}
               onNeutralPaletteChange={themeStudio.setNeutralPaletteId}
+              onBrandPaletteChange={themeStudio.setBrandPalette}
+              onStatePaletteChange={themeStudio.setStatePalette}
               onThemeModeChange={themeStudio.setThemeMode}
               onFontFamilyChange={themeStudio.setFontFamily}
               onStructuralColorsChange={themeStudio.setStructuralColors}
@@ -356,7 +359,7 @@ function ThemeStudioContent() {
             ) : (
               <>
                 {/* Power BI Preview - Keep mounted but use CSS to show/hide */}
-                <div style={{ display: viewMode === 'preview' ? 'block' : 'none', height: '100%' }}>
+                <div style={{ display: viewMode === 'preview' ? 'block' : 'none', height: '100%', position: 'relative' }}>
                   <PowerBIPreview 
                     generatedTheme={themeStudio.previewTheme}
                     selectedVisualType={themeStudio.selectedVisual}

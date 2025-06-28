@@ -161,7 +161,7 @@ export function StructuralColorsTab() {
               tooltip={description}
               defaultOpen={false}
               badge={colors.length}
-              hasChanges={hasCustomColors}
+              hasContent={hasCustomColors}
               onClear={() => {
                 // Clear all colors in this group
                 const updatedColors = { ...structuralColors } as any;
@@ -170,7 +170,6 @@ export function StructuralColorsTab() {
                 });
                 setStructuralColors(updatedColors);
               }}
-              hasContent={hasCustomColors}
               clearMessage={`Clear all color customizations in the ${groupName} group?`}
             >
             <div className={`${THEME_STUDIO_SPACING.propertyGap} pt-2`}>

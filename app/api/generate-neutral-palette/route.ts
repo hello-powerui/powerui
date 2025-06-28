@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateNeutralPalette, generateNeutralPaletteOffline } from '@/lib/theme-generation/neutral-palette';
+import { generateNeutralPalette } from '@/lib/theme-generation/neutral-palette';
 import { NeutralPaletteGenerationInput } from '@/lib/theme-generation/types';
 import { requireUser } from '@/lib/utils/get-current-user';
 
@@ -18,19 +18,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Try to generate using the API
-    try {
-      const result = await generateNeutralPalette(data);
-      return NextResponse.json(result);
-    } catch (apiError) {
-
-      // Fallback to offline generation
-      const palette = generateNeutralPaletteOffline(data.hexColor);
-      return NextResponse.json({
-        name: 'Custom',
-        palette
-      });
-    }
+    // Generate palette using our enhanced algorithm
+    const result = await generateNeutralPalette(data);
+    return NextResponse.json(result);
   } catch (error) {
     // console.error('Error generating neutral palette:', error);
     return NextResponse.json(

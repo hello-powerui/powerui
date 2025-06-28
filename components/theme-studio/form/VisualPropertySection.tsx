@@ -8,6 +8,7 @@ import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 import { getContextualTitle } from '@/lib/theme-studio/utils/schema-form-utils';
 import { THEME_STUDIO_TYPOGRAPHY } from '../constants/typography';
+import { hasActualContent } from '@/lib/utils/theme-helpers';
 
 interface VisualPropertySectionProps {
   name: string;
@@ -18,8 +19,6 @@ interface VisualPropertySectionProps {
   schemaLoader: SchemaLoader;
   path: string[];
   level: number;
-  hasChanges: boolean;
-  changedCount: number;
 }
 
 export function VisualPropertySection({
@@ -30,9 +29,7 @@ export function VisualPropertySection({
   onChange,
   schemaLoader,
   path,
-  level,
-  hasChanges,
-  changedCount
+  level
 }: VisualPropertySectionProps) {
   const trackChangeRef = useThemeChanges(state => state.trackChange);
   
@@ -50,15 +47,16 @@ export function VisualPropertySection({
   // Import SchemaForm here to avoid circular dependency
   const { SchemaForm } = require('./schema-form');
   
+  // Check if section has actual content
+  const sectionHasContent = hasActualContent(value[name]);
+  
   return (
     <CollapsibleSection
       id={`${path.join('-')}-${name}`}
       title={title}
       defaultOpen={false}
-      hasChanges={hasChanges}
-      changedCount={changedCount}
       onClear={handleSectionReset}
-      hasContent={value[name] !== undefined && value[name] !== null}
+      hasContent={sectionHasContent}
       clearMessage={`Clear all ${title.toLowerCase()} settings? This will remove any customizations and use default values.`}
     >
       <div className="space-y-2">

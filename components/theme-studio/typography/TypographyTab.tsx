@@ -233,6 +233,10 @@ export function TypographyTab() {
         const neutralObj = (resolved.neutralPalette as any)?.colors || {};
         const resolvedColor = resolveToken(color, mode, { 
           neutral: neutralObj, 
+          brand: null,
+          success: null,
+          warning: null,
+          error: null,
           dataColors: dataColors as string[]
         });
         return resolvedColor || (mode === 'dark' ? '#FFFFFF' : '#000000');
@@ -302,7 +306,7 @@ export function TypographyTab() {
               title={name}
               tooltip={`${description} - Used in: ${usage}`}
               defaultOpen={false}
-              hasChanges={hasCustomization}
+              hasContent={hasCustomization}
               onClear={() => {
                 // Clear this specific text class
                 const updatedTextClasses = { ...textClasses } as any;
@@ -317,7 +321,6 @@ export function TypographyTab() {
                   [name]: resetClass
                 }));
               }}
-              hasContent={hasCustomization}
               clearMessage={`Clear all customizations for the ${name} text class?`}
               headerAction={
                 <div

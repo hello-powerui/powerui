@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
-import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 import { formatGroupTitle, getImportantSections } from '@/lib/theme-studio/utils/schema-form-utils';
 import { TAB_TYPES } from '@/lib/theme-studio/utils/schema-form-constants';
 import { VisualPropertySection } from './VisualPropertySection';
@@ -11,6 +10,7 @@ import { customVisualComponents } from './custom-visuals';
 import { THEME_STUDIO_TYPOGRAPHY } from '../constants/typography';
 import { VisualStates } from './VisualStates';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
+import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 
 interface VisualPropertiesPanelProps {
   schema: SchemaProperty;
@@ -30,10 +30,10 @@ export function VisualPropertiesPanel({
   level 
 }: VisualPropertiesPanelProps) {
   const [activeTab, setActiveTab] = useState<'specific' | 'general'>(TAB_TYPES.SPECIFIC);
-  const hasChangesInSection = useThemeChanges(state => state.hasChangesInSection);
-  const getChangedPropertiesCount = useThemeChanges(state => state.getChangedPropertiesCount);
   const selectedState = useThemeStudioStore(state => state.selectedState);
   const setSelectedState = useThemeStudioStore(state => state.setSelectedState);
+  const hasChangesInSection = useThemeChanges(state => state.hasChangesInSection);
+  const getChangedPropertiesCount = useThemeChanges(state => state.getChangedPropertiesCount);
   
   // Check if we have a custom component for this visual type
   // The path structure can be:
@@ -213,8 +213,6 @@ export function VisualPropertiesPanel({
                       schemaLoader={schemaLoader}
                       path={path}
                       level={level}
-                      hasChanges={hasChangesInSection([...path, name])}
-                      changedCount={getChangedPropertiesCount([...path, name])}
                     />
                   ))}
                 </div>
@@ -233,8 +231,6 @@ export function VisualPropertiesPanel({
                     schemaLoader={schemaLoader}
                     path={path}
                     level={level}
-                    hasChanges={hasChangesInSection([...path, name])}
-                    changedCount={getChangedPropertiesCount([...path, name])}
                   />
                 ))}
               </div>
@@ -259,8 +255,6 @@ export function VisualPropertiesPanel({
                   schemaLoader={schemaLoader}
                   path={path}
                   level={level}
-                  hasChanges={hasChangesInSection([...path, name])}
-                  changedCount={getChangedPropertiesCount([...path, name])}
                 />
               ))
             ) : (

@@ -35,3 +35,28 @@ export function hasActualContent(value: any): boolean {
     return true;
   });
 }
+
+/**
+ * Clean up empty objects from visual styles
+ */
+export function cleanupVisualStyles(visualStyles: Record<string, any>): Record<string, any> {
+  const cleaned: Record<string, any> = {};
+  
+  Object.entries(visualStyles).forEach(([visual, variants]) => {
+    if (!variants || typeof variants !== 'object') return;
+    
+    const cleanedVariants: Record<string, any> = {};
+    
+    Object.entries(variants).forEach(([variant, styles]) => {
+      if (hasActualContent(styles)) {
+        cleanedVariants[variant] = styles;
+      }
+    });
+    
+    if (Object.keys(cleanedVariants).length > 0) {
+      cleaned[visual] = cleanedVariants;
+    }
+  });
+  
+  return cleaned;
+}

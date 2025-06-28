@@ -23,6 +23,10 @@ export class ClientPreviewGenerator {
       neutral: Array.isArray(input.neutralPalette) 
         ? neutralColorsToShadeMap(input.neutralPalette)
         : input.neutralPalette as Record<string, string>,
+      brand: input.brandPalette || null,
+      success: input.successPalette || null,
+      warning: input.warningPalette || null,
+      error: input.errorPalette || null,
       dataColors: input.dataColors
     };
     

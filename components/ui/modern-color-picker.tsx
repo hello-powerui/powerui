@@ -368,6 +368,10 @@ function getTokenPreviewColor(
   // Create palettes object for token resolution
   const palettes: ColorPalettes = {
     neutral: neutralPalette || null,
+    brand: null,
+    success: null,
+    warning: null,
+    error: null,
     dataColors: dataColors
   };
   

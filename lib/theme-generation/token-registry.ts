@@ -3,6 +3,10 @@ import { NeutralPalette } from '@prisma/client';
 // Type definitions for theme configuration
 export interface ColorPalettes {
   neutral: Record<string, string> | null;
+  brand: Record<string, string> | null;
+  success: Record<string, string> | null;
+  warning: Record<string, string> | null;
+  error: Record<string, string> | null;
   dataColors: string[];
 }
 
@@ -16,93 +20,7 @@ export interface TokenDefinition {
 }
 
 export const TOKEN_REGISTRY: Record<string, TokenDefinition> = {
-  // Backgrounds
-  '@bg-primary': {
-    name: 'Primary background',
-    category: 'Backgrounds',
-    light: () => '#FFFFFF',
-    dark: (p) => p.neutral?.['950'] || '#0A0A0A'
-  },
-  '@bg-primary_alt': {
-    name: 'Primary alternative',
-    category: 'Backgrounds',
-    light: (p) => p.neutral?.['50'] || '#F5F5F5',
-    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
-  },
-  '@bg-primary_hover': {
-    name: 'Primary hover',
-    category: 'Backgrounds',
-    light: (p) => p.neutral?.['50'] || '#F5F5F5',
-    dark: (p) => p.neutral?.['800'] || '#333333'
-  },
-  '@bg-secondary': {
-    name: 'Secondary background',
-    category: 'Backgrounds',
-    light: (p) => p.neutral?.['50'] || '#F5F5F5',
-    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
-  },
-  '@bg-secondary_alt': {
-    name: 'Secondary alternative',
-    category: 'Backgrounds',
-    light: (p) => p.neutral?.['100'] || '#EEEEEE',
-    dark: (p) => p.neutral?.['800'] || '#333333'
-  },
-  '@bg-tertiary': {
-    name: 'Tertiary background',
-    category: 'Backgrounds',
-    light: (p) => p.neutral?.['100'] || '#EEEEEE',
-    dark: (p) => p.neutral?.['800'] || '#333333'
-  },
-  '@bg-quaternary': {
-    name: 'Quaternary background',
-    category: 'Backgrounds',
-    light: (p) => p.neutral?.['200'] || '#E0E0E0',
-    dark: (p) => p.neutral?.['700'] || '#404040'
-  },
-  '@bg-active': {
-    name: 'Active state',
-    category: 'Backgrounds',
-    light: (p) => p.neutral?.['50'] || '#F5F5F5',
-    dark: (p) => p.neutral?.['800'] || '#333333'
-  },
-  '@bg-disabled': {
-    name: 'Disabled state',
-    category: 'Backgrounds',
-    light: (p) => p.neutral?.['100'] || '#EEEEEE',
-    dark: (p) => p.neutral?.['800'] || '#333333'
-  },
-  '@bg-brand-primary': {
-    name: 'Brand primary',
-    category: 'Backgrounds',
-    light: () => '#2568E8',
-    dark: () => '#3B82F6'
-  },
-  '@bg-brand-solid': {
-    name: 'Brand solid',
-    category: 'Backgrounds',
-    light: () => '#2568E8',
-    dark: () => '#3B82F6'
-  },
-  '@bg-error-primary': {
-    name: 'Error background',
-    category: 'Backgrounds',
-    light: () => '#FEE2E2',
-    dark: () => '#7F1D1D'
-  },
-  '@bg-warning-primary': {
-    name: 'Warning background',
-    category: 'Backgrounds',
-    light: () => '#FEF3C7',
-    dark: () => '#78350F'
-  },
-  '@bg-success-primary': {
-    name: 'Success background',
-    category: 'Backgrounds',
-    light: () => '#D1FAE5',
-    dark: () => '#064E3B'
-  },
-
-  // Text
+  // Text - Default
   '@text-primary': {
     name: 'Primary text',
     category: 'Text',
@@ -118,47 +36,141 @@ export const TOKEN_REGISTRY: Record<string, TokenDefinition> = {
   '@text-tertiary': {
     name: 'Tertiary text',
     category: 'Text',
-    light: (p) => p.neutral?.['600'] || '#666666',
-    dark: (p) => p.neutral?.['400'] || '#999999'
+    light: (p) => p.neutral?.['500'] || '#808080',
+    dark: (p) => p.neutral?.['500'] || '#808080'
   },
-  '@text-disabled': {
-    name: 'Disabled text',
+  
+  // Text - Brand
+  '@text-brand': {
+    name: 'Brand text',
+    category: 'Text',
+    light: (p) => p.brand?.['600'] || '#2568E8',
+    dark: (p) => p.neutral?.['300'] || '#CCCCCC'
+  },
+  '@text-brand-hover': {
+    name: 'Brand text hover',
+    category: 'Text',
+    light: (p) => p.brand?.['700'] || '#1E50C0',
+    dark: (p) => p.brand?.['200'] || '#93BBFF'
+  },
+  '@text-brand-press': {
+    name: 'Brand text press',
+    category: 'Text',
+    light: (p) => p.brand?.['800'] || '#163A8C',
+    dark: (p) => p.brand?.['100'] || '#C6DAFF'
+  },
+  '@text-brand-disabled': {
+    name: 'Brand text disabled',
     category: 'Text',
     light: (p) => p.neutral?.['400'] || '#999999',
     dark: (p) => p.neutral?.['600'] || '#666666'
   },
-  '@text-placeholder': {
-    name: 'Placeholder text',
+  '@text-on-brand': {
+    name: 'Text on brand background',
     category: 'Text',
-    light: (p) => p.neutral?.['500'] || '#808080',
-    dark: (p) => p.neutral?.['500'] || '#808080'
+    light: (p) => p.neutral?.['25'] || '#FAFAFA',
+    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
   },
-  '@text-brand-primary': {
-    name: 'Brand text',
-    category: 'Text',
-    light: () => '#2568E8',
-    dark: () => '#60A5FA'
-  },
-  '@text-error-primary': {
-    name: 'Error text',
-    category: 'Text',
-    light: () => '#DC2626',
-    dark: () => '#EF4444'
-  },
-  '@text-warning-primary': {
-    name: 'Warning text',
-    category: 'Text',
-    light: () => '#D97706',
-    dark: () => '#FCD34D'
-  },
-  '@text-success-primary': {
+  
+  // Text - States
+  '@text-success': {
     name: 'Success text',
     category: 'Text',
-    light: () => '#059669',
-    dark: () => '#34D399'
+    light: (p) => p.success?.['700'] || '#059669',
+    dark: (p) => p.success?.['300'] || '#6EE7B7'
   },
-
-  // Borders
+  '@text-warning': {
+    name: 'Warning text',
+    category: 'Text',
+    light: (p) => p.warning?.['700'] || '#D97706',
+    dark: (p) => p.warning?.['300'] || '#FCD34D'
+  },
+  '@text-error': {
+    name: 'Error text',
+    category: 'Text',
+    light: (p) => p.error?.['700'] || '#DC2626',
+    dark: (p) => p.error?.['300'] || '#FCA5A5'
+  },
+  
+  // Backgrounds - Default
+  '@bg-primary': {
+    name: 'Primary background',
+    category: 'Backgrounds',
+    light: () => '#FFFFFF',
+    dark: (p) => p.neutral?.['950'] || '#0A0A0A'
+  },
+  '@bg-secondary': {
+    name: 'Secondary background',
+    category: 'Backgrounds',
+    light: (p) => p.neutral?.['25'] || '#FAFAFA',
+    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
+  },
+  '@bg-tertiary': {
+    name: 'Tertiary background',
+    category: 'Backgrounds',
+    light: (p) => p.neutral?.['100'] || '#EEEEEE',
+    dark: (p) => p.neutral?.['800'] || '#333333'
+  },
+  '@bg-active': {
+    name: 'Active background',
+    category: 'Backgrounds',
+    light: (p) => p.neutral?.['50'] || '#F5F5F5',
+    dark: (p) => p.neutral?.['800'] || '#333333'
+  },
+  '@bg-disabled': {
+    name: 'Disabled background',
+    category: 'Backgrounds',
+    light: (p) => p.neutral?.['200'] || '#E0E0E0',
+    dark: (p) => p.neutral?.['700'] || '#404040'
+  },
+  
+  // Backgrounds - Brand
+  '@bg-brand-primary': {
+    name: 'Brand primary background',
+    category: 'Backgrounds',
+    light: (p) => p.brand?.['500'] || '#2568E8',
+    dark: (p) => p.brand?.['400'] || '#3B82F6'
+  },
+  '@bg-brand-hover': {
+    name: 'Brand hover background',
+    category: 'Backgrounds',
+    light: (p) => p.brand?.['600'] || '#1E50C0',
+    dark: (p) => p.brand?.['300'] || '#93BBFF'
+  },
+  '@bg-brand-press': {
+    name: 'Brand press background',
+    category: 'Backgrounds',
+    light: (p) => p.brand?.['700'] || '#163A8C',
+    dark: (p) => p.brand?.['200'] || '#C6DAFF'
+  },
+  '@bg-brand-disabled': {
+    name: 'Brand disabled background',
+    category: 'Backgrounds',
+    light: (p) => p.brand?.['200'] || '#C6DAFF',
+    dark: (p) => p.brand?.['700'] || '#163A8C'
+  },
+  
+  // Backgrounds - States
+  '@bg-success': {
+    name: 'Success background',
+    category: 'Backgrounds',
+    light: (p) => p.success?.['200'] || '#D1FAE5',
+    dark: (p) => p.success?.['900'] || '#064E3B'
+  },
+  '@bg-warning': {
+    name: 'Warning background',
+    category: 'Backgrounds',
+    light: (p) => p.warning?.['200'] || '#FEF3C7',
+    dark: (p) => p.warning?.['900'] || '#78350F'
+  },
+  '@bg-error': {
+    name: 'Error background',
+    category: 'Backgrounds',
+    light: (p) => p.error?.['200'] || '#FEE2E2',
+    dark: (p) => p.error?.['900'] || '#7F1D1D'
+  },
+  
+  // Borders - Default
   '@border-primary': {
     name: 'Primary border',
     category: 'Borders',
@@ -175,175 +187,53 @@ export const TOKEN_REGISTRY: Record<string, TokenDefinition> = {
     name: 'Tertiary border',
     category: 'Borders',
     light: (p) => p.neutral?.['100'] || '#EEEEEE',
-    dark: (p) => p.neutral?.['800'] || '#333333'
+    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
   },
   '@border-disabled': {
     name: 'Disabled border',
     category: 'Borders',
-    light: (p) => p.neutral?.['200'] || '#E0E0E0',
-    dark: (p) => p.neutral?.['700'] || '#404040'
-  },
-  '@border-brand': {
-    name: 'Brand border',
-    category: 'Borders',
-    light: () => '#2568E8',
-    dark: () => '#3B82F6'
-  },
-  '@border-error': {
-    name: 'Error border',
-    category: 'Borders',
-    light: () => '#DC2626',
-    dark: () => '#EF4444'
-  },
-
-  // Foreground
-  '@fg-primary': {
-    name: 'Primary foreground',
-    category: 'Foreground',
-    light: (p) => p.neutral?.['900'] || '#1A1A1A',
-    dark: (p) => p.neutral?.['50'] || '#F5F5F5'
-  },
-  '@fg-secondary': {
-    name: 'Secondary foreground',
-    category: 'Foreground',
-    light: (p) => p.neutral?.['700'] || '#404040',
-    dark: (p) => p.neutral?.['300'] || '#CCCCCC'
-  },
-  '@fg-tertiary': {
-    name: 'Tertiary foreground',
-    category: 'Foreground',
-    light: (p) => p.neutral?.['600'] || '#666666',
-    dark: (p) => p.neutral?.['400'] || '#999999'
-  },
-  '@fg-disabled': {
-    name: 'Disabled foreground',
-    category: 'Foreground',
-    light: (p) => p.neutral?.['400'] || '#999999',
-    dark: (p) => p.neutral?.['600'] || '#666666'
-  },
-  '@fg-brand-primary': {
-    name: 'Brand foreground',
-    category: 'Foreground',
-    light: () => '#2568E8',
-    dark: () => '#60A5FA'
-  },
-  '@fg-error-primary': {
-    name: 'Error foreground',
-    category: 'Foreground',
-    light: () => '#DC2626',
-    dark: () => '#EF4444'
-  },
-  '@fg-warning-primary': {
-    name: 'Warning foreground',
-    category: 'Foreground',
-    light: () => '#D97706',
-    dark: () => '#FCD34D'
-  },
-  '@fg-success-primary': {
-    name: 'Success foreground',
-    category: 'Foreground',
-    light: () => '#059669',
-    dark: () => '#34D399'
-  },
-
-  // Visual-specific tokens
-  '@table-header-bg': {
-    name: 'Table header background',
-    category: 'Visual Elements',
     light: (p) => p.neutral?.['100'] || '#EEEEEE',
     dark: (p) => p.neutral?.['800'] || '#333333'
   },
-  '@table-header-text': {
-    name: 'Table header text',
-    category: 'Visual Elements',
-    light: (p) => p.neutral?.['700'] || '#404040',
-    dark: (p) => p.neutral?.['200'] || '#E0E0E0'
+  
+  // Borders - Brand
+  '@border-brand': {
+    name: 'Brand border',
+    category: 'Borders',
+    light: (p) => p.brand?.['500'] || '#2568E8',
+    dark: (p) => p.brand?.['400'] || '#3B82F6'
   },
-  '@table-row-alt': {
-    name: 'Table alternate row',
-    category: 'Visual Elements',
-    light: (p) => p.neutral?.['50'] || '#F5F5F5',
+  '@border-brand-hover': {
+    name: 'Brand hover border',
+    category: 'Borders',
+    light: (p) => p.brand?.['600'] || '#1E50C0',
+    dark: (p) => p.brand?.['300'] || '#93BBFF'
+  },
+  '@border-brand-press': {
+    name: 'Brand press border',
+    category: 'Borders',
+    light: (p) => p.brand?.['700'] || '#163A8C',
+    dark: (p) => p.brand?.['200'] || '#C6DAFF'
+  },
+  '@border-brand-disabled': {
+    name: 'Brand disabled border',
+    category: 'Borders',
+    light: (p) => p.neutral?.['200'] || '#E0E0E0',
+    dark: (p) => p.neutral?.['700'] || '#404040'
+  },
+  
+  // Utility
+  '@utility-icon': {
+    name: 'Icon color',
+    category: 'Utility',
+    light: () => '#000000',
+    dark: () => '#FFFFFF'
+  },
+  '@utility-shadow': {
+    name: 'Shadow color',
+    category: 'Utility',
+    light: (p) => p.neutral?.['200'] || '#E0E0E0',
     dark: (p) => p.neutral?.['900'] || '#1A1A1A'
-  },
-  '@table-gridline': {
-    name: 'Table gridline',
-    category: 'Visual Elements',
-    light: (p) => p.neutral?.['200'] || '#E0E0E0',
-    dark: (p) => p.neutral?.['700'] || '#404040'
-  },
-  '@table-total-bg': {
-    name: 'Table total background',
-    category: 'Visual Elements',
-    light: (p) => p.neutral?.['200'] || '#E0E0E0',
-    dark: (p) => p.neutral?.['700'] || '#404040'
-  },
-  '@chart-gridline': {
-    name: 'Chart gridline',
-    category: 'Visual Elements',
-    light: (p) => p.neutral?.['200'] || '#E0E0E0',
-    dark: (p) => p.neutral?.['800'] || '#333333'
-  },
-  '@chart-axis-text': {
-    name: 'Chart axis text',
-    category: 'Visual Elements',
-    light: (p) => p.neutral?.['600'] || '#666666',
-    dark: (p) => p.neutral?.['400'] || '#999999'
-  },
-  '@card-background': {
-    name: 'Card background',
-    category: 'Visual Elements',
-    light: () => '#FFFFFF',
-    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
-  },
-  '@card-border': {
-    name: 'Card border',
-    category: 'Visual Elements',
-    light: (p) => p.neutral?.['200'] || '#E0E0E0',
-    dark: (p) => p.neutral?.['700'] || '#404040'
-  },
-  '@tooltip-background': {
-    name: 'Tooltip background',
-    category: 'Visual Elements',
-    light: (p) => p.neutral?.['900'] || '#1A1A1A',
-    dark: (p) => p.neutral?.['100'] || '#EEEEEE'
-  },
-  '@tooltip-text': {
-    name: 'Tooltip text',
-    category: 'Visual Elements',
-    light: () => '#FFFFFF',
-    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
-  },
-
-  // Structural colors (from neutral palette mapping)
-  '@firstLevelElements': {
-    name: 'First level elements',
-    category: 'Structural',
-    light: (p) => p.neutral?.['800'] || '#333333',
-    dark: (p) => p.neutral?.['200'] || '#E0E0E0'
-  },
-  '@secondLevelElements': {
-    name: 'Second level elements',
-    category: 'Structural',
-    light: (p) => p.neutral?.['600'] || '#666666',
-    dark: (p) => p.neutral?.['400'] || '#999999'
-  },
-  '@thirdLevelElements': {
-    name: 'Third level elements',
-    category: 'Structural',
-    light: (p) => p.neutral?.['400'] || '#999999',
-    dark: (p) => p.neutral?.['600'] || '#666666'
-  },
-  '@fourthLevelElements': {
-    name: 'Fourth level elements',
-    category: 'Structural',
-    light: (p) => p.neutral?.['300'] || '#CCCCCC',
-    dark: (p) => p.neutral?.['700'] || '#404040'
-  },
-  '@tableAccent': {
-    name: 'Table accent',
-    category: 'Structural',
-    light: (p) => p.neutral?.['200'] || '#E0E0E0',
-    dark: (p) => p.neutral?.['700'] || '#404040'
   }
 };
 

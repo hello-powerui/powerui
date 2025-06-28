@@ -5,6 +5,7 @@ import { ColorPalette, NeutralPalette } from '@prisma/client';
 import { StructuralColors, TextClasses } from '@/lib/theme-generation/types';
 import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
 import isEqual from 'fast-deep-equal';
+import { cleanupVisualStyles } from '@/lib/utils/theme-helpers';
 
 // Single unified theme structure
 interface StudioTheme {
@@ -16,6 +17,11 @@ interface StudioTheme {
   // Foundation settings (stored as IDs only)
   colorPaletteId: string;
   neutralPaletteId: string;
+  brandPalette?: Record<string, string>;
+  brandColor?: string;
+  successPalette?: string;
+  warningPalette?: string;
+  errorPalette?: string;
   mode: 'light' | 'dark';
   fontFamily: string;
   structuralColors?: StructuralColors;
@@ -57,6 +63,8 @@ interface ThemeStudioState {
   updateTheme: (updates: Partial<StudioTheme>) => void;
   setColorPaletteId: (paletteId: string) => void;
   setNeutralPaletteId: (paletteId: string) => void;
+  setBrandPalette: (palette: Record<string, string>) => void;
+  setStatePalette: (type: 'success' | 'warning' | 'error', paletteName: string) => void;
   setThemeMode: (mode: 'light' | 'dark') => void;
   setFontFamily: (fontFamily: string) => void;
   setStructuralColors: (colors: StructuralColors) => void;
@@ -103,6 +111,10 @@ const defaultStudioTheme: StudioTheme = {
   description: '',
   colorPaletteId: DEFAULT_COLOR_PALETTE.id,
   neutralPaletteId: AZURE_NEUTRAL_PALETTE.id,
+  brandColor: '#2568E8',
+  successPalette: 'green',
+  warningPalette: 'amber',
+  errorPalette: 'red',
   mode: 'light',
   fontFamily: 'Segoe UI',
   structuralColors: {},
@@ -171,6 +183,19 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           theme: { ...state.theme, neutralPaletteId: paletteId }
         })),
         
+      setBrandPalette: (palette) =>
+        set((state) => ({
+          theme: { ...state.theme, brandPalette: palette }
+        })),
+        
+      setStatePalette: (type, paletteName) =>
+        set((state) => ({
+          theme: { 
+            ...state.theme, 
+            [`${type}Palette`]: paletteName 
+          }
+        })),
+        
       setThemeMode: (mode) =>
         set((state) => ({
           theme: { ...state.theme, mode }
@@ -192,19 +217,37 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         })),
         
       updateVisualStyles: (visualStyles) =>
-        set((state) => ({
-          theme: { ...state.theme, visualStyles }
-        })),
+        set((state) => {
+          const cleanedVisualStyles = cleanupVisualStyles(visualStyles);
+          return {
+            theme: { ...state.theme, visualStyles: cleanedVisualStyles }
+          };
+        }),
         
       updateVisualStyle: (visual, variant, value) =>
         set((state) => {
           const newVisualStyles = { ...state.theme.visualStyles };
           
-          if (!newVisualStyles[visual]) {
-            newVisualStyles[visual] = {};
-          }
+          // Check if value is empty or should be removed
+          const isEmpty = !value || (typeof value === 'object' && Object.keys(value).length === 0);
           
-          newVisualStyles[visual][variant] = value;
+          if (isEmpty) {
+            // Remove the variant if it exists
+            if (newVisualStyles[visual]?.[variant]) {
+              delete newVisualStyles[visual][variant];
+              
+              // Clean up empty visual object
+              if (Object.keys(newVisualStyles[visual]).length === 0) {
+                delete newVisualStyles[visual];
+              }
+            }
+          } else {
+            // Add or update the value
+            if (!newVisualStyles[visual]) {
+              newVisualStyles[visual] = {};
+            }
+            newVisualStyles[visual][variant] = value;
+          }
           
           return {
             theme: { ...state.theme, visualStyles: newVisualStyles }

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power BI Schema API Playground</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        .property-card {
+            transition: all 0.2s ease;
+        }
+        .property-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .json-preview {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+        }
+        .loading-spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div x-data="schemaPlayground()" x-init="init()" class="container mx-auto p-6 max-w-7xl">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Power BI Schema API Playground</h1>
+            <p class="text-gray-600">Explore the power of the new schema API with instant search, natural language queries, and intelligent suggestions</p>
+            <div class="mt-4 flex items-center space-x-4 text-sm">
+                <span class="flex items-center" :class="apiStatus ? 'text-green-600' : 'text-red-600'">
+                    <span class="w-2 h-2 rounded-full mr-2" :class="apiStatus ? 'bg-green-600' : 'bg-red-600'"></span>
+                    API Status: <span x-text="apiStatus ? 'Connected' : 'Disconnected'"></span>
+                </span>
+                <span class="text-gray-500">
+                    Properties: <span x-text="stats.totalProperties || '...'"></span>
+                </span>
+                <span class="text-gray-500">
+                    Visuals: <span x-text="stats.totalVisuals || '...'"></span>
+                </span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Panel: Search and Filters -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Natural Language Search -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                        </svg>
+                        Natural Language Search
+                    </h2>
+                    <div class="space-y-3">
+                        <textarea 
+                            x-model="nlQuery"
+                            @keyup.enter="searchNaturalLanguage()"
+                            class="w-full p-3 border rounded-lg text-sm resize-none"
+                            rows="3"
+                            placeholder="Try: 'change card background color' or 'make chart text bigger'"
+                        ></textarea>
+                        <button 
+                            @click="searchNaturalLanguage()"
+                            class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                            :disabled="nlSearching"
+                        >
+                            <span x-show="!nlSearching">Search with AI</span>
+                            <div x-show="nlSearching" class="loading-spinner"></div>
+                        </button>
+                        
+                        <!-- Suggestions -->
+                        <div x-show="nlSuggestions.length > 0" class="mt-3 p-3 bg-blue-50 rounded-lg">
+                            <p class="text-xs font-semibold text-blue-800 mb-1">Suggestions:</p>
+                            <ul class="text-xs text-blue-700 space-y-1">
+                                <template x-for="suggestion in nlSuggestions">
+                                    <li x-text="suggestion"></li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Traditional Search -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Property Search</h2>
+                    <div class="space-y-4">
+                        <input 
+                            type="text"
+                            x-model="searchText"
+                            @input="debounceSearch()"
+                            class="w-full p-2 border rounded-lg text-sm"
+                            placeholder="Search properties..."
+                        >
+                        
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Visual Type</label>
+                            <select 
+                                x-model="selectedVisual"
+                                @change="searchProperties()"
+                                class="w-full mt-1 p-2 border rounded-lg text-sm"
+                            >
+                                <option value="">All Visuals</option>
+                                <template x-for="visual in visuals">
+                                    <option :value="visual.type" x-text="visual.title"></option>
+                                </template>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Category</label>
+                            <select 
+                                x-model="selectedCategory"
+                                @change="searchProperties()"
+                                class="w-full mt-1 p-2 border rounded-lg text-sm"
+                            >
+                                <option value="">All Categories</option>
+                                <option value="color">Colors</option>
+                                <option value="typography">Typography</option>
+                                <option value="spacing">Spacing</option>
+                                <option value="border">Borders</option>
+                                <option value="layout">Layout</option>
+                                <option value="data">Data</option>
+                                <option value="interaction">Interaction</option>
+                                <option value="visual">Visual</option>
+                                <option value="effect">Effects</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Property Type</label>
+                            <select 
+                                x-model="selectedType"
+                                @change="searchProperties()"
+                                class="w-full mt-1 p-2 border rounded-lg text-sm"
+                            >
+                                <option value="">All Types</option>
+                                <option value="string">String</option>
+                                <option value="number">Number</option>
+                                <option value="boolean">Boolean</option>
+                                <option value="array">Array</option>
+                                <option value="object">Object</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Structure Explorer -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Visual Structure</h2>
+                    <select 
+                        x-model="structureVisual"
+                        @change="loadVisualStructure()"
+                        class="w-full p-2 border rounded-lg text-sm"
+                    >
+                        <option value="">Select a visual to explore</option>
+                        <template x-for="visual in visuals">
+                            <option :value="visual.type" x-text="`${visual.title} (${visual.propertyCount} props)`"></option>
+                        </template>
+                    </select>
+                    
+                    <div x-show="visualStructure" class="mt-4 space-y-2">
+                        <template x-for="(props, category) in visualStructure?.properties || {}">
+                            <div class="text-sm">
+                                <span class="font-medium capitalize" x-text="category"></span>:
+                                <span class="text-gray-600" x-text="props.length + ' properties'"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Results -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Search Results -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">
+                            Results 
+                            <span x-show="searchResults.length > 0" class="text-sm font-normal text-gray-600">
+                                (<span x-text="searchResults.length"></span> properties)
+                            </span>
+                        </h2>
+                        <div x-show="searching" class="loading-spinner"></div>
+                    </div>
+                    
+                    <div x-show="searchResults.length === 0 && !searching" class="text-center py-12 text-gray-500">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <p>Start searching to see properties</p>
+                    </div>
+                    
+                    <div class="grid gap-4">
+                        <template x-for="property in searchResults" :key="property.id">
+                            <div class="property-card border rounded-lg p-4 cursor-pointer hover:border-blue-400"
+                                 @click="selectProperty(property)">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-semibold text-gray-800" x-text="property.title"></h3>
+                                    <span class="text-xs px-2 py-1 rounded-full"
+                                          :class="getCategoryColor(property.category)"
+                                          x-text="property.category"></span>
+                                </div>
+                                <p class="text-xs text-gray-600 mb-2 font-mono" x-text="property.path"></p>
+                                <p x-show="property.description" class="text-sm text-gray-700 mb-2" x-text="property.description"></p>
+                                <div class="flex items-center space-x-4 text-xs">
+                                    <span class="text-gray-500">
+                                        Type: <span class="font-medium" x-text="property.type"></span>
+                                    </span>
+                                    <span x-show="property.visuals.length > 0" class="text-gray-500">
+                                        Visuals: <span class="font-medium" x-text="property.visuals.length"></span>
+                                    </span>
+                                    <span x-show="property.isStateEnabled" class="text-green-600 font-medium">
+                                        ✓ State Enabled
+                                    </span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Selected Property Details -->
+                <div x-show="selectedProperty" class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Property Details</h2>
+                    <div x-show="selectedProperty">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Title</p>
+                                <p class="font-semibold" x-text="selectedProperty?.title"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Type</p>
+                                <p class="font-mono text-sm" x-text="selectedProperty?.type"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-700 mb-1">Path</p>
+                            <p class="font-mono text-xs bg-gray-100 p-2 rounded" x-text="selectedProperty?.path"></p>
+                        </div>
+                        
+                        <!-- Examples -->
+                        <div x-show="propertyExamples.length > 0" class="mb-4">
+                            <p class="text-sm font-medium text-gray-700 mb-2">Example Values</p>
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="example in propertyExamples">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-mono"
+                                          x-text="JSON.stringify(example)"></span>
+                                </template>
+                            </div>
+                        </div>
+                        
+                        <!-- Related Properties -->
+                        <div x-show="relatedProperties.length > 0">
+                            <p class="text-sm font-medium text-gray-700 mb-2">Related Properties</p>
+                            <div class="space-y-2">
+                                <template x-for="related in relatedProperties">
+                                    <button 
+                                        @click="selectProperty(related)"
+                                        class="w-full text-left p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                                    >
+                                        <p class="font-medium text-sm" x-text="related.title"></p>
+                                        <p class="text-xs text-gray-600" x-text="related.path"></p>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Preview -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Generated Theme Preview</h2>
+                    <div class="json-preview p-4 rounded-lg overflow-x-auto">
+                        <pre x-text="themePreview"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function schemaPlayground() {
+            return {
+                // API connection
+                apiUrl: 'http://localhost:3001',
+                apiStatus: false,
+                stats: {},
+                
+                // Search state
+                searchText: '',
+                selectedVisual: '',
+                selectedCategory: '',
+                selectedType: '',
+                searchResults: [],
+                searching: false,
+                searchTimeout: null,
+                
+                // Natural language
+                nlQuery: '',
+                nlSearching: false,
+                nlSuggestions: [],
+                
+                // Visuals
+                visuals: [],
+                structureVisual: '',
+                visualStructure: null,
+                
+                // Selected property
+                selectedProperty: null,
+                propertyExamples: [],
+                relatedProperties: [],
+                
+                // Theme preview
+                themePreview: '{}',
+                
+                async init() {
+                    await this.checkAPI();
+                    await this.loadStats();
+                    await this.loadVisuals();
+                },
+                
+                async checkAPI() {
+                    try {
+                        const response = await fetch(`${this.apiUrl}/health`);
+                        this.apiStatus = response.ok;
+                    } catch (error) {
+                        this.apiStatus = false;
+                    }
+                },
+                
+                async loadStats() {
+                    try {
+                        const response = await fetch(`${this.apiUrl}/api/stats`);
+                        this.stats = await response.json();
+                    } catch (error) {
+                        console.error('Failed to load stats:', error);
+                    }
+                },
+                
+                async loadVisuals() {
+                    // For demo, we'll use a static list since we can't query all visuals easily
+                    this.visuals = [
+                        { type: 'card', title: 'Card', propertyCount: 0 },
+                        { type: 'slicer', title: 'Slicer', propertyCount: 0 },
+                        { type: 'table', title: 'Table', propertyCount: 0 },
+                        { type: 'matrix', title: 'Matrix', propertyCount: 0 },
+                        { type: 'barChart', title: 'Bar Chart', propertyCount: 0 },
+                        { type: 'columnChart', title: 'Column Chart', propertyCount: 0 },
+                        { type: 'lineChart', title: 'Line Chart', propertyCount: 0 },
+                        { type: 'pieChart', title: 'Pie Chart', propertyCount: 0 },
+                        { type: 'donutChart', title: 'Donut Chart', propertyCount: 0 },
+                        { type: 'gauge', title: 'Gauge', propertyCount: 0 },
+                    ];
+                },
+                
+                debounceSearch() {
+                    clearTimeout(this.searchTimeout);
+                    this.searchTimeout = setTimeout(() => this.searchProperties(), 300);
+                },
+                
+                async searchProperties() {
+                    this.searching = true;
+                    try {
+                        const params = new URLSearchParams();
+                        if (this.searchText) params.set('text', this.searchText);
+                        if (this.selectedVisual) params.set('visual', this.selectedVisual);
+                        if (this.selectedCategory) params.set('category', this.selectedCategory);
+                        if (this.selectedType) params.set('type', this.selectedType);
+                        params.set('limit', '20');
+                        
+                        const response = await fetch(`${this.apiUrl}/api/properties?${params}`);
+                        const data = await response.json();
+                        this.searchResults = data.results || [];
+                    } catch (error) {
+                        console.error('Search failed:', error);
+                        this.searchResults = [];
+                    } finally {
+                        this.searching = false;
+                    }
+                },
+                
+                async searchNaturalLanguage() {
+                    if (!this.nlQuery.trim()) return;
+                    
+                    this.nlSearching = true;
+                    this.nlSuggestions = [];
+                    try {
+                        const response = await fetch(`${this.apiUrl}/api/query`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                query: this.nlQuery,
+                                context: this.selectedVisual ? { currentVisual: this.selectedVisual } : undefined
+                            })
+                        });
+                        const data = await response.json();
+                        this.searchResults = data.properties || [];
+                        this.nlSuggestions = data.suggestions || [];
+                    } catch (error) {
+                        console.error('Natural language search failed:', error);
+                    } finally {
+                        this.nlSearching = false;
+                    }
+                },
+                
+                async loadVisualStructure() {
+                    if (!this.structureVisual) {
+                        this.visualStructure = null;
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch(`${this.apiUrl}/api/visuals/${this.structureVisual}/structure`);
+                        this.visualStructure = await response.json();
+                    } catch (error) {
+                        console.error('Failed to load visual structure:', error);
+                        this.visualStructure = null;
+                    }
+                },
+                
+                async selectProperty(property) {
+                    this.selectedProperty = property;
+                    
+                    // Load examples
+                    try {
+                        const response = await fetch(`${this.apiUrl}/api/properties/${property.id}/examples`);
+                        const data = await response.json();
+                        this.propertyExamples = data.examples || [];
+                    } catch (error) {
+                        this.propertyExamples = [];
+                    }
+                    
+                    // Load related properties
+                    try {
+                        const response = await fetch(`${this.apiUrl}/api/properties/${property.id}/related`);
+                        this.relatedProperties = await response.json() || [];
+                    } catch (error) {
+                        this.relatedProperties = [];
+                    }
+                    
+                    // Update theme preview
+                    this.updateThemePreview(property);
+                },
+                
+                updateThemePreview(property) {
+                    const pathParts = property.path.split('.');
+                    const theme = {};
+                    
+                    let current = theme;
+                    for (let i = 0; i < pathParts.length - 1; i++) {
+                        current[pathParts[i]] = current[pathParts[i]] || {};
+                        current = current[pathParts[i]];
+                    }
+                    
+                    // Set example value
+                    const exampleValue = this.propertyExamples[0] || this.getDefaultValue(property);
+                    current[pathParts[pathParts.length - 1]] = exampleValue;
+                    
+                    this.themePreview = JSON.stringify(theme, null, 2);
+                },
+                
+                getDefaultValue(property) {
+                    switch (property.type) {
+                        case 'string': return property.category === 'color' ? '#0078D4' : 'Example';
+                        case 'number': return 12;
+                        case 'boolean': return true;
+                        case 'array': return [];
+                        case 'object': return {};
+                        default: return null;
+                    }
+                },
+                
+                getCategoryColor(category) {
+                    const colors = {
+                        color: 'bg-purple-100 text-purple-800',
+                        typography: 'bg-blue-100 text-blue-800',
+                        spacing: 'bg-green-100 text-green-800',
+                        border: 'bg-yellow-100 text-yellow-800',
+                        layout: 'bg-indigo-100 text-indigo-800',
+                        data: 'bg-red-100 text-red-800',
+                        interaction: 'bg-pink-100 text-pink-800',
+                        visual: 'bg-gray-100 text-gray-800',
+                        effect: 'bg-orange-100 text-orange-800',
+                        other: 'bg-gray-100 text-gray-600'
+                    };
+                    return colors[category] || colors.other;
+                }
+            };
+        }
+    </script>
+</body>
+</html>

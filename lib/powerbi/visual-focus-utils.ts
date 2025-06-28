@@ -90,7 +90,7 @@ export function generateFocusedVisualLayout(
           width: actualPageSize.width,
           height: actualPageSize.height
         },
-        displayOption: models.DisplayOption.FitToPage,
+        displayOption: models.DisplayOption.ActualSize,
         pagesLayout: {
           [pageId]: {
             defaultLayout,
@@ -102,54 +102,58 @@ export function generateFocusedVisualLayout(
   }
 
   if (selectedVisuals.length === 1) {
-    // Single visual: center and enlarge
+    // Single visual: center at original size
     const visual = selectedVisuals[0];
-    const enlargeFactor = 1.5;
-    const newWidth = Math.min(visual.layout.width * enlargeFactor, actualPageSize.width * 0.8);
-    const newHeight = Math.min(visual.layout.height * enlargeFactor, actualPageSize.height * 0.8);
     
     visualsLayout[visual.name] = {
-      x: (actualPageSize.width - newWidth) / 2,
-      y: (actualPageSize.height - newHeight) / 2,
+      x: (actualPageSize.width - visual.layout.width) / 2,
+      y: (actualPageSize.height - visual.layout.height) / 2,
       z: visual.layout.z,
-      width: newWidth,
-      height: newHeight,
+      width: visual.layout.width,
+      height: visual.layout.height,
       displayState: {
         mode: models.VisualContainerDisplayMode.Visible
       }
     };
   } else {
-    // Multiple visuals: arrange in a grid
+    // Multiple visuals: arrange in a grid at original sizes
     const cols = Math.ceil(Math.sqrt(selectedVisuals.length));
     const rows = Math.ceil(selectedVisuals.length / cols);
-    const padding = 20;
-    const cellWidth = (actualPageSize.width - padding * (cols + 1)) / cols;
-    const cellHeight = (actualPageSize.height - padding * (rows + 1)) / rows;
+    const padding = 40;
+    
+    // Calculate total bounds needed for all visuals at original size
+    const maxVisualWidth = Math.max(...selectedVisuals.map(v => v.layout.width));
+    const maxVisualHeight = Math.max(...selectedVisuals.map(v => v.layout.height));
+    
+    // Calculate grid cell size based on largest visual
+    const cellWidth = maxVisualWidth + padding;
+    const cellHeight = maxVisualHeight + padding;
+    
+    // Calculate total grid size
+    const totalGridWidth = cols * cellWidth;
+    const totalGridHeight = rows * cellHeight;
+    
+    // Center the grid on the page
+    const gridStartX = (actualPageSize.width - totalGridWidth) / 2;
+    const gridStartY = (actualPageSize.height - totalGridHeight) / 2;
     
     selectedVisuals.forEach((visual, index) => {
       const col = index % cols;
       const row = Math.floor(index / cols);
       
-      // Maintain aspect ratio
-      const aspectRatio = visual.layout.width / visual.layout.height;
-      let width = cellWidth - padding;
-      let height = cellHeight - padding;
+      // Center each visual within its grid cell
+      const cellX = gridStartX + col * cellWidth;
+      const cellY = gridStartY + row * cellHeight;
       
-      if (width / height > aspectRatio) {
-        width = height * aspectRatio;
-      } else {
-        height = width / aspectRatio;
-      }
-      
-      const x = padding + col * cellWidth + (cellWidth - width) / 2;
-      const y = padding + row * cellHeight + (cellHeight - height) / 2;
+      const x = cellX + (cellWidth - visual.layout.width) / 2;
+      const y = cellY + (cellHeight - visual.layout.height) / 2;
       
       visualsLayout[visual.name] = {
         x,
         y,
         z: visual.layout.z,
-        width,
-        height,
+        width: visual.layout.width,
+        height: visual.layout.height,
         displayState: {
           mode: models.VisualContainerDisplayMode.Visible
         }
@@ -165,7 +169,7 @@ export function generateFocusedVisualLayout(
         width: actualPageSize.width,
         height: actualPageSize.height
       },
-      displayOption: models.DisplayOption.FitToPage,
+      displayOption: models.DisplayOption.ActualSize,
       pagesLayout: {
         [pageId]: {
           defaultLayout,
@@ -189,7 +193,7 @@ export function generateDefaultLayout(pageId: string): FocusLayoutConfig {
         width: 1280,
         height: 720
       },
-      displayOption: models.DisplayOption.FitToPage,
+      displayOption: models.DisplayOption.ActualSize,
       pagesLayout: {
         [pageId]: {
           defaultLayout: {

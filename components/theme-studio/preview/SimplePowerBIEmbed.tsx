@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { X, Maximize2 } from 'lucide-react';
+import { X, Maximize2, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 
 interface SimplePowerBIEmbedProps {
   generatedTheme?: any;
@@ -48,6 +48,7 @@ function SimplePowerBIEmbed({
   const [visuals, setVisuals] = useState<VisualInfo[]>([]);
   const currentPageRef = useRef<Page | null>(null);
   const [isReportReady, setIsReportReady] = useState(false);
+  const [currentZoom, setCurrentZoom] = useState(1.0);
   const isInitialLoad = useRef(true);
   const [isResetting, setIsResetting] = useState(false);
   const hasLoadedReport = useRef(false);
@@ -134,7 +135,7 @@ function SimplePowerBIEmbed({
             navContentPaneEnabled: false,
             layoutType: models.LayoutType.Custom,
             customLayout: {
-              displayOption: models.DisplayOption.FitToPage
+              displayOption: models.DisplayOption.ActualSize
             },
             bars: {
               actionBar: {
@@ -266,6 +267,32 @@ function SimplePowerBIEmbed({
     }
   }, [focusMode, selectedVisualType, visuals]);
 
+  // Zoom functions
+  const handleZoom = useCallback(async (zoomLevel: number) => {
+    if (!reportRef.current) return;
+    
+    try {
+      await reportRef.current.setZoom(zoomLevel);
+      setCurrentZoom(zoomLevel);
+    } catch (error) {
+      console.error('Error setting zoom:', error);
+    }
+  }, []);
+
+  const zoomIn = useCallback(() => {
+    const newZoom = Math.min(currentZoom + 0.25, 4.0);
+    handleZoom(newZoom);
+  }, [currentZoom, handleZoom]);
+
+  const zoomOut = useCallback(() => {
+    const newZoom = Math.max(currentZoom - 0.25, 0.25);
+    handleZoom(newZoom);
+  }, [currentZoom, handleZoom]);
+
+  const resetZoom = useCallback(() => {
+    handleZoom(1.0);
+  }, [handleZoom]);
+
   // Reset report to original state
   const resetReport = useCallback(async () => {
     if (isResetting) return;
@@ -274,6 +301,9 @@ function SimplePowerBIEmbed({
     
     // First, reset focus mode state
     setFocusMode(false);
+    
+    // Reset zoom to default
+    setCurrentZoom(1.0);
     
     // Clear visuals array to ensure clean state
     setVisuals([]);
@@ -305,7 +335,7 @@ function SimplePowerBIEmbed({
               filterPaneEnabled: true,
               navContentPaneEnabled: false,
               layoutType: models.LayoutType.Custom,
-              customLayout: { displayOption: models.DisplayOption.FitToPage },
+              customLayout: { displayOption: models.DisplayOption.ActualSize },
               bars: { actionBar: { visible: false } }
             },
             theme: variantPreviewTheme ? { themeJson: variantPreviewTheme } : undefined
@@ -355,6 +385,14 @@ function SimplePowerBIEmbed({
       applyFocusMode();
     }
   }, [applyFocusMode, visuals.length]); // applyFocusMode already depends on focusMode, selectedVisualType, visuals
+
+  // Effect to restore zoom level when report is ready
+  useEffect(() => {
+    if (reportRef.current && isReportReady) {
+      // Apply current zoom level when report is ready
+      handleZoom(currentZoom);
+    }
+  }, [isReportReady, currentZoom, handleZoom]);
 
 
   const eventHandlers = useMemo(() => new Map([
@@ -441,7 +479,7 @@ function SimplePowerBIEmbed({
   }
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-full relative overflow-visible">
       {/* Focus Mode Controls */}
       {focusMode && selectedVisualType !== '*' && (
         <div className="absolute top-2 left-2 z-50 flex items-center gap-2 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
@@ -471,6 +509,41 @@ function SimplePowerBIEmbed({
             <span>{selectedVisualType}</span>
           </div>
 
+          {/* Zoom Controls */}
+          <div className="w-px h-6 bg-gray-300" /> {/* Divider */}
+          <div className="flex items-center gap-1">
+            <Button
+              onClick={zoomOut}
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              disabled={currentZoom <= 0.25}
+              title="Zoom out"
+            >
+              <ZoomOut className="w-3 h-3" />
+            </Button>
+            <Button
+              onClick={resetZoom}
+              variant="outline"
+              size="sm"
+              className="h-8 px-2 text-xs font-medium"
+              disabled={currentZoom === 1.0}
+              title="Reset zoom"
+            >
+              {Math.round(currentZoom * 100)}%
+            </Button>
+            <Button
+              onClick={zoomIn}
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              disabled={currentZoom >= 4.0}
+              title="Zoom in"
+            >
+              <ZoomIn className="w-3 h-3" />
+            </Button>
+          </div>
+
           {/* Variant Selector */}
           {availableVariants.length > 0 && (
             <>
@@ -495,6 +568,42 @@ function SimplePowerBIEmbed({
               </div>
             </>
           )}
+        </div>
+      )}
+      
+      {/* Zoom Controls for regular view */}
+      {!focusMode && (
+        <div className="absolute top-2 left-2 z-50 flex items-center gap-1 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
+          <Button
+            onClick={zoomOut}
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0"
+            disabled={currentZoom <= 0.25}
+            title="Zoom out"
+          >
+            <ZoomOut className="w-3 h-3" />
+          </Button>
+          <Button
+            onClick={resetZoom}
+            variant="outline"
+            size="sm"
+            className="h-8 px-2 text-xs font-medium"
+            disabled={currentZoom === 1.0}
+            title="Reset zoom"
+          >
+            {Math.round(currentZoom * 100)}%
+          </Button>
+          <Button
+            onClick={zoomIn}
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0"
+            disabled={currentZoom >= 4.0}
+            title="Zoom in"
+          >
+            <ZoomIn className="w-3 h-3" />
+          </Button>
         </div>
       )}
       
@@ -525,7 +634,7 @@ function SimplePowerBIEmbed({
                     filterPaneEnabled: true,
                     navContentPaneEnabled: false,
                     layoutType: models.LayoutType.Custom,
-                    customLayout: { displayOption: models.DisplayOption.FitToPage },
+                    customLayout: { displayOption: models.DisplayOption.ActualSize },
                     bars: { actionBar: { visible: false } }
                   },
                   theme: variantPreviewTheme ? { themeJson: variantPreviewTheme } : undefined

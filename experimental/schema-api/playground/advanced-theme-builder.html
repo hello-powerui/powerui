@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Power BI Theme Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .json-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            tab-size: 2;
+        }
+        .json-key { color: #9CDCFE; }
+        .json-string { color: #CE9178; }
+        .json-number { color: #B5CEA8; }
+        .json-boolean { color: #569CD6; }
+        
+        .gradient-preview {
+            background: linear-gradient(135deg, var(--color-1) 0%, var(--color-2) 100%);
+            height: 40px;
+            border-radius: 6px;
+        }
+        
+        .visual-preview {
+            background: #f8f9fa;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+        }
+        
+        .property-group {
+            border-left: 3px solid #3b82f6;
+            padding-left: 12px;
+            margin-left: 4px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .loading { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        
+        .tab-active {
+            background: white;
+            border-bottom: 2px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div x-data="advancedThemeBuilder()" x-init="init()" class="min-h-screen">
+        <!-- Header -->
+        <div class="bg-white border-b border-gray-200 sticky top-0 z-50">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Advanced Theme Studio</h1>
+                        <p class="text-sm text-gray-600 mt-1">Powered by Schema API - Build production-ready Power BI themes</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button 
+                            @click="saveTheme()"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2"></path>
+                            </svg>
+                            <span>Export Theme</span>
+                        </button>
+                        <button 
+                            @click="showImportDialog = true"
+                            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        >
+                            Import
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-6 py-6">
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Left Sidebar: Visual Navigator -->
+                <div class="col-span-3">
+                    <div class="bg-white rounded-lg shadow-sm sticky top-24">
+                        <div class="p-4 border-b">
+                            <h2 class="font-semibold text-gray-900">Visual Navigator</h2>
+                            <input 
+                                type="text"
+                                x-model="visualSearch"
+                                @input="filterVisuals()"
+                                class="w-full mt-2 px-3 py-1.5 text-sm border rounded-lg"
+                                placeholder="Search visuals..."
+                            >
+                        </div>
+                        <div class="p-2 max-h-[600px] overflow-y-auto">
+                            <!-- Foundation -->
+                            <div class="mb-4">
+                                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 mb-2">Foundation</h3>
+                                <button 
+                                    @click="selectSection('foundation')"
+                                    class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                                    :class="currentSection === 'foundation' ? 'bg-blue-50 text-blue-700' : ''"
+                                >
+                                    <div class="flex items-center space-x-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                                        </svg>
+                                        <span class="text-sm font-medium">Colors & Typography</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- Canvas -->
+                            <div class="mb-4">
+                                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 mb-2">Canvas</h3>
+                                <template x-for="visual in canvasVisuals" :key="visual">
+                                    <button 
+                                        @click="selectVisual(visual)"
+                                        class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 transition-colors flex items-center justify-between"
+                                        :class="selectedVisual === visual ? 'bg-blue-50 text-blue-700' : ''"
+                                    >
+                                        <span class="text-sm" x-text="formatVisualName(visual)"></span>
+                                        <span x-show="getVisualPropertyCount(visual) > 0" 
+                                              class="text-xs bg-gray-200 px-2 py-0.5 rounded-full"
+                                              x-text="getVisualPropertyCount(visual)"></span>
+                                    </button>
+                                </template>
+                            </div>
+
+                            <!-- Data Visuals -->
+                            <div class="mb-4">
+                                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 mb-2">Data Visuals</h3>
+                                <template x-for="visual in dataVisuals" :key="visual">
+                                    <button 
+                                        @click="selectVisual(visual)"
+                                        class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 transition-colors flex items-center justify-between"
+                                        :class="selectedVisual === visual ? 'bg-blue-50 text-blue-700' : ''"
+                                    >
+                                        <span class="text-sm" x-text="formatVisualName(visual)"></span>
+                                        <span x-show="getVisualPropertyCount(visual) > 0" 
+                                              class="text-xs bg-gray-200 px-2 py-0.5 rounded-full"
+                                              x-text="getVisualPropertyCount(visual)"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center: Property Editor -->
+                <div class="col-span-6">
+                    <!-- Foundation Section -->
+                    <div x-show="currentSection === 'foundation'" class="space-y-6">
+                        <!-- Data Colors -->
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center">
+                                <span class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg mr-3"></span>
+                                Data Colors
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4">Define the color palette for your charts and data visualizations</p>
+                            
+                            <div class="grid grid-cols-8 gap-2 mb-4">
+                                <template x-for="(color, index) in theme.dataColors" :key="index">
+                                    <div class="relative group">
+                                        <input 
+                                            type="color"
+                                            :value="color"
+                                            @input="updateDataColor(index, $event.target.value)"
+                                            class="w-full h-12 rounded-lg cursor-pointer border-2 border-gray-200 hover:border-gray-300"
+                                            :style="`background-color: ${color}`"
+                                        >
+                                        <button 
+                                            @click="removeDataColor(index)"
+                                            class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >×</button>
+                                        <p class="text-xs text-center mt-1 font-mono text-gray-600" x-text="color"></p>
+                                    </div>
+                                </template>
+                                <button 
+                                    @click="addDataColor()"
+                                    class="h-12 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 flex items-center justify-center"
+                                >
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Color Palette Presets -->
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm text-gray-600">Presets:</span>
+                                <button @click="applyColorPalette('default')" class="px-3 py-1 text-xs border rounded-full hover:bg-gray-50">Default</button>
+                                <button @click="applyColorPalette('colorblind')" class="px-3 py-1 text-xs border rounded-full hover:bg-gray-50">Colorblind Safe</button>
+                                <button @click="applyColorPalette('corporate')" class="px-3 py-1 text-xs border rounded-full hover:bg-gray-50">Corporate</button>
+                                <button @click="applyColorPalette('vibrant')" class="px-3 py-1 text-xs border rounded-full hover:bg-gray-50">Vibrant</button>
+                            </div>
+                        </div>
+
+                        <!-- Text Classes -->
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center">
+                                <span class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-800 rounded-lg mr-3 flex items-center justify-center text-white text-xs font-bold">Aa</span>
+                                Text Classes
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4">Define reusable text styles for consistency</p>
+                            
+                            <div class="space-y-4">
+                                <template x-for="(textClass, index) in theme.textClasses" :key="index">
+                                    <div class="border rounded-lg p-4">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <input 
+                                                type="text"
+                                                x-model="textClass.name"
+                                                class="font-medium text-sm border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none"
+                                                placeholder="Class name"
+                                            >
+                                            <button 
+                                                @click="removeTextClass(index)"
+                                                class="text-red-500 hover:text-red-600"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="text-xs text-gray-600">Font Family</label>
+                                                <select 
+                                                    x-model="textClass.fontFamily"
+                                                    class="w-full mt-1 text-sm border rounded px-2 py-1"
+                                                >
+                                                    <option>Segoe UI</option>
+                                                    <option>Arial</option>
+                                                    <option>Helvetica</option>
+                                                    <option>Calibri</option>
+                                                    <option>DIN</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="text-xs text-gray-600">Font Size</label>
+                                                <input 
+                                                    type="number"
+                                                    x-model.number="textClass.fontSize"
+                                                    class="w-full mt-1 text-sm border rounded px-2 py-1"
+                                                    min="8" max="72"
+                                                >
+                                            </div>
+                                            <div>
+                                                <label class="text-xs text-gray-600">Color</label>
+                                                <div class="flex items-center space-x-2 mt-1">
+                                                    <input 
+                                                        type="color"
+                                                        x-model="textClass.color"
+                                                        class="h-8 w-16 border rounded cursor-pointer"
+                                                    >
+                                                    <input 
+                                                        type="text"
+                                                        x-model="textClass.color"
+                                                        class="flex-1 text-sm border rounded px-2 py-1 font-mono"
+                                                    >
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-3 mt-4">
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" x-model="textClass.bold" class="mr-1">
+                                                    <span class="text-xs">Bold</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" x-model="textClass.italic" class="mr-1">
+                                                    <span class="text-xs">Italic</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" x-model="textClass.underline" class="mr-1">
+                                                    <span class="text-xs">Underline</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 p-3 bg-gray-50 rounded" 
+                                             :style="`font-family: ${textClass.fontFamily}; font-size: ${textClass.fontSize}px; color: ${textClass.color}; font-weight: ${textClass.bold ? 'bold' : 'normal'}; font-style: ${textClass.italic ? 'italic' : 'normal'}; text-decoration: ${textClass.underline ? 'underline' : 'none'}`">
+                                            Sample Text Preview
+                                        </div>
+                                    </div>
+                                </template>
+                                <button 
+                                    @click="addTextClass()"
+                                    class="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 text-gray-600"
+                                >
+                                    + Add Text Class
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Properties Section -->
+                    <div x-show="currentSection === 'visual' && selectedVisual" class="space-y-6">
+                        <!-- Visual Header -->
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold" x-text="formatVisualName(selectedVisual) + ' Properties'"></h3>
+                                <div class="flex items-center space-x-2">
+                                    <button 
+                                        @click="resetVisual(selectedVisual)"
+                                        class="text-sm text-gray-500 hover:text-gray-700"
+                                    >
+                                        Reset
+                                    </button>
+                                    <span class="text-sm text-gray-400">|</span>
+                                    <button 
+                                        @click="copyVisualProperties(selectedVisual)"
+                                        class="text-sm text-blue-600 hover:text-blue-700"
+                                    >
+                                        Copy Properties
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Property Search -->
+                            <div class="relative mb-4">
+                                <input 
+                                    type="text"
+                                    x-model="propertySearch"
+                                    @input="searchVisualProperties()"
+                                    class="w-full px-4 py-2 border rounded-lg pl-10"
+                                    placeholder="Search properties..."
+                                >
+                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+
+                            <!-- Property Categories -->
+                            <div class="flex space-x-2 mb-4 border-b">
+                                <template x-for="category in propertyCategories" :key="category">
+                                    <button 
+                                        @click="selectedCategory = category"
+                                        class="px-3 py-2 text-sm font-medium transition-colors"
+                                        :class="selectedCategory === category ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-gray-900'"
+                                        x-text="category"
+                                    ></button>
+                                </template>
+                            </div>
+
+                            <!-- Properties Grid -->
+                            <div class="space-y-4">
+                                <template x-for="prop in filteredProperties" :key="prop.id">
+                                    <div class="border rounded-lg p-4 hover:border-blue-200 transition-colors">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div>
+                                                <h4 class="font-medium text-sm" x-text="prop.title"></h4>
+                                                <p class="text-xs text-gray-600 mt-1" x-text="prop.description"></p>
+                                            </div>
+                                            <span class="text-xs px-2 py-1 bg-gray-100 rounded-full" x-text="prop.type"></span>
+                                        </div>
+
+                                        <!-- Property Input -->
+                                        <div class="mt-3">
+                                            <!-- Color Input -->
+                                            <div x-show="isColorProperty(prop)">
+                                                <div class="flex items-center space-x-2">
+                                                    <input 
+                                                        type="color"
+                                                        :value="getPropertyValue(prop) || '#000000'"
+                                                        @input="setPropertyValue(prop, $event.target.value)"
+                                                        class="h-10 w-20 border rounded cursor-pointer"
+                                                    >
+                                                    <input 
+                                                        type="text"
+                                                        :value="getPropertyValue(prop) || ''"
+                                                        @input="setPropertyValue(prop, $event.target.value)"
+                                                        class="flex-1 px-3 py-2 border rounded-lg text-sm font-mono"
+                                                        placeholder="#000000"
+                                                    >
+                                                    <button 
+                                                        @click="toggleGradient(prop)"
+                                                        class="px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
+                                                        title="Toggle gradient"
+                                                    >
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Number Input -->
+                                            <div x-show="prop.type === 'number' || prop.type === 'integer'">
+                                                <div class="flex items-center space-x-2">
+                                                    <input 
+                                                        type="range"
+                                                        :min="prop.constraints?.minimum || 0"
+                                                        :max="prop.constraints?.maximum || 100"
+                                                        :value="getPropertyValue(prop) || 0"
+                                                        @input="setPropertyValue(prop, parseFloat($event.target.value))"
+                                                        class="flex-1"
+                                                    >
+                                                    <input 
+                                                        type="number"
+                                                        :min="prop.constraints?.minimum"
+                                                        :max="prop.constraints?.maximum"
+                                                        :value="getPropertyValue(prop) || 0"
+                                                        @input="setPropertyValue(prop, parseFloat($event.target.value))"
+                                                        class="w-20 px-3 py-2 border rounded-lg text-sm"
+                                                    >
+                                                </div>
+                                            </div>
+
+                                            <!-- Boolean Input -->
+                                            <div x-show="prop.type === 'boolean'">
+                                                <label class="flex items-center space-x-2">
+                                                    <input 
+                                                        type="checkbox"
+                                                        :checked="getPropertyValue(prop)"
+                                                        @change="setPropertyValue(prop, $event.target.checked)"
+                                                        class="rounded"
+                                                    >
+                                                    <span class="text-sm">Enable</span>
+                                                </label>
+                                            </div>
+
+                                            <!-- String Input -->
+                                            <div x-show="prop.type === 'string' && !isColorProperty(prop)">
+                                                <input 
+                                                    type="text"
+                                                    :value="getPropertyValue(prop) || ''"
+                                                    @input="setPropertyValue(prop, $event.target.value)"
+                                                    class="w-full px-3 py-2 border rounded-lg text-sm"
+                                                    :placeholder="prop.default || 'Enter value'"
+                                                >
+                                            </div>
+
+                                            <!-- State Support -->
+                                            <div x-show="prop.isStateEnabled" class="mt-2 p-2 bg-blue-50 rounded">
+                                                <p class="text-xs text-blue-700 mb-2">This property supports states</p>
+                                                <div class="flex space-x-2">
+                                                    <button class="text-xs px-2 py-1 bg-white rounded border">Default</button>
+                                                    <button class="text-xs px-2 py-1 bg-white rounded border">Hover</button>
+                                                    <button class="text-xs px-2 py-1 bg-white rounded border">Selected</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Live Preview & JSON -->
+                <div class="col-span-3">
+                    <div class="sticky top-24 space-y-6">
+                        <!-- Live Preview -->
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="font-semibold mb-4">Live Preview</h3>
+                            <div class="visual-preview">
+                                <div x-show="selectedVisual === 'card'" class="space-y-3">
+                                    <div class="bg-white rounded-lg shadow p-4" 
+                                         :style="`background-color: ${visualProperties.card?.background || '#ffffff'}; border: 2px solid ${visualProperties.card?.border || '#e5e7eb'}`">
+                                        <h4 class="text-lg font-semibold" :style="`color: ${visualProperties.card?.fontColor || '#000000'}`">Sales Total</h4>
+                                        <p class="text-3xl font-bold mt-2" :style="`color: ${visualProperties.card?.fontColor || '#000000'}`">$142.5K</p>
+                                        <p class="text-sm text-gray-600 mt-1">+12% from last month</p>
+                                    </div>
+                                </div>
+                                
+                                <div x-show="selectedVisual === 'slicer'" class="space-y-2">
+                                    <div class="bg-white rounded border p-3" 
+                                         :style="`background-color: ${visualProperties.slicer?.background || '#ffffff'}; border-color: ${visualProperties.slicer?.border || '#e5e7eb'}`">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="mr-2" checked>
+                                            <span :style="`color: ${visualProperties.slicer?.fontColor || '#000000'}`">Option 1</span>
+                                        </label>
+                                    </div>
+                                    <div class="bg-white rounded border p-3" 
+                                         :style="`background-color: ${visualProperties.slicer?.background || '#ffffff'}; border-color: ${visualProperties.slicer?.border || '#e5e7eb'}`">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="mr-2">
+                                            <span :style="`color: ${visualProperties.slicer?.fontColor || '#000000'}`">Option 2</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div x-show="!selectedVisual && currentSection === 'foundation'" class="text-center text-gray-500">
+                                    <div class="mb-4">
+                                        <div class="flex justify-center space-x-2 mb-4">
+                                            <template x-for="color in $data.theme.dataColors.slice(0, 6)" :key="color">
+                                                <div class="w-12 h-12 rounded" :style="`background-color: ${color}`"></div>
+                                            </template>
+                                        </div>
+                                        <p class="text-sm">Data color palette preview</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Theme JSON -->
+                        <div class="bg-white rounded-lg shadow-sm">
+                            <div class="p-4 border-b flex items-center justify-between">
+                                <h3 class="font-semibold">Theme JSON</h3>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs text-gray-500" x-text="$data.themeSize + ' bytes'"></span>
+                                    <button 
+                                        @click="copyTheme()"
+                                        class="text-sm text-blue-600 hover:text-blue-700"
+                                    >
+                                        Copy
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="json-output p-4 rounded-b-lg max-h-96 overflow-y-auto">
+                                <pre x-html="$data.formattedJson"></pre>
+                            </div>
+                        </div>
+
+                        <!-- Validation Status -->
+                        <div x-show="$data.validation.warnings.length > 0" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-yellow-800 mb-2">Validation Warnings</h4>
+                            <ul class="space-y-1">
+                                <template x-for="warning in $data.validation.warnings" :key="warning">
+                                    <li class="text-xs text-yellow-700">• <span x-text="warning"></span></li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Dialog -->
+        <div x-show="$data.showImportDialog" 
+             x-transition
+             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+             @click.self="showImportDialog = false">
+            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
+                <h3 class="text-lg font-semibold mb-4">Import Theme</h3>
+                <textarea 
+                    x-model="$data.importJson"
+                    class="w-full h-64 p-4 border rounded-lg font-mono text-sm"
+                    placeholder="Paste your Power BI theme JSON here..."
+                ></textarea>
+                <div class="flex justify-end space-x-3 mt-4">
+                    <button 
+                        @click="showImportDialog = false"
+                        class="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        @click="importTheme()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                        Import
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function advancedThemeBuilder() {
+            return {
+                apiUrl: 'http://localhost:3001',
+                
+                // Navigation
+                currentSection: 'foundation',
+                selectedVisual: '',
+                selectedCategory: 'All',
+                visualSearch: '',
+                propertySearch: '',
+                
+                // Visual lists (will be populated from API)
+                canvasVisuals: [],
+                dataVisuals: [],
+                allVisuals: [],
+                
+                // Theme data
+                theme: {
+                    name: 'My Advanced Theme',
+                    dataColors: ['#0078D4', '#40E0D0', '#107C10', '#FFB900', '#D83B01', '#5C2D91'],
+                    textClasses: []
+                },
+                
+                // Visual properties
+                visualProperties: {},
+                properties: [],
+                filteredProperties: [],
+                propertyCategories: ['All', 'Colors', 'Typography', 'Layout', 'Borders', 'Effects'],
+                
+                // UI State
+                showImportDialog: false,
+                importJson: '',
+                validation: { warnings: [] },
+                themeSize: 0,
+                formattedJson: '',
+                
+                async init() {
+                    await this.loadVisuals();
+                    await this.updateTheme();
+                },
+                
+                async loadVisuals() {
+                    try {
+                        // Load visual list from the processed schema summary
+                        const response = await fetch(`${this.apiUrl}/api/stats`);
+                        const stats = await response.json();
+                        
+                        // For now, we'll use a hardcoded categorization
+                        // In a real app, this would come from the API
+                        const canvasTypes = ['report', 'page', 'filter', 'group'];
+                        const chartTypes = ['barChart', 'columnChart', 'lineChart', 'areaChart', 'pieChart', 'donutChart', 'scatterChart', 'waterfallChart', 'treemap', 'funnel'];
+                        const mapTypes = ['map', 'filledMap', 'shapeMap', 'azureMap'];
+                        const dataTypes = ['card', 'multiRowCard', 'kpi', 'gauge', 'slicer', 'table', 'matrix', 'pivotTable'];
+                        
+                        // Get all visual types from the API
+                        const allVisualsResponse = await fetch(`${this.apiUrl}/api/properties?limit=1000`);
+                        const allPropsData = await allVisualsResponse.json();
+                        
+                        // Extract unique visual types from properties
+                        const visualSet = new Set();
+                        allPropsData.results.forEach(prop => {
+                            prop.visuals.forEach(v => visualSet.add(v));
+                        });
+                        
+                        this.allVisuals = Array.from(visualSet).sort();
+                        
+                        // Categorize visuals
+                        this.canvasVisuals = this.allVisuals.filter(v => canvasTypes.includes(v));
+                        this.dataVisuals = this.allVisuals.filter(v => 
+                            dataTypes.includes(v) || chartTypes.includes(v) || mapTypes.includes(v) || 
+                            (!canvasTypes.includes(v) && !this.canvasVisuals.includes(v))
+                        );
+                        
+                        console.log('Loaded visuals:', {
+                            canvas: this.canvasVisuals,
+                            data: this.dataVisuals,
+                            total: this.allVisuals.length
+                        });
+                    } catch (error) {
+                        console.error('Failed to load visuals:', error);
+                        // Fallback to some defaults
+                        this.canvasVisuals = ['report', 'page', 'filter'];
+                        this.dataVisuals = ['card', 'slicer', 'table', 'barChart', 'lineChart', 'pieChart'];
+                    }
+                },
+                
+                selectSection(section) {
+                    this.currentSection = section;
+                    this.selectedVisual = '';
+                },
+                
+                async selectVisual(visual) {
+                    this.selectedVisual = visual;
+                    this.currentSection = 'visual';
+                    await this.loadVisualProperties();
+                },
+                
+                async loadVisualProperties() {
+                    if (!this.selectedVisual) return;
+                    
+                    try {
+                        const response = await fetch(`${this.apiUrl}/api/properties?visual=${this.selectedVisual}&limit=100`);
+                        const data = await response.json();
+                        this.properties = data.results || [];
+                        this.filterProperties();
+                    } catch (error) {
+                        console.error('Failed to load properties:', error);
+                        this.properties = [];
+                    }
+                },
+                
+                async searchVisualProperties() {
+                    if (!this.selectedVisual) return;
+                    
+                    try {
+                        const params = new URLSearchParams({
+                            visual: this.selectedVisual,
+                            text: this.propertySearch,
+                            limit: '50'
+                        });
+                        
+                        const response = await fetch(`${this.apiUrl}/api/properties?${params}`);
+                        const data = await response.json();
+                        this.properties = data.results || [];
+                        this.filterProperties();
+                    } catch (error) {
+                        console.error('Search failed:', error);
+                    }
+                },
+                
+                filterProperties() {
+                    let filtered = [...this.properties];
+                    
+                    if (this.selectedCategory !== 'All') {
+                        const categoryMap = {
+                            'Colors': 'color',
+                            'Typography': 'typography',
+                            'Layout': 'layout',
+                            'Borders': 'border',
+                            'Effects': 'effect'
+                        };
+                        const category = categoryMap[this.selectedCategory];
+                        if (category) {
+                            filtered = filtered.filter(p => p.category === category);
+                        }
+                    }
+                    
+                    this.filteredProperties = filtered;
+                },
+                
+                isColorProperty(prop) {
+                    return prop.category === 'color' || 
+                           prop.path.includes('color') || 
+                           prop.path.includes('Color') ||
+                           prop.path.includes('background') ||
+                           prop.path.includes('border');
+                },
+                
+                getPropertyValue(prop) {
+                    if (!this.visualProperties[this.selectedVisual]) return null;
+                    const propName = prop.path.split('.').pop();
+                    const value = this.visualProperties[this.selectedVisual][propName];
+                    
+                    // Extract value from formatted structure
+                    if (Array.isArray(value) && value[0]) {
+                        if (value[0].color?.solid?.color) return value[0].color.solid.color;
+                        if (value[0].value !== undefined) return value[0].value;
+                    }
+                    return value;
+                },
+                
+                setPropertyValue(prop, value) {
+                    if (!this.visualProperties[this.selectedVisual]) {
+                        this.visualProperties[this.selectedVisual] = {};
+                    }
+                    
+                    const propName = prop.path.split('.').pop();
+                    
+                    // Format value based on property type
+                    let formattedValue;
+                    
+                    if (prop.path.includes('background') || prop.path.includes('border') || prop.path.includes('Color')) {
+                        formattedValue = [{
+                            "color": {
+                                "solid": {
+                                    "color": value
+                                }
+                            }
+                        }];
+                    } else if (prop.path.includes('outspace')) {
+                        formattedValue = [{
+                            "color": {
+                                "solid": {
+                                    "color": value
+                                }
+                            }
+                        }];
+                    } else if (prop.type === 'number' || prop.type === 'integer') {
+                        formattedValue = [{ "value": value }];
+                    } else if (prop.type === 'boolean') {
+                        formattedValue = [{ "value": value }];
+                    } else {
+                        formattedValue = value;
+                    }
+                    
+                    this.visualProperties[this.selectedVisual][propName] = formattedValue;
+                    this.updateTheme();
+                },
+                
+                formatVisualName(visual) {
+                    const names = {
+                        'report': 'Report',
+                        'page': 'Page',
+                        'filter': 'Filter Pane',
+                        'card': 'Card',
+                        'slicer': 'Slicer',
+                        'table': 'Table',
+                        'matrix': 'Matrix',
+                        'barChart': 'Bar Chart',
+                        'columnChart': 'Column Chart',
+                        'lineChart': 'Line Chart',
+                        'pieChart': 'Pie Chart',
+                        'donutChart': 'Donut Chart',
+                        'gauge': 'Gauge',
+                        'kpi': 'KPI'
+                    };
+                    return names[visual] || visual;
+                },
+                
+                getVisualPropertyCount(visual) {
+                    return Object.keys(this.visualProperties[visual] || {}).length;
+                },
+                
+                updateDataColor(index, color) {
+                    this.theme.dataColors[index] = color;
+                    this.updateTheme();
+                },
+                
+                addDataColor() {
+                    this.theme.dataColors.push('#000000');
+                    this.updateTheme();
+                },
+                
+                removeDataColor(index) {
+                    this.theme.dataColors.splice(index, 1);
+                    this.updateTheme();
+                },
+                
+                addTextClass() {
+                    this.theme.textClasses.push({
+                        name: `Text Class ${this.theme.textClasses.length + 1}`,
+                        fontFamily: 'Segoe UI',
+                        fontSize: 12,
+                        color: '#000000',
+                        bold: false,
+                        italic: false,
+                        underline: false
+                    });
+                    this.updateTheme();
+                },
+                
+                removeTextClass(index) {
+                    this.theme.textClasses.splice(index, 1);
+                    this.updateTheme();
+                },
+                
+                applyColorPalette(palette) {
+                    const palettes = {
+                        default: ['#0078D4', '#40E0D0', '#107C10', '#FFB900', '#D83B01', '#5C2D91'],
+                        colorblind: ['#648FFF', '#785EF0', '#DC267F', '#FE6100', '#FFB000', '#000000'],
+                        corporate: ['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#f95d6a'],
+                        vibrant: ['#FF006E', '#8338EC', '#3A86FF', '#06FFA5', '#FFBE0B', '#FB5607']
+                    };
+                    this.theme.dataColors = palettes[palette] || palettes.default;
+                    this.updateTheme();
+                },
+                
+                async updateTheme() {
+                    const theme = {
+                        name: this.theme.name,
+                        dataColors: this.theme.dataColors
+                    };
+                    
+                    // Add text classes if any
+                    if (this.theme.textClasses.length > 0) {
+                        theme.textClasses = this.theme.textClasses.map(tc => ({
+                            name: tc.name,
+                            fontFace: tc.fontFamily,
+                            fontSize: tc.fontSize + 'pt',
+                            color: tc.color,
+                            isBold: tc.bold,
+                            isItalic: tc.italic,
+                            isUnderlined: tc.underline
+                        }));
+                    }
+                    
+                    // Add visual styles
+                    if (Object.keys(this.visualProperties).length > 0) {
+                        theme.visualStyles = {};
+                        
+                        for (const [visual, props] of Object.entries(this.visualProperties)) {
+                            if (Object.keys(props).length > 0) {
+                                theme.visualStyles[visual] = { "*": props };
+                            }
+                        }
+                    }
+                    
+                    const json = JSON.stringify(theme, null, 2);
+                    this.themeSize = new Blob([json]).size;
+                    this.formattedJson = this.syntaxHighlight(json);
+                    
+                    // Validate
+                    this.validation.warnings = [];
+                    if (!theme.name) {
+                        this.validation.warnings.push('Theme name is required');
+                    }
+                    if (theme.dataColors.length === 0) {
+                        this.validation.warnings.push('At least one data color is recommended');
+                    }
+                },
+                
+                syntaxHighlight(json) {
+                    return json
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                            let cls = 'json-number';
+                            if (/^"/.test(match)) {
+                                if (/:$/.test(match)) {
+                                    cls = 'json-key';
+                                } else {
+                                    cls = 'json-string';
+                                }
+                            } else if (/true|false/.test(match)) {
+                                cls = 'json-boolean';
+                            } else if (/null/.test(match)) {
+                                cls = 'json-null';
+                            }
+                            return '<span class="' + cls + '">' + match + '</span>';
+                        });
+                },
+                
+                copyTheme() {
+                    const theme = {
+                        name: this.theme.name,
+                        dataColors: this.theme.dataColors
+                    };
+                    
+                    if (this.theme.textClasses.length > 0) {
+                        theme.textClasses = this.theme.textClasses.map(tc => ({
+                            name: tc.name,
+                            fontFace: tc.fontFamily,
+                            fontSize: tc.fontSize + 'pt',
+                            color: tc.color,
+                            isBold: tc.bold,
+                            isItalic: tc.italic,
+                            isUnderlined: tc.underline
+                        }));
+                    }
+                    
+                    if (Object.keys(this.visualProperties).length > 0) {
+                        theme.visualStyles = {};
+                        for (const [visual, props] of Object.entries(this.visualProperties)) {
+                            if (Object.keys(props).length > 0) {
+                                theme.visualStyles[visual] = { "*": props };
+                            }
+                        }
+                    }
+                    
+                    navigator.clipboard.writeText(JSON.stringify(theme, null, 2)).then(() => {
+                        alert('Theme JSON copied to clipboard!');
+                    });
+                },
+                
+                saveTheme() {
+                    const theme = {
+                        name: this.theme.name,
+                        dataColors: this.theme.dataColors
+                    };
+                    
+                    if (this.theme.textClasses.length > 0) {
+                        theme.textClasses = this.theme.textClasses.map(tc => ({
+                            name: tc.name,
+                            fontFace: tc.fontFamily,
+                            fontSize: tc.fontSize + 'pt',
+                            color: tc.color,
+                            isBold: tc.bold,
+                            isItalic: tc.italic,
+                            isUnderlined: tc.underline
+                        }));
+                    }
+                    
+                    if (Object.keys(this.visualProperties).length > 0) {
+                        theme.visualStyles = {};
+                        for (const [visual, props] of Object.entries(this.visualProperties)) {
+                            if (Object.keys(props).length > 0) {
+                                theme.visualStyles[visual] = { "*": props };
+                            }
+                        }
+                    }
+                    
+                    const blob = new Blob([JSON.stringify(theme, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${theme.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                },
+                
+                importTheme() {
+                    try {
+                        const imported = JSON.parse(this.importJson);
+                        
+                        // Import basic properties
+                        this.theme.name = imported.name || 'Imported Theme';
+                        this.theme.dataColors = imported.dataColors || [];
+                        
+                        // Import text classes
+                        if (imported.textClasses) {
+                            this.theme.textClasses = imported.textClasses.map(tc => ({
+                                name: tc.name,
+                                fontFamily: tc.fontFace,
+                                fontSize: parseInt(tc.fontSize),
+                                color: tc.color,
+                                bold: tc.isBold || false,
+                                italic: tc.isItalic || false,
+                                underline: tc.isUnderlined || false
+                            }));
+                        }
+                        
+                        // Import visual styles
+                        if (imported.visualStyles) {
+                            this.visualProperties = {};
+                            for (const [visual, config of Object.entries(imported.visualStyles)) {
+                                if (config['*']) {
+                                    this.visualProperties[visual] = config['*'];
+                                }
+                            }
+                        }
+                        
+                        this.updateTheme();
+                        this.showImportDialog = false;
+                        this.importJson = '';
+                    } catch (error) {
+                        alert('Invalid JSON format');
+                    }
+                },
+                
+                resetVisual(visual) {
+                    delete this.visualProperties[visual];
+                    this.updateTheme();
+                },
+                
+                copyVisualProperties(visual) {
+                    const props = this.visualProperties[visual];
+                    if (props) {
+                        navigator.clipboard.writeText(JSON.stringify(props, null, 2));
+                        alert('Visual properties copied to clipboard!');
+                    }
+                },
+                
+                filterVisuals() {
+                    // This would filter the visual list based on search
+                    // For now, just a placeholder
+                },
+                
+                toggleGradient(prop) {
+                    // This would toggle between solid and gradient fills
+                    alert('Gradient editor coming soon!');
+                }
+            };
+        }
+    </script>
+</body>
+</html>

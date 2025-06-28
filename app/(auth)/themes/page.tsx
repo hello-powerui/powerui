@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ThemeCard } from '@/components/theme-card';
 import { ChevronLeft, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Theme {
   id: string;
@@ -110,13 +111,25 @@ export default function ThemesPage() {
       });
       
       if (response.ok) {
-        // Refresh the themes list to show the new duplicate
-        await fetchAllThemes();
+        const duplicatedTheme = await response.json();
+        
+        // Check if this is a public theme being duplicated (not owned by current user)
+        const originalTheme = [...publicThemes, ...myThemes].find(t => t.id === themeId);
+        const isNonOwned = originalTheme && originalTheme.user?.id !== user?.id;
+        
+        if (isNonOwned && duplicatedTheme.id) {
+          // Redirect to theme studio with the new duplicated theme
+          router.push(`/themes/studio?themeId=${duplicatedTheme.id}`);
+        } else {
+          // Refresh the themes list to show the new duplicate
+          await fetchAllThemes();
+          toast.success('Theme duplicated successfully');
+        }
       } else {
-        alert('Failed to duplicate theme');
+        toast.error('Failed to duplicate theme');
       }
     } catch (error) {
-      alert('Failed to duplicate theme');
+      toast.error('Failed to duplicate theme');
     }
   };
 

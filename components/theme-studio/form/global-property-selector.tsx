@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { SchemaProperty } from '@/lib/theme-studio/types/schema';
 import { cn } from '@/lib/utils';
@@ -8,7 +8,7 @@ import { X, Plus, Search, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SchemaForm } from './schema-form';
 import { CollapsibleSection } from '../ui/collapsible-section';
-import { hasActualContent } from '@/lib/utils/theme-helpers';
+import { hasActualContent, cleanupVisualStyles } from '@/lib/utils/theme-helpers';
 
 interface GlobalPropertySelectorProps {
   schemaLoader: SchemaLoader;
@@ -34,6 +34,8 @@ export function GlobalPropertySelector({
   const [showPropertyPicker, setShowPropertyPicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedComplexProperties, setSelectedComplexProperties] = useState<string[]>([]);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<'above' | 'below'>('below');
 
   // Dynamically extract structured and complex properties
   const { structuredProperties, complexProperties } = useMemo(() => {
@@ -99,7 +101,7 @@ export function GlobalPropertySelector({
           '*': newGlobalProps
         }
       };
-      onVisualStylesChange(newVisualStyles);
+      onVisualStylesChange(cleanupVisualStyles(newVisualStyles));
     }
   };
 
@@ -128,6 +130,25 @@ export function GlobalPropertySelector({
     );
   }, [complexProperties, searchQuery]);
 
+  // Calculate dropdown position when opening
+  useEffect(() => {
+    if (showPropertyPicker && buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const dropdownHeight = 400; // Approximate height of dropdown
+      
+      // Check if there's enough space below
+      const spaceBelow = viewportHeight - buttonRect.bottom;
+      const spaceAbove = buttonRect.top;
+      
+      if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
+        setDropdownPosition('above');
+      } else {
+        setDropdownPosition('below');
+      }
+    }
+  }, [showPropertyPicker]);
+
   const handleAddComplexProperty = (propertyName: string) => {
     if (!selectedComplexProperties.includes(propertyName)) {
       setSelectedComplexProperties([...selectedComplexProperties, propertyName]);
@@ -145,7 +166,7 @@ export function GlobalPropertySelector({
             }
           }
         };
-        onVisualStylesChange(newVisualStyles);
+        onVisualStylesChange(cleanupVisualStyles(newVisualStyles));
       }
     }
     setShowPropertyPicker(false);
@@ -167,7 +188,7 @@ export function GlobalPropertySelector({
           '*': newGlobalProps
         }
       };
-      onVisualStylesChange(newVisualStyles);
+      onVisualStylesChange(cleanupVisualStyles(newVisualStyles));
     }
   };
 
@@ -191,24 +212,31 @@ export function GlobalPropertySelector({
                   key={key}
                   title={sectionTitle}
                   defaultOpen={false}
-                  hasChanges={hasContent}
+                  hasContent={hasContent}
                   onClear={() => {
                     // Clear this structured property
                     if (onVisualStylesChange) {
-                      const newVisualStyles = {
-                        ...visualStyles,
-                        '*': {
-                          ...visualStyles?.['*'],
+                      const newGlobalProps = { ...visualStyles?.['*']?.['*'] };
+                      delete newGlobalProps[key];
+                      
+                      // Check if global props is now empty
+                      if (Object.keys(newGlobalProps).length === 0) {
+                        // Remove the entire * visual if no global props remain
+                        const newVisualStyles = { ...visualStyles };
+                        delete newVisualStyles['*'];
+                        onVisualStylesChange(newVisualStyles);
+                      } else {
+                        const newVisualStyles = {
+                          ...visualStyles,
                           '*': {
-                            ...visualStyles?.['*']?.['*'],
-                            [key]: undefined
+                            ...visualStyles?.['*'],
+                            '*': newGlobalProps
                           }
-                        }
-                      };
-                      onVisualStylesChange(newVisualStyles);
+                        };
+                        onVisualStylesChange(newVisualStyles);
+                      }
                     }
                   }}
-                  hasContent={hasContent}
                   clearMessage={`Clear all ${sectionTitle.toLowerCase()} settings?`}
                 >
                   <SchemaForm
@@ -227,7 +255,7 @@ export function GlobalPropertySelector({
                             }
                           }
                         };
-                        onVisualStylesChange(newVisualStyles);
+                        onVisualStylesChange(cleanupVisualStyles(newVisualStyles));
                       }
                     }}
                     schemaLoader={schemaLoader}
@@ -247,6 +275,7 @@ export function GlobalPropertySelector({
           <h4 className="text-sm font-medium text-gray-700">Custom Global Properties</h4>
           <div className="relative">
             <button
+              ref={buttonRef}
               onClick={() => setShowPropertyPicker(!showPropertyPicker)}
               className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
               title="Add global property"
@@ -266,7 +295,10 @@ export function GlobalPropertySelector({
                   }}
                 />
                 
-                <div className="absolute top-full right-0 mt-2 bg-white rounded-md shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden w-80">
+                <div className={cn(
+                  "absolute right-0 bg-white rounded-md shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden w-80",
+                  dropdownPosition === 'above' ? "bottom-full mb-2" : "top-full mt-2"
+                )}>
                   {/* Search bar */}
                   <div className="p-3 border-b border-gray-200">
                     <div className="relative">
@@ -320,16 +352,15 @@ export function GlobalPropertySelector({
             if (!schema) return null;
             
             const sectionSchema = schema as any;
-            const hasChanges = hasPropertyChanges(propertyName);
+            const hasPropertyContent = hasPropertyChanges(propertyName);
             
             return (
               <CollapsibleSection
                 key={propertyName}
                 title={propertyName}  // Always use property name
                 defaultOpen={false}
-                hasChanges={hasChanges}
                 onClear={() => handleResetProperty(propertyName)}
-                hasContent={hasActualContent(visualStyles?.['*']?.['*']?.[propertyName])}
+                hasContent={hasPropertyContent}
                 clearMessage={`Clear all ${propertyName} settings?`}
                 headerAction={
                   <div
@@ -369,7 +400,7 @@ export function GlobalPropertySelector({
                           }
                         }
                       };
-                      onVisualStylesChange(newVisualStyles);
+                      onVisualStylesChange(cleanupVisualStyles(newVisualStyles));
                     }
                   }}
                   schemaLoader={schemaLoader}

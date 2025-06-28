@@ -34,6 +34,10 @@ export interface UnifiedColorPickerProps {
   enableShades?: boolean;
   mode?: 'light' | 'dark';
   neutralPalette?: string[];
+  brandPalette?: Record<string, string>;
+  successPalette?: Record<string, string>;
+  warningPalette?: Record<string, string>;
+  errorPalette?: Record<string, string>;
   themeColors?: string[];
   className?: string;
   placeholder?: string;
@@ -78,6 +82,10 @@ export function UnifiedColorPicker({
   enableShades = false,
   mode = 'light',
   neutralPalette,
+  brandPalette,
+  successPalette,
+  warningPalette,
+  errorPalette,
   themeColors = DEFAULT_THEME_COLORS,
   className,
   placeholder = 'Select color',
@@ -202,7 +210,14 @@ export function UnifiedColorPicker({
       const neutralObj = neutralPalette && neutralPalette.length > 0
         ? Object.fromEntries(neutralPalette.slice(0, shadeKeys.length).map((color, i) => [shadeKeys[i], color]))
         : {};
-      const resolved = resolveToken(displayValue, mode, { neutral: neutralObj, dataColors: [] });
+      const resolved = resolveToken(displayValue, mode, { 
+        neutral: neutralObj, 
+        brand: brandPalette || null,
+        success: successPalette || null,
+        warning: warningPalette || null,
+        error: errorPalette || null,
+        dataColors: themeColors || [] 
+      });
       return resolved || '#000000';
     }
     if (displayValue.startsWith('Theme')) {
@@ -385,153 +400,205 @@ export function UnifiedColorPicker({
             <ChevronDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[320px] p-0 overflow-hidden" align="start">
+        <PopoverContent className="w-[340px] p-0" align="start" sideOffset={4}>
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-            <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}>
-              {enableTokens && <TabsTrigger value="tokens">Tokens</TabsTrigger>}
-              <TabsTrigger value="custom">Custom</TabsTrigger>
-              {enableThemeColors && <TabsTrigger value="theme">Theme</TabsTrigger>}
-            </TabsList>
+            <div className="px-1 pt-1 pb-0">
+              <TabsList className="grid w-full h-10 p-1 bg-gray-100/80" style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}>
+                {enableTokens && <TabsTrigger value="tokens" className="text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm">Tokens</TabsTrigger>}
+                <TabsTrigger value="custom" className="text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm">Custom</TabsTrigger>
+                {enableThemeColors && <TabsTrigger value="theme" className="text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm">Theme</TabsTrigger>}
+              </TabsList>
+            </div>
             
             {enableTokens && (
-              <TabsContent value="tokens" className="p-3 space-y-3 max-h-[400px] flex flex-col">
-                <div className="relative flex-shrink-0">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search tokens..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8"
-                  />
+              <TabsContent value="tokens" className="mt-0 space-y-0">
+                <div className="p-3 pb-0">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-gray-400" />
+                    <Input
+                      placeholder="Search tokens..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="h-8 pl-8 text-sm bg-gray-50 border-gray-200 focus:bg-white"
+                    />
+                  </div>
                 </div>
-                <div className="flex-1 overflow-y-auto space-y-3 pr-1 min-h-0">
-                  {Object.entries(filteredTokens).map(([category, tokens]) => (
-                    <div key={category}>
-                      <p className="text-xs font-medium text-muted-foreground mb-2">
-                        {category}
-                      </p>
-                      <div className="grid grid-cols-2 gap-1">
-                        {tokens.map((token) => {
-                          // Convert neutralPalette array to proper shade keys
-                          // Standard shade values: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950
-                          const shadeKeys = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
-                          const neutralObj = neutralPalette && neutralPalette.length > 0
-                            ? Object.fromEntries(neutralPalette.slice(0, shadeKeys.length).map((color, i) => [shadeKeys[i], color]))
-                            : {};
-                          const resolvedColor = resolveToken(token, mode, { neutral: neutralObj, dataColors: [] });
-                          return (
-                            <Button
-                              key={token}
-                              variant="ghost"
-                              size="sm"
-                              className="justify-start gap-2 h-8 px-2"
-                              onClick={() => handleColorChange(token)}
-                              type="button"
-                            >
-                              <div
-                                className="h-4 w-4 rounded border border-gray-200 shrink-0"
-                                style={{ backgroundColor: resolvedColor || '#000' }}
-                              />
-                              <span className="text-xs truncate">{token}</span>
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
+                <div className="max-h-[320px] overflow-y-auto p-3 pt-2">
+                  <div className="space-y-4">
+                    {Object.entries(filteredTokens).length === 0 ? (
+                      <p className="text-sm text-gray-500 text-center py-8">No tokens found</p>
+                    ) : (
+                      Object.entries(filteredTokens).map(([category, tokens]) => (
+                        <div key={category}>
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                            {category}
+                          </p>
+                          <div className="grid grid-cols-2 gap-1">
+                            {tokens.map((token) => {
+                              // Convert neutralPalette array to proper shade keys
+                              const shadeKeys = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+                              const neutralObj = neutralPalette && neutralPalette.length > 0
+                                ? Object.fromEntries(neutralPalette.slice(0, shadeKeys.length).map((color, i) => [shadeKeys[i], color]))
+                                : {};
+                              const resolvedColor = resolveToken(token, mode, { 
+                                neutral: neutralObj, 
+                                brand: brandPalette || null,
+                                success: successPalette || null,
+                                warning: warningPalette || null,
+                                error: errorPalette || null,
+                                dataColors: themeColors || [] 
+                              });
+                              const displayValue = getDisplayValue();
+                              const isSelected = displayValue === token;
+                              
+                              return (
+                                <button
+                                  key={token}
+                                  className={cn(
+                                    "flex items-center gap-2 h-8 px-2 rounded text-xs hover:bg-gray-100 transition-colors w-full text-left",
+                                    isSelected && "bg-gray-100 font-medium"
+                                  )}
+                                  onClick={() => handleColorChange(token)}
+                                  type="button"
+                                >
+                                  <div
+                                    className="h-4 w-4 rounded border border-gray-200 shrink-0"
+                                    style={{ backgroundColor: resolvedColor || '#000' }}
+                                  />
+                                  <span className="truncate">{token}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </TabsContent>
             )}
             
-            <TabsContent value="custom" className="p-3 space-y-3">
-              <div className="space-y-2">
-                <Label>Hex Color</Label>
-                <div className="flex gap-2">
-                  <Input
-                    type="color"
-                    value={(() => {
-                      const display = getDisplayValue();
-                      return display.startsWith('#') ? display : '#000000';
-                    })()}
-                    onChange={(e) => handleColorChange(e.target.value)}
-                    className="w-16 h-9 p-1 cursor-pointer"
-                  />
-                  <Input
-                    type="text"
-                    placeholder="#000000"
-                    value={(() => {
-                      const display = getDisplayValue();
-                      return display.startsWith('#') ? display : '';
-                    })()}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value.match(/^#[0-9A-Fa-f]{0,6}$/)) {
-                        handleColorChange(value);
-                      }
-                    }}
-                    className="flex-1"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Preset Colors</Label>
-                <div className="grid grid-cols-6 gap-1">
-                  {PRESET_COLORS.map((color) => (
-                    <button
-                      key={color}
-                      className="h-8 w-full rounded border-2 border-gray-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-                      style={{ backgroundColor: color }}
-                      onClick={() => handleColorChange(color)}
+            <TabsContent value="custom" className="mt-0 p-4 space-y-4">
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">Hex Color</Label>
+                  <div className="flex gap-2">
+                    <div className="relative">
+                      <Input
+                        type="color"
+                        value={(() => {
+                          const display = getDisplayValue();
+                          return display.startsWith('#') ? display : '#000000';
+                        })()}
+                        onChange={(e) => handleColorChange(e.target.value)}
+                        className="w-12 h-9 p-1 cursor-pointer border-gray-200"
+                      />
+                    </div>
+                    <Input
+                      type="text"
+                      placeholder="#000000"
+                      value={(() => {
+                        const display = getDisplayValue();
+                        return display.startsWith('#') ? display : '';
+                      })()}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.match(/^#[0-9A-Fa-f]{0,6}$/)) {
+                          handleColorChange(value);
+                        }
+                      }}
+                      className="flex-1 h-9 text-sm font-mono"
                     />
-                  ))}
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">Preset Colors</Label>
+                  <div className="grid grid-cols-12 gap-1">
+                    {PRESET_COLORS.map((color) => {
+                      const displayValue = getDisplayValue();
+                      const isSelected = displayValue === color;
+                      return (
+                        <button
+                          key={color}
+                          className={cn(
+                            "h-7 w-full rounded border-2 transition-all",
+                            isSelected 
+                              ? "border-gray-900 scale-110 shadow-sm" 
+                              : "border-gray-200 hover:border-gray-400"
+                          )}
+                          style={{ backgroundColor: color }}
+                          onClick={() => handleColorChange(color)}
+                          title={color}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </TabsContent>
             
             {enableThemeColors && (
-              <TabsContent value="theme" className="p-3 space-y-3">
-                <div className="space-y-2">
-                  <Label>Theme Colors</Label>
-                  {themeColors.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No theme colors available</p>
-                  ) : (
-                  <div className="grid grid-cols-2 gap-2">
-                    {themeColors.map((color, index) => (
-                      <Button
-                        key={index}
-                        variant={selectedThemeColor === index ? "default" : "outline"}
-                        size="sm"
-                        className="justify-start gap-2"
-                        onClick={() => handleThemeColorSelect(index)}
-                        type="button"
-                      >
-                        <div
-                          className="h-4 w-4 rounded border border-gray-200"
-                          style={{ backgroundColor: color }}
-                        />
-                        <span>Color {index + 1}</span>
-                      </Button>
-                    ))}
+              <TabsContent value="theme" className="mt-0 p-4">
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-3 block">Theme Colors</Label>
+                    {themeColors.length === 0 ? (
+                      <p className="text-sm text-gray-500 text-center py-4">No theme colors available</p>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        {themeColors.map((color, index) => {
+                          const isSelected = selectedThemeColor === index;
+                          return (
+                            <button
+                              key={index}
+                              className={cn(
+                                "flex items-center gap-2 h-9 px-3 rounded text-sm transition-all",
+                                isSelected 
+                                  ? "bg-gray-900 text-white" 
+                                  : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                              )}
+                              onClick={() => handleThemeColorSelect(index)}
+                              type="button"
+                            >
+                              <div
+                                className={cn(
+                                  "h-4 w-4 rounded border",
+                                  isSelected ? "border-white/30" : "border-gray-300"
+                                )}
+                                style={{ backgroundColor: color }}
+                              />
+                              <span>Color {index + 1}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
+                  {enableShades && selectedThemeColor !== null && (
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700 mb-3 block">Shade Adjustment</Label>
+                      <div className="grid grid-cols-5 gap-1">
+                        {SHADE_OPTIONS.map((option) => {
+                          const isSelected = selectedShade === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              className={cn(
+                                "h-8 px-2 rounded text-xs font-medium transition-all",
+                                isSelected 
+                                  ? "bg-gray-900 text-white" 
+                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              )}
+                              onClick={() => handleShadeSelect(option.value)}
+                            >
+                              {option.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   )}
                 </div>
-                {enableShades && selectedThemeColor !== null && (
-                  <div className="space-y-2">
-                    <Label>Shade Adjustment</Label>
-                    <div className="grid grid-cols-3 gap-1">
-                      {SHADE_OPTIONS.map((option) => (
-                        <Button
-                          key={option.value}
-                          variant={selectedShade === option.value ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handleShadeSelect(option.value)}
-                        >
-                          {option.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </TabsContent>
             )}
           </Tabs>

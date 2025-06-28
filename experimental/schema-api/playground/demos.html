@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema API Demos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .demo-card {
+            transition: all 0.2s;
+        }
+        .demo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto p-8 max-w-6xl">
+        <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+            <h1 class="text-3xl font-bold mb-2">Schema API Demos</h1>
+            <p class="text-gray-600">Explore different ways to build Power BI themes with the Schema API</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Original Playground -->
+            <a href="index.html" class="demo-card block bg-white rounded-lg shadow-sm p-6 hover:shadow-lg">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                        <span class="text-2xl">🎯</span>
+                    </div>
+                    <h3 class="text-lg font-semibold">API Playground</h3>
+                </div>
+                <p class="text-sm text-gray-600">Original API explorer with search, filters, and natural language queries</p>
+                <div class="mt-4 text-xs text-gray-500">
+                    Features: Property search, NL queries, visual structure
+                </div>
+            </a>
+
+            <!-- Simple Demo -->
+            <a href="schema-api-demo.html" class="demo-card block bg-white rounded-lg shadow-sm p-6 hover:shadow-lg">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                        <span class="text-2xl">✨</span>
+                    </div>
+                    <h3 class="text-lg font-semibold">Simple Builder</h3>
+                </div>
+                <p class="text-sm text-gray-600">Basic theme builder with visual selection and property editing</p>
+                <div class="mt-4 text-xs text-gray-500">
+                    Features: Visual dropdown, basic properties, live preview
+                </div>
+            </a>
+
+            <!-- Theme Builder -->
+            <a href="theme-builder.html" class="demo-card block bg-white rounded-lg shadow-sm p-6 hover:shadow-lg">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                        <span class="text-2xl">🎨</span>
+                    </div>
+                    <h3 class="text-lg font-semibold">Theme Builder</h3>
+                </div>
+                <p class="text-sm text-gray-600">Interactive theme builder with property categories and export</p>
+                <div class="mt-4 text-xs text-gray-500">
+                    Features: Property groups, color pickers, theme export
+                </div>
+            </a>
+
+            <!-- Smart Builder -->
+            <a href="smart-theme-builder.html" class="demo-card block bg-white rounded-lg shadow-sm p-6 hover:shadow-lg">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
+                        <span class="text-2xl">🤖</span>
+                    </div>
+                    <h3 class="text-lg font-semibold">Smart Builder</h3>
+                </div>
+                <p class="text-sm text-gray-600">AI-powered theme suggestions and natural language editing</p>
+                <div class="mt-4 text-xs text-gray-500">
+                    Features: NL commands, smart suggestions, auto-complete
+                </div>
+            </a>
+
+            <!-- Advanced Builder -->
+            <a href="advanced-theme-builder.html" class="demo-card block bg-white rounded-lg shadow-sm p-6 hover:shadow-lg">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
+                        <span class="text-2xl">🚀</span>
+                    </div>
+                    <h3 class="text-lg font-semibold">Advanced Builder</h3>
+                </div>
+                <p class="text-sm text-gray-600">Full-featured editor with search, categories, and visual preview</p>
+                <div class="mt-4 text-xs text-gray-500">
+                    Features: Visual navigator, property search, live preview
+                </div>
+            </a>
+
+            <!-- Dynamic Studio -->
+            <a href="dynamic-theme-studio.html" class="demo-card block bg-white rounded-lg shadow-sm p-6 hover:shadow-lg">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mr-4">
+                        <span class="text-2xl">⚡</span>
+                    </div>
+                    <h3 class="text-lg font-semibold">Dynamic Studio</h3>
+                </div>
+                <p class="text-sm text-gray-600">Fully dynamic theme generation with smart property detection</p>
+                <div class="mt-4 text-xs text-gray-500">
+                    Features: Dynamic UI, property categories, complex types
+                </div>
+            </a>
+
+            <!-- Schema-Aware Builder -->
+            <a href="schema-aware-builder.html" class="demo-card block bg-white rounded-lg shadow-sm p-6 hover:shadow-lg border-2 border-blue-500">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                        <span class="text-2xl">🔍</span>
+                    </div>
+                    <h3 class="text-lg font-semibold">Schema-Aware Builder</h3>
+                    <span class="ml-2 text-xs bg-blue-500 text-white px-2 py-1 rounded">NEW</span>
+                </div>
+                <p class="text-sm text-gray-600">
+                    <strong>True schema-driven editing</strong> with full $ref resolution and type awareness
+                </p>
+                <div class="mt-4 text-xs text-gray-500">
+                    Features: Property tree, oneOf/allOf support, nested objects, enum values, complete type system
+                </div>
+            </a>
+        </div>
+
+        <div class="mt-8 bg-blue-50 rounded-lg p-6">
+            <h2 class="font-semibold mb-2">About Schema-Aware Builder</h2>
+            <p class="text-sm text-gray-700">
+                The Schema-Aware Builder is the most advanced demo, providing a truly dynamic interface that:
+            </p>
+            <ul class="mt-2 text-sm text-gray-700 list-disc list-inside space-y-1">
+                <li>Resolves all $ref definitions to show actual property structures</li>
+                <li>Handles complex types like oneOf, allOf, and nested objects</li>
+                <li>Shows the complete property tree for each visual</li>
+                <li>Generates correct JSON based on schema requirements</li>
+                <li>Provides type-appropriate editors for each property</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -7,6 +7,7 @@ import { Focus } from 'lucide-react';
 import { SchemaForm } from '@/components/theme-studio/form/schema-form';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { VariantManager } from './VariantManager';
+import { cleanupVisualStyles } from '@/lib/utils/theme-helpers';
 
 interface VisualsSectionProps {
   visualSettings: Record<string, any>;
@@ -45,15 +46,36 @@ export function VisualsSection({
     // Extract the value from the * wrapper
     const variantValue = value['*'] || value;
     
-    // Update visual settings directly
-    const updatedVisualSettings = {
-      ...visualSettings,
-      [selectedVisual]: {
-        ...visualSettings[selectedVisual],
-        [selectedVariant]: variantValue
+    // Check if the variant value is empty
+    const isEmpty = !variantValue || (typeof variantValue === 'object' && Object.keys(variantValue).length === 0);
+    
+    if (isEmpty) {
+      // Remove the variant entirely if empty
+      const updatedVisualSettings = { ...visualSettings };
+      if (updatedVisualSettings[selectedVisual]) {
+        const updatedVisual = { ...updatedVisualSettings[selectedVisual] };
+        delete updatedVisual[selectedVariant];
+        
+        // If no variants left, remove the visual entirely
+        if (Object.keys(updatedVisual).length === 0) {
+          delete updatedVisualSettings[selectedVisual];
+        } else {
+          updatedVisualSettings[selectedVisual] = updatedVisual;
+        }
       }
-    };
-    onVisualSettingsChange(updatedVisualSettings);
+      onVisualSettingsChange(cleanupVisualStyles(updatedVisualSettings));
+    } else {
+      // Update visual settings with non-empty value
+      const updatedVisualSettings = {
+        ...visualSettings,
+        [selectedVisual]: {
+          ...visualSettings[selectedVisual],
+          [selectedVariant]: variantValue
+        }
+      };
+      onVisualSettingsChange(cleanupVisualStyles(updatedVisualSettings));
+    }
+    
     trackChange(['visualStyles', selectedVisual, selectedVariant]);
   };
 

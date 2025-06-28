@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import { CollapsibleSection } from '@/components/theme-studio/ui/collapsible-section';
 import { SchemaForm } from '@/components/theme-studio/form/schema-form';
+import { PageSettingsPanel } from '@/components/theme-studio/form/PageSettingsPanel';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { hasActualContent } from '@/lib/utils/theme-helpers';
 
@@ -65,38 +66,40 @@ export function CanvasLayoutSection({
               title="Report Canvas"
               tooltip="Controls the overall report appearance and behavior"
               defaultOpen={false}
-              hasChanges={hasActualContent(visualSettings.report?.['*'])}
               onClear={onClearSection ? () => onClearSection('report') : undefined}
               hasContent={hasActualContent(visualSettings.report?.['*'])}
             >
               <SchemaForm
-                schema={schemaLoader?.getVisualSchema('report')?.properties?.['*'] || {}}
-                value={visualSettings.report?.['*'] || {}}
-                onChange={createCanvasChangeHandler('report')}
+                schema={schemaLoader?.getVisualSchema('report') || {}}
+                value={visualSettings.report || {}}
+                onChange={(value: any) => {
+                  onVisualSettingsChange({
+                    ...visualSettings,
+                    report: value
+                  });
+                  trackChange(['visualStyles', 'report']);
+                }}
                 schemaLoader={schemaLoader}
-                path={['visualStyles', 'report', '*']}
+                path={['visualStyles', 'report']}
               />
             </CollapsibleSection>
           )}
           
-          {/* Page Settings */}
+          {/* Page Settings - Now with multiple collapsible sections */}
           {schemaLoaded && schemaLoader && canvasTypes.includes('page') && (
-            <CollapsibleSection
-              title="Page Settings"
-              tooltip="Configure page backgrounds, size, and layout options"
-              defaultOpen={false}
-              hasChanges={hasActualContent(visualSettings.page?.['*'])}
-              onClear={onClearSection ? () => onClearSection('page') : undefined}
-              hasContent={hasActualContent(visualSettings.page?.['*'])}
-            >
-              <SchemaForm
-                schema={schemaLoader?.getVisualSchema('page')?.properties?.['*'] || {}}
-                value={visualSettings.page?.['*'] || {}}
-                onChange={createCanvasChangeHandler('page')}
-                schemaLoader={schemaLoader}
-                path={['visualStyles', 'page', '*']}
-              />
-            </CollapsibleSection>
+            <PageSettingsPanel
+              schema={schemaLoader?.getVisualSchema('page') || {}}
+              value={visualSettings.page || {}}
+              onChange={(value: any) => {
+                onVisualSettingsChange({
+                  ...visualSettings,
+                  page: value
+                });
+              }}
+              schemaLoader={schemaLoader}
+              basePath={['visualStyles', 'page']}
+              trackChange={trackChange}
+            />
           )}
           
           {/* Filter Pane */}
@@ -105,16 +108,21 @@ export function CanvasLayoutSection({
               title="Filter Pane"
               tooltip="Customize the appearance of filter panes and cards"
               defaultOpen={false}
-              hasChanges={hasActualContent(visualSettings.filter?.['*'])}
               onClear={onClearSection ? () => onClearSection('filter') : undefined}
               hasContent={hasActualContent(visualSettings.filter?.['*'])}
             >
               <SchemaForm
-                schema={schemaLoader?.getVisualSchema('filter')?.properties?.['*'] || {}}
-                value={visualSettings.filter?.['*'] || {}}
-                onChange={createCanvasChangeHandler('filter')}
+                schema={schemaLoader?.getVisualSchema('filter') || {}}
+                value={visualSettings.filter || {}}
+                onChange={(value: any) => {
+                  onVisualSettingsChange({
+                    ...visualSettings,
+                    filter: value
+                  });
+                  trackChange(['visualStyles', 'filter']);
+                }}
                 schemaLoader={schemaLoader}
-                path={['visualStyles', 'filter', '*']}
+                path={['visualStyles', 'filter']}
               />
             </CollapsibleSection>
           )}

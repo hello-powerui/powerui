@@ -1,5 +1,6 @@
 import { ColorPalette, NeutralPaletteGenerationInput, NeutralPaletteResponse } from './types';
 import { hexToHSL, hslToHex } from './utils';
+import { hexToOklch, oklchToHex, clamp, cubicBezier } from './color-utils';
 
 interface UIColorsResponse {
   name: string;
@@ -17,54 +18,29 @@ interface UIColorsResponse {
 export async function generateNeutralPalette(
   data: NeutralPaletteGenerationInput
 ): Promise<NeutralPaletteResponse> {
-  const hexColor = data.hexColor.trim().replace('#', '');
+  const hexColor = data.hexColor.trim();
   
   if (!hexColor) {
     throw new Error('Hex color is required');
   }
 
-  const apiKey = process.env.UICOLORS_API_KEY;
-  if (!apiKey) {
-    throw new Error('UICOLORS_API_KEY not configured');
+  // Validate hex format
+  const hexRegex = /^#?[0-9A-Fa-f]{6}$/;
+  const cleanHex = hexColor.startsWith('#') ? hexColor : `#${hexColor}`;
+  
+  if (!hexRegex.test(cleanHex)) {
+    throw new Error('Invalid hex color format');
   }
 
   try {
-    const response = await fetch(
-      `https://uicolors.app/api/v1/color-scales/tailwindcss3/generate/${hexColor}`,
-      {
-        method: 'POST',
-        headers: {
-          'x-api-key': apiKey
-        }
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to generate palette: ${response.status}`);
-    }
-
-    const paletteData: UIColorsResponse = await response.json();
-
-    // Transform the response into our required format
-    const palette: ColorPalette = {};
-    for (const shade of paletteData.shades) {
-      palette[shade.name] = shade.hexcode;
-    }
-
-    // Calculate and add shade 25 by modifying shade 50
-    const shade50 = paletteData.shades.find(shade => shade.name === '50');
-    if (shade50) {
-      const shade25HSL = {
-        h: shade50.hsl.hue,
-        s: Math.max(5, shade50.hsl.saturation - 5), // Slightly reduce saturation
-        l: Math.min(98, shade50.hsl.lightness + 8)  // Much bigger lightness increase
-      };
-
-      palette['25'] = hslToHex(shade25HSL.h, shade25HSL.s, shade25HSL.l);
-    }
-
+    // Use our enhanced offline generator exclusively
+    const palette = generateNeutralPaletteOffline(cleanHex);
+    
+    // Generate a name based on the color
+    const colorName = generateColorName(cleanHex);
+    
     return {
-      name: paletteData.name,
+      name: colorName,
       palette
     };
   } catch (error) {
@@ -73,34 +49,87 @@ export async function generateNeutralPalette(
   }
 }
 
-// For fallback or offline generation (simplified version)
-export function generateNeutralPaletteOffline(hexColor: string): ColorPalette {
-  const { h, s, l } = hexToHSL(hexColor);
+// Helper function to generate a descriptive name for the color
+function generateColorName(hex: string): string {
+  const { h, s, l } = hexToHSL(hex);
   
-  // Generate a basic neutral palette
-  const shades = [
-    { name: '25', lightness: 98 },
-    { name: '50', lightness: 96 },
-    { name: '100', lightness: 90 },
-    { name: '200', lightness: 82 },
-    { name: '300', lightness: 68 },
-    { name: '400', lightness: 54 },
-    { name: '500', lightness: 40 },
-    { name: '600', lightness: 32 },
-    { name: '700', lightness: 24 },
-    { name: '800', lightness: 16 },
-    { name: '900', lightness: 8 },
-    { name: '950', lightness: 4 }
+  // Determine base color name from hue
+  let baseName = 'Gray';
+  if (s > 10) {
+    if (h >= 0 && h < 15) baseName = 'Red';
+    else if (h >= 15 && h < 40) baseName = 'Orange';
+    else if (h >= 40 && h < 65) baseName = 'Yellow';
+    else if (h >= 65 && h < 150) baseName = 'Green';
+    else if (h >= 150 && h < 250) baseName = 'Blue';
+    else if (h >= 250 && h < 290) baseName = 'Purple';
+    else if (h >= 290 && h < 330) baseName = 'Pink';
+    else baseName = 'Red';
+  }
+  
+  // Add modifier based on lightness and saturation
+  if (s < 15) {
+    if (l < 20) return 'Charcoal';
+    if (l > 80) return 'Light Gray';
+    return 'Gray';
+  }
+  
+  if (l < 30) return `Dark ${baseName}`;
+  if (l > 70) return `Light ${baseName}`;
+  
+  return baseName;
+}
+
+// Enhanced offline generation using OKLCH color space for perceptual uniformity
+export function generateNeutralPaletteOffline(hexColor: string): ColorPalette {
+  // Convert input color to OKLCH
+  const baseColor = hexToOklch(hexColor);
+  
+  // Define shade mappings with perceptually uniform lightness values
+  // Adjusted dark end values for better distinction
+  const shadeConfig = [
+    { name: '25', lightnessTarget: 0.98, chromaFactor: 0.1 },
+    { name: '50', lightnessTarget: 0.96, chromaFactor: 0.15 },
+    { name: '100', lightnessTarget: 0.92, chromaFactor: 0.25 },
+    { name: '200', lightnessTarget: 0.85, chromaFactor: 0.4 },
+    { name: '300', lightnessTarget: 0.74, chromaFactor: 0.6 },
+    { name: '400', lightnessTarget: 0.61, chromaFactor: 0.8 },
+    { name: '500', lightnessTarget: 0.48, chromaFactor: 1.0 },
+    { name: '600', lightnessTarget: 0.38, chromaFactor: 0.9 },
+    { name: '700', lightnessTarget: 0.30, chromaFactor: 0.7 },
+    { name: '800', lightnessTarget: 0.22, chromaFactor: 0.5 },
+    { name: '900', lightnessTarget: 0.14, chromaFactor: 0.3 },
+    { name: '950', lightnessTarget: 0.07, chromaFactor: 0.2 }
   ];
 
   const palette: ColorPalette = {};
   
-  for (const shade of shades) {
-    // Reduce saturation as lightness increases/decreases
-    const saturationAdjust = Math.abs(shade.lightness - 50) * 0.3;
-    const adjustedSaturation = Math.max(5, s - saturationAdjust);
+  // Base chroma for neutrals (low saturation)
+  const neutralChroma = Math.min(baseColor.c * 0.25, 0.04);
+  
+  // Generate each shade
+  for (const config of shadeConfig) {
+    // Calculate lightness using cubic bezier for smooth transitions
+    const t = (11 - shadeConfig.indexOf(config)) / 11;
+    const lightnessControl = cubicBezier(t, 0.25, 0.9);
+    const targetLightness = config.lightnessTarget;
     
-    palette[shade.name] = hslToHex(h, adjustedSaturation, shade.lightness);
+    // Adjust chroma based on position in the scale
+    // Less chroma at extremes, more in the middle
+    const adjustedChroma = neutralChroma * config.chromaFactor;
+    
+    // Subtle hue shift for more natural neutrals
+    // Cooler (bluer) at light end, warmer at dark end
+    // Increased shift for darker colors to help with distinction
+    const hueShift = (config.lightnessTarget - 0.5) * -20;
+    const adjustedHue = (baseColor.h + hueShift + 360) % 360;
+    
+    // Ensure values are within valid ranges
+    const finalLightness = clamp(targetLightness, 0, 1);
+    const finalChroma = clamp(adjustedChroma, 0, 0.1);
+    
+    // Convert back to hex
+    const shadeHex = oklchToHex(finalLightness, finalChroma, adjustedHue);
+    palette[config.name] = shadeHex;
   }
 
   return palette;
