@@ -107,7 +107,13 @@ export function ThemeCard({
     if (!onDuplicate) return;
     setIsDuplicating(true);
     try {
+      // Call the parent's duplicate handler
       await onDuplicate(theme.id);
+      
+      // If this is not the owner duplicating a public theme, show a message
+      if (!isOwner) {
+        toast.success('Theme duplicated to your workspace. Opening in theme studio...');
+      }
     } finally {
       setIsDuplicating(false);
     }
@@ -172,29 +178,55 @@ export function ThemeCard({
         <div className="relative z-10">
           {/* Header with title and actions */}
           <div className="flex items-start justify-between mb-4 gap-2">
-            <Link href={`/themes/studio?themeId=${theme.id}`} className="flex-1 min-w-0 group/link">
-              <h3 className="text-base font-semibold text-gray-900 group-hover/link:text-gray-700 transition-colors truncate pr-2">
-                {theme.name}
-              </h3>
-              {theme.description ? (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p className="text-sm text-gray-500 mt-1 truncate">
-                        {theme.description}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs">
-                      <p className="text-sm">{theme.description}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ) : (
-                <p className="text-sm text-gray-500 mt-1">
-                  No description yet.
-                </p>
-              )}
-            </Link>
+            {isOwner ? (
+              <Link href={`/themes/studio?themeId=${theme.id}`} className="flex-1 min-w-0 group/link">
+                <h3 className="text-base font-semibold text-gray-900 group-hover/link:text-gray-700 transition-colors truncate pr-2">
+                  {theme.name}
+                </h3>
+                {theme.description ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <p className="text-sm text-gray-500 mt-1 truncate">
+                          {theme.description}
+                        </p>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p className="text-sm">{theme.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <p className="text-sm text-gray-500 mt-1">
+                    No description yet.
+                  </p>
+                )}
+              </Link>
+            ) : (
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-semibold text-gray-900 truncate pr-2">
+                  {theme.name}
+                </h3>
+                {theme.description ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <p className="text-sm text-gray-500 mt-1 truncate">
+                          {theme.description}
+                        </p>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p className="text-sm">{theme.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <p className="text-sm text-gray-500 mt-1">
+                    No description yet.
+                  </p>
+                )}
+              </div>
+            )}
             
             <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-all duration-200">
               {/* Dropdown menu */}
@@ -206,10 +238,17 @@ export function ThemeCard({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuItem onClick={() => router.push(`/themes/studio?themeId=${theme.id}`)}>
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    Open in theme studio
-                  </DropdownMenuItem>
+                  {isOwner ? (
+                    <DropdownMenuItem onClick={() => router.push(`/themes/studio?themeId=${theme.id}`)}>
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Open in theme studio
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem onClick={handleDuplicate} disabled={isDuplicating}>
+                      <Copy className="mr-2 h-4 w-4" />
+                      Duplicate to my workspace
+                    </DropdownMenuItem>
+                  )}
                   {isOwner && onUpdate && (
                     <DropdownMenuItem onClick={() => setIsEditModalOpen(true)}>
                       <Pencil className="mr-2 h-4 w-4" />
@@ -222,10 +261,12 @@ export function ThemeCard({
                       Change visibility
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={handleDuplicate} disabled={isDuplicating}>
-                    <Copy className="mr-2 h-4 w-4" />
-                    Duplicate
-                  </DropdownMenuItem>
+                  {isOwner && (
+                    <DropdownMenuItem onClick={handleDuplicate} disabled={isDuplicating}>
+                      <Copy className="mr-2 h-4 w-4" />
+                      Duplicate
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleDownload}>
                     <Download className="mr-2 h-4 w-4" />
                     Download JSON

@@ -181,7 +181,7 @@ function ThemeStudioContent() {
       
       {/* Header */}
       <header className="bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
-        <div className="max-w-full px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-6">
           <div className="flex items-center justify-between h-16">
             {/* Left side: Back button and theme name */}
             <div className="flex items-center">
