@@ -3,6 +3,14 @@
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { UnifiedColorPicker } from '@/components/ui/unified-color-picker';
 import { Label } from '@/components/ui/label';
+import { STATE_PALETTES, convertStatePaletteToHex } from '@/lib/theme-generation/state-palettes';
+
+// Helper function to get state palette colors
+function getStatePaletteColors(type: 'success' | 'warning' | 'error', paletteName: string): Record<string, string> | undefined {
+  const palettes = STATE_PALETTES[type];
+  const palette = palettes[paletteName as keyof typeof palettes];
+  return palette ? convertStatePaletteToHex(palette) : undefined;
+}
 
 interface FillControlProps {
   label: string;
@@ -46,6 +54,10 @@ export function FillControl({
             enableThemeColors={true}
             mode={theme.mode || 'light'}
             neutralPalette={(neutralPalette?.colors as string[]) || []}
+            brandPalette={theme.brandPalette}
+            successPalette={theme.successPalette ? getStatePaletteColors('success', theme.successPalette) : undefined}
+            warningPalette={theme.warningPalette ? getStatePaletteColors('warning', theme.warningPalette) : undefined}
+            errorPalette={theme.errorPalette ? getStatePaletteColors('error', theme.errorPalette) : undefined}
             themeColors={(colorPalette?.colors as string[]) || []}
             className="[&_button]:h-8 [&_button]:text-sm [&_button]:px-3 [&_button]:hover:border-gray-400 [&_button]:transition-colors"
           />
@@ -68,6 +80,10 @@ export function FillControl({
         enableThemeColors={true}
         mode={theme.mode || 'light'}
         neutralPalette={(neutralPalette?.colors as string[]) || []}
+        brandPalette={theme.brandPalette}
+        successPalette={theme.successPalette ? getStatePaletteColors('success', theme.successPalette) : undefined}
+        warningPalette={theme.warningPalette ? getStatePaletteColors('warning', theme.warningPalette) : undefined}
+        errorPalette={theme.errorPalette ? getStatePaletteColors('error', theme.errorPalette) : undefined}
         themeColors={(colorPalette?.colors as string[]) || []}
         className="[&_button]:h-6 [&_button]:text-[11px] [&_button]:px-2"
       />
