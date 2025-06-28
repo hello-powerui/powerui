@@ -402,17 +402,17 @@ export function UnifiedColorPicker({
         </PopoverTrigger>
         <PopoverContent className="w-[340px] p-0" align="start" sideOffset={4}>
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-            <div className="border-b border-gray-200 px-3 pt-3">
-              <TabsList className="grid w-full h-9 p-0.5" style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}>
-                {enableTokens && <TabsTrigger value="tokens" className="text-xs">Tokens</TabsTrigger>}
-                <TabsTrigger value="custom" className="text-xs">Custom</TabsTrigger>
-                {enableThemeColors && <TabsTrigger value="theme" className="text-xs">Theme</TabsTrigger>}
+            <div className="px-1 pt-1 pb-0">
+              <TabsList className="grid w-full h-10 p-1 bg-gray-100/80" style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}>
+                {enableTokens && <TabsTrigger value="tokens" className="text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm">Tokens</TabsTrigger>}
+                <TabsTrigger value="custom" className="text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm">Custom</TabsTrigger>
+                {enableThemeColors && <TabsTrigger value="theme" className="text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm">Theme</TabsTrigger>}
               </TabsList>
             </div>
             
             {enableTokens && (
               <TabsContent value="tokens" className="mt-0 space-y-0">
-                <div className="border-b border-gray-100 p-3">
+                <div className="p-3 pb-0">
                   <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-gray-400" />
                     <Input
@@ -423,7 +423,7 @@ export function UnifiedColorPicker({
                     />
                   </div>
                 </div>
-                <div className="max-h-[320px] overflow-y-auto p-3">
+                <div className="max-h-[320px] overflow-y-auto p-3 pt-2">
                   <div className="space-y-4">
                     {Object.entries(filteredTokens).length === 0 ? (
                       <p className="text-sm text-gray-500 text-center py-8">No tokens found</p>
