@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,7 @@ import { THEME_STUDIO_TYPOGRAPHY } from '@/components/theme-studio/constants/typ
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import { CanvasLayoutSection } from './CanvasLayoutSection';
 import Link from 'next/link';
+import { STATE_PALETTES, convertStatePaletteToHex } from '@/lib/theme-generation/state-palettes';
 
 interface FoundationPanelProps {
   theme: any;
@@ -70,7 +71,29 @@ function FoundationPanelComponent({
   const [schemaLoaded, setSchemaLoaded] = useState(false);
   const [canvasTypes, setCanvasTypes] = useState<string[]>([]);
   const [brandColor, setBrandColor] = useState(theme.brandColor || '#2568E8');
+  
+  // Sync brand color with theme
+  useEffect(() => {
+    if (theme.brandColor && theme.brandColor !== brandColor) {
+      setBrandColor(theme.brandColor);
+    }
+  }, [theme.brandColor]);
   const [isGeneratingBrand, setIsGeneratingBrand] = useState(false);
+  
+  // Convert state palettes to hex for display
+  const statePalettesHex = useMemo(() => ({
+    success: {
+      green: convertStatePaletteToHex(STATE_PALETTES.success.green),
+      lime: convertStatePaletteToHex(STATE_PALETTES.success.lime),
+    },
+    warning: {
+      amber: convertStatePaletteToHex(STATE_PALETTES.warning.amber),
+      orange: convertStatePaletteToHex(STATE_PALETTES.warning.orange),
+    },
+    error: {
+      red: convertStatePaletteToHex(STATE_PALETTES.error.red),
+    }
+  }), []);
   
   // Initialize SchemaLoader
   useEffect(() => {
@@ -271,11 +294,11 @@ function FoundationPanelComponent({
             </div>
             
             {/* Brand color input and generator */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 flex-1">
                   <div
-                    className="w-10 h-10 rounded-md border-2 border-gray-200 cursor-pointer hover:border-gray-300 transition-colors"
+                    className="w-8 h-8 rounded border border-gray-200 cursor-pointer hover:border-gray-300 transition-colors flex-shrink-0"
                     style={{ backgroundColor: brandColor }}
                     onClick={() => {
                       const input = document.getElementById('brand-color-input') as HTMLInputElement;
@@ -294,7 +317,7 @@ function FoundationPanelComponent({
                     value={brandColor}
                     onChange={(e) => setBrandColor(e.target.value)}
                     placeholder="#2568E8"
-                    className="flex-1"
+                    className="flex-1 h-8 text-sm"
                   />
                 </div>
                 <Button
@@ -310,7 +333,8 @@ function FoundationPanelComponent({
                       if (response.ok) {
                         const data = await response.json();
                         onBrandPaletteChange?.(data.palette);
-                        trackChange(['brandPalette']);
+                        onThemeChange({ brandColor, brandPalette: data.palette });
+                        trackChange(['brandPalette', 'brandColor']);
                       }
                     } catch (error) {
                       console.error('Failed to generate brand palette:', error);
@@ -319,16 +343,17 @@ function FoundationPanelComponent({
                     }
                   }}
                   disabled={isGeneratingBrand}
-                  className="bg-gray-900 text-white hover:bg-gray-800"
+                  size="sm"
+                  className="bg-gray-900 text-white hover:bg-gray-800 h-8 px-3 text-sm"
                 >
                   {isGeneratingBrand ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                      <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
                       Generating...
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-4 h-4 mr-1.5" />
+                      <Sparkles className="w-3.5 h-3.5 mr-1" />
                       Generate
                     </>
                   )}
@@ -337,7 +362,7 @@ function FoundationPanelComponent({
               
               {/* Brand palette preview */}
               {brandPalette && (
-                <div className="h-8 rounded-md overflow-hidden flex border border-gray-200">
+                <div className="h-6 rounded overflow-hidden flex border border-gray-200">
                   {Object.entries(brandPalette).map(([shade, color]) => (
                     <div
                       key={shade}
@@ -378,9 +403,9 @@ function FoundationPanelComponent({
                     <SelectItem value="green">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-0.5">
-                          <div className="w-3 h-3 rounded-sm bg-green-300" />
-                          <div className="w-3 h-3 rounded-sm bg-green-500" />
-                          <div className="w-3 h-3 rounded-sm bg-green-700" />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.green['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.green['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.green['700'] }} />
                         </div>
                         <span>Green</span>
                       </div>
@@ -388,9 +413,9 @@ function FoundationPanelComponent({
                     <SelectItem value="lime">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-0.5">
-                          <div className="w-3 h-3 rounded-sm bg-lime-300" />
-                          <div className="w-3 h-3 rounded-sm bg-lime-500" />
-                          <div className="w-3 h-3 rounded-sm bg-lime-700" />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lime['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lime['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lime['700'] }} />
                         </div>
                         <span>Lime</span>
                       </div>
@@ -416,9 +441,9 @@ function FoundationPanelComponent({
                     <SelectItem value="amber">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-0.5">
-                          <div className="w-3 h-3 rounded-sm bg-amber-300" />
-                          <div className="w-3 h-3 rounded-sm bg-amber-500" />
-                          <div className="w-3 h-3 rounded-sm bg-amber-700" />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.warning.amber['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.warning.amber['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.warning.amber['700'] }} />
                         </div>
                         <span>Amber</span>
                       </div>
@@ -426,9 +451,9 @@ function FoundationPanelComponent({
                     <SelectItem value="orange">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-0.5">
-                          <div className="w-3 h-3 rounded-sm bg-orange-300" />
-                          <div className="w-3 h-3 rounded-sm bg-orange-500" />
-                          <div className="w-3 h-3 rounded-sm bg-orange-700" />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.warning.orange['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.warning.orange['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.warning.orange['700'] }} />
                         </div>
                         <span>Orange</span>
                       </div>
@@ -454,9 +479,9 @@ function FoundationPanelComponent({
                     <SelectItem value="red">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-0.5">
-                          <div className="w-3 h-3 rounded-sm bg-red-300" />
-                          <div className="w-3 h-3 rounded-sm bg-red-500" />
-                          <div className="w-3 h-3 rounded-sm bg-red-700" />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.red['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.red['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.red['700'] }} />
                         </div>
                         <span>Red</span>
                       </div>
@@ -499,8 +524,12 @@ export const FoundationPanel = memo(FoundationPanelComponent, (prevProps, nextPr
     prevProps.theme.neutralPaletteId === nextProps.theme.neutralPaletteId &&
     prevProps.theme.mode === nextProps.theme.mode &&
     prevProps.theme.fontFamily === nextProps.theme.fontFamily &&
+    prevProps.theme.successPalette === nextProps.theme.successPalette &&
+    prevProps.theme.warningPalette === nextProps.theme.warningPalette &&
+    prevProps.theme.errorPalette === nextProps.theme.errorPalette &&
     prevProps.colorPalette?.id === nextProps.colorPalette?.id &&
     prevProps.neutralPalette?.id === nextProps.neutralPalette?.id &&
+    JSON.stringify(prevProps.brandPalette) === JSON.stringify(nextProps.brandPalette) &&
     JSON.stringify(prevProps.visualSettings) === JSON.stringify(nextProps.visualSettings)
   );
 });

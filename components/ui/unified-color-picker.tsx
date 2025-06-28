@@ -202,7 +202,14 @@ export function UnifiedColorPicker({
       const neutralObj = neutralPalette && neutralPalette.length > 0
         ? Object.fromEntries(neutralPalette.slice(0, shadeKeys.length).map((color, i) => [shadeKeys[i], color]))
         : {};
-      const resolved = resolveToken(displayValue, mode, { neutral: neutralObj, dataColors: [] });
+      const resolved = resolveToken(displayValue, mode, { 
+        neutral: neutralObj, 
+        brand: null,
+        success: null,
+        warning: null,
+        error: null,
+        dataColors: [] 
+      });
       return resolved || '#000000';
     }
     if (displayValue.startsWith('Theme')) {
@@ -418,7 +425,14 @@ export function UnifiedColorPicker({
                           const neutralObj = neutralPalette && neutralPalette.length > 0
                             ? Object.fromEntries(neutralPalette.slice(0, shadeKeys.length).map((color, i) => [shadeKeys[i], color]))
                             : {};
-                          const resolvedColor = resolveToken(token, mode, { neutral: neutralObj, dataColors: [] });
+                          const resolvedColor = resolveToken(token, mode, { 
+                            neutral: neutralObj, 
+                            brand: null,
+                            success: null,
+                            warning: null,
+                            error: null,
+                            dataColors: [] 
+                          });
                           return (
                             <Button
                               key={token}

@@ -68,6 +68,14 @@ export function useThemeStudio() {
   const setTextClasses = useCallback((textClasses: any) => {
     updateTheme({ textClasses });
   }, [updateTheme]);
+  
+  const setBrandPalette = useCallback((palette: Record<string, string>) => {
+    updateTheme({ brandPalette: palette });
+  }, [updateTheme]);
+  
+  const setStatePalette = useCallback((type: 'success' | 'warning' | 'error', paletteName: string) => {
+    updateTheme({ [`${type}Palette`]: paletteName });
+  }, [updateTheme]);
 
   // Memoize the return value to prevent unnecessary re-renders
   return useMemo(() => ({
@@ -102,6 +110,8 @@ export function useThemeStudio() {
     setFontFamily,
     setStructuralColors,
     setTextClasses,
+    setBrandPalette,
+    setStatePalette,
     updateVisualStyle: visualStyles.updateVisualStyle,
     
     // UI actions
@@ -148,6 +158,8 @@ export function useThemeStudio() {
     setFontFamily,
     setStructuralColors,
     setTextClasses,
+    setBrandPalette,
+    setStatePalette,
     visualStyles.updateVisualStyle,
     uiState.setSelectedVisual,
     uiState.setSelectedVariant,

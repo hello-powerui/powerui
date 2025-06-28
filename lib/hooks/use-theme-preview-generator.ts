@@ -4,6 +4,7 @@ import { getPreviewGenerator } from '@/lib/theme-generation/client-preview-gener
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import isEqual from 'fast-deep-equal';
 import { useShallow } from 'zustand/react/shallow';
+import { STATE_PALETTES, convertStatePaletteToHex } from '@/lib/theme-generation/state-palettes';
 
 /**
  * Hook that automatically generates preview themes when theme data changes
@@ -32,6 +33,10 @@ export function useThemePreviewGenerator() {
     mode: theme.mode,
     colorPaletteId: theme.colorPaletteId,
     neutralPaletteId: theme.neutralPaletteId,
+    brandPalette: theme.brandPalette,
+    successPalette: theme.successPalette,
+    warningPalette: theme.warningPalette,
+    errorPalette: theme.errorPalette,
     fontFamily: theme.fontFamily,
     visualStyles: theme.visualStyles,
     structuralColors: theme.structuralColors,
@@ -40,6 +45,10 @@ export function useThemePreviewGenerator() {
     theme.mode,
     theme.colorPaletteId,
     theme.neutralPaletteId,
+    theme.brandPalette,
+    theme.successPalette,
+    theme.warningPalette,
+    theme.errorPalette,
     theme.fontFamily,
     theme.visualStyles,
     theme.structuralColors,
@@ -77,12 +86,27 @@ export function useThemePreviewGenerator() {
       const generatePreview = async () => {
         setIsGenerating(true);
         
+        // Convert state palette names to actual palettes
+        const successPalette = debouncedVisualProperties.successPalette ? 
+          convertStatePaletteToHex(STATE_PALETTES.success[debouncedVisualProperties.successPalette as keyof typeof STATE_PALETTES.success] || STATE_PALETTES.success.green) : 
+          null;
+        const warningPalette = debouncedVisualProperties.warningPalette ? 
+          convertStatePaletteToHex(STATE_PALETTES.warning[debouncedVisualProperties.warningPalette as keyof typeof STATE_PALETTES.warning] || STATE_PALETTES.warning.amber) : 
+          null;
+        const errorPalette = debouncedVisualProperties.errorPalette ? 
+          convertStatePaletteToHex(STATE_PALETTES.error[debouncedVisualProperties.errorPalette as keyof typeof STATE_PALETTES.error] || STATE_PALETTES.error.red) : 
+          null;
+        
         // Prepare theme input for generator
         const themeInput = {
           name: theme.name,
           mode: debouncedVisualProperties.mode,
           dataColors: colorPalette!.colors as string[],
           neutralPalette: neutralPalette!.colors as string[],
+          brandPalette: debouncedVisualProperties.brandPalette || null,
+          successPalette,
+          warningPalette,
+          errorPalette,
           fontFamily: debouncedVisualProperties.fontFamily.toLowerCase().replace(/\s+/g, '-'),
           visualStyles: debouncedVisualProperties.visualStyles,
           structuralColors: debouncedVisualProperties.structuralColors && Object.keys(debouncedVisualProperties.structuralColors).length > 0 ? debouncedVisualProperties.structuralColors : undefined,

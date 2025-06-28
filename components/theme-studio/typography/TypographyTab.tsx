@@ -233,6 +233,10 @@ export function TypographyTab() {
         const neutralObj = (resolved.neutralPalette as any)?.colors || {};
         const resolvedColor = resolveToken(color, mode, { 
           neutral: neutralObj, 
+          brand: null,
+          success: null,
+          warning: null,
+          error: null,
           dataColors: dataColors as string[]
         });
         return resolvedColor || (mode === 'dark' ? '#FFFFFF' : '#000000');

@@ -39,6 +39,12 @@ export interface ThemeGenerationInput {
   dataColors: string[];
   name: string;
   
+  // Brand and state palettes
+  brandPalette?: Record<string, string> | null;
+  successPalette?: Record<string, string> | null;
+  warningPalette?: Record<string, string> | null;
+  errorPalette?: Record<string, string> | null;
+  
   // Extended typography
   fontSize?: number;
   fontWeight?: 'normal' | 'bold';
