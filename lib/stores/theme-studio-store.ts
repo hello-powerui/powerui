@@ -17,6 +17,11 @@ interface StudioTheme {
   // Foundation settings (stored as IDs only)
   colorPaletteId: string;
   neutralPaletteId: string;
+  brandPalette?: Record<string, string>;
+  brandColor?: string;
+  successPalette?: string;
+  warningPalette?: string;
+  errorPalette?: string;
   mode: 'light' | 'dark';
   fontFamily: string;
   structuralColors?: StructuralColors;
@@ -58,6 +63,8 @@ interface ThemeStudioState {
   updateTheme: (updates: Partial<StudioTheme>) => void;
   setColorPaletteId: (paletteId: string) => void;
   setNeutralPaletteId: (paletteId: string) => void;
+  setBrandPalette: (palette: Record<string, string>) => void;
+  setStatePalette: (type: 'success' | 'warning' | 'error', paletteName: string) => void;
   setThemeMode: (mode: 'light' | 'dark') => void;
   setFontFamily: (fontFamily: string) => void;
   setStructuralColors: (colors: StructuralColors) => void;
@@ -104,6 +111,10 @@ const defaultStudioTheme: StudioTheme = {
   description: '',
   colorPaletteId: DEFAULT_COLOR_PALETTE.id,
   neutralPaletteId: AZURE_NEUTRAL_PALETTE.id,
+  brandColor: '#2568E8',
+  successPalette: 'green',
+  warningPalette: 'amber',
+  errorPalette: 'red',
   mode: 'light',
   fontFamily: 'Segoe UI',
   structuralColors: {},
@@ -170,6 +181,19 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       setNeutralPaletteId: (paletteId) =>
         set((state) => ({
           theme: { ...state.theme, neutralPaletteId: paletteId }
+        })),
+        
+      setBrandPalette: (palette) =>
+        set((state) => ({
+          theme: { ...state.theme, brandPalette: palette }
+        })),
+        
+      setStatePalette: (type, paletteName) =>
+        set((state) => ({
+          theme: { 
+            ...state.theme, 
+            [`${type}Palette`]: paletteName 
+          }
         })),
         
       setThemeMode: (mode) =>

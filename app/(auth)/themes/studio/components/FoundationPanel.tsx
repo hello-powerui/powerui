@@ -3,6 +3,7 @@
 import { useState, useEffect, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { 
   Select,
   SelectContent,
@@ -10,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Palette } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Palette, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ChangeIndicator } from '@/components/theme-studio/ui/change-indicator';
 import { HelpTooltip } from '@/components/theme-studio/HelpTooltip';
@@ -24,11 +25,14 @@ interface FoundationPanelProps {
   theme: any;
   colorPalette: any;
   neutralPalette: any;
+  brandPalette?: any;
   visualSettings: Record<string, any>;
   hasChanges: (path: string[]) => boolean;
   onThemeChange: (updates: any) => void;
   onColorPaletteChange: (paletteId: string) => void;
   onNeutralPaletteChange: (paletteId: string) => void;
+  onBrandPaletteChange?: (palette: Record<string, string>) => void;
+  onStatePaletteChange?: (type: 'success' | 'warning' | 'error', paletteName: string) => void;
   onThemeModeChange: (mode: 'light' | 'dark') => void;
   onFontFamilyChange: (fontFamily: string) => void;
   onStructuralColorsChange: (colors: any) => void;
@@ -44,11 +48,14 @@ function FoundationPanelComponent({
   theme,
   colorPalette,
   neutralPalette,
+  brandPalette,
   visualSettings,
   hasChanges,
   onThemeChange,
   onColorPaletteChange,
   onNeutralPaletteChange,
+  onBrandPaletteChange,
+  onStatePaletteChange,
   onThemeModeChange,
   onFontFamilyChange,
   onStructuralColorsChange,
@@ -62,6 +69,8 @@ function FoundationPanelComponent({
   const [schemaLoader, setSchemaLoader] = useState<SchemaLoader | null>(null);
   const [schemaLoaded, setSchemaLoaded] = useState(false);
   const [canvasTypes, setCanvasTypes] = useState<string[]>([]);
+  const [brandColor, setBrandColor] = useState(theme.brandColor || '#2568E8');
+  const [isGeneratingBrand, setIsGeneratingBrand] = useState(false);
   
   // Initialize SchemaLoader
   useEffect(() => {
@@ -243,6 +252,218 @@ function FoundationPanelComponent({
                   title={shade}
                 />
               ))}
+            </div>
+          </div>
+
+          {/* Brand Palette */}
+          <div className="bg-white rounded-md border border-gray-200 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <Label className={`${THEME_STUDIO_TYPOGRAPHY.label.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight}`}>Brand Palette</Label>
+                  <HelpTooltip 
+                    content="Brand colors are used throughout your theme for interactive elements, accents, and emphasis. Enter your brand color to generate a complete palette."
+                  />
+                  <ChangeIndicator hasChanged={hasChanges(['brandPalette'])} />
+                </div>
+                <p className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color} mt-0.5`}>Generate from your brand color</p>
+              </div>
+            </div>
+            
+            {/* Brand color input and generator */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-1">
+                  <div
+                    className="w-10 h-10 rounded-md border-2 border-gray-200 cursor-pointer hover:border-gray-300 transition-colors"
+                    style={{ backgroundColor: brandColor }}
+                    onClick={() => {
+                      const input = document.getElementById('brand-color-input') as HTMLInputElement;
+                      input?.click();
+                    }}
+                  />
+                  <input
+                    id="brand-color-input"
+                    type="color"
+                    value={brandColor}
+                    onChange={(e) => setBrandColor(e.target.value)}
+                    className="sr-only"
+                  />
+                  <Input
+                    type="text"
+                    value={brandColor}
+                    onChange={(e) => setBrandColor(e.target.value)}
+                    placeholder="#2568E8"
+                    className="flex-1"
+                  />
+                </div>
+                <Button
+                  onClick={async () => {
+                    setIsGeneratingBrand(true);
+                    try {
+                      const response = await fetch('/api/generate-brand-palette', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ hexColor: brandColor }),
+                      });
+                      
+                      if (response.ok) {
+                        const data = await response.json();
+                        onBrandPaletteChange?.(data.palette);
+                        trackChange(['brandPalette']);
+                      }
+                    } catch (error) {
+                      console.error('Failed to generate brand palette:', error);
+                    } finally {
+                      setIsGeneratingBrand(false);
+                    }
+                  }}
+                  disabled={isGeneratingBrand}
+                  className="bg-gray-900 text-white hover:bg-gray-800"
+                >
+                  {isGeneratingBrand ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-1.5" />
+                      Generate
+                    </>
+                  )}
+                </Button>
+              </div>
+              
+              {/* Brand palette preview */}
+              {brandPalette && (
+                <div className="h-8 rounded-md overflow-hidden flex border border-gray-200">
+                  {Object.entries(brandPalette).map(([shade, color]) => (
+                    <div
+                      key={shade}
+                      className="flex-1 h-full"
+                      style={{ backgroundColor: color as string }}
+                      title={`${shade}: ${color}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* State Palettes */}
+          <div className="bg-white rounded-md border border-gray-200 p-4">
+            <div className="flex items-center gap-1.5 mb-3">
+              <Label className={`${THEME_STUDIO_TYPOGRAPHY.label.size} ${THEME_STUDIO_TYPOGRAPHY.label.weight}`}>State Palettes</Label>
+              <HelpTooltip 
+                content="State palettes provide consistent colors for success, warning, and error states throughout your reports. Choose from pre-defined options optimized for accessibility."
+              />
+            </div>
+            
+            <div className="space-y-3">
+              {/* Success Palette */}
+              <div>
+                <Label className="text-xs text-gray-600 mb-1.5 block">Success</Label>
+                <Select
+                  value={theme.successPalette || 'green'}
+                  onValueChange={(value) => {
+                    onStatePaletteChange?.('success', value);
+                    trackChange(['successPalette']);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="green">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          <div className="w-3 h-3 rounded-sm bg-green-300" />
+                          <div className="w-3 h-3 rounded-sm bg-green-500" />
+                          <div className="w-3 h-3 rounded-sm bg-green-700" />
+                        </div>
+                        <span>Green</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="lime">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          <div className="w-3 h-3 rounded-sm bg-lime-300" />
+                          <div className="w-3 h-3 rounded-sm bg-lime-500" />
+                          <div className="w-3 h-3 rounded-sm bg-lime-700" />
+                        </div>
+                        <span>Lime</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Warning Palette */}
+              <div>
+                <Label className="text-xs text-gray-600 mb-1.5 block">Warning</Label>
+                <Select
+                  value={theme.warningPalette || 'amber'}
+                  onValueChange={(value) => {
+                    onStatePaletteChange?.('warning', value);
+                    trackChange(['warningPalette']);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="amber">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          <div className="w-3 h-3 rounded-sm bg-amber-300" />
+                          <div className="w-3 h-3 rounded-sm bg-amber-500" />
+                          <div className="w-3 h-3 rounded-sm bg-amber-700" />
+                        </div>
+                        <span>Amber</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="orange">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          <div className="w-3 h-3 rounded-sm bg-orange-300" />
+                          <div className="w-3 h-3 rounded-sm bg-orange-500" />
+                          <div className="w-3 h-3 rounded-sm bg-orange-700" />
+                        </div>
+                        <span>Orange</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Error Palette */}
+              <div>
+                <Label className="text-xs text-gray-600 mb-1.5 block">Error</Label>
+                <Select
+                  value={theme.errorPalette || 'red'}
+                  onValueChange={(value) => {
+                    onStatePaletteChange?.('error', value);
+                    trackChange(['errorPalette']);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="red">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          <div className="w-3 h-3 rounded-sm bg-red-300" />
+                          <div className="w-3 h-3 rounded-sm bg-red-500" />
+                          <div className="w-3 h-3 rounded-sm bg-red-700" />
+                        </div>
+                        <span>Red</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 

@@ -320,11 +320,14 @@ function ThemeStudioContent() {
               theme={themeStudio.theme}
               colorPalette={themeStudio.colorPalette}
               neutralPalette={themeStudio.neutralPalette}
+              brandPalette={themeStudio.theme.brandPalette}
               visualSettings={visualSettings}
               hasChanges={(path) => themeStudio.changedPaths.has(path.join('.'))}
               onThemeChange={themeStudio.updateTheme}
               onColorPaletteChange={themeStudio.setColorPaletteId}
               onNeutralPaletteChange={themeStudio.setNeutralPaletteId}
+              onBrandPaletteChange={themeStudio.setBrandPalette}
+              onStatePaletteChange={themeStudio.setStatePalette}
               onThemeModeChange={themeStudio.setThemeMode}
               onFontFamilyChange={themeStudio.setFontFamily}
               onStructuralColorsChange={themeStudio.setStructuralColors}
