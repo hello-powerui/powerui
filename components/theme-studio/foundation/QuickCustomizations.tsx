@@ -41,8 +41,11 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
     
-    applyQuickCustomization(key, value);
+    // Track quick customization change
     trackChange(['quickCustomizations', key]);
+    
+    // Apply the customization (this will track visual styles changes internally)
+    applyQuickCustomization(key, value);
     
     // Restore scroll position after state update
     requestAnimationFrame(() => {

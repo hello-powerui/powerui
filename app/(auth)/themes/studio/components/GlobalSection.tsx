@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { GlobalPropertySelector } from '@/components/theme-studio/form/global-property-selector';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 
@@ -30,6 +31,7 @@ export function GlobalSection({
       {/* Global Settings Property Selector */}
       {schemaLoader && schemaLoaded ? (
         <GlobalPropertySelector
+          key={JSON.stringify(visualSettings?.['*']?.['*'] || {})}
           visualStyles={visualSettings}
           onVisualStylesChange={onVisualSettingsChange}
           schemaLoader={schemaLoader}
