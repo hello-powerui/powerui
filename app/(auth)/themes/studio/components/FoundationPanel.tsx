@@ -20,6 +20,7 @@ import { THEME_STUDIO_TYPOGRAPHY } from '@/components/theme-studio/constants/typ
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
 import Link from 'next/link';
 import { STATE_PALETTES, convertStatePaletteToHex } from '@/lib/theme-generation/state-palettes';
+import { QuickCustomizations } from '@/components/theme-studio/foundation/QuickCustomizations';
 
 interface FoundationPanelProps {
   theme: any;
@@ -523,6 +524,12 @@ function FoundationPanelComponent({
               </div>
             </div>
           </div>
+
+          {/* Quick Customizations */}
+          <QuickCustomizations 
+            hasChanges={hasChanges} 
+            trackChange={trackChange}
+          />
 
         </div>
       </div>

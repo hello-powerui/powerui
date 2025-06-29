@@ -27,6 +27,14 @@ interface StudioTheme {
   structuralColors?: StructuralColors;
   textClasses?: TextClasses;
   
+  // Quick Customizations
+  quickCustomizations?: {
+    paddingStyle?: 'small' | 'medium' | 'large';
+    borderRadius?: 'none' | 'small' | 'medium' | 'large' | 'xl';
+    borderStyle?: 'default' | 'subtle' | 'none';
+    backgroundStyle?: 'default' | 'subtle' | 'inversed';
+  };
+  
   // Visual Styles
   visualStyles: Record<string, any>;
 }
@@ -71,6 +79,7 @@ interface ThemeStudioState {
   setTextClasses: (textClasses: TextClasses) => void;
   updateVisualStyles: (visualStyles: Record<string, any>) => void;
   updateVisualStyle: (visual: string, variant: string, value: any) => void;
+  setQuickCustomization: (key: keyof NonNullable<StudioTheme['quickCustomizations']>, value: string) => void;
   
   // Resolved data actions
   setResolvedPalettes: (colorPalette: ColorPalette | null, neutralPalette: NeutralPalette | null) => void;
@@ -119,6 +128,12 @@ const defaultStudioTheme: StudioTheme = {
   fontFamily: 'Segoe UI',
   structuralColors: {},
   textClasses: {},
+  quickCustomizations: {
+    paddingStyle: 'medium',
+    borderRadius: 'medium',
+    borderStyle: 'default',
+    backgroundStyle: 'default'
+  },
   visualStyles: {}
 };
 
@@ -253,6 +268,17 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
             theme: { ...state.theme, visualStyles: newVisualStyles }
           };
         }),
+        
+      setQuickCustomization: (key, value) =>
+        set((state) => ({
+          theme: { 
+            ...state.theme, 
+            quickCustomizations: {
+              ...state.theme.quickCustomizations,
+              [key]: value
+            }
+          }
+        })),
       
       // Resolved data actions
       setResolvedPalettes: (colorPalette, neutralPalette) =>
@@ -411,6 +437,12 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           fontFamily: loadedTheme.fontFamily || 'Segoe UI',
           structuralColors: loadedTheme.structuralColors || {},
           textClasses: loadedTheme.textClasses || {},
+          quickCustomizations: loadedTheme.quickCustomizations || {
+            paddingStyle: 'medium',
+            borderRadius: 'medium',
+            borderStyle: 'default',
+            backgroundStyle: 'default'
+          },
           visualStyles: visualStyles
         };
         
