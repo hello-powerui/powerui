@@ -6,6 +6,7 @@ import { StructuralColors, TextClasses } from '@/lib/theme-generation/types';
 import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
 import isEqual from 'fast-deep-equal';
 import { cleanupVisualStyles } from '@/lib/utils/theme-helpers';
+import { detectQuickCustomizationsFromVisualStyles, isPropertyControlledByQuickCustomization } from '@/lib/theme-studio/quick-customization-utils';
 
 // Single unified theme structure
 interface StudioTheme {
@@ -30,7 +31,7 @@ interface StudioTheme {
   // Quick Customizations
   quickCustomizations?: {
     paddingStyle?: 'small' | 'medium' | 'large';
-    borderRadius?: 'none' | 'small' | 'medium' | 'large' | 'xl';
+    borderRadius?: 'none' | 'small' | 'medium' | 'large';
     borderStyle?: 'default' | 'subtle' | 'none';
     backgroundStyle?: 'default' | 'subtle' | 'inversed';
   };
@@ -234,8 +235,39 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       updateVisualStyles: (visualStyles) =>
         set((state) => {
           const cleanedVisualStyles = cleanupVisualStyles(visualStyles);
+          
+          // Detect which quick customizations match the new visual styles
+          const detectedCustomizations = detectQuickCustomizationsFromVisualStyles(cleanedVisualStyles);
+          const currentQuickCustomizations = state.theme.quickCustomizations || {};
+          
+          // Update quick customizations - unselect if they no longer match
+          const updatedQuickCustomizations = {
+            ...currentQuickCustomizations,
+            // Clear the quick customization if it no longer matches the visual styles
+            paddingStyle: currentQuickCustomizations.paddingStyle && 
+              detectedCustomizations.paddingStyle !== currentQuickCustomizations.paddingStyle 
+              ? undefined 
+              : currentQuickCustomizations.paddingStyle,
+            borderRadius: currentQuickCustomizations.borderRadius &&
+              detectedCustomizations.borderRadius !== currentQuickCustomizations.borderRadius
+              ? undefined
+              : currentQuickCustomizations.borderRadius,
+            borderStyle: currentQuickCustomizations.borderStyle &&
+              detectedCustomizations.borderStyle !== currentQuickCustomizations.borderStyle
+              ? undefined
+              : currentQuickCustomizations.borderStyle,
+            backgroundStyle: currentQuickCustomizations.backgroundStyle &&
+              detectedCustomizations.backgroundStyle !== currentQuickCustomizations.backgroundStyle
+              ? undefined
+              : currentQuickCustomizations.backgroundStyle
+          };
+          
           return {
-            theme: { ...state.theme, visualStyles: cleanedVisualStyles }
+            theme: { 
+              ...state.theme, 
+              visualStyles: cleanedVisualStyles,
+              quickCustomizations: updatedQuickCustomizations
+            }
           };
         }),
         
@@ -264,8 +296,37 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
             newVisualStyles[visual][variant] = value;
           }
           
+          // Check if this change affects quick customizations
+          const detectedCustomizations = detectQuickCustomizationsFromVisualStyles(newVisualStyles);
+          const currentQuickCustomizations = state.theme.quickCustomizations || {};
+          
+          // Update quick customizations - unselect if they no longer match
+          const updatedQuickCustomizations = {
+            ...currentQuickCustomizations,
+            paddingStyle: currentQuickCustomizations.paddingStyle && 
+              detectedCustomizations.paddingStyle !== currentQuickCustomizations.paddingStyle 
+              ? undefined 
+              : currentQuickCustomizations.paddingStyle,
+            borderRadius: currentQuickCustomizations.borderRadius &&
+              detectedCustomizations.borderRadius !== currentQuickCustomizations.borderRadius
+              ? undefined
+              : currentQuickCustomizations.borderRadius,
+            borderStyle: currentQuickCustomizations.borderStyle &&
+              detectedCustomizations.borderStyle !== currentQuickCustomizations.borderStyle
+              ? undefined
+              : currentQuickCustomizations.borderStyle,
+            backgroundStyle: currentQuickCustomizations.backgroundStyle &&
+              detectedCustomizations.backgroundStyle !== currentQuickCustomizations.backgroundStyle
+              ? undefined
+              : currentQuickCustomizations.backgroundStyle
+          };
+          
           return {
-            theme: { ...state.theme, visualStyles: newVisualStyles }
+            theme: { 
+              ...state.theme, 
+              visualStyles: newVisualStyles,
+              quickCustomizations: updatedQuickCustomizations
+            }
           };
         }),
         

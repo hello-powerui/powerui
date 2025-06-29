@@ -74,8 +74,7 @@ export function QuickCustomizations({ hasChanges, trackChange, onQuickCustomizat
     none: 0,
     small: 4,
     medium: 8,
-    large: 12,
-    xl: 16
+    large: 12
   };
 
   // Apply quick customizations to visual styles
@@ -256,9 +255,9 @@ export function QuickCustomizations({ hasChanges, trackChange, onQuickCustomizat
           <RadioGroup
             value={quickCustomizations.borderRadius || 'medium'}
             onValueChange={(value) => applyQuickCustomizations('borderRadius', value)}
-            className="grid grid-cols-5 gap-1.5"
+            className="grid grid-cols-4 gap-1.5"
           >
-            {['none', 'small', 'medium', 'large', 'xl'].map((size) => (
+            {['none', 'small', 'medium', 'large'].map((size) => (
               <Label 
                 key={size}
                 htmlFor={`radius-${size}`}
