@@ -14,32 +14,13 @@ const NoFocusRadioItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupItem>,
   React.ComponentPropsWithoutRef<typeof RadioGroupItem>
 >((props, ref) => {
-  const handleClick = (e: React.MouseEvent) => {
-    // Preserve scroll position
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-    
-    // Let the original click handler run
-    if (props.onClick) {
-      props.onClick(e as any);
-    }
-    
-    // Restore scroll position
-    window.scrollTo(scrollLeft, scrollTop);
-  };
-  
   return (
     <RadioGroupItem 
       {...props} 
       ref={ref}
-      onClick={handleClick}
       onFocus={(e) => {
         e.preventDefault();
-        e.stopPropagation();
-      }}
-      onMouseDown={(e) => {
-        // Prevent default to avoid focus changes
-        e.preventDefault();
+        e.currentTarget.blur();
       }}
     />
   );
@@ -56,8 +37,17 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
 
   // Apply quick customization and track the change
   const handleQuickCustomization = (key: string, value: string) => {
+    // Preserve scroll position before state update
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    
     applyQuickCustomization(key, value);
     trackChange(['quickCustomizations', key]);
+    
+    // Restore scroll position after state update
+    requestAnimationFrame(() => {
+      window.scrollTo(scrollLeft, scrollTop);
+    });
   };
 
   return (
@@ -81,8 +71,8 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
             onValueChange={(value) => handleQuickCustomization('paddingStyle', value)}
             className="grid grid-cols-3 gap-2"
           >
-            <Label 
-              htmlFor="padding-small" 
+            <div 
+              onClick={() => handleQuickCustomization('paddingStyle', 'small')}
               className={cn(
                 "flex items-center justify-center p-2 rounded-md border cursor-pointer transition-all",
                 quickCustomizations.paddingStyle === 'small' 
@@ -92,9 +82,9 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
             >
               <NoFocusRadioItem value="small" id="padding-small" className="sr-only" />
               <span className="text-sm">Small (12px)</span>
-            </Label>
-            <Label 
-              htmlFor="padding-medium" 
+            </div>
+            <div 
+              onClick={() => handleQuickCustomization('paddingStyle', 'medium')}
               className={cn(
                 "flex items-center justify-center p-2 rounded-md border cursor-pointer transition-all",
                 quickCustomizations.paddingStyle === 'medium' 
@@ -104,9 +94,9 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
             >
               <NoFocusRadioItem value="medium" id="padding-medium" className="sr-only" />
               <span className="text-sm">Medium (16px)</span>
-            </Label>
-            <Label 
-              htmlFor="padding-large" 
+            </div>
+            <div 
+              onClick={() => handleQuickCustomization('paddingStyle', 'large')}
               className={cn(
                 "flex items-center justify-center p-2 rounded-md border cursor-pointer transition-all",
                 quickCustomizations.paddingStyle === 'large' 
@@ -116,7 +106,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
             >
               <NoFocusRadioItem value="large" id="padding-large" className="sr-only" />
               <span className="text-sm">Large (20px)</span>
-            </Label>
+            </div>
           </RadioGroup>
         </div>
 
@@ -129,9 +119,9 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
             className="grid grid-cols-4 gap-1.5"
           >
             {['none', 'small', 'medium', 'large'].map((size) => (
-              <Label 
+              <div 
                 key={size}
-                htmlFor={`radius-${size}`}
+                onClick={() => handleQuickCustomization('borderRadius', size)}
                 className={cn(
                   "flex items-center justify-center p-1.5 rounded-md border cursor-pointer transition-all",
                   quickCustomizations.borderRadius === size 
@@ -151,7 +141,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                   />
                   <span className="text-xs capitalize">{size}</span>
                 </div>
-              </Label>
+              </div>
             ))}
           </RadioGroup>
         </div>
@@ -164,8 +154,8 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
             onValueChange={(value) => handleQuickCustomization('borderStyle', value)}
             className="grid grid-cols-3 gap-2"
           >
-            <Label 
-              htmlFor="border-default" 
+            <div 
+              onClick={() => handleQuickCustomization('borderStyle', 'default')}
               className={cn(
                 "flex items-center justify-center p-2 rounded-md border cursor-pointer transition-all",
                 quickCustomizations.borderStyle === 'default' 
@@ -175,9 +165,9 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
             >
               <NoFocusRadioItem value="default" id="border-default" className="sr-only" />
               <span className="text-sm">Default</span>
-            </Label>
-            <Label 
-              htmlFor="border-subtle" 
+            </div>
+            <div 
+              onClick={() => handleQuickCustomization('borderStyle', 'subtle')}
               className={cn(
                 "flex items-center justify-center p-2 rounded-md border cursor-pointer transition-all",
                 quickCustomizations.borderStyle === 'subtle' 
@@ -187,9 +177,9 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
             >
               <NoFocusRadioItem value="subtle" id="border-subtle" className="sr-only" />
               <span className="text-sm">Subtle</span>
-            </Label>
-            <Label 
-              htmlFor="border-none" 
+            </div>
+            <div 
+              onClick={() => handleQuickCustomization('borderStyle', 'none')}
               className={cn(
                 "flex items-center justify-center p-2 rounded-md border cursor-pointer transition-all",
                 quickCustomizations.borderStyle === 'none' 
@@ -199,7 +189,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
             >
               <NoFocusRadioItem value="none" id="border-none" className="sr-only" />
               <span className="text-sm">None</span>
-            </Label>
+            </div>
           </RadioGroup>
         </div>
 
