@@ -18,7 +18,6 @@ import { HelpTooltip } from '@/components/theme-studio/HelpTooltip';
 import { AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/palettes';
 import { THEME_STUDIO_TYPOGRAPHY } from '@/components/theme-studio/constants/typography';
 import { SchemaLoader } from '@/lib/theme-studio/services/schema-loader';
-import { CanvasLayoutSection } from './CanvasLayoutSection';
 import Link from 'next/link';
 import { STATE_PALETTES, convertStatePaletteToHex } from '@/lib/theme-generation/state-palettes';
 
@@ -491,24 +490,6 @@ function FoundationPanelComponent({
               </div>
             </div>
           </div>
-
-          {/* Canvas & Layout */}
-          <CanvasLayoutSection
-            visualSettings={visualSettings}
-            onVisualSettingsChange={onVisualSettingsChange}
-            trackChange={trackChange}
-            hasChanges={hasChanges}
-            schemaLoader={schemaLoader}
-            schemaLoaded={schemaLoaded}
-            canvasTypes={canvasTypes}
-            onClearSection={(visual) => {
-              // Clear the visual section by removing it from visualSettings
-              const updatedSettings = { ...visualSettings };
-              delete updatedSettings[visual];
-              onVisualSettingsChange(updatedSettings);
-              trackChange(['visualStyles', visual]);
-            }}
-          />
 
         </div>
       </div>

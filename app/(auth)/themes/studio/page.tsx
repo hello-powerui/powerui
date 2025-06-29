@@ -414,6 +414,7 @@ function ThemeStudioContent() {
               trackChange={() => {
                 // Change tracking is handled by the updateTheme and updateVisualStyle methods
               }}
+              hasChanges={(path) => themeStudio.changedPaths.has(path.join('.'))}
               onEnterFocusMode={() => setIsInFocusMode(true)}
             />
           </ErrorBoundaryWithLogging>
