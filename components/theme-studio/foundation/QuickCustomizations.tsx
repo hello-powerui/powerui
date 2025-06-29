@@ -2,12 +2,12 @@
 
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { HelpTooltip } from '@/components/theme-studio/HelpTooltip';
 import { ChangeIndicator } from '@/components/theme-studio/ui/change-indicator';
 import { THEME_STUDIO_TYPOGRAPHY } from '@/components/theme-studio/constants/typography';
 import { cn } from '@/lib/utils';
 import React from 'react';
+import { useQuickCustomizations } from '@/lib/hooks/use-quick-customizations';
 
 // Custom RadioGroupItem that prevents focus issues
 const NoFocusRadioItem = React.forwardRef<
@@ -49,144 +49,15 @@ NoFocusRadioItem.displayName = 'NoFocusRadioItem';
 interface QuickCustomizationsProps {
   hasChanges: (path: string[]) => boolean;
   trackChange: (path: string[]) => void;
-  onQuickCustomizationChange?: (key: string, value: string) => void;
-  onVisualSettingsChange?: (visualSettings: Record<string, any>) => void;
 }
 
-export function QuickCustomizations({ hasChanges, trackChange, onQuickCustomizationChange, onVisualSettingsChange }: QuickCustomizationsProps) {
-  const { theme } = useThemeStudioStore();
-  const quickCustomizations = theme.quickCustomizations || {
-    paddingStyle: 'medium',
-    borderRadius: 'medium',
-    borderStyle: 'default',
-    backgroundStyle: 'default'
-  };
+export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizationsProps) {
+  const { quickCustomizations, applyQuickCustomization } = useQuickCustomizations();
 
-  // Padding values
-  const paddingValues = {
-    small: 12,
-    medium: 16,
-    large: 20
-  };
-
-  // Border radius values
-  const borderRadiusValues = {
-    none: 0,
-    small: 4,
-    medium: 8,
-    large: 12
-  };
-
-  // Apply quick customizations to visual styles
-  const applyQuickCustomizations = (key: string, value: string) => {
-    if (onQuickCustomizationChange) {
-      onQuickCustomizationChange(key, value);
-    }
+  // Apply quick customization and track the change
+  const handleQuickCustomization = (key: string, value: string) => {
+    applyQuickCustomization(key, value);
     trackChange(['quickCustomizations', key]);
-
-    const currentVisualStyles = theme.visualStyles || {};
-    let updatedStyles = { ...currentVisualStyles };
-
-    // Initialize global styles if they don't exist
-    if (!updatedStyles['*']) {
-      updatedStyles['*'] = {};
-    }
-    if (!updatedStyles['*']['*']) {
-      updatedStyles['*']['*'] = {};
-    }
-
-    switch (key) {
-      case 'paddingStyle':
-        const paddingValue = paddingValues[value as keyof typeof paddingValues];
-        updatedStyles['*']['*'].padding = [{
-          show: true,
-          top: paddingValue,
-          bottom: paddingValue,
-          left: paddingValue,
-          right: paddingValue
-        }];
-        break;
-
-      case 'borderRadius':
-        if (!updatedStyles['*']['*'].border) {
-          updatedStyles['*']['*'].border = [{ show: true }];
-        }
-        updatedStyles['*']['*'].border[0].radius = borderRadiusValues[value as keyof typeof borderRadiusValues];
-        break;
-
-      case 'borderStyle':
-        if (!updatedStyles['*']['*'].border) {
-          updatedStyles['*']['*'].border = [{ show: true }];
-        }
-        
-        switch (value) {
-          case 'default':
-            updatedStyles['*']['*'].border[0].color = { solid: { color: '@border-primary' } };
-            break;
-          case 'subtle':
-            updatedStyles['*']['*'].border[0].color = { solid: { color: '@border-secondary' } };
-            break;
-          case 'none':
-            // Match border color to background
-            if (!updatedStyles['*']['*'].background) {
-              updatedStyles['*']['*'].background = [{ show: true, color: { solid: { color: '@bg-primary' } } }];
-            }
-            const bgColor = updatedStyles['*']['*'].background[0].color?.solid?.color || '@bg-primary';
-            updatedStyles['*']['*'].border[0].color = { solid: { color: bgColor } };
-            break;
-        }
-        break;
-
-      case 'backgroundStyle':
-        // Initialize page styles if they don't exist
-        if (!updatedStyles.page) {
-          updatedStyles.page = {};
-        }
-        if (!updatedStyles.page['*']) {
-          updatedStyles.page['*'] = {};
-        }
-
-        switch (value) {
-          case 'default':
-            // Both use bg-primary
-            updatedStyles['*']['*'].background = [{
-              show: true,
-              color: { solid: { color: '@bg-primary' } }
-            }];
-            updatedStyles.page['*'].background = [{
-              color: { solid: { color: '@bg-primary' } },
-              transparency: 0
-            }];
-            break;
-          case 'subtle':
-            // Visuals use bg-primary, canvas uses bg-secondary
-            updatedStyles['*']['*'].background = [{
-              show: true,
-              color: { solid: { color: '@bg-primary' } }
-            }];
-            updatedStyles.page['*'].background = [{
-              color: { solid: { color: '@bg-secondary' } },
-              transparency: 0
-            }];
-            break;
-          case 'inversed':
-            // Canvas uses bg-primary, visuals use bg-secondary
-            updatedStyles['*']['*'].background = [{
-              show: true,
-              color: { solid: { color: '@bg-secondary' } }
-            }];
-            updatedStyles.page['*'].background = [{
-              color: { solid: { color: '@bg-primary' } },
-              transparency: 0
-            }];
-            break;
-        }
-        break;
-    }
-
-    if (onVisualSettingsChange) {
-      onVisualSettingsChange(updatedStyles);
-    }
   };
 
   return (
@@ -207,7 +78,7 @@ export function QuickCustomizations({ hasChanges, trackChange, onQuickCustomizat
           <Label className="text-xs text-gray-600 mb-2 block">Padding</Label>
           <RadioGroup
             value={quickCustomizations.paddingStyle || 'medium'}
-            onValueChange={(value) => applyQuickCustomizations('paddingStyle', value)}
+            onValueChange={(value) => handleQuickCustomization('paddingStyle', value)}
             className="grid grid-cols-3 gap-2"
           >
             <Label 
@@ -254,7 +125,7 @@ export function QuickCustomizations({ hasChanges, trackChange, onQuickCustomizat
           <Label className="text-xs text-gray-600 mb-2 block">Border Radius</Label>
           <RadioGroup
             value={quickCustomizations.borderRadius || 'medium'}
-            onValueChange={(value) => applyQuickCustomizations('borderRadius', value)}
+            onValueChange={(value) => handleQuickCustomization('borderRadius', value)}
             className="grid grid-cols-4 gap-1.5"
           >
             {['none', 'small', 'medium', 'large'].map((size) => (
@@ -273,7 +144,9 @@ export function QuickCustomizations({ hasChanges, trackChange, onQuickCustomizat
                   <div 
                     className="w-6 h-6 bg-gray-300 mb-1"
                     style={{ 
-                      borderRadius: `${borderRadiusValues[size as keyof typeof borderRadiusValues]}px` 
+                      borderRadius: size === 'none' ? 0 : 
+                        size === 'small' ? 4 : 
+                        size === 'medium' ? 8 : 12
                     }}
                   />
                   <span className="text-xs capitalize">{size}</span>
@@ -288,7 +161,7 @@ export function QuickCustomizations({ hasChanges, trackChange, onQuickCustomizat
           <Label className="text-xs text-gray-600 mb-2 block">Border Style</Label>
           <RadioGroup
             value={quickCustomizations.borderStyle || 'default'}
-            onValueChange={(value) => applyQuickCustomizations('borderStyle', value)}
+            onValueChange={(value) => handleQuickCustomization('borderStyle', value)}
             className="grid grid-cols-3 gap-2"
           >
             <Label 
@@ -335,7 +208,7 @@ export function QuickCustomizations({ hasChanges, trackChange, onQuickCustomizat
           <Label className="text-xs text-gray-600 mb-2 block">Background Style</Label>
           <RadioGroup
             value={quickCustomizations.backgroundStyle || 'default'}
-            onValueChange={(value) => applyQuickCustomizations('backgroundStyle', value)}
+            onValueChange={(value) => handleQuickCustomization('backgroundStyle', value)}
             className="space-y-2"
           >
             <Label 

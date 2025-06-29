@@ -531,8 +531,6 @@ function FoundationPanelComponent({
           <QuickCustomizations 
             hasChanges={hasChanges} 
             trackChange={trackChange}
-            onQuickCustomizationChange={onQuickCustomizationChange}
-            onVisualSettingsChange={onVisualSettingsChange}
           />
 
         </div>
