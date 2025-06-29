@@ -7,6 +7,7 @@ import { TypographyTab } from '@/components/theme-studio/typography/TypographyTa
 import { StructuralColorsTab } from '@/components/theme-studio/typography/StructuralColorsTab';
 import { VisualsSection } from './VisualsSection';
 import { GlobalSection } from './GlobalSection';
+import { CanvasSection } from './CanvasSection';
 
 
 interface VisualStylesPanelProps {
@@ -14,16 +15,17 @@ interface VisualStylesPanelProps {
   visualSettings: Record<string, any>;
   selectedVisual: string;
   selectedVariant: string;
-  selectedSection: 'typography' | 'structural' | 'visuals' | 'global';
+  selectedSection: 'typography' | 'structural' | 'visuals' | 'global' | 'canvas';
   onVisualSettingsChange: (visualSettings: Record<string, any>) => void;
   onVisualStyleChange: (visual: string, variant: string, value: any) => void;
   onSelectedVisualChange: (visual: string) => void;
   onSelectedVariantChange: (variant: string) => void;
-  onSelectedSectionChange: (section: 'typography' | 'structural' | 'visuals' | 'global') => void;
+  onSelectedSectionChange: (section: 'typography' | 'structural' | 'visuals' | 'global' | 'canvas') => void;
   onCreateVariant: (visual: string, variantName: string) => void;
   onDeleteVariant: (visual: string, variantName: string) => void;
   getVisualVariants: (visual: string) => string[];
   trackChange: (path: string[]) => void;
+  hasChanges: (path: string[]) => boolean;
   onEnterFocusMode?: () => void;
 }
 
@@ -42,6 +44,7 @@ function VisualStylesPanelComponent({
   onDeleteVariant,
   getVisualVariants,
   trackChange,
+  hasChanges,
   onEnterFocusMode,
 }: VisualStylesPanelProps) {
   const [schemaLoader, setSchemaLoader] = useState<SchemaLoader | null>(null);
@@ -120,6 +123,19 @@ function VisualStylesPanelComponent({
           />
         );
       
+      case 'canvas':
+        return (
+          <CanvasSection
+            visualSettings={visualSettings}
+            onVisualSettingsChange={onVisualSettingsChange}
+            trackChange={trackChange}
+            hasChanges={hasChanges}
+            schemaLoader={schemaLoader}
+            schemaLoaded={schemaLoaded}
+            canvasTypes={canvasTypes}
+          />
+        );
+      
       default:
         return null;
     }
@@ -177,6 +193,17 @@ function VisualStylesPanelComponent({
             )}
           >
             Global
+          </button>
+          <button
+            onClick={() => onSelectedSectionChange('canvas')}
+            className={cn(
+              "px-3 py-1.5 text-[13px] font-medium rounded-md transition-all",
+              selectedSection === 'canvas'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            )}
+          >
+            Canvas
           </button>
           <div className="flex-1" />
         </div>
