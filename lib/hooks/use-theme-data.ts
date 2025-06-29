@@ -32,6 +32,7 @@ export function useThemeData() {
   const setFontFamily = useThemeStudioStore((state) => state.setFontFamily);
   const setStructuralColors = useThemeStudioStore((state) => state.setStructuralColors);
   const setTextClasses = useThemeStudioStore((state) => state.setTextClasses);
+  const setQuickCustomization = useThemeStudioStore((state) => state.setQuickCustomization);
 
   // Clear actions
   const clearTypography = useCallback(() => {
@@ -73,6 +74,7 @@ export function useThemeData() {
     setFontFamily,
     setStructuralColors,
     setTextClasses,
+    setQuickCustomization,
     
     // Clear actions
     clearTypography,

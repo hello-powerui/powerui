@@ -7,14 +7,54 @@ import { HelpTooltip } from '@/components/theme-studio/HelpTooltip';
 import { ChangeIndicator } from '@/components/theme-studio/ui/change-indicator';
 import { THEME_STUDIO_TYPOGRAPHY } from '@/components/theme-studio/constants/typography';
 import { cn } from '@/lib/utils';
+import React from 'react';
+
+// Custom RadioGroupItem that prevents focus issues
+const NoFocusRadioItem = React.forwardRef<
+  React.ElementRef<typeof RadioGroupItem>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupItem>
+>((props, ref) => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Preserve scroll position
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    
+    // Let the original click handler run
+    if (props.onClick) {
+      props.onClick(e as any);
+    }
+    
+    // Restore scroll position
+    window.scrollTo(scrollLeft, scrollTop);
+  };
+  
+  return (
+    <RadioGroupItem 
+      {...props} 
+      ref={ref}
+      onClick={handleClick}
+      onFocus={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        // Prevent default to avoid focus changes
+        e.preventDefault();
+      }}
+    />
+  );
+});
+NoFocusRadioItem.displayName = 'NoFocusRadioItem';
 
 interface QuickCustomizationsProps {
   hasChanges: (path: string[]) => boolean;
   trackChange: (path: string[]) => void;
+  onQuickCustomizationChange?: (key: string, value: string) => void;
+  onVisualSettingsChange?: (visualSettings: Record<string, any>) => void;
 }
 
-export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizationsProps) {
-  const { theme, setQuickCustomization, updateVisualStyles } = useThemeStudioStore();
+export function QuickCustomizations({ hasChanges, trackChange, onQuickCustomizationChange, onVisualSettingsChange }: QuickCustomizationsProps) {
+  const { theme } = useThemeStudioStore();
   const quickCustomizations = theme.quickCustomizations || {
     paddingStyle: 'medium',
     borderRadius: 'medium',
@@ -40,7 +80,9 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
 
   // Apply quick customizations to visual styles
   const applyQuickCustomizations = (key: string, value: string) => {
-    setQuickCustomization(key as any, value);
+    if (onQuickCustomizationChange) {
+      onQuickCustomizationChange(key, value);
+    }
     trackChange(['quickCustomizations', key]);
 
     const currentVisualStyles = theme.visualStyles || {};
@@ -143,7 +185,9 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
         break;
     }
 
-    updateVisualStyles(updatedStyles);
+    if (onVisualSettingsChange) {
+      onVisualSettingsChange(updatedStyles);
+    }
   };
 
   return (
@@ -163,7 +207,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
         <div>
           <Label className="text-xs text-gray-600 mb-2 block">Padding</Label>
           <RadioGroup
-            value={quickCustomizations.paddingStyle}
+            value={quickCustomizations.paddingStyle || 'medium'}
             onValueChange={(value) => applyQuickCustomizations('paddingStyle', value)}
             className="grid grid-cols-3 gap-2"
           >
@@ -176,7 +220,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <RadioGroupItem value="small" id="padding-small" className="sr-only" />
+              <NoFocusRadioItem value="small" id="padding-small" className="sr-only" />
               <span className="text-sm">Small (12px)</span>
             </Label>
             <Label 
@@ -188,7 +232,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <RadioGroupItem value="medium" id="padding-medium" className="sr-only" />
+              <NoFocusRadioItem value="medium" id="padding-medium" className="sr-only" />
               <span className="text-sm">Medium (16px)</span>
             </Label>
             <Label 
@@ -200,7 +244,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <RadioGroupItem value="large" id="padding-large" className="sr-only" />
+              <NoFocusRadioItem value="large" id="padding-large" className="sr-only" />
               <span className="text-sm">Large (20px)</span>
             </Label>
           </RadioGroup>
@@ -210,7 +254,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
         <div>
           <Label className="text-xs text-gray-600 mb-2 block">Border Radius</Label>
           <RadioGroup
-            value={quickCustomizations.borderRadius}
+            value={quickCustomizations.borderRadius || 'medium'}
             onValueChange={(value) => applyQuickCustomizations('borderRadius', value)}
             className="grid grid-cols-5 gap-1.5"
           >
@@ -225,7 +269,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                     : "border-gray-200 hover:border-gray-300"
                 )}
               >
-                <RadioGroupItem value={size} id={`radius-${size}`} className="sr-only" />
+                <NoFocusRadioItem value={size} id={`radius-${size}`} className="sr-only" />
                 <div className="flex flex-col items-center">
                   <div 
                     className="w-6 h-6 bg-gray-300 mb-1"
@@ -244,7 +288,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
         <div>
           <Label className="text-xs text-gray-600 mb-2 block">Border Style</Label>
           <RadioGroup
-            value={quickCustomizations.borderStyle}
+            value={quickCustomizations.borderStyle || 'default'}
             onValueChange={(value) => applyQuickCustomizations('borderStyle', value)}
             className="grid grid-cols-3 gap-2"
           >
@@ -257,7 +301,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <RadioGroupItem value="default" id="border-default" className="sr-only" />
+              <NoFocusRadioItem value="default" id="border-default" className="sr-only" />
               <span className="text-sm">Default</span>
             </Label>
             <Label 
@@ -269,7 +313,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <RadioGroupItem value="subtle" id="border-subtle" className="sr-only" />
+              <NoFocusRadioItem value="subtle" id="border-subtle" className="sr-only" />
               <span className="text-sm">Subtle</span>
             </Label>
             <Label 
@@ -281,7 +325,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <RadioGroupItem value="none" id="border-none" className="sr-only" />
+              <NoFocusRadioItem value="none" id="border-none" className="sr-only" />
               <span className="text-sm">None</span>
             </Label>
           </RadioGroup>
@@ -291,7 +335,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
         <div>
           <Label className="text-xs text-gray-600 mb-2 block">Background Style</Label>
           <RadioGroup
-            value={quickCustomizations.backgroundStyle}
+            value={quickCustomizations.backgroundStyle || 'default'}
             onValueChange={(value) => applyQuickCustomizations('backgroundStyle', value)}
             className="space-y-2"
           >
@@ -304,7 +348,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <RadioGroupItem value="default" id="bg-default" className="mr-2" />
+              <NoFocusRadioItem value="default" id="bg-default" className="mr-2" />
               <div className="flex-1">
                 <span className="text-sm font-medium">Default</span>
                 <p className="text-xs text-gray-500">Visuals and canvas share the same background</p>
@@ -319,7 +363,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <RadioGroupItem value="subtle" id="bg-subtle" className="mr-2" />
+              <NoFocusRadioItem value="subtle" id="bg-subtle" className="mr-2" />
               <div className="flex-1">
                 <span className="text-sm font-medium">Subtle Contrast</span>
                 <p className="text-xs text-gray-500">Visuals on primary, canvas on secondary background</p>
@@ -334,7 +378,7 @@ export function QuickCustomizations({ hasChanges, trackChange }: QuickCustomizat
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <RadioGroupItem value="inversed" id="bg-inversed" className="mr-2" />
+              <NoFocusRadioItem value="inversed" id="bg-inversed" className="mr-2" />
               <div className="flex-1">
                 <span className="text-sm font-medium">Inversed Contrast</span>
                 <p className="text-xs text-gray-500">Canvas on primary, visuals on secondary background</p>

@@ -334,6 +334,7 @@ function ThemeStudioContent() {
               onTextClassesChange={themeStudio.setTextClasses}
               onShowPaletteManager={handleShowPaletteManager}
               onVisualSettingsChange={handleVisualSettingsChange}
+              onQuickCustomizationChange={themeStudio.setQuickCustomization}
               trackChange={(path) => {
                 // Change tracking is handled internally by updateTheme
               }}

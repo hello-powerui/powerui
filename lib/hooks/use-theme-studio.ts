@@ -76,6 +76,10 @@ export function useThemeStudio() {
   const setStatePalette = useCallback((type: 'success' | 'warning' | 'error', paletteName: string) => {
     updateTheme({ [`${type}Palette`]: paletteName });
   }, [updateTheme]);
+  
+  const setQuickCustomization = useCallback((key: string, value: string) => {
+    themeData.setQuickCustomization(key as any, value);
+  }, [themeData]);
 
   // Memoize the return value to prevent unnecessary re-renders
   return useMemo(() => ({
@@ -112,6 +116,7 @@ export function useThemeStudio() {
     setTextClasses,
     setBrandPalette,
     setStatePalette,
+    setQuickCustomization,
     updateVisualStyle: visualStyles.updateVisualStyle,
     
     // UI actions
@@ -160,6 +165,7 @@ export function useThemeStudio() {
     setTextClasses,
     setBrandPalette,
     setStatePalette,
+    setQuickCustomization,
     visualStyles.updateVisualStyle,
     uiState.setSelectedVisual,
     uiState.setSelectedVariant,

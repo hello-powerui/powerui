@@ -40,6 +40,7 @@ interface FoundationPanelProps {
   onTextClassesChange: (textClasses: any) => void;
   onShowPaletteManager: (type: 'color' | 'neutral') => void;
   onVisualSettingsChange: (visualSettings: Record<string, any>) => void;
+  onQuickCustomizationChange?: (key: string, value: string) => void;
   trackChange: (path: string[]) => void;
   isVisible: boolean;
   onToggleVisibility: (visible: boolean) => void;
@@ -63,6 +64,7 @@ function FoundationPanelComponent({
   onTextClassesChange,
   onShowPaletteManager,
   onVisualSettingsChange,
+  onQuickCustomizationChange,
   trackChange,
   isVisible,
   onToggleVisibility,
@@ -529,6 +531,8 @@ function FoundationPanelComponent({
           <QuickCustomizations 
             hasChanges={hasChanges} 
             trackChange={trackChange}
+            onQuickCustomizationChange={onQuickCustomizationChange}
+            onVisualSettingsChange={onVisualSettingsChange}
           />
 
         </div>

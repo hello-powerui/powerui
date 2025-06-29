@@ -40,7 +40,8 @@ export function useThemePreviewGenerator() {
     fontFamily: theme.fontFamily,
     visualStyles: theme.visualStyles,
     structuralColors: theme.structuralColors,
-    textClasses: theme.textClasses
+    textClasses: theme.textClasses,
+    quickCustomizations: theme.quickCustomizations
   }), [
     theme.mode,
     theme.colorPaletteId,
@@ -52,7 +53,8 @@ export function useThemePreviewGenerator() {
     theme.fontFamily,
     theme.visualStyles,
     theme.structuralColors,
-    theme.textClasses
+    theme.textClasses,
+    theme.quickCustomizations
   ]);
   
   // Add debouncing to batch rapid changes
