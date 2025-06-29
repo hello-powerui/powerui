@@ -187,6 +187,7 @@ export function StructuralColorsTab() {
                       onChange={(value) => handleColorChange(colorKey, value)}
                       path={[colorKey]}
                       inline={true}
+                      enableThemeColors={false}
                     />
                   </ConnectedProperty>
                 );

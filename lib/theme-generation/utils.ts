@@ -135,12 +135,9 @@ export function replaceTokens(
           return { solid: { color: resolved } };
         }
         
-        // Handle theme data color references
-        if (colorValue?.expr?.ThemeDataColor && dataColors) {
-          const resolved = resolveThemeDataColor(colorValue, dataColors);
-          if (resolved) {
-            return { solid: { color: resolved } };
-          }
+        // Handle theme data color references - preserve the structure, don't resolve
+        if (colorValue?.expr?.ThemeDataColor) {
+          return { solid: { color: colorValue } };
         }
       }
       
@@ -154,21 +151,15 @@ export function replaceTokens(
           return { ...obj, color: { solid: { color: resolved } } };
         }
         
-        // Handle theme data color references
-        if (colorValue?.expr?.ThemeDataColor && dataColors) {
-          const resolved = resolveThemeDataColor(colorValue, dataColors);
-          if (resolved) {
-            return { ...obj, color: { solid: { color: resolved } } };
-          }
+        // Handle theme data color references - preserve the structure, don't resolve
+        if (colorValue?.expr?.ThemeDataColor) {
+          return { ...obj, color: { solid: { color: colorValue } } };
         }
       }
       
-      // Check if this is a ThemeDataColor expression at the current level
-      if (obj.expr?.ThemeDataColor && dataColors) {
-        const resolved = resolveThemeDataColor(obj, dataColors);
-        if (resolved) {
-          return resolved;
-        }
+      // Check if this is a ThemeDataColor expression at the current level - preserve it
+      if (obj.expr?.ThemeDataColor) {
+        return obj;
       }
       
       const result: any = {};
@@ -285,9 +276,12 @@ export function resolveThemeDataColor(
   if (expression?.expr?.ThemeDataColor) {
     const { ColorId, Percent } = expression.expr.ThemeDataColor;
     
-    // ColorId is 0-indexed in the dataColors array
-    if (ColorId >= 0 && ColorId < dataColors.length) {
-      const baseColor = dataColors[ColorId];
+    // ColorId 2 corresponds to the first data color (index 0)
+    // Power BI reserves ColorId 0 and 1 for other purposes
+    const dataColorIndex = ColorId - 2;
+    
+    if (dataColorIndex >= 0 && dataColorIndex < dataColors.length) {
+      const baseColor = dataColors[dataColorIndex];
       
       // If there's a percentage adjustment, apply it
       if (Percent !== undefined && Percent !== 0) {

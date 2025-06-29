@@ -20,6 +20,7 @@ interface FillControlProps {
   required?: boolean;
   path: string[];
   inline?: boolean;
+  enableThemeColors?: boolean;
 }
 
 export function FillControl({
@@ -30,6 +31,7 @@ export function FillControl({
   required,
   path,
   inline = false,
+  enableThemeColors = true,
 }: FillControlProps) {
   const theme = useThemeStudioStore((state) => state.theme);
   const neutralPalette = useThemeStudioStore((state) => state.resolved.neutralPalette);
@@ -51,7 +53,7 @@ export function FillControl({
             onChange={onChange}
             format="powerbi"
             enableTokens={true}
-            enableThemeColors={true}
+            enableThemeColors={enableThemeColors}
             mode={theme.mode || 'light'}
             neutralPalette={(neutralPalette?.colors as string[]) || []}
             brandPalette={theme.brandPalette}

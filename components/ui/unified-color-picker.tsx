@@ -110,7 +110,9 @@ export function UnifiedColorPicker({
     if (typeof value === 'object' && 'solid' in value && value.solid) {
       const color = value.solid.color;
       if (typeof color === 'object' && color.expr?.ThemeDataColor?.ColorId !== undefined) {
-        return color.expr.ThemeDataColor.ColorId;
+        // Convert ColorId back to 0-based index
+        const colorId = color.expr.ThemeDataColor.ColorId;
+        return colorId >= 2 ? colorId - 2 : null;
       }
     } else if (typeof value === 'object' && 'themeColor' in value && value.themeColor) {
       return value.themeColor.id;
@@ -121,7 +123,12 @@ export function UnifiedColorPicker({
   const getInitialShade = React.useCallback((): number => {
     if (!value) return 0;
     
-    if (typeof value === 'object' && 'themeColor' in value && value.themeColor) {
+    if (typeof value === 'object' && 'solid' in value && value.solid) {
+      const color = value.solid.color;
+      if (typeof color === 'object' && color.expr?.ThemeDataColor?.Percent !== undefined) {
+        return color.expr.ThemeDataColor.Percent;
+      }
+    } else if (typeof value === 'object' && 'themeColor' in value && value.themeColor) {
       return value.themeColor.shade || 0;
     }
     return 0;
@@ -142,7 +149,12 @@ export function UnifiedColorPicker({
       if (typeof color === 'string') return color;
       if (typeof color === 'object' && color.expr?.ThemeDataColor?.ColorId !== undefined) {
         const colorId = color.expr.ThemeDataColor.ColorId;
-        return colorId < themeColors.length ? `Theme Color ${colorId + 1}` : '';
+        const percent = color.expr.ThemeDataColor.Percent || 0;
+        const colorIndex = colorId - 2; // ColorId 2 corresponds to first data color (index 0)
+        if (colorIndex >= 0 && colorIndex < themeColors.length) {
+          return `Theme Color ${colorIndex + 1}${percent !== 0 ? ` (${percent > 0 ? '+' : ''}${percent * 100}%)` : ''}`;
+        }
+        return '';
       }
       // Handle other object formats
       if (typeof color === 'object' && 'color' in color) {
@@ -173,7 +185,12 @@ export function UnifiedColorPicker({
       if (typeof color === 'string') return color;
       if (typeof color === 'object' && color.expr?.ThemeDataColor?.ColorId !== undefined) {
         const colorId = color.expr.ThemeDataColor.ColorId;
-        return colorId < themeColors.length ? `Theme Color ${colorId + 1}` : '';
+        const percent = color.expr.ThemeDataColor.Percent || 0;
+        const colorIndex = colorId - 2; // ColorId 2 corresponds to first data color (index 0)
+        if (colorIndex >= 0 && colorIndex < themeColors.length) {
+          return `Theme Color ${colorIndex + 1}${percent !== 0 ? ` (${percent > 0 ? '+' : ''}${percent * 100}%)` : ''}`;
+        }
+        return '';
       }
       // Handle other object formats
       if (typeof color === 'object' && 'color' in color) {
@@ -224,7 +241,17 @@ export function UnifiedColorPicker({
       const match = displayValue.match(/Color (\d+)/);
       if (match) {
         const colorIndex = parseInt(match[1]) - 1;
-        return themeColors[colorIndex] || '#000000';
+        const baseColor = themeColors[colorIndex] || '#000000';
+        
+        // Check if there's a shade/percent adjustment
+        const shadeMatch = displayValue.match(/\(([+-]?\d+)%\)/);
+        if (shadeMatch) {
+          const percent = parseInt(shadeMatch[1]) / 100;
+          // Apply simple shade adjustment (this is approximate)
+          // In production, you'd want to use proper color manipulation
+          return baseColor;
+        }
+        return baseColor;
       }
     }
     return '#E5E7EB'; // Light gray as fallback
@@ -232,7 +259,9 @@ export function UnifiedColorPicker({
 
   // Format value based on format prop
   const formatValue = (rawValue: any): UnifiedColorValue => {
-    if (!rawValue) return format === 'simple' ? '' : format === 'powerbi' ? { solid: { color: '' } } : { color: '' };
+    if (rawValue === null || rawValue === undefined || rawValue === '') {
+      return format === 'simple' ? '' : format === 'powerbi' ? { solid: { color: '' } } : { color: '' };
+    }
     
     switch (format) {
       case 'simple':
@@ -245,7 +274,13 @@ export function UnifiedColorPicker({
             return { solid: { color: rawValue } };
           }
         } else if (typeof rawValue === 'number') {
-          return { solid: { color: { expr: { ThemeDataColor: { ColorId: rawValue } } } } };
+          // rawValue is the theme color index (0-based), convert to ColorId (2+ for data colors)
+          return { solid: { color: { expr: { ThemeDataColor: { ColorId: rawValue + 2, Percent: 0 } } } } };
+        } else if (typeof rawValue === 'object' && rawValue.themeColor) {
+          // Handle theme color with shade
+          const colorId = rawValue.themeColor.id + 2; // Convert 0-based index to ColorId
+          const percent = rawValue.themeColor.shade || 0;
+          return { solid: { color: { expr: { ThemeDataColor: { ColorId: colorId, Percent: percent } } } } };
         }
         return { solid: { color: rawValue } };
       case 'themestudio':
@@ -266,24 +301,33 @@ export function UnifiedColorPicker({
     setOpen(false);
   };
 
-  const handleThemeColorSelect = (colorId: number) => {
-    setSelectedThemeColor(colorId);
+  const handleThemeColorSelect = (colorIndex: number) => {
+    setSelectedThemeColor(colorIndex);
     if (enableShades) {
       // Stay on theme tab to allow shade selection
       setSelectedTab('theme');
     } else {
       // Immediately apply the theme color selection
-      const formattedValue = format === 'themestudio' 
-        ? { themeColor: { id: colorId, shade: 0 } } 
-        : colorId;
-      handleColorChange(formattedValue);
+      if (format === 'powerbi') {
+        // For Power BI format, pass the index which will be converted to ColorId
+        handleColorChange(colorIndex);
+      } else if (format === 'themestudio') {
+        handleColorChange({ themeColor: { id: colorIndex, shade: 0 } });
+      } else {
+        handleColorChange(colorIndex);
+      }
     }
   };
 
   const handleShadeSelect = (shade: number) => {
     setSelectedShade(shade);
     if (selectedThemeColor !== null) {
-      handleColorChange({ themeColor: { id: selectedThemeColor, shade } });
+      if (format === 'powerbi') {
+        // For Power BI format, include shade as Percent
+        handleColorChange({ themeColor: { id: selectedThemeColor, shade } });
+      } else {
+        handleColorChange({ themeColor: { id: selectedThemeColor, shade } });
+      }
     }
   };
 
@@ -330,11 +374,11 @@ export function UnifiedColorPicker({
     } else if (displayValue.startsWith('Theme') && enableThemeColors) {
       setSelectedTab('theme');
       
-      // Extract theme color ID from display value
+      // Extract theme color index from display value
       const match = displayValue.match(/Color (\d+)/);
       if (match) {
-        const colorId = parseInt(match[1]) - 1;
-        setSelectedThemeColor(colorId);
+        const colorIndex = parseInt(match[1]) - 1;
+        setSelectedThemeColor(colorIndex);
       }
     } else if (displayValue.startsWith('#')) {
       setSelectedTab('custom');

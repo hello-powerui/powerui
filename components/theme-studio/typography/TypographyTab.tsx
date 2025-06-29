@@ -382,6 +382,7 @@ export function TypographyTab() {
                     onChange={(value) => handleColorChange(name, value)}
                     path={['textClasses', name, 'color']}
                     inline={true}
+                    enableThemeColors={false}
                   />
                 </ConnectedProperty>
               </div>

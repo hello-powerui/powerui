@@ -84,13 +84,16 @@ function FoundationPanelComponent({
     success: {
       green: convertStatePaletteToHex(STATE_PALETTES.success.green),
       lime: convertStatePaletteToHex(STATE_PALETTES.success.lime),
+      lightGreen: convertStatePaletteToHex(STATE_PALETTES.success.lightGreen),
     },
     warning: {
       amber: convertStatePaletteToHex(STATE_PALETTES.warning.amber),
       orange: convertStatePaletteToHex(STATE_PALETTES.warning.orange),
+      yellow: convertStatePaletteToHex(STATE_PALETTES.warning.yellow),
     },
     error: {
       red: convertStatePaletteToHex(STATE_PALETTES.error.red),
+      scarlet: convertStatePaletteToHex(STATE_PALETTES.error.scarlet),
     }
   }), []);
   
@@ -419,6 +422,16 @@ function FoundationPanelComponent({
                         <span>Lime</span>
                       </div>
                     </SelectItem>
+                    <SelectItem value="lightGreen">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lightGreen['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lightGreen['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lightGreen['700'] }} />
+                        </div>
+                        <span>Light Green</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -457,6 +470,16 @@ function FoundationPanelComponent({
                         <span>Orange</span>
                       </div>
                     </SelectItem>
+                    <SelectItem value="yellow">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.warning.yellow['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.warning.yellow['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.warning.yellow['700'] }} />
+                        </div>
+                        <span>Yellow</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -483,6 +506,16 @@ function FoundationPanelComponent({
                           <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.red['700'] }} />
                         </div>
                         <span>Red</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="scarlet">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.scarlet['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.scarlet['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.scarlet['700'] }} />
+                        </div>
+                        <span>Scarlet</span>
                       </div>
                     </SelectItem>
                   </SelectContent>

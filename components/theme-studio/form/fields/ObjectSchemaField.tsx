@@ -31,14 +31,33 @@ export function ObjectSchemaField({
   SchemaForm,
   VisualPropertiesRenderer
 }: ObjectSchemaFieldProps) {
-  const objectValue = useMemo(() => 
-    typeof value === 'object' && value !== null ? value : {}
-  , [value]);
+  const objectValue = useMemo(() => {
+    const val = typeof value === 'object' && value !== null ? value : {};
+    // For image objects, ensure name is always set
+    if (schema.properties?.name && schema.properties?.url && !val.name) {
+      return { ...val, name: 'image' };
+    }
+    return val;
+  }, [value, schema.properties]);
+  
+  // Check if this is an image object
+  const isImageObject = schema.properties && 
+    schema.properties.name && 
+    schema.properties.url;
   
   // Memoize the property change handler
   const handlePropertyChange = useCallback((propName: string, newValue: any) => {
-    onChange({ ...objectValue, [propName]: newValue });
-  }, [objectValue, onChange]);
+    // For image objects, when URL is set, automatically set name to "image"
+    if (isImageObject && propName === 'url' && newValue) {
+      onChange({ 
+        ...objectValue, 
+        [propName]: newValue,
+        name: objectValue.name || 'image'
+      });
+    } else {
+      onChange({ ...objectValue, [propName]: newValue });
+    }
+  }, [objectValue, onChange, isImageObject]);
   
   // Check if this is a visual style object with a "*" property that has a $ref
   const starProperty = schema.properties?.['*'];
@@ -114,7 +133,12 @@ export function ObjectSchemaField({
   
   // Render fields function
   const renderFields = () => {
-    const entries = Object.entries(schema.properties || {});
+    let entries = Object.entries(schema.properties || {});
+    
+    // For image objects, filter out the name field
+    if (isImageObject) {
+      entries = entries.filter(([propName]) => propName !== 'name');
+    }
     
     // If this needs visual grouping, wrap each property with ConnectedProperty
     if (needsVisualGrouping && !hideTitle) {
