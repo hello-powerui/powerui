@@ -28,14 +28,17 @@ export function PropertySection({
   hideTitle,
   SchemaForm
 }: PropertySectionProps) {
-  const arrayValue = useMemo(() => Array.isArray(value) ? value : [{}], [value]);
-  const itemValue = useMemo(() => arrayValue.length > 0 ? arrayValue[0] : {}, [arrayValue]);
+  // Don't memoize these values - let them update on every render
+  const arrayValue = Array.isArray(value) ? value : [{}];
+  const itemValue = arrayValue.length > 0 ? arrayValue[0] : {};
   
   // Memoize the property change handler
   const handlePropertyChange = useCallback((propName: string, newValue: any) => {
-    const newItemValue = { ...itemValue, [propName]: newValue };
+    const currentArrayValue = Array.isArray(value) ? value : [{}];
+    const currentItemValue = currentArrayValue.length > 0 ? currentArrayValue[0] : {};
+    const newItemValue = { ...currentItemValue, [propName]: newValue };
     onChange([newItemValue]);
-  }, [itemValue, onChange]);
+  }, [value, onChange]);
   
   return (
     <div className="space-y-2">

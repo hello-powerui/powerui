@@ -31,7 +31,6 @@ export function GlobalSection({
       {/* Global Settings Property Selector */}
       {schemaLoader && schemaLoaded ? (
         <GlobalPropertySelector
-          key={JSON.stringify(visualSettings?.['*']?.['*'] || {})}
           visualStyles={visualSettings}
           onVisualStylesChange={onVisualSettingsChange}
           schemaLoader={schemaLoader}

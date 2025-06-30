@@ -161,6 +161,9 @@ export const getContextualTitle = (schema: SchemaProperty, propertyName: string,
   // Check if we're in a visual property section (like legend, labels, etc.)
   const isInVisualSection = path && path.length >= 4 && path[0] === 'visualStyles';
   
+  // Check if we're in a card visual
+  const isCardVisual = path && path.length >= 2 && (path[1] === 'card' || path[1] === 'cardVisual');
+  
   // List of generic titles that should be replaced with property names in sections
   const genericTitles = [
     'Title', 'Show', 'Color', 'Size', 'Font Size', 'Font Family', 
@@ -168,6 +171,43 @@ export const getContextualTitle = (schema: SchemaProperty, propertyName: string,
     'Width', 'Height', 'Visible', 'Enable', 'Disable', 'Value',
     'Label', 'Name', 'Description', 'Underline'
   ];
+  
+  // For card visuals, add context to disambiguate duplicate property names
+  if (isCardVisual && path && path.length >= 3) {
+    // Path structure: ['visualStyles', 'cardVisual', '*', 'referenceLabelLayout', '0', 'propertyName']
+    // We want the section name which is at index -3 from the end
+    let sectionName = '';
+    
+    
+    if (path.length >= 3 && path[path.length - 2] === '0') {
+      // This is a property within a section
+      sectionName = path[path.length - 3];
+    }
+    
+    // Map of section names to friendly prefixes
+    const sectionPrefixes: Record<string, string> = {
+      'referenceLabelLayout': 'Reference Label',
+      'referenceLabelTitle': 'Reference Label Title',
+      'referenceLabelValue': 'Reference Label Value',
+      'referenceLabelDetail': 'Reference Label Detail',
+      'smallMultiplesLayout': 'Small Multiples',
+      'smallMultiplesGrid': 'Small Multiples Grid',
+      'smallMultiplesBorder': 'Small Multiples Border',
+      'smallMultiplesHeader': 'Small Multiples Header',
+      'smallMultiplesOverFlow': 'Small Multiples',
+      'smallMultiplesOuterShape': 'Small Multiples',
+      'smallMultiplesAccentBar': 'Small Multiples',
+      'smallMultiplesCellBackGround': 'Small Multiples Cell'
+    };
+    
+    // Check if this property needs disambiguation
+    const needsDisambiguation = ['Layout', 'Grid', 'Overflow', 'Shape', 'Border', 'Overflow style'].includes(schema.title || '');
+    
+    if (needsDisambiguation && sectionPrefixes[sectionName]) {
+      const baseTitle = schema.title || formatPropertyName(propertyName);
+      return `${sectionPrefixes[sectionName]} - ${baseTitle}`;
+    }
+  }
   
   // If we have a title but it's generic and we're in a visual section, prefer the property name
   if (isInVisualSection && schema.title && genericTitles.includes(schema.title)) {

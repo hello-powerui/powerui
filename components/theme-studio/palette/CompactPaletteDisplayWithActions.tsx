@@ -95,11 +95,11 @@ export function CompactPaletteDisplayWithActions({
             </div>
           ) : (
             // Neutral palette - gradient strip
-            <div className="flex h-5 rounded overflow-hidden border border-gray-200 shadow-sm">
+            <div className="flex h-6 rounded overflow-hidden border border-gray-200 shadow-sm min-w-[140px]">
               {displayColors.map((color, i) => (
                 <div
                   key={i}
-                  className="w-2 h-full"
+                  className="flex-1 h-full"
                   style={{ backgroundColor: color }}
                 />
               ))}

@@ -9,6 +9,7 @@ import { VisualPropertySection } from './VisualPropertySection';
 import { customVisualComponents } from './custom-visuals';
 import { THEME_STUDIO_TYPOGRAPHY } from '../constants/typography';
 import { VisualStates } from './VisualStates';
+import { ButtonSlicerStates } from './ButtonSlicerStates';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { useThemeChanges } from '@/lib/hooks/use-theme-changes';
 
@@ -29,6 +30,9 @@ export function VisualPropertiesPanel({
   path, 
   level 
 }: VisualPropertiesPanelProps) {
+  console.log('[VisualPropertiesPanel] Received value:', value);
+  console.log('[VisualPropertiesPanel] Path:', path);
+  
   const [activeTab, setActiveTab] = useState<'specific' | 'general'>(TAB_TYPES.SPECIFIC);
   const selectedState = useThemeStudioStore(state => state.selectedState);
   const setSelectedState = useThemeStudioStore(state => state.setSelectedState);
@@ -46,7 +50,9 @@ export function VisualPropertiesPanel({
   const CustomVisualComponent = customVisualComponents[visualType];
   
   // Check if this visual has state-driven properties
-  const hasStateDrivenProperties = visualType && schemaLoader?.visualHasStateDrivenProperties(visualType);
+  // Card visuals don't use the visual states selector - they use $id: 'default' pattern
+  const isCardVisual = visualType === 'card' || visualType === 'cardVisual';
+  const hasStateDrivenProperties = !isCardVisual && visualType && schemaLoader?.visualHasStateDrivenProperties(visualType);
   
   // If we have a custom component, use it instead of generic rendering
   if (CustomVisualComponent) {
@@ -119,10 +125,43 @@ export function VisualPropertiesPanel({
     
     // Each property should be an array with items containing the actual form fields
     if (propSchema.type === 'array' && propSchema.items?.type === 'object') {
+      let title = propSchema.title || formatGroupTitle(propName);
+      
+      // For card visuals, add context to disambiguate duplicate section names
+      const isCardVisual = path && path.length >= 2 && (path[1] === 'card' || path[1] === 'cardVisual');
+      
+      if (isCardVisual) {
+        const sectionPrefixes: Record<string, string> = {
+          'referenceLabelLayout': 'Reference Label',
+          'referenceLabelTitle': 'Reference Label Title',
+          'referenceLabelValue': 'Reference Label Value',
+          'referenceLabelDetail': 'Reference Label Detail',
+          'smallMultiplesLayout': 'Small Multiples',
+          'smallMultiplesGrid': 'Small Multiples Grid',
+          'smallMultiplesBorder': 'Small Multiples Border',
+          'smallMultiplesHeader': 'Small Multiples Header',
+          'smallMultiplesOverFlow': 'Small Multiples',
+          'smallMultiplesOuterShape': 'Small Multiples',
+          'smallMultiplesAccentBar': 'Small Multiples',
+          'smallMultiplesCellBackGround': 'Small Multiples Cell'
+        };
+        
+        const needsDisambiguation = ['Layout', 'Grid', 'Overflow', 'Shape', 'Border', 'Accent bar'].includes(title);
+        
+        if (needsDisambiguation && sectionPrefixes[propName]) {
+          title = `${sectionPrefixes[propName]} - ${title}`;
+        }
+        
+        // Special case for Values section - make it clearer what it's for
+        if (propName === 'value' && title === 'Values') {
+          title = 'Card Values';
+        }
+      }
+      
       sections.push({
         name: propName,
         schema: propSchema,
-        title: propSchema.title || formatGroupTitle(propName),
+        title: title,
         isCommon: false
       });
     }
@@ -195,30 +234,22 @@ export function VisualPropertiesPanel({
         {activeTab === TAB_TYPES.SPECIFIC ? (
           <div>
             {/* Visual States - only shown in Visual Properties tab */}
-            <VisualStates
-              selectedState={selectedState}
-              onSelectedStateChange={setSelectedState}
-              hasStateDrivenProperties={hasStateDrivenProperties || false}
-            >
-              {specificSections.length > 0 && (
-                <div className="-space-y-px">
-                  {specificSections.map(({ name, schema: sectionSchema, title }) => (
-                    <VisualPropertySection
-                      key={name}
-                      name={name}
-                      schema={sectionSchema}
-                      title={title}
-                      value={value}
-                      onChange={onChange}
-                      schemaLoader={schemaLoader}
-                      path={path}
-                      level={level}
-                    />
-                  ))}
-                </div>
-              )}
-            </VisualStates>
-            {!hasStateDrivenProperties && specificSections.length > 0 && (
+            {(visualType === 'advancedSlicerVisual' || visualType === 'buttonSlicer') ? (
+              <ButtonSlicerStates
+                selectedState={selectedState}
+                onSelectedStateChange={setSelectedState}
+                visualType={visualType}
+              />
+            ) : hasStateDrivenProperties ? (
+              <VisualStates
+                selectedState={selectedState}
+                onSelectedStateChange={setSelectedState}
+                hasStateDrivenProperties={true}
+              />
+            ) : null}
+            
+            {/* Property sections */}
+            {specificSections.length > 0 && (
               <div className="-space-y-px">
                 {specificSections.map(({ name, schema: sectionSchema, title }) => (
                   <VisualPropertySection

@@ -44,12 +44,15 @@ export function useQuickCustomizations() {
   
   // Apply quick customization and update visual styles
   const applyQuickCustomization = useCallback((key: string, value: string) => {
+    console.log('[QuickCustomization] Applying:', key, value);
+    
     // Update the quick customization state first
     setQuickCustomization(key as any, value);
     
     // Then update visual styles using the store's current state
     const store = useThemeStudioStore.getState();
     const currentStyles = store.theme.visualStyles || {};
+    console.log('[QuickCustomization] Current visual styles:', currentStyles);
     let updatedStyles = { ...currentStyles };
     
     // Initialize global styles if they don't exist
@@ -150,6 +153,7 @@ export function useQuickCustomizations() {
     }
     
     // Update visual styles through the proper hook
+    console.log('[QuickCustomization] Updated visual styles to apply:', updatedStyles);
     updateVisualStyles(updatedStyles);
   }, [setQuickCustomization, updateVisualStyles]);
   

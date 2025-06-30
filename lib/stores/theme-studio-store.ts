@@ -78,6 +78,7 @@ interface ThemeStudioState {
   setFontFamily: (fontFamily: string) => void;
   setStructuralColors: (colors: StructuralColors) => void;
   setTextClasses: (textClasses: TextClasses) => void;
+  updateTextClassProperty: (className: string, property: keyof TextClass, value: any) => void;
   updateVisualStyles: (visualStyles: Record<string, any>) => void;
   updateVisualStyle: (visual: string, variant: string, value: any) => void;
   setQuickCustomization: (key: keyof NonNullable<StudioTheme['quickCustomizations']>, value: string) => void;
@@ -96,8 +97,9 @@ interface ThemeStudioState {
   
   // Variant management
   getVisualVariants: (visual: string) => string[];
-  createVariant: (visual: string, variantName: string) => void;
+  createVariant: (visual: string, variantName: string, initialData?: any) => void;
   deleteVariant: (visual: string, variantName: string) => void;
+  renameVariant: (visual: string, oldName: string, newName: string) => void;
   
   // Loading/saving actions
   setIsSaving: (saving: boolean) => void;
@@ -232,12 +234,36 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           theme: { ...state.theme, textClasses }
         })),
         
+      updateTextClassProperty: (className, property, value) =>
+        set((state) => {
+          const newTextClasses = { ...state.theme.textClasses };
+          
+          // Initialize the text class if it doesn't exist
+          if (!newTextClasses[className]) {
+            newTextClasses[className] = {} as TextClass;
+          }
+          
+          // Update only the specific property
+          newTextClasses[className] = {
+            ...newTextClasses[className],
+            [property]: value
+          };
+          
+          return {
+            theme: { ...state.theme, textClasses: newTextClasses }
+          };
+        }),
+        
       updateVisualStyles: (visualStyles) =>
         set((state) => {
           const cleanedVisualStyles = cleanupVisualStyles(visualStyles);
-          return {
+          console.log('[Store] updateVisualStyles called with:', visualStyles);
+          console.log('[Store] Cleaned visual styles:', cleanedVisualStyles);
+          const newState = {
             theme: { ...state.theme, visualStyles: cleanedVisualStyles }
           };
+          console.log('[Store] New theme visual styles will be:', newState.theme.visualStyles);
+          return newState;
         }),
         
       updateVisualStyle: (visual, variant, value) =>
@@ -327,7 +353,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
         });
       },
 
-      createVariant: (visual, variantName) => {
+      createVariant: (visual, variantName, initialData = {}) => {
         if (!variantName || variantName === '*') return;
         
         set((state) => {
@@ -337,8 +363,8 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
             newVisualStyles[visual] = { '*': {} };
           }
           
-          // Initialize the new variant with empty object
-          newVisualStyles[visual][variantName] = {};
+          // Initialize the new variant with provided data or empty object
+          newVisualStyles[visual][variantName] = initialData;
           
           return {
             theme: { ...state.theme, visualStyles: newVisualStyles },
@@ -360,6 +386,35 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           return {
             theme: { ...state.theme, visualStyles: newVisualStyles },
             selectedVariant: '*', // Reset to default
+          };
+        });
+      },
+
+      renameVariant: (visual, oldName, newName) => {
+        if (oldName === '*' || newName === '*') return; // Cannot rename default variant
+        if (oldName === newName) return; // No change needed
+        
+        set((state) => {
+          const newVisualStyles = { ...state.theme.visualStyles };
+          
+          // Check if the old variant exists
+          if (!newVisualStyles[visual]?.[oldName]) return state;
+          
+          // Check if the new name already exists
+          if (newVisualStyles[visual]?.[newName]) {
+            console.warn(`Variant "${newName}" already exists for ${visual}`);
+            return state;
+          }
+          
+          // Copy the variant data to the new name
+          newVisualStyles[visual][newName] = newVisualStyles[visual][oldName];
+          
+          // Delete the old variant
+          delete newVisualStyles[visual][oldName];
+          
+          return {
+            theme: { ...state.theme, visualStyles: newVisualStyles },
+            selectedVariant: newName, // Update selection to the new name
           };
         });
       },

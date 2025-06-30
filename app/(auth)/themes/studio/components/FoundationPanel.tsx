@@ -72,14 +72,13 @@ function FoundationPanelComponent({
   const [schemaLoader, setSchemaLoader] = useState<SchemaLoader | null>(null);
   const [schemaLoaded, setSchemaLoaded] = useState(false);
   const [canvasTypes, setCanvasTypes] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<'foundation' | 'quick'>('foundation');
   const [brandColor, setBrandColor] = useState(theme.brandColor || '#2568E8');
   
-  // Sync brand color with theme
+  // Always sync brand color with theme
   useEffect(() => {
-    if (theme.brandColor && theme.brandColor !== brandColor) {
-      setBrandColor(theme.brandColor);
-    }
-  }, [theme.brandColor, brandColor]);
+    setBrandColor(theme.brandColor || '#2568E8');
+  }, [theme.brandColor]);
   const [isGeneratingBrand, setIsGeneratingBrand] = useState(false);
   
   // Convert state palettes to hex for display
@@ -142,28 +141,68 @@ function FoundationPanelComponent({
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-white">
+    <div className="h-full overflow-y-auto bg-gray-50">
       <div className="h-full flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <div className="flex items-center gap-2">
-            <Palette className="w-5 h-5 text-gray-700" />
-            <h2 className={`${THEME_STUDIO_TYPOGRAPHY.panelHeader.size} ${THEME_STUDIO_TYPOGRAPHY.panelHeader.weight}`}>Theme Foundation</h2>
+        <div className="border-b border-gray-200 bg-white">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-2">
+              <Palette className="w-5 h-5 text-gray-700" />
+              <h2 className={`${THEME_STUDIO_TYPOGRAPHY.panelHeader.size} ${THEME_STUDIO_TYPOGRAPHY.panelHeader.weight}`}>Theme Foundation</h2>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onToggleVisibility(false)}
+              className="hover:bg-gray-100"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onToggleVisibility(false)}
-            className="hover:bg-gray-100"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
+          {/* Tabs Row - Figma/Vercel style buttons */}
+          <div className="flex items-center gap-1 p-2">
+            <button
+              onClick={() => setActiveTab('foundation')}
+              className={cn(
+                "px-3 py-1.5 text-[13px] font-medium rounded-md transition-all",
+                activeTab === 'foundation'
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              )}
+            >
+              Foundation
+            </button>
+            <button
+              onClick={() => setActiveTab('quick')}
+              className={cn(
+                "px-3 py-1.5 text-[13px] font-medium rounded-md transition-all",
+                activeTab === 'quick'
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              )}
+            >
+              Quick Styles
+            </button>
+            <div className="flex-1" />
+          </div>
         </div>
         
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-4 pb-20 space-y-4">
-          
-          {/* Data Colors */}
+        <div 
+          className="flex-1 overflow-y-auto"
+          style={{
+            backgroundImage: `repeating-linear-gradient(
+              45deg,
+              transparent,
+              transparent 10px,
+              rgba(0, 0, 0, 0.015) 10px,
+              rgba(0, 0, 0, 0.015) 20px
+            )`
+          }}
+        >
+          {activeTab === 'foundation' ? (
+            <div className="p-4 pb-20 space-y-4">
+              {/* Data Colors */}
           <div className="bg-white rounded-md border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-3">
               <div>
@@ -526,13 +565,15 @@ function FoundationPanelComponent({
               </div>
             </div>
           </div>
-
-          {/* Quick Customizations */}
-          <QuickCustomizations 
-            hasChanges={hasChanges} 
-            trackChange={trackChange}
-          />
-
+            </div>
+          ) : (
+            <div className="p-4 pb-20">
+              <QuickCustomizations 
+                hasChanges={hasChanges} 
+                trackChange={trackChange}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -550,6 +591,7 @@ export const FoundationPanel = memo(FoundationPanelComponent, (prevProps, nextPr
     prevProps.theme.successPalette === nextProps.theme.successPalette &&
     prevProps.theme.warningPalette === nextProps.theme.warningPalette &&
     prevProps.theme.errorPalette === nextProps.theme.errorPalette &&
+    prevProps.theme.brandColor === nextProps.theme.brandColor &&
     prevProps.colorPalette?.id === nextProps.colorPalette?.id &&
     prevProps.neutralPalette?.id === nextProps.neutralPalette?.id &&
     JSON.stringify(prevProps.brandPalette) === JSON.stringify(nextProps.brandPalette) &&

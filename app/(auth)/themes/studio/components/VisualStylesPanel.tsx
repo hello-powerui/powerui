@@ -21,8 +21,9 @@ interface VisualStylesPanelProps {
   onSelectedVisualChange: (visual: string) => void;
   onSelectedVariantChange: (variant: string) => void;
   onSelectedSectionChange: (section: 'typography' | 'structural' | 'visuals' | 'global' | 'canvas') => void;
-  onCreateVariant: (visual: string, variantName: string) => void;
+  onCreateVariant: (visual: string, variantName: string, initialData?: any) => void;
   onDeleteVariant: (visual: string, variantName: string) => void;
+  onRenameVariant: (visual: string, oldName: string, newName: string) => void;
   getVisualVariants: (visual: string) => string[];
   trackChange: (path: string[]) => void;
   hasChanges: (path: string[]) => boolean;
@@ -42,6 +43,7 @@ function VisualStylesPanelComponent({
   onSelectedSectionChange,
   onCreateVariant,
   onDeleteVariant,
+  onRenameVariant,
   getVisualVariants,
   trackChange,
   hasChanges,
@@ -105,6 +107,7 @@ function VisualStylesPanelComponent({
             onSelectedVariantChange={onSelectedVariantChange}
             onCreateVariant={onCreateVariant}
             onDeleteVariant={onDeleteVariant}
+            onRenameVariant={onRenameVariant}
             getVisualVariants={getVisualVariants}
             trackChange={trackChange}
             onEnterFocusMode={onEnterFocusMode}
@@ -181,10 +184,7 @@ function VisualStylesPanelComponent({
             Visuals
           </button>
           <button
-            onClick={() => {
-              onSelectedSectionChange('global');
-              onSelectedVisualChange('*');
-            }}
+            onClick={() => onSelectedSectionChange('global')}
             className={cn(
               "px-3 py-1.5 text-[13px] font-medium rounded-md transition-all",
               selectedSection === 'global'
@@ -232,6 +232,8 @@ export const VisualStylesPanel = memo(VisualStylesPanelComponent, (prevProps, ne
     prevProps.theme.colorPaletteId === nextProps.theme.colorPaletteId &&
     prevProps.theme.neutralPaletteId === nextProps.theme.neutralPaletteId &&
     prevProps.theme.mode === nextProps.theme.mode &&
-    prevProps.theme.fontFamily === nextProps.theme.fontFamily
+    prevProps.theme.fontFamily === nextProps.theme.fontFamily &&
+    // Include visual styles to trigger re-render when quick customizations change
+    JSON.stringify(prevProps.theme.visualStyles) === JSON.stringify(nextProps.theme.visualStyles)
   );
 });

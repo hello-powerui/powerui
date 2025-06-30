@@ -31,6 +31,9 @@ export function GlobalPropertySelector({
   visualStyles,
   onVisualStylesChange
 }: GlobalPropertySelectorProps) {
+  console.log('[GlobalPropertySelector] visualStyles:', visualStyles);
+  console.log('[GlobalPropertySelector] Global properties (*.*):', visualStyles?.['*']?.['*']);
+  
   const [showPropertyPicker, setShowPropertyPicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedComplexProperties, setSelectedComplexProperties] = useState<string[]>([]);
@@ -241,7 +244,13 @@ export function GlobalPropertySelector({
                 >
                   <SchemaForm
                     schema={sectionSchema || {}}
-                    value={visualStyles?.['*']?.['*']?.[key] || [{}]}
+                    value={(() => {
+                      const val = visualStyles?.['*']?.['*']?.[key] || [{}];
+                      if (key === 'padding') {
+                        console.log('[GlobalPropertySelector] Padding value:', val);
+                      }
+                      return val;
+                    })()}
                     onChange={(newValue) => {
                       // Update at the *.*.property level
                       if (onVisualStylesChange) {

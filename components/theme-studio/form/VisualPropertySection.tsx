@@ -34,8 +34,15 @@ export function VisualPropertySection({
   const trackChangeRef = useThemeChanges(state => state.trackChange);
   
   // Get the value for this section - it should be an array with one object
+  // Don't memoize to ensure updates are detected
   const sectionValue = Array.isArray(value[name]) ? value[name] : [{}];
   const itemValue = sectionValue.length > 0 ? sectionValue[0] : {};
+  
+  // Debug logging for padding section
+  if (name === 'padding') {
+    console.log('[VisualPropertySection] Padding section value:', value[name]);
+    console.log('[VisualPropertySection] Padding itemValue:', itemValue);
+  }
   
   const handleSectionReset = () => {
     // Reset the entire section to inherit from global/defaults
@@ -60,19 +67,6 @@ export function VisualPropertySection({
       clearMessage={`Clear all ${title.toLowerCase()} settings? This will remove any customizations and use default values.`}
     >
       <div className="space-y-2">
-        {/* Show state indicator if this section has state support */}
-        {sectionSchema.items?.properties?.$id && (
-          <div className="flex items-center gap-2 mb-2">
-            <span className={`${THEME_STUDIO_TYPOGRAPHY.description.size} text-gray-700 bg-gray-100 px-2 py-1 rounded flex items-center gap-1`}>
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              State: {useThemeStudioStore.getState().selectedState || 'default'}
-            </span>
-            <span className={`${THEME_STUDIO_TYPOGRAPHY.description.size} ${THEME_STUDIO_TYPOGRAPHY.description.color}`}>This section uses the visual state selector</span>
-          </div>
-        )}
-        
         {/* Check if this section has state support */}
         {sectionSchema.items?.properties?.$id ? (
           // This is a state-driven property - pass the entire schema
@@ -98,6 +92,12 @@ export function VisualPropertySection({
                   .filter(([propName, propSchema]) => {
                     // Filter out properties with complex/mixed types that are confusing
                     if ((propName === 'end' || propName === 'start') && Array.isArray(propSchema.type)) {
+                      return false;
+                    }
+                    // Filter out fillRule (Color saturation) - too complex for users
+                    // This property controls gradient color mapping based on data values
+                    // but requires understanding of linearGradient2/linearGradient3 configurations
+                    if (propName === 'fillRule') {
                       return false;
                     }
                     return true;

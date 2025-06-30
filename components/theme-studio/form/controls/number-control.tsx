@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
@@ -32,15 +33,30 @@ export function NumberControl({
   isPercentage = false,
   inline = false,
 }: NumberControlProps) {
+  // Use local state to ensure input updates
+  const [localValue, setLocalValue] = useState(value?.toString() || '');
+  
+  // Update local value when prop changes
+  useEffect(() => {
+    const newValue = value !== undefined && value !== null ? value.toString() : '';
+    setLocalValue(newValue);
+    
+    // Debug logging for padding values
+    if (label.toLowerCase().includes('padding')) {
+      console.log('[NumberControl] Padding field updated:', label, 'value:', value, 'localValue:', newValue);
+    }
+  }, [value, label]);
+  
   const handleChange = (newValue: string) => {
+    setLocalValue(newValue);
     const parsed = parseFloat(newValue);
     if (!isNaN(parsed)) {
       // Always pass the literal value entered by the user
       onChange(parsed);
+    } else if (newValue === '') {
+      onChange(0);
     }
   };
-
-  const displayValue = value?.toString() || '0';
 
   if (inline) {
     return (
@@ -53,7 +69,7 @@ export function NumberControl({
           <Input
             id={path.join('-')}
             type="number"
-            value={displayValue}
+            value={localValue}
             onChange={(e) => handleChange(e.target.value)}
             min={isPercentage ? 0 : min}
             max={isPercentage ? 100 : max}
@@ -88,7 +104,7 @@ export function NumberControl({
         <Input
           id={path.join('-')}
           type="number"
-          value={displayValue}
+          value={localValue}
           onChange={(e) => handleChange(e.target.value)}
           min={isPercentage ? 0 : min}
           max={isPercentage ? 100 : max}
@@ -104,7 +120,7 @@ export function NumberControl({
       {min !== undefined && max !== undefined && (
         <input
           type="range"
-          value={value}
+          value={localValue || 0}
           onChange={(e) => handleChange(e.target.value)}
           min={isPercentage ? 0 : min}
           max={isPercentage ? 100 : max}

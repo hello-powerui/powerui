@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -291,12 +293,12 @@ export function UnifiedPaletteManager({
             New palette
           </Button>
         </div>
-        <ScrollArea className="h-[360px] -mx-6 px-6">
-          <div className="space-y-1 pr-3 pl-1">
+        <ScrollArea className="h-[380px] -mx-6 px-6">
+          <div className="space-y-2 pr-3 pl-1">
             {/* Built-in Palettes */}
             {builtInPalettes.length > 0 && (
-              <div className="space-y-1.5 mb-4">
-                <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Built-in</h4>
+              <div className="space-y-2 mb-5">
+                <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Built-in</h4>
                 {builtInPalettes.map((palette) => (
                   <CompactPaletteDisplayWithActions
                     key={palette.id}
@@ -314,8 +316,8 @@ export function UnifiedPaletteManager({
 
             {/* User Palettes */}
             {userPalettes.length > 0 ? (
-              <div className="space-y-1.5">
-                <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Your Palettes</h4>
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Your Palettes</h4>
                 {userPalettes.map((palette) => (
                   <CompactPaletteDisplayWithActions
                     key={palette.id}
@@ -355,10 +357,10 @@ export function UnifiedPaletteManager({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-xl p-0 gap-0 border-gray-200">
+        <DialogContent className="max-w-xl p-0 gap-0 border-gray-200" aria-describedby="palette-dialog-description">
           <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-medium text-gray-900">Palettes</h2>
-            <p className="text-sm text-gray-500 mt-0.5">Select or create a palette</p>
+            <DialogTitle className="text-base font-medium text-gray-900">Palettes</DialogTitle>
+            <DialogDescription id="palette-dialog-description" className="text-sm text-gray-500 mt-0.5">Select or create a palette</DialogDescription>
           </div>
 
           <div className="px-6">
@@ -426,14 +428,23 @@ export function UnifiedPaletteManager({
             // Reload palettes to include the new one
             loadPalettes();
             
-            // If creating a new palette and we have selection callbacks, auto-select it
-            if (creatingType && savedPalette) {
-              if (creatingType === 'color' && onSelectColorPalette) {
-                onSelectColorPalette(savedPalette);
-                onOpenChange(false);
-              } else if (creatingType === 'neutral' && onSelectNeutralPalette) {
-                onSelectNeutralPalette(savedPalette);
-                onOpenChange(false);
+            // Auto-select the palette that was just edited or created
+            if (savedPalette) {
+              if (savedPalette.hasOwnProperty('colors') && Array.isArray(savedPalette.colors)) {
+                // If editing an existing palette, apply the changes immediately
+                if (editingPalette && editingPalette.type === 'color' && onSelectColorPalette) {
+                  onSelectColorPalette(savedPalette as ColorPalette);
+                } else if (editingPalette && editingPalette.type === 'neutral' && onSelectNeutralPalette) {
+                  onSelectNeutralPalette(savedPalette as NeutralPalette);
+                }
+                // If creating a new palette, auto-select it
+                else if (creatingType === 'color' && onSelectColorPalette) {
+                  onSelectColorPalette(savedPalette as ColorPalette);
+                  onOpenChange(false);
+                } else if (creatingType === 'neutral' && onSelectNeutralPalette) {
+                  onSelectNeutralPalette(savedPalette as NeutralPalette);
+                  onOpenChange(false);
+                }
               }
             }
           }}

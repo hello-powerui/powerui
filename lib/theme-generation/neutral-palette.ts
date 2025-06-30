@@ -85,20 +85,20 @@ export function generateNeutralPaletteOffline(hexColor: string): ColorPalette {
   const baseColor = hexToOklch(hexColor);
   
   // Define shade mappings with perceptually uniform lightness values
-  // Adjusted dark end values for better distinction
+  // Adjusted for better visual distinction, especially at dark end
   const shadeConfig = [
     { name: '25', lightnessTarget: 0.98, chromaFactor: 0.1 },
-    { name: '50', lightnessTarget: 0.96, chromaFactor: 0.15 },
-    { name: '100', lightnessTarget: 0.92, chromaFactor: 0.25 },
-    { name: '200', lightnessTarget: 0.85, chromaFactor: 0.4 },
-    { name: '300', lightnessTarget: 0.74, chromaFactor: 0.6 },
-    { name: '400', lightnessTarget: 0.61, chromaFactor: 0.8 },
-    { name: '500', lightnessTarget: 0.48, chromaFactor: 1.0 },
-    { name: '600', lightnessTarget: 0.38, chromaFactor: 0.9 },
-    { name: '700', lightnessTarget: 0.30, chromaFactor: 0.7 },
-    { name: '800', lightnessTarget: 0.22, chromaFactor: 0.5 },
-    { name: '900', lightnessTarget: 0.14, chromaFactor: 0.3 },
-    { name: '950', lightnessTarget: 0.07, chromaFactor: 0.2 }
+    { name: '50', lightnessTarget: 0.95, chromaFactor: 0.15 },
+    { name: '100', lightnessTarget: 0.90, chromaFactor: 0.25 },
+    { name: '200', lightnessTarget: 0.82, chromaFactor: 0.4 },
+    { name: '300', lightnessTarget: 0.70, chromaFactor: 0.6 },
+    { name: '400', lightnessTarget: 0.58, chromaFactor: 0.8 },
+    { name: '500', lightnessTarget: 0.46, chromaFactor: 1.0 },
+    { name: '600', lightnessTarget: 0.36, chromaFactor: 0.9 },
+    { name: '700', lightnessTarget: 0.28, chromaFactor: 0.7 },
+    { name: '800', lightnessTarget: 0.21, chromaFactor: 0.5 },
+    { name: '900', lightnessTarget: 0.15, chromaFactor: 0.3 },
+    { name: '950', lightnessTarget: 0.10, chromaFactor: 0.2 }
   ];
 
   const palette: ColorPalette = {};

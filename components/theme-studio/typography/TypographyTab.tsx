@@ -12,7 +12,7 @@ import {
   StudioSelectValue as SelectValue
 } from '@/components/theme-studio/ui/form-controls';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
-import { FONT_WEIGHTS, getAvailableWeights } from '@/lib/theme-studio/font-registry';
+import { FONT_WEIGHTS, getAvailableWeights, AVAILABLE_FONTS } from '@/lib/theme-studio/font-registry';
 import { resolveToken } from '@/lib/theme-generation/token-registry';
 import { CollapsibleSection } from '@/components/theme-studio/ui/collapsible-section';
 import { hasActualContent } from '@/lib/utils/theme-helpers';
@@ -127,7 +127,7 @@ const DEFAULT_TEXT_CLASSES: Record<string, TextClass> = {
 };
 
 export function TypographyTab() {
-  const { theme, setTextClasses, resolved } = useThemeStudioStore();
+  const { theme, setTextClasses, updateTextClassProperty, resolved } = useThemeStudioStore();
   const [localTextClasses, setLocalTextClasses] = useState<Record<string, TextClass>>({});
   
   const textClasses = theme.textClasses;
@@ -158,16 +158,14 @@ export function TypographyTab() {
   const handleFontSizeChange = (className: string, value: string) => {
     const fontSize = parseInt(value);
     if (!isNaN(fontSize) && fontSize > 0) {
-      const updatedClass = { ...(localTextClasses as any)[className], fontSize };
+      // Update local state
       setLocalTextClasses(prev => ({
         ...prev,
-        [className]: updatedClass
+        [className]: { ...prev[className], fontSize }
       }));
-      setTextClasses({
-        ...textClasses,
-        [className]: updatedClass
-      });
-      // Change tracking is handled at the hook level
+      
+      // Use granular update for just the fontSize property
+      updateTextClassProperty(className, 'fontSize', fontSize);
     }
   };
 
@@ -190,29 +188,25 @@ export function TypographyTab() {
       color = '#000000';
     }
     
-    const updatedClass = { ...(localTextClasses as any)[className], color };
+    // Update local state
     setLocalTextClasses(prev => ({
       ...prev,
-      [className]: updatedClass
+      [className]: { ...prev[className], color }
     }));
-    setTextClasses({
-      ...textClasses,
-      [className]: updatedClass
-    });
-    // Change tracking is handled at the hook level
+    
+    // Use granular update for just the color property
+    updateTextClassProperty(className, 'color', color);
   };
 
   const handleFontWeightChange = (className: string, weight: string) => {
-    const updatedClass = { ...(localTextClasses as any)[className], fontWeight: weight };
+    // Update local state
     setLocalTextClasses(prev => ({
       ...prev,
-      [className]: updatedClass
+      [className]: { ...prev[className], fontWeight: weight }
     }));
-    setTextClasses({
-      ...textClasses,
-      [className]: updatedClass
-    });
-    // Change tracking is handled at the hook level
+    
+    // Use granular update for just the fontWeight property
+    updateTextClassProperty(className, 'fontWeight', weight);
   };
 
   const handleReset = () => {
@@ -274,21 +268,52 @@ export function TypographyTab() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Segoe UI">Segoe UI (Default)</SelectItem>
-              <SelectItem value="Arial">Arial</SelectItem>
-              <SelectItem value="Calibri">Calibri</SelectItem>
-              <SelectItem value="Helvetica Neue">Helvetica Neue</SelectItem>
-              <SelectItem value="Georgia">Georgia</SelectItem>
-              <SelectItem value="Times New Roman">Times New Roman</SelectItem>
-              <SelectItem value="Roboto">Roboto</SelectItem>
-              <SelectItem value="Inter">Inter</SelectItem>
-              <SelectItem value="Open Sans">Open Sans</SelectItem>
-              <SelectItem value="Lato">Lato</SelectItem>
+              {/* Power BI Fonts */}
+              <div className="px-2 py-1.5">
+                <p className="text-xs font-medium text-gray-500">Power BI Fonts</p>
+              </div>
+              {AVAILABLE_FONTS.filter(f => f.category === 'powerbi').map(font => (
+                <SelectItem key={font.name} value={font.name}>
+                  {font.name} {font.name === 'Segoe UI' && '(Default)'}
+                </SelectItem>
+              ))}
+              
+              {/* Custom Fonts */}
+              <div className="border-t mt-2 pt-2 px-2 pb-1.5">
+                <p className="text-xs font-medium text-gray-500">Custom Fonts</p>
+                <p className="text-xs text-gray-400 mt-0.5">Requires installation on user devices</p>
+              </div>
+              {AVAILABLE_FONTS.filter(f => f.category === 'custom').map(font => (
+                <SelectItem key={font.name} value={font.name}>
+                  <div>
+                    <div>{font.name}</div>
+                    <div className="text-xs text-gray-500">{font.description}</div>
+                  </div>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <p className="text-sm text-gray-500 mt-1">
             This font will be applied to all text classes
           </p>
+          
+          {/* Show warning for custom fonts */}
+          {AVAILABLE_FONTS.find(f => f.name === fontFamily)?.category === 'custom' && (
+            <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-xs">
+              <div className="flex items-start gap-2">
+                <svg className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <p className="font-medium text-amber-800">Custom Font Selected</p>
+                  <p className="text-amber-700 mt-0.5">
+                    Users must have {fontFamily} installed on their device to see this font. 
+                    Otherwise, Power BI will use a fallback font.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       

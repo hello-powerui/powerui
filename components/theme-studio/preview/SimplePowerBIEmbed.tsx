@@ -79,24 +79,6 @@ function SimplePowerBIEmbed({
   }, [generatedTheme, selectedVisualType, selectedVariant]);
 
 
-  // Extract available variants for the selected visual type
-  const availableVariants = useMemo(() => {
-    if (!generatedTheme || selectedVisualType === '*') {
-      return [];
-    }
-
-    const visualStyles = generatedTheme?.visualStyles?.[selectedVisualType];
-    if (!visualStyles) {
-      return [];
-    }
-
-    return Object.keys(visualStyles).sort((a, b) => {
-      // Put default (*) first
-      if (a === '*') return -1;
-      if (b === '*') return 1;
-      return a.localeCompare(b);
-    });
-  }, [generatedTheme, selectedVisualType]);
 
   // Load report only when theme is ready - one time only
   useEffect(() => {
@@ -478,6 +460,7 @@ function SimplePowerBIEmbed({
     );
   }
 
+
   return (
     <div className="w-full h-full relative overflow-visible">
       {/* Focus Mode Controls */}
@@ -544,30 +527,6 @@ function SimplePowerBIEmbed({
             </Button>
           </div>
 
-          {/* Variant Selector */}
-          {availableVariants.length > 0 && (
-            <>
-              <div className="w-px h-6 bg-gray-300" /> {/* Divider */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-600">Style:</span>
-                <Select
-                  value={selectedVariant}
-                  onValueChange={onVariantChange}
-                >
-                  <SelectTrigger className="w-[120px] h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableVariants.map(variant => (
-                      <SelectItem key={variant} value={variant}>
-                        {variant === '*' ? 'Default' : variant}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
-          )}
         </div>
       )}
       

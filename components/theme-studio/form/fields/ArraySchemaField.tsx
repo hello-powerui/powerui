@@ -56,7 +56,22 @@ export function ArraySchemaField({
     // Check if this is a state-driven property (has $id field)
     const hasStateSupport = schema.items.properties.$id !== undefined;
     
-    if (hasStateSupport) {
+    // Check if we're in a card visual context
+    const isCardVisual = path.includes('card') || path.includes('cardVisual');
+    
+    // For card visual, certain properties need default state even if not in schema
+    const cardPropertiesNeedingDefault = [
+      'referenceLabelLayout', 'referenceLabel', 'border', 'grid', 'overFlow',
+      'rotation', 'shapeCustomRectangle', 'smallMultiplesAccentBar', 
+      'smallMultiplesBorder', 'smallMultiplesCellBackGround', 'smallMultiplesGrid',
+      'smallMultiplesHeader', 'smallMultiplesLayout', 'smallMultiplesOuterShape',
+      'smallMultiplesOverFlow'
+    ];
+    
+    const shouldForceStateSupport = isCardVisual && 
+      cardPropertiesNeedingDefault.includes(path[path.length - 1]);
+    
+    if (hasStateSupport || shouldForceStateSupport) {
       // Check if this is the filterCard property with Available/Applied states
       const isFilterCard = path[path.length - 1] === 'filterCard' && 
         schema.items.properties.$id?.anyOf?.[0]?.enum?.includes('Available');
@@ -75,6 +90,24 @@ export function ArraySchemaField({
           />
         );
       } else {
+        // For card visual properties without $id in schema, ensure default state
+        if (shouldForceStateSupport && !hasStateSupport) {
+          const ensuredValue = Array.isArray(value) ? value : [];
+          const hasDefault = ensuredValue.some(item => item.$id === 'default');
+          
+          if (!hasDefault && ensuredValue.length > 0) {
+            // Add $id: 'default' to first item if it exists
+            const newValue = [...ensuredValue];
+            if (newValue[0] && Object.keys(newValue[0]).length > 0) {
+              newValue[0] = { $id: 'default', ...newValue[0] };
+              onChange(newValue);
+            }
+          } else if (!hasDefault && ensuredValue.length === 0) {
+            // Create default item
+            onChange([{ $id: 'default' }]);
+          }
+        }
+        
         return (
           <StateAwarePropertySection
             schema={schema}

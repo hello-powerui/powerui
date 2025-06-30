@@ -11,19 +11,59 @@ export const FONT_WEIGHTS = [
   { value: "900", label: "Black" }
 ] as const;
 
-// Available font weights per font family
-export const FONT_AVAILABLE_WEIGHTS: Record<string, string[]> = {
-  'Segoe UI': ["300", "400", "600", "700"],
-  'Arial': ["400", "700"],
-  'Calibri': ["400", "700"],
-  'Helvetica Neue': ["300", "400", "500", "700"],
-  'Georgia': ["400", "700"],
-  'Times New Roman': ["400", "700"],
-  'Roboto': ["100", "300", "400", "500", "700", "900"],
-  'Inter': ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  'Open Sans': ["300", "400", "600", "700", "800"],
-  'Lato': ["100", "300", "400", "700", "900"]
-};
+// Font categories
+export interface FontInfo {
+  name: string;
+  weights: string[];
+  category: 'powerbi' | 'custom';
+  description?: string;
+  requiresInstall?: boolean;
+}
+
+// Power BI built-in fonts (sans-serif)
+const POWERBI_FONTS: FontInfo[] = [
+  { name: 'Arial', weights: ["400", "700"], category: 'powerbi' },
+  { name: 'Segoe UI', weights: ["300", "400", "600", "700"], category: 'powerbi' },
+  { name: 'Calibri', weights: ["400", "700"], category: 'powerbi' },
+  { name: 'Candara', weights: ["400", "700"], category: 'powerbi' },
+  { name: 'Corbel', weights: ["400", "700"], category: 'powerbi' },
+  { name: 'Tahoma', weights: ["400", "700"], category: 'powerbi' },
+  { name: 'Trebuchet MS', weights: ["400", "700"], category: 'powerbi' }
+];
+
+// Custom fonts (require installation)
+const CUSTOM_FONTS: FontInfo[] = [
+  { 
+    name: 'Public Sans', 
+    weights: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+    category: 'custom',
+    description: 'Modern, clean sans-serif designed for digital interfaces',
+    requiresInstall: true
+  },
+  { 
+    name: 'Space Grotesk', 
+    weights: ["300", "400", "500", "600", "700"],
+    category: 'custom',
+    description: 'Geometric sans-serif with unique character',
+    requiresInstall: true
+  },
+  { 
+    name: 'Inter', 
+    weights: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+    category: 'custom',
+    description: 'Highly legible font optimized for UI design',
+    requiresInstall: true
+  }
+];
+
+// All available fonts
+export const AVAILABLE_FONTS: FontInfo[] = [...POWERBI_FONTS, ...CUSTOM_FONTS];
+
+// Available font weights per font family (for backward compatibility)
+export const FONT_AVAILABLE_WEIGHTS: Record<string, string[]> = AVAILABLE_FONTS.reduce((acc, font) => {
+  acc[font.name] = font.weights;
+  return acc;
+}, {} as Record<string, string[]>);
 
 // Font size presets
 export const FONT_SIZE_PRESETS = {

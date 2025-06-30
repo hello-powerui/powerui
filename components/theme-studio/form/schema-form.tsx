@@ -49,6 +49,11 @@ export function SchemaForm({
 }: SchemaFormProps) {
   const trackChangeRef = useThemeChanges(state => state.trackChange);
   
+  // Debug logging for visual styles
+  if (path[0] === 'visualStyles') {
+    console.log('[SchemaForm] Path:', path, 'Value:', value);
+  }
+  
   // Handle value updates
   const handleChange = useCallback((newValue: any) => {
     onChange(newValue);

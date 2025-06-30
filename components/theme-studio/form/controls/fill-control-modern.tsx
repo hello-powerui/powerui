@@ -60,7 +60,7 @@ export function FillControl({
             successPalette={theme.successPalette ? getStatePaletteColors('success', theme.successPalette) : undefined}
             warningPalette={theme.warningPalette ? getStatePaletteColors('warning', theme.warningPalette) : undefined}
             errorPalette={theme.errorPalette ? getStatePaletteColors('error', theme.errorPalette) : undefined}
-            themeColors={(colorPalette?.colors as string[]) || []}
+            themeColors={(colorPalette?.colors as string[])?.slice(0, 8) || []}
             className="[&_button]:h-8 [&_button]:text-sm [&_button]:px-3 [&_button]:hover:border-gray-400 [&_button]:transition-colors"
           />
         </div>

@@ -71,38 +71,74 @@ export class PaletteService {
    * Delete a color palette and cascade update themes to default colors
    */
   static async deleteColorPalette(paletteId: string, userId: string): Promise<{ deletedPalette: boolean; updatedThemes: number }> {
-    // Find themes using this palette
-    const affectedThemes = await this.findThemesUsingColorPalette(paletteId, userId);
-    
-    // Update affected themes to use default colors
-    const updatePromises = affectedThemes.map(theme => {
-      const updatedThemeData = {
-        ...(theme.themeData as Record<string, any> || {}),
-        dataColors: DEFAULT_COLOR_PALETTE.colors
-      };
-      
-      return prisma.theme.update({
-        where: { id: theme.id },
-        data: { 
-          themeData: updatedThemeData
+    return await prisma.$transaction(async (tx) => {
+      try {
+        // First check if the palette exists and belongs to the user
+        const palette = await tx.colorPalette.findFirst({
+          where: {
+            id: paletteId,
+            userId,
+          },
+        });
+        
+        if (!palette) {
+          throw new Error('Color palette not found or you do not have permission to delete it');
         }
-      });
+        
+        // Find themes using this palette - use raw query for reliability
+        let affectedThemes: any[] = [];
+        try {
+          affectedThemes = await tx.$queryRaw`
+            SELECT * FROM "Theme" 
+            WHERE "userId" = ${userId} 
+            AND ("themeData"->>'colorPaletteId') = ${paletteId}
+          `;
+        } catch (queryError) {
+          console.error('Raw query failed, falling back to Prisma query:', queryError);
+          // Fallback to regular Prisma query
+          affectedThemes = await tx.theme.findMany({
+            where: {
+              userId,
+              themeData: {
+                path: ['colorPaletteId'],
+                equals: paletteId
+              }
+            }
+          });
+        }
+        
+        // Update affected themes to use default colors
+        for (const theme of affectedThemes) {
+          const updatedThemeData = {
+            ...(theme.themeData as Record<string, any> || {}),
+            colorPaletteId: DEFAULT_COLOR_PALETTE.id,
+            dataColors: DEFAULT_COLOR_PALETTE.colors
+          };
+          
+          await tx.theme.update({
+            where: { id: theme.id },
+            data: { 
+              themeData: updatedThemeData
+            }
+          });
+        }
+        
+        // Now delete the palette
+        await tx.colorPalette.delete({
+          where: {
+            id: paletteId,
+          },
+        });
+        
+        return {
+          deletedPalette: true,
+          updatedThemes: affectedThemes.length
+        };
+      } catch (error) {
+        console.error('Error in deleteColorPalette transaction:', error);
+        throw error;
+      }
     });
-    
-    await Promise.all(updatePromises);
-    
-    // Now delete the palette
-    await prisma.colorPalette.delete({
-      where: {
-        id: paletteId,
-        userId,
-      },
-    });
-    
-    return {
-      deletedPalette: true,
-      updatedThemes: affectedThemes.length
-    };
   }
 
   /**
@@ -183,69 +219,138 @@ export class PaletteService {
    * Find themes using a specific neutral palette
    */
   private static async findThemesUsingNeutralPalette(paletteId: string, userId: string) {
-    return prisma.theme.findMany({
-      where: {
-        userId,
-        themeData: {
-          path: ['neutralPalette', 'id'],
-          equals: paletteId
+    try {
+      // Use raw SQL for more reliable JSON querying
+      const themes = await prisma.$queryRaw`
+        SELECT * FROM "Theme" 
+        WHERE "userId" = ${userId}::text 
+        AND "themeData"->>'neutralPaletteId' = ${paletteId}::text
+      `;
+      
+      return themes as any[];
+    } catch (error) {
+      console.error('Error finding themes with neutral palette:', error);
+      // Fallback to basic Prisma query
+      return prisma.theme.findMany({
+        where: {
+          userId,
+          themeData: {
+            path: ['neutralPaletteId'],
+            equals: paletteId
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   /**
    * Find themes using a specific color palette  
    */
   private static async findThemesUsingColorPalette(paletteId: string, userId: string) {
-    return prisma.theme.findMany({
-      where: {
-        userId,
-        themeData: {
-          path: ['palette', 'id'],
-          equals: paletteId
+    try {
+      // Use raw SQL for more reliable JSON querying
+      const themes = await prisma.$queryRaw`
+        SELECT * FROM "Theme" 
+        WHERE "userId" = ${userId}::text 
+        AND "themeData"->>'colorPaletteId' = ${paletteId}::text
+      `;
+      
+      return themes as any[];
+    } catch (error) {
+      console.error('Error finding themes with color palette:', error);
+      // Fallback to basic Prisma query
+      return prisma.theme.findMany({
+        where: {
+          userId,
+          themeData: {
+            path: ['colorPaletteId'],
+            equals: paletteId
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   /**
    * Delete a neutral palette and cascade update themes to Azure default
    */
   static async deleteNeutralPalette(paletteId: string, userId: string): Promise<{ deletedPalette: boolean; updatedThemes: number }> {
-    // Find themes using this palette
-    const affectedThemes = await this.findThemesUsingNeutralPalette(paletteId, userId);
-    
-    // Update affected themes to use Azure default
-    const updatePromises = affectedThemes.map(theme => {
-      const updatedThemeData = {
-        ...(theme.themeData as Record<string, any> || {}),
-        // Remove reference to deleted neutral palette
-        neutralPaletteId: 'azure-default'
-      };
-      
-      return prisma.theme.update({
-        where: { id: theme.id },
-        data: { 
-          themeData: updatedThemeData
+    return await prisma.$transaction(async (tx) => {
+      try {
+        // First check if the palette exists and belongs to the user
+        const palette = await tx.neutralPalette.findFirst({
+          where: {
+            id: paletteId,
+            userId,
+          },
+        });
+        
+        if (!palette) {
+          throw new Error('Neutral palette not found or you do not have permission to delete it');
         }
-      });
+        
+        console.log('Found palette to delete:', palette.id, palette.name);
+        
+        // Find themes using this palette - use raw query for reliability
+        let affectedThemes: any[] = [];
+        try {
+          affectedThemes = await tx.$queryRaw`
+            SELECT * FROM "Theme" 
+            WHERE "userId" = ${userId}::text 
+            AND "themeData"->>'neutralPaletteId' = ${paletteId}::text
+          `;
+        } catch (queryError) {
+          console.error('Raw query failed, falling back to Prisma query:', queryError);
+          // Fallback to regular Prisma query
+          affectedThemes = await tx.theme.findMany({
+            where: {
+              userId,
+              themeData: {
+                path: ['neutralPaletteId'],
+                equals: paletteId
+              }
+            }
+          });
+        }
+        
+        console.log(`Found ${affectedThemes.length} themes using this palette`);
+        
+        // Update affected themes to use Azure default
+        for (const theme of affectedThemes) {
+          const updatedThemeData = {
+            ...(theme.themeData as Record<string, any> || {}),
+            // Remove reference to deleted neutral palette
+            neutralPaletteId: 'azure-default'
+          };
+          
+          await tx.theme.update({
+            where: { id: theme.id },
+            data: { 
+              themeData: updatedThemeData
+            }
+          });
+        }
+        
+        console.log('Updated all affected themes');
+        
+        // Now delete the palette
+        await tx.neutralPalette.delete({
+          where: {
+            id: paletteId,
+          },
+        });
+        
+        console.log('Successfully deleted palette');
+        
+        return {
+          deletedPalette: true,
+          updatedThemes: affectedThemes.length
+        };
+      } catch (error) {
+        console.error('Error in deleteNeutralPalette transaction:', error);
+        throw error;
+      }
     });
-    
-    await Promise.all(updatePromises);
-    
-    // Now delete the palette
-    await prisma.neutralPalette.delete({
-      where: {
-        id: paletteId,
-        userId,
-      },
-    });
-    
-    return {
-      deletedPalette: true,
-      updatedThemes: affectedThemes.length
-    };
   }
 
   /**

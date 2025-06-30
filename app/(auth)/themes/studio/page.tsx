@@ -45,10 +45,6 @@ function ThemeStudioContent() {
   // Visual styles panel width - fixed
   const visualStylesPanelWidth = 380;
   
-  // Get visual styles directly from the store
-  const visualSettings = themeStudio.theme.visualStyles || {};
-  
-  
   // Focus mode state
   const [isInFocusMode, setIsInFocusMode] = useState(false);
   const [reportResetFn, setReportResetFn] = useState<(() => void) | null>(null);
@@ -321,7 +317,7 @@ function ThemeStudioContent() {
               colorPalette={themeStudio.colorPalette}
               neutralPalette={themeStudio.neutralPalette}
               brandPalette={themeStudio.theme.brandPalette}
-              visualSettings={visualSettings}
+              visualSettings={themeStudio.theme.visualStyles || {}}
               hasChanges={(path) => themeStudio.changedPaths.has(path.join('.'))}
               onThemeChange={themeStudio.updateTheme}
               onColorPaletteChange={themeStudio.setColorPaletteId}
@@ -400,7 +396,11 @@ function ThemeStudioContent() {
           <ErrorBoundaryWithLogging componentName="VisualStylesPanel">
             <VisualStylesPanel
               theme={themeStudio.theme}
-              visualSettings={visualSettings}
+              visualSettings={(() => {
+                const vs = themeStudio.theme.visualStyles || {};
+                console.log('[Page] Passing visualSettings to VisualStylesPanel:', vs);
+                return vs;
+              })()}
               selectedVisual={themeStudio.selectedVisual}
               selectedVariant={themeStudio.selectedVariant}
               selectedSection={themeStudio.selectedSection}
@@ -411,6 +411,7 @@ function ThemeStudioContent() {
               onSelectedSectionChange={themeStudio.setSelectedSection}
               onCreateVariant={themeStudio.createVariant}
               onDeleteVariant={themeStudio.deleteVariant}
+              onRenameVariant={themeStudio.renameVariant}
               getVisualVariants={themeStudio.getVisualVariants}
               trackChange={() => {
                 // Change tracking is handled by the updateTheme and updateVisualStyle methods

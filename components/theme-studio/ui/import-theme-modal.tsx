@@ -10,6 +10,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 import { PowerBITheme } from '@/lib/theme-studio/types';
+import { AVAILABLE_FONTS } from '@/lib/theme-studio/font-registry';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ImportThemeModalProps {
   isOpen: boolean;
@@ -42,11 +44,39 @@ const ErrorIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// Analyze fonts in theme
+const analyzeFonts = (theme: PowerBITheme) => {
+  const fonts = new Set<string>();
+  
+  // Check text classes for fonts
+  if (theme.textClasses) {
+    Object.values(theme.textClasses).forEach((textClass: any) => {
+      if (textClass.fontFace) {
+        fonts.add(textClass.fontFace);
+      }
+    });
+  }
+  
+  // Check global font family
+  if (theme.fontFamily) {
+    fonts.add(theme.fontFamily);
+  }
+  
+  return {
+    hasMultipleFonts: fonts.size > 1,
+    fonts: Array.from(fonts),
+    mostCommon: theme.fontFamily || Array.from(fonts)[0] || 'Segoe UI'
+  };
+};
+
 export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModalProps) {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileContent, setFileContent] = useState<PowerBITheme | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showFontDialog, setShowFontDialog] = useState(false);
+  const [fontAnalysis, setFontAnalysis] = useState<ReturnType<typeof analyzeFonts> | null>(null);
+  const [selectedFont, setSelectedFont] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { loadTheme, updateTheme } = useThemeStudioStore();
@@ -99,6 +129,16 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
         }
         
         setFileContent(content);
+        
+        // Analyze fonts in the theme
+        const analysis = analyzeFonts(content);
+        setFontAnalysis(analysis);
+        
+        // If multiple fonts detected, show font selection dialog
+        if (analysis.hasMultipleFonts) {
+          setShowFontDialog(true);
+          setSelectedFont(analysis.mostCommon);
+        }
       } catch (err) {
         setError('Failed to parse JSON file');
       }
@@ -108,17 +148,37 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
 
   const handleImport = () => {
     if (fileContent) {
-      // Set theme name from file or use filename
-      const themeName = fileContent.name || selectedFile?.name.replace('.json', '') || 'Imported Theme';
+      let processedTheme = { ...fileContent };
       
-      loadTheme(fileContent);
+      // If font dialog was shown, normalize fonts to selected font
+      if (showFontDialog && selectedFont) {
+        // Update global font family
+        processedTheme.fontFamily = selectedFont;
+        
+        // Update all text classes to use selected font
+        if (processedTheme.textClasses) {
+          const updatedTextClasses: any = {};
+          Object.entries(processedTheme.textClasses).forEach(([key, value]: [string, any]) => {
+            updatedTextClasses[key] = {
+              ...value,
+              fontFace: selectedFont
+            };
+          });
+          processedTheme.textClasses = updatedTextClasses;
+        }
+      }
+      
+      // Set theme name from file or use filename
+      const themeName = processedTheme.name || selectedFile?.name.replace('.json', '') || 'Imported Theme';
+      
+      loadTheme(processedTheme);
       updateTheme({ 
         name: themeName,
         description: `Imported from ${selectedFile?.name}`
       });
       
       if (onImport) {
-        onImport(fileContent);
+        onImport(processedTheme);
       }
       
       onClose();
@@ -130,6 +190,9 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
     setFileContent(null);
     setError(null);
     setDragActive(false);
+    setShowFontDialog(false);
+    setFontAnalysis(null);
+    setSelectedFont('');
   };
 
   return (
@@ -207,23 +270,24 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
             )}
 
             {fileContent && !error && (
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
-                <h4 className="font-medium text-sm text-blue-900 mb-2">Theme Details</h4>
-                <dl className="space-y-1 text-xs">
-                  {fileContent.name && (
-                    <div className="flex">
-                      <dt className="text-blue-700 w-20">Name:</dt>
-                      <dd className="text-blue-900">{fileContent.name}</dd>
-                    </div>
-                  )}
-                  {fileContent.dataColors && (
-                    <div className="flex">
-                      <dt className="text-blue-700 w-20">Colors:</dt>
-                      <dd className="text-blue-900">{fileContent.dataColors.length} data colors</dd>
-                    </div>
-                  )}
-                  {fileContent.visualStyles && (
-                    <div className="flex">
+              <>
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+                  <h4 className="font-medium text-sm text-blue-900 mb-2">Theme Details</h4>
+                  <dl className="space-y-1 text-xs">
+                    {fileContent.name && (
+                      <div className="flex">
+                        <dt className="text-blue-700 w-20">Name:</dt>
+                        <dd className="text-blue-900">{fileContent.name}</dd>
+                      </div>
+                    )}
+                    {fileContent.dataColors && (
+                      <div className="flex">
+                        <dt className="text-blue-700 w-20">Colors:</dt>
+                        <dd className="text-blue-900">{fileContent.dataColors.length} data colors</dd>
+                      </div>
+                    )}
+                    {fileContent.visualStyles && (
+                      <div className="flex">
                       <dt className="text-blue-700 w-20">Visuals:</dt>
                       <dd className="text-blue-900">
                         {Object.keys(fileContent.visualStyles).length} visual styles
@@ -232,6 +296,58 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
                   )}
                 </dl>
               </div>
+              
+              {/* Font Selection Dialog */}
+              {showFontDialog && fontAnalysis && (
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-md">
+                  <div className="flex items-start gap-2 mb-3">
+                    <svg className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div className="flex-1">
+                      <h4 className="font-medium text-sm text-amber-900">Multiple Fonts Detected</h4>
+                      <p className="text-xs text-amber-700 mt-1">
+                        This theme uses {fontAnalysis.fonts.length} different fonts: {fontAnalysis.fonts.join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-amber-900">
+                      Select a font to use for the entire theme:
+                    </label>
+                    <Select value={selectedFont} onValueChange={setSelectedFont}>
+                      <SelectTrigger className="w-full h-9 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {/* Show detected fonts first */}
+                        {fontAnalysis.fonts.map(font => (
+                          <SelectItem key={font} value={font}>
+                            {font} {font === fontAnalysis.mostCommon && '(Most used)'}
+                          </SelectItem>
+                        ))}
+                        
+                        {/* Show other available fonts */}
+                        <div className="border-t my-1" />
+                        <div className="px-2 py-1">
+                          <p className="text-xs text-gray-500">Or choose a different font:</p>
+                        </div>
+                        {AVAILABLE_FONTS.filter(f => !fontAnalysis.fonts.includes(f.name)).map(font => (
+                          <SelectItem key={font.name} value={font.name}>
+                            {font.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <p className="text-xs text-amber-600">
+                      All text elements will be updated to use this font
+                    </p>
+                  </div>
+                </div>
+              )}
+            </>
             )}
           </div>
         )}
