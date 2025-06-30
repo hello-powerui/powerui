@@ -149,12 +149,17 @@ export function TypographyTab() {
       });
     }
     
+    // Apply the current font family to all text classes
     Object.keys(initialClasses).forEach(key => {
       initialClasses[key].fontFace = fontFamily;
+      // If this is a new text class without fontFace, update it in the store
+      if (!(textClasses?.[key as keyof TextClasses] as TextClass)?.fontFace) {
+        updateTextClassProperty(key as keyof TextClasses, 'fontFace', fontFamily);
+      }
     });
     
     setLocalTextClasses(initialClasses);
-  }, [textClasses, fontFamily, mode]);
+  }, [textClasses, fontFamily, mode, updateTextClassProperty]);
 
   const handleFontSizeChange = (className: keyof TextClasses, value: string) => {
     const fontSize = parseInt(value);
@@ -264,7 +269,19 @@ export function TypographyTab() {
           <Label htmlFor="font-family" className="mb-2 block">
             Font Family
           </Label>
-          <Select value={fontFamily} onValueChange={(value) => useThemeStudioStore.getState().setFontFamily(value)}>
+          <Select value={fontFamily} onValueChange={(value) => {
+            // Update the global font family
+            useThemeStudioStore.getState().setFontFamily(value);
+            
+            // Apply font family to all text classes
+            const updatedTextClasses = { ...localTextClasses };
+            Object.keys(updatedTextClasses).forEach(key => {
+              updatedTextClasses[key].fontFace = value;
+              // Update each text class with the new font family
+              updateTextClassProperty(key as keyof TextClasses, 'fontFace', value);
+            });
+            setLocalTextClasses(updatedTextClasses);
+          }}>
             <SelectTrigger id="font-family" className="w-full">
               <SelectValue />
             </SelectTrigger>
