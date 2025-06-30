@@ -43,6 +43,12 @@ export function AnimatedHeroBackground({ className }: { className?: string }) {
     handleResize();
     window.addEventListener('resize', handleResize);
 
+    // Power UI palette colors
+    const powerUIColors = [
+      '#2568E8', '#8338EC', '#FF006E', '#F95608', 
+      '#FFBE0C', '#2ACF56', '#3498DB', '#A66999'
+    ];
+
     // Initialize floating data points
     const points: DataPoint[] = [];
     for (let i = 0; i < 80; i++) {
@@ -52,7 +58,7 @@ export function AnimatedHeroBackground({ className }: { className?: string }) {
         size: Math.random() * 6 + 3,
         opacity: Math.random() * 0.9 + 0.3,
         speed: Math.random() * 0.8 + 0.2,
-        color: Math.random() > 0.5 ? '#6b7280' : '#4b5563'
+        color: powerUIColors[Math.floor(Math.random() * powerUIColors.length)]
       });
     }
     dataPointsRef.current = points;
@@ -72,7 +78,7 @@ export function AnimatedHeroBackground({ className }: { className?: string }) {
         targetHeight: Math.random() * 200 + 80,
         x: barX,
         width: barWidth,
-        color: i % 2 === 0 ? '#6b7280' : '#4b5563',
+        color: powerUIColors[i % powerUIColors.length],
         delay: i * 50
       });
     }
@@ -187,7 +193,7 @@ export function AnimatedHeroBackground({ className }: { className?: string }) {
           point.x, point.y, 0,
           point.x, point.y, glowSize
         );
-        glowGradient.addColorStop(0, point.color + '60');
+        glowGradient.addColorStop(0, point.color + '20'); // Reduced opacity for subtlety
         glowGradient.addColorStop(1, 'transparent');
         
         ctx.fillStyle = glowGradient;
@@ -195,8 +201,8 @@ export function AnimatedHeroBackground({ className }: { className?: string }) {
         ctx.arc(point.x, point.y, glowSize, 0, Math.PI * 2);
         ctx.fill();
 
-        // Draw solid point
-        ctx.fillStyle = point.color + Math.floor(point.opacity * 255).toString(16).padStart(2, '0');
+        // Draw solid point with reduced opacity for subtlety
+        ctx.fillStyle = point.color + Math.floor(point.opacity * 0.4 * 255).toString(16).padStart(2, '0'); // Reduced opacity
         ctx.beginPath();
         ctx.arc(point.x, point.y, point.size, 0, Math.PI * 2);
         ctx.fill();
