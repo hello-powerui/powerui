@@ -30,8 +30,6 @@ export function VisualPropertiesPanel({
   path, 
   level 
 }: VisualPropertiesPanelProps) {
-  console.log('[VisualPropertiesPanel] Received value:', value);
-  console.log('[VisualPropertiesPanel] Path:', path);
   
   const [activeTab, setActiveTab] = useState<'specific' | 'general'>(TAB_TYPES.SPECIFIC);
   const selectedState = useThemeStudioStore(state => state.selectedState);

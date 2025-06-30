@@ -40,12 +40,7 @@ export function NumberControl({
   useEffect(() => {
     const newValue = value !== undefined && value !== null ? value.toString() : '';
     setLocalValue(newValue);
-    
-    // Debug logging for padding values
-    if (label.toLowerCase().includes('padding')) {
-      console.log('[NumberControl] Padding field updated:', label, 'value:', value, 'localValue:', newValue);
-    }
-  }, [value, label]);
+  }, [value]);
   
   const handleChange = (newValue: string) => {
     setLocalValue(newValue);

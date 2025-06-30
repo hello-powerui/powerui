@@ -257,13 +257,9 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       updateVisualStyles: (visualStyles) =>
         set((state) => {
           const cleanedVisualStyles = cleanupVisualStyles(visualStyles);
-          console.log('[Store] updateVisualStyles called with:', visualStyles);
-          console.log('[Store] Cleaned visual styles:', cleanedVisualStyles);
-          const newState = {
+          return {
             theme: { ...state.theme, visualStyles: cleanedVisualStyles }
           };
-          console.log('[Store] New theme visual styles will be:', newState.theme.visualStyles);
-          return newState;
         }),
         
       updateVisualStyle: (visual, variant, value) =>

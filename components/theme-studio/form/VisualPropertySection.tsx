@@ -38,11 +38,6 @@ export function VisualPropertySection({
   const sectionValue = Array.isArray(value[name]) ? value[name] : [{}];
   const itemValue = sectionValue.length > 0 ? sectionValue[0] : {};
   
-  // Debug logging for padding section
-  if (name === 'padding') {
-    console.log('[VisualPropertySection] Padding section value:', value[name]);
-    console.log('[VisualPropertySection] Padding itemValue:', itemValue);
-  }
   
   const handleSectionReset = () => {
     // Reset the entire section to inherit from global/defaults

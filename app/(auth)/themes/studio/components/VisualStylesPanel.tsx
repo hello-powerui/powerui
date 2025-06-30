@@ -219,21 +219,5 @@ function VisualStylesPanelComponent({
   );
 }
 
-// Memoize the component to prevent unnecessary re-renders
-export const VisualStylesPanel = memo(VisualStylesPanelComponent, (prevProps, nextProps) => {
-  // Custom comparison - only re-render if relevant props change
-  return (
-    prevProps.selectedVisual === nextProps.selectedVisual &&
-    prevProps.selectedVariant === nextProps.selectedVariant &&
-    prevProps.selectedSection === nextProps.selectedSection &&
-    JSON.stringify(prevProps.visualSettings) === JSON.stringify(nextProps.visualSettings) &&
-    // Don't re-render for theme name changes
-    prevProps.theme.id === nextProps.theme.id &&
-    prevProps.theme.colorPaletteId === nextProps.theme.colorPaletteId &&
-    prevProps.theme.neutralPaletteId === nextProps.theme.neutralPaletteId &&
-    prevProps.theme.mode === nextProps.theme.mode &&
-    prevProps.theme.fontFamily === nextProps.theme.fontFamily &&
-    // Include visual styles to trigger re-render when quick customizations change
-    JSON.stringify(prevProps.theme.visualStyles) === JSON.stringify(nextProps.theme.visualStyles)
-  );
-});
+// Export without memoization to ensure updates work properly
+export const VisualStylesPanel = VisualStylesPanelComponent;

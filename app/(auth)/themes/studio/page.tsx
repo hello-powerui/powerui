@@ -396,11 +396,7 @@ function ThemeStudioContent() {
           <ErrorBoundaryWithLogging componentName="VisualStylesPanel">
             <VisualStylesPanel
               theme={themeStudio.theme}
-              visualSettings={(() => {
-                const vs = themeStudio.theme.visualStyles || {};
-                console.log('[Page] Passing visualSettings to VisualStylesPanel:', vs);
-                return vs;
-              })()}
+              visualSettings={themeStudio.theme.visualStyles || {}}
               selectedVisual={themeStudio.selectedVisual}
               selectedVariant={themeStudio.selectedVariant}
               selectedSection={themeStudio.selectedSection}
