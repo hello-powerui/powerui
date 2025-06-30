@@ -33,6 +33,9 @@ export function useThemePreviewGenerator() {
     mode: theme.mode,
     colorPaletteId: theme.colorPaletteId,
     neutralPaletteId: theme.neutralPaletteId,
+    // Include actual palette colors for proper change detection
+    colorPaletteColors: colorPalette?.colors,
+    neutralPaletteColors: neutralPalette?.colors,
     brandPalette: theme.brandPalette,
     successPalette: theme.successPalette,
     warningPalette: theme.warningPalette,
@@ -46,6 +49,9 @@ export function useThemePreviewGenerator() {
     theme.mode,
     theme.colorPaletteId,
     theme.neutralPaletteId,
+    // Include actual palette colors in dependencies
+    colorPalette?.colors,
+    neutralPalette?.colors,
     theme.brandPalette,
     theme.successPalette,
     theme.warningPalette,

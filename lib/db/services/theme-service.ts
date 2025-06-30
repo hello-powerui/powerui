@@ -15,12 +15,20 @@ export class ThemeService {
     // Check for colorPaletteId at root level (new theme studio structure)
     if (typeof themeDataObj === 'object' && 'colorPaletteId' in themeDataObj && themeDataObj.colorPaletteId) {
       try {
+        // First try to get from database
         const colorPalette = await prisma.colorPalette.findUnique({
           where: { id: themeDataObj.colorPaletteId },
           select: { colors: true }
         });
         if (colorPalette && colorPalette.colors && Array.isArray(colorPalette.colors)) {
           return (colorPalette.colors as string[]).slice(0, 10); // Return up to 10 colors for display
+        }
+        
+        // If not found in database, check if it's a built-in palette
+        const { BUILT_IN_COLOR_PALETTES } = await import('@/lib/constants/built-in-palettes');
+        const builtInPalette = BUILT_IN_COLOR_PALETTES.find(p => p.id === themeDataObj.colorPaletteId);
+        if (builtInPalette && builtInPalette.colors) {
+          return builtInPalette.colors.slice(0, 10);
         }
       } catch (error) {
         console.error('Failed to fetch color palette:', error);

@@ -16,6 +16,7 @@ interface PropertySectionProps {
   level: number;
   hideTitle?: boolean;
   SchemaForm: React.ComponentType<any>;
+  isVisualContext?: boolean;
 }
 
 export function PropertySection({
@@ -26,7 +27,8 @@ export function PropertySection({
   path,
   level,
   hideTitle,
-  SchemaForm
+  SchemaForm,
+  isVisualContext
 }: PropertySectionProps) {
   // Don't memoize these values - let them update on every render
   const arrayValue = Array.isArray(value) ? value : [{}];
@@ -68,6 +70,7 @@ export function PropertySection({
                   path={fullPath}
                   level={level + 1}
                   hideTitle={false}
+                  isVisualContext={isVisualContext}
                 />
               </ConnectedProperty>
             );

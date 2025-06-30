@@ -85,8 +85,9 @@ function FoundationPanelComponent({
   const statePalettesHex = useMemo(() => ({
     success: {
       green: convertStatePaletteToHex(STATE_PALETTES.success.green),
-      lime: convertStatePaletteToHex(STATE_PALETTES.success.lime),
-      lightGreen: convertStatePaletteToHex(STATE_PALETTES.success.lightGreen),
+      emerald: convertStatePaletteToHex(STATE_PALETTES.success.emerald),
+      teal: convertStatePaletteToHex(STATE_PALETTES.success.teal),
+      blue: convertStatePaletteToHex(STATE_PALETTES.success.blue),
     },
     warning: {
       amber: convertStatePaletteToHex(STATE_PALETTES.warning.amber),
@@ -95,7 +96,8 @@ function FoundationPanelComponent({
     },
     error: {
       red: convertStatePaletteToHex(STATE_PALETTES.error.red),
-      scarlet: convertStatePaletteToHex(STATE_PALETTES.error.scarlet),
+      rose: convertStatePaletteToHex(STATE_PALETTES.error.rose),
+      pink: convertStatePaletteToHex(STATE_PALETTES.error.pink),
     }
   }), []);
   
@@ -454,24 +456,34 @@ function FoundationPanelComponent({
                         <span>Green</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="lime">
+                    <SelectItem value="emerald">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-0.5">
-                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lime['300'] }} />
-                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lime['500'] }} />
-                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lime['700'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.emerald['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.emerald['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.emerald['700'] }} />
                         </div>
-                        <span>Lime</span>
+                        <span>Emerald</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="lightGreen">
+                    <SelectItem value="teal">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-0.5">
-                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lightGreen['300'] }} />
-                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lightGreen['500'] }} />
-                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.lightGreen['700'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.teal['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.teal['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.teal['700'] }} />
                         </div>
-                        <span>Light Green</span>
+                        <span>Teal</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="blue">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.blue['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.blue['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.success.blue['700'] }} />
+                        </div>
+                        <span>Blue</span>
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -550,14 +562,24 @@ function FoundationPanelComponent({
                         <span>Red</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="scarlet">
+                    <SelectItem value="rose">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-0.5">
-                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.scarlet['300'] }} />
-                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.scarlet['500'] }} />
-                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.scarlet['700'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.rose['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.rose['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.rose['700'] }} />
                         </div>
-                        <span>Scarlet</span>
+                        <span>Rose</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="pink">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.pink['300'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.pink['500'] }} />
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: statePalettesHex.error.pink['700'] }} />
+                        </div>
+                        <span>Pink</span>
                       </div>
                     </SelectItem>
                   </SelectContent>

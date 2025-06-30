@@ -7,6 +7,7 @@ export { ObjectSchemaField } from './ObjectSchemaField';
 export { PropertySection } from './PropertySection';
 export { StateAwarePropertySection } from './StateAwarePropertySection';
 export { FontFamilyField } from './FontFamilyField';
+export { VisualFontFamilyField } from './VisualFontFamilyField';
 export { FontSizeField } from './FontSizeField';
 export { FontWeightField } from './FontWeightField';
 export { FilterCardStateField } from './FilterCardStateField';

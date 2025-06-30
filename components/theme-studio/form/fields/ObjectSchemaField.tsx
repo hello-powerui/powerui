@@ -18,6 +18,7 @@ interface ObjectSchemaFieldProps {
   hideTitle?: boolean;
   SchemaForm: React.ComponentType<any>;
   VisualPropertiesRenderer?: React.ComponentType<any>;
+  isVisualContext?: boolean;
 }
 
 export function ObjectSchemaField({
@@ -29,7 +30,8 @@ export function ObjectSchemaField({
   level,
   hideTitle,
   SchemaForm,
-  VisualPropertiesRenderer
+  VisualPropertiesRenderer,
+  isVisualContext
 }: ObjectSchemaFieldProps) {
   const objectValue = useMemo(() => {
     const val = typeof value === 'object' && value !== null ? value : {};
@@ -91,6 +93,7 @@ export function ObjectSchemaField({
             path={[...path, '*']}
             level={level + 1}
             hideTitle={hideTitle}
+            isVisualContext={isVisualContext}
           />
         );
       }
@@ -162,6 +165,7 @@ export function ObjectSchemaField({
                   path={fullPath}
                   level={level + 1}
                   hideTitle={false}
+                  isVisualContext={isVisualContext}
                 />
               </ConnectedProperty>
             );
@@ -187,6 +191,7 @@ export function ObjectSchemaField({
               path={fullPath}
               level={level + 1}
               hideTitle={false}
+              isVisualContext={isVisualContext}
             />
           );
         })}

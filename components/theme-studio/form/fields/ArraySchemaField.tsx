@@ -18,6 +18,7 @@ interface ArraySchemaFieldProps {
   level: number;
   hideTitle?: boolean;
   SchemaForm: React.ComponentType<any>; // Pass SchemaForm to avoid circular dependency
+  isVisualContext?: boolean;
 }
 
 export function ArraySchemaField({ 
@@ -28,7 +29,8 @@ export function ArraySchemaField({
   path, 
   level, 
   hideTitle,
-  SchemaForm 
+  SchemaForm,
+  isVisualContext 
 }: ArraySchemaFieldProps) {
   const arrayValue = useMemo(() => Array.isArray(value) ? value : [], [value]);
   
@@ -87,6 +89,7 @@ export function ArraySchemaField({
             level={level}
             hideTitle={hideTitle}
             SchemaForm={SchemaForm}
+            isVisualContext={isVisualContext}
           />
         );
       } else {
@@ -118,6 +121,7 @@ export function ArraySchemaField({
             level={level}
             hideTitle={hideTitle}
             SchemaForm={SchemaForm}
+            isVisualContext={isVisualContext}
           />
         );
       }
@@ -132,6 +136,7 @@ export function ArraySchemaField({
           level={level}
           hideTitle={hideTitle}
           SchemaForm={SchemaForm}
+          isVisualContext={isVisualContext}
         />
       );
     }
@@ -169,6 +174,7 @@ export function ArraySchemaField({
                   path={[...path, String(index)]}
                   level={level + 1}
                   hideTitle
+                  isVisualContext={isVisualContext}
                 />
               )}
             </Card>

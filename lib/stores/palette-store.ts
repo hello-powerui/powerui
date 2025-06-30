@@ -145,6 +145,12 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         colorPalettes: [...state.colorPalettes, data.palette],
         isLoading: false
       }));
+      
+      // Trigger refresh in theme studio
+      if (typeof window !== 'undefined') {
+        const { useThemeStudioStore } = await import('@/lib/stores/theme-studio-store');
+        useThemeStudioStore.getState().refreshPalettes();
+      }
       return data.palette;
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Failed to create palette', isLoading: false });
@@ -170,6 +176,12 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         ),
         isLoading: false
       }));
+      
+      // Trigger force refresh in theme studio for updates
+      if (typeof window !== 'undefined') {
+        const { useThemeStudioStore } = await import('@/lib/stores/theme-studio-store');
+        useThemeStudioStore.getState().forceRefreshCurrentPalettes();
+      }
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Failed to update palette', isLoading: false });
       throw error;
@@ -216,6 +228,12 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         neutralPalettes: [...state.neutralPalettes, palette],
         isLoading: false
       }));
+      
+      // Trigger refresh in theme studio
+      if (typeof window !== 'undefined') {
+        const { useThemeStudioStore } = await import('@/lib/stores/theme-studio-store');
+        useThemeStudioStore.getState().refreshPalettes();
+      }
       return palette;
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Failed to create neutral palette', isLoading: false });
@@ -241,6 +259,12 @@ export const usePaletteStore = create<PaletteStore>((set, get) => ({
         ),
         isLoading: false
       }));
+      
+      // Trigger force refresh in theme studio for updates
+      if (typeof window !== 'undefined') {
+        const { useThemeStudioStore } = await import('@/lib/stores/theme-studio-store');
+        useThemeStudioStore.getState().forceRefreshCurrentPalettes();
+      }
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Failed to update neutral palette', isLoading: false });
       throw error;

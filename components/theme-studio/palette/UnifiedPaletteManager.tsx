@@ -422,26 +422,33 @@ export function UnifiedPaletteManager({
           }}
           type={editingPalette?.type || creatingType || 'color'}
           palette={editingPalette?.palette}
-          onSave={(savedPalette) => {
+          onSave={async (savedPalette) => {
+            const wasEditing = editingPalette;
+            const wasCreating = creatingType;
+            
             setEditingPalette(null);
             setCreatingType(null);
-            // Reload palettes to include the new one
-            loadPalettes();
+            
+            // Reload palettes to include the new one and wait for completion
+            await loadPalettes();
+            
+            // Small delay to ensure store updates are processed
+            await new Promise(resolve => setTimeout(resolve, 50));
             
             // Auto-select the palette that was just edited or created
             if (savedPalette) {
               if (savedPalette.hasOwnProperty('colors') && Array.isArray(savedPalette.colors)) {
                 // If editing an existing palette, apply the changes immediately
-                if (editingPalette && editingPalette.type === 'color' && onSelectColorPalette) {
+                if (wasEditing && wasEditing.type === 'color' && onSelectColorPalette) {
                   onSelectColorPalette(savedPalette as ColorPalette);
-                } else if (editingPalette && editingPalette.type === 'neutral' && onSelectNeutralPalette) {
+                } else if (wasEditing && wasEditing.type === 'neutral' && onSelectNeutralPalette) {
                   onSelectNeutralPalette(savedPalette as NeutralPalette);
                 }
                 // If creating a new palette, auto-select it
-                else if (creatingType === 'color' && onSelectColorPalette) {
+                else if (wasCreating === 'color' && onSelectColorPalette) {
                   onSelectColorPalette(savedPalette as ColorPalette);
                   onOpenChange(false);
-                } else if (creatingType === 'neutral' && onSelectNeutralPalette) {
+                } else if (wasCreating === 'neutral' && onSelectNeutralPalette) {
                   onSelectNeutralPalette(savedPalette as NeutralPalette);
                   onOpenChange(false);
                 }

@@ -78,7 +78,7 @@ export function AnimatedHeroBackground({ className }: { className?: string }) {
         targetHeight: Math.random() * 200 + 80,
         x: barX,
         width: barWidth,
-        color: powerUIColors[i % powerUIColors.length],
+        color: i % 2 === 0 ? '#6b7280' : '#4b5563',
         delay: i * 50
       });
     }
@@ -247,7 +247,7 @@ export function AnimatedHeroBackground({ className }: { className?: string }) {
           ctx.fillStyle = gradient;
           ctx.fillRect(
             bar.x,
-            dimensions.height - bar.height - 100,
+            dimensions.height - bar.height,
             bar.width,
             bar.height
           );

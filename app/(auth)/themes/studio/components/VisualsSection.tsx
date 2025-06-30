@@ -186,6 +186,7 @@ export function VisualsSection({
                 onChange={handleSchemaFormChange}
                 schemaLoader={schemaLoader}
                 path={['visualStyles', selectedVisual, selectedVariant]}
+                isVisualContext={true}
               />
             )}
           </div>

@@ -21,6 +21,7 @@ import {
   FontSizeField,
   FontWeightField
 } from './fields';
+import { VisualFontFamilyField } from './fields/VisualFontFamilyField';
 import { 
   isColorProperty, 
   formatPropertyName,
@@ -36,6 +37,7 @@ interface SchemaFormProps {
   path?: string[];
   level?: number;
   hideTitle?: boolean;
+  isVisualContext?: boolean;
 }
 
 export function SchemaForm({
@@ -46,8 +48,19 @@ export function SchemaForm({
   path = [],
   level = 0,
   hideTitle = false,
+  isVisualContext = false,
 }: SchemaFormProps) {
   const trackChangeRef = useThemeChanges(state => state.trackChange);
+  
+  // Debug logging
+  if (path.includes('visualStyles') || isVisualContext) {
+    console.log('[SchemaForm] Rendering:', {
+      path: path.join('.'),
+      isVisualContext,
+      schemaType: schema.type,
+      level
+    });
+  }
   
   
   // Handle value updates
@@ -100,6 +113,7 @@ export function SchemaForm({
             path={[...path, '*']}
             level={level}
             hideTitle={hideTitle}
+            isVisualContext={isVisualContext}
           />
         );
       } else {
@@ -156,6 +170,7 @@ export function SchemaForm({
             path={path}
             level={level}
             hideTitle={true}
+            isVisualContext={isVisualContext}
           />
         </FieldGroupCard>
       );
@@ -170,6 +185,7 @@ export function SchemaForm({
         path={path}
         level={level}
         hideTitle={hideTitle}
+        isVisualContext={isVisualContext}
       />
     );
   }
@@ -208,6 +224,7 @@ export function SchemaForm({
         path={path}
         level={level}
         hideTitle={hideTitle}
+        isVisualContext={isVisualContext}
       />
     );
   }
@@ -403,6 +420,7 @@ export function SchemaForm({
         level={level}
         hideTitle={hideTitle}
         SchemaForm={SchemaForm}
+        isVisualContext={isVisualContext}
       />
     );
   }
@@ -420,6 +438,7 @@ export function SchemaForm({
         hideTitle={hideTitle}
         SchemaForm={SchemaForm}
         VisualPropertiesRenderer={VisualPropertiesPanel}
+        isVisualContext={isVisualContext}
       />
     );
   }
@@ -442,14 +461,32 @@ export function SchemaForm({
   if (propertyName && (schema.type === 'string' || schema.type === 'number')) {
     // Font family detection
     if (propertyName === 'fontFamily' || propertyName.endsWith('FontFamily')) {
-      return (
-        <FontFamilyField
-          schema={schema}
-          value={value}
-          onChange={handleChange}
-          path={path}
-        />
-      );
+      console.log('[SchemaForm] Font family field detected:', {
+        propertyName,
+        path: path.join('.'),
+        isVisualContext,
+        value
+      });
+      // Use VisualFontFamilyField for visual context, regular FontFamilyField otherwise
+      if (isVisualContext) {
+        return (
+          <VisualFontFamilyField
+            schema={schema}
+            value={value}
+            onChange={handleChange}
+            path={path}
+          />
+        );
+      } else {
+        return (
+          <FontFamilyField
+            schema={schema}
+            value={value}
+            onChange={handleChange}
+            path={path}
+          />
+        );
+      }
     }
     
     // Font size detection
@@ -573,6 +610,7 @@ export function SchemaForm({
           path={path}
           level={level}
           hideTitle={hideTitle}
+          isVisualContext={isVisualContext}
         />
       );
     }
@@ -588,6 +626,7 @@ export function SchemaForm({
           path={path}
           level={level}
           hideTitle={hideTitle}
+          isVisualContext={isVisualContext}
         />
       );
     }

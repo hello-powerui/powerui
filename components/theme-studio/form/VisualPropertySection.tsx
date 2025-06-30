@@ -76,6 +76,7 @@ export function VisualPropertySection({
               path={[...path, name]}
               level={level + 1}
               hideTitle={true}
+              isVisualContext={true}
             />
           </ConnectedProperty>
         ) : (
@@ -118,6 +119,7 @@ export function VisualPropertySection({
                           path={fullPath}
                           level={level + 2}
                           hideTitle={false}
+                          isVisualContext={true}
                         />
                       </ConnectedProperty>
                     );

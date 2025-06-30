@@ -9,6 +9,7 @@ import { DEFAULT_COLOR_PALETTE, AZURE_NEUTRAL_PALETTE } from '@/lib/defaults/pal
  */
 export function useThemeStudioPalettes() {
   const theme = useThemeStudioStore((state) => state.theme);
+  const paletteRefreshCounter = useThemeStudioStore((state) => state.paletteRefreshCounter);
   const setResolvedPalettes = useThemeStudioStore((state) => state.setResolvedPalettes);
   
   const { 
@@ -41,6 +42,7 @@ export function useThemeStudioPalettes() {
     colorPalettes, 
     neutralPalettes, 
     palettesLoading,
+    paletteRefreshCounter,
     setResolvedPalettes
   ]);
 

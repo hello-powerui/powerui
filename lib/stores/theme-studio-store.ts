@@ -54,6 +54,9 @@ interface ThemeStudioState {
   // Resolved/computed data
   resolved: ResolvedThemeData;
   
+  // Force refresh counter for palette resolution
+  paletteRefreshCounter: number;
+  
   // UI state
   selectedVisual: string;
   selectedStyle: string;
@@ -86,6 +89,8 @@ interface ThemeStudioState {
   // Resolved data actions
   setResolvedPalettes: (colorPalette: ColorPalette | null, neutralPalette: NeutralPalette | null) => void;
   setPreviewTheme: (previewTheme: PowerBITheme | null) => void;
+  refreshPalettes: () => void;
+  forceRefreshCurrentPalettes: () => void;
   
   // UI state actions
   setSelectedVisual: (visual: string) => void;
@@ -152,6 +157,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       // Initial state
       theme: { ...defaultStudioTheme },
       resolved: { ...defaultResolvedData },
+      paletteRefreshCounter: 0,
       
       // UI state
       selectedVisual: '',
@@ -319,6 +325,22 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
             ...state.resolved,
             previewTheme,
           },
+        })),
+        
+      refreshPalettes: () =>
+        set((state) => ({
+          paletteRefreshCounter: state.paletteRefreshCounter + 1,
+        })),
+        
+      forceRefreshCurrentPalettes: () =>
+        set((state) => ({
+          paletteRefreshCounter: state.paletteRefreshCounter + 1,
+          // Also clear resolved palettes to force fresh resolution
+          resolved: {
+            ...state.resolved,
+            colorPalette: null,
+            neutralPalette: null,
+          }
         })),
 
       // UI state actions
