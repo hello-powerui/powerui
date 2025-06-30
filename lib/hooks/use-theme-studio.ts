@@ -28,8 +28,9 @@ export function useThemeStudio() {
   const { previewTheme, isGenerating } = useThemePreviewGenerator();
   
   // Change tracking
-  const { changedPaths, trackChange, hasChanges } = useThemeChanges();
-  const hasChangesValue = useMemo(() => hasChanges(), [hasChanges]);
+  const changedPaths = useThemeChanges(state => state.changedPaths);
+  const trackChange = useThemeChanges(state => state.trackChange);
+  const hasChanges = useThemeChanges(state => state.hasChanges);
   
   
   // Enhanced theme update with change tracking
@@ -103,8 +104,8 @@ export function useThemeStudio() {
     isGenerating,
     
     // Change tracking
-    isDirty: hasChangesValue,
-    changedPaths: changedPaths || EMPTY_SET,
+    isDirty: changedPaths.size > 0,
+    changedPaths: changedPaths,
     
     // Theme actions
     updateTheme,
@@ -129,6 +130,7 @@ export function useThemeStudio() {
     getVisualVariants: uiState.getVisualVariants,
     createVariant: uiState.createVariant,
     deleteVariant: uiState.deleteVariant,
+    renameVariant: uiState.renameVariant,
     
     // Save/load
     saveTheme: persistence.saveTheme,
@@ -154,7 +156,6 @@ export function useThemeStudio() {
     palettesLoading,
     persistence.isSaving,
     isGenerating,
-    hasChangesValue,
     changedPaths,
     updateTheme,
     setColorPaletteId,
@@ -174,6 +175,7 @@ export function useThemeStudio() {
     uiState.getVisualVariants,
     uiState.createVariant,
     uiState.deleteVariant,
+    uiState.renameVariant,
     persistence.saveTheme,
     persistence.loadTheme,
     persistence.resetTheme,

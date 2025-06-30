@@ -30,7 +30,7 @@ export function ArraySchemaField({
   hideTitle,
   SchemaForm 
 }: ArraySchemaFieldProps) {
-  const arrayValue = Array.isArray(value) ? value : [];
+  const arrayValue = useMemo(() => Array.isArray(value) ? value : [], [value]);
   
   // Memoize the item change handler
   const handleItemChange = useCallback((index: number, newItem: any) => {

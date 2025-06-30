@@ -20,6 +20,7 @@ import { ConnectedProperty } from '@/components/theme-studio/ui/connected-proper
 import { PropertyWrapper } from '@/components/theme-studio/form/property-wrapper';
 import { FillControl } from '@/components/theme-studio/form/controls/fill-control-modern';
 import { THEME_STUDIO_SPACING } from '@/components/theme-studio/constants/layout';
+import { TextClasses } from '@/lib/theme-generation/types';
 
 type ThemeDataColor = string | { color: string } | { dataColorIndex: number };
 
@@ -155,7 +156,7 @@ export function TypographyTab() {
     setLocalTextClasses(initialClasses);
   }, [textClasses, fontFamily, mode]);
 
-  const handleFontSizeChange = (className: string, value: string) => {
+  const handleFontSizeChange = (className: keyof TextClasses, value: string) => {
     const fontSize = parseInt(value);
     if (!isNaN(fontSize) && fontSize > 0) {
       // Update local state
@@ -169,7 +170,7 @@ export function TypographyTab() {
     }
   };
 
-  const handleColorChange = (className: string, value: any) => {
+  const handleColorChange = (className: keyof TextClasses, value: any) => {
     // FillControl returns PowerBI format { solid: { color: string } }
     let color: ThemeDataColor;
     
@@ -198,7 +199,7 @@ export function TypographyTab() {
     updateTextClassProperty(className, 'color', color);
   };
 
-  const handleFontWeightChange = (className: string, weight: string) => {
+  const handleFontWeightChange = (className: keyof TextClasses, weight: string) => {
     // Update local state
     setLocalTextClasses(prev => ({
       ...prev,
@@ -370,7 +371,7 @@ export function TypographyTab() {
                         min="8"
                         max="72"
                         value={textClass.fontSize || 12}
-                        onChange={(e) => handleFontSizeChange(name, e.target.value)}
+                        onChange={(e) => handleFontSizeChange(name as keyof TextClasses, e.target.value)}
                         className="w-20"
                       />
                       <span className="text-sm text-gray-500">pt</span>
@@ -382,7 +383,7 @@ export function TypographyTab() {
                   <PropertyWrapper label="Font Weight" path={['textClasses', name, 'fontWeight']} inline={true}>
                     <Select 
                       value={textClass.fontWeight || "400"} 
-                      onValueChange={(value) => handleFontWeightChange(name, value)}
+                      onValueChange={(value) => handleFontWeightChange(name as keyof TextClasses, value)}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -404,7 +405,7 @@ export function TypographyTab() {
                   <FillControl
                     label="Color"
                     value={textClass.color}
-                    onChange={(value) => handleColorChange(name, value)}
+                    onChange={(value) => handleColorChange(name as keyof TextClasses, value)}
                     path={['textClasses', name, 'color']}
                     inline={true}
                     enableThemeColors={false}

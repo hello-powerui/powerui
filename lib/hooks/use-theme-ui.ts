@@ -30,6 +30,7 @@ export function useThemeUI() {
   const getVisualVariants = useThemeStudioStore((state) => state.getVisualVariants);
   const createVariant = useThemeStudioStore((state) => state.createVariant);
   const deleteVariant = useThemeStudioStore((state) => state.deleteVariant);
+  const renameVariant = useThemeStudioStore((state) => state.renameVariant);
 
   return {
     // UI state
@@ -46,6 +47,7 @@ export function useThemeUI() {
     // Variant management
     getVisualVariants,
     createVariant,
-    deleteVariant
+    deleteVariant,
+    renameVariant
   };
 }

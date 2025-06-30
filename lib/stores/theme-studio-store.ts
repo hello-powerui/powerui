@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { PowerBITheme, StudioThemeData, SchemaValidationError } from '@/lib/theme-studio/types';
 import { ColorPalette, NeutralPalette } from '@prisma/client';
-import { StructuralColors, TextClasses } from '@/lib/theme-generation/types';
+import { StructuralColors, TextClasses, TextClass } from '@/lib/theme-generation/types';
 import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/palettes';
 import isEqual from 'fast-deep-equal';
 import { cleanupVisualStyles } from '@/lib/utils/theme-helpers';
@@ -59,7 +59,7 @@ interface ThemeStudioState {
   selectedStyle: string;
   selectedVariant: string;
   selectedProperty: string;
-  selectedSection: 'typography' | 'structural' | 'visuals' | 'global';
+  selectedSection: 'typography' | 'structural' | 'visuals' | 'global' | 'canvas';
   selectedState: string; // For state-driven properties (default, hover, selected, etc.)
   expandedPanels: string[];
   isSaving: boolean;
@@ -78,7 +78,7 @@ interface ThemeStudioState {
   setFontFamily: (fontFamily: string) => void;
   setStructuralColors: (colors: StructuralColors) => void;
   setTextClasses: (textClasses: TextClasses) => void;
-  updateTextClassProperty: (className: string, property: keyof TextClass, value: any) => void;
+  updateTextClassProperty: (className: keyof TextClasses, property: keyof TextClass, value: any) => void;
   updateVisualStyles: (visualStyles: Record<string, any>) => void;
   updateVisualStyle: (visual: string, variant: string, value: any) => void;
   setQuickCustomization: (key: keyof NonNullable<StudioTheme['quickCustomizations']>, value: string) => void;
@@ -91,7 +91,7 @@ interface ThemeStudioState {
   setSelectedVisual: (visual: string) => void;
   setSelectedVariant: (variant: string) => void;
   setSelectedState: (state: string) => void;
-  setSelectedSection: (section: 'typography' | 'structural' | 'visuals' | 'global') => void;
+  setSelectedSection: (section: 'typography' | 'structural' | 'visuals' | 'global' | 'canvas') => void;
   setActiveTab: (tab: 'color' | 'typography' | 'style') => void;
   togglePanel: (panelId: string) => void;
   
