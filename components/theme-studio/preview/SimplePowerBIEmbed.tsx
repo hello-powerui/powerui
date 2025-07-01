@@ -1,7 +1,7 @@
 'use client';
 
 import { PowerBIEmbed } from 'powerbi-client-react';
-import { models, Report, Page, VisualDescriptor } from 'powerbi-client';
+import { models, Report, Page } from 'powerbi-client';
 import { useEffect, useState, useRef, useMemo, useCallback, memo } from 'react';
 import { powerBIConfig } from '@/lib/powerbi/config';
 import { PowerBIService } from '@/lib/powerbi/service';
@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { X, Maximize2, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { ZoomIn, ZoomOut } from 'lucide-react';
 
 interface SimplePowerBIEmbedProps {
   generatedTheme?: any;
@@ -206,73 +206,6 @@ function SimplePowerBIEmbed({
     }
   }, []);
 
-  // Discover visuals in the report
-  const discoverVisuals = useCallback(async () => {
-    if (!reportRef.current) return;
-    
-    try {
-      const pages = await reportRef.current.getPages();
-      if (pages.length === 0) return;
-      
-      // Get the active page
-      const activePage = pages.find(p => p.isActive) || pages[0];
-      if (!activePage) return;
-      
-      currentPageRef.current = activePage;
-      const pageVisuals = await activePage.getVisuals();
-      
-      const visualInfos: VisualInfo[] = pageVisuals.map((visual: VisualDescriptor) => ({
-        name: visual.name,
-        title: visual.title || visual.name,
-        type: visual.type,
-        layout: {
-          x: visual.layout.x || 0,
-          y: visual.layout.y || 0,
-          z: visual.layout.z,
-          width: visual.layout.width || 300,
-          height: visual.layout.height || 300
-        }
-      }));
-      
-      setVisuals(visualInfos);
-      
-    } catch (error) {
-      // console.error('Error discovering visuals:', error);
-    }
-  }, []);
-
-  // Apply focus mode layout
-  const applyFocusMode = useCallback(async () => {
-    if (!reportRef.current || !currentPageRef.current) return;
-    
-    try {
-      const pageId = currentPageRef.current.name;
-      const pageSize = {
-        width: currentPageRef.current.defaultSize?.width || 1280,
-        height: currentPageRef.current.defaultSize?.height || 720
-      };
-      
-      if (focusMode && selectedVisualType !== '*') {
-        // Apply focused layout
-        const focusLayout = generateFocusedVisualLayout(
-          visuals,
-          selectedVisualType,
-          pageId,
-          pageSize
-        );
-        
-        await reportRef.current.updateSettings(focusLayout);
-        
-      } else {
-        // Restore default layout
-        const defaultLayout = generateDefaultLayout(pageId);
-        await reportRef.current.updateSettings(defaultLayout);
-        
-      }
-    } catch (error) {
-      // console.error('Error applying focus mode:', error);
-    }
-  }, [focusMode, selectedVisualType, visuals]);
 
   // Zoom functions
   const handleZoom = useCallback(async (zoomLevel: number) => {
@@ -306,14 +239,8 @@ function SimplePowerBIEmbed({
     
     setIsResetting(true);
     
-    // First, reset focus mode state
-    setFocusMode(false);
-    
     // Reset zoom to default
     setCurrentZoom(1.0);
-    
-    // Clear visuals array to ensure clean state
-    setVisuals([]);
     
     // Force a complete reload of the report (like the reload button does)
     // This ensures the layout is properly reset
@@ -371,27 +298,6 @@ function SimplePowerBIEmbed({
     }
   }, [onReportReset, resetReport]);
 
-  // Effect to handle entering focus mode when prop changes
-  useEffect(() => {
-    if (enterFocusMode && selectedVisualType !== '*' && !focusMode) {
-      setFocusMode(true);
-    }
-  }, [enterFocusMode, selectedVisualType, focusMode]);
-
-  // Effect to prepare visuals when selected visual type changes
-  useEffect(() => {
-    if (reportRef.current && selectedVisualType !== '*' && isReportReady) {
-      // Discover visuals when a specific visual is selected
-      discoverVisuals();
-    }
-  }, [selectedVisualType, isReportReady, discoverVisuals]);
-
-  // Effect to apply/remove focus mode
-  useEffect(() => {
-    if (reportRef.current && visuals.length > 0) {
-      applyFocusMode();
-    }
-  }, [applyFocusMode, visuals.length]); // applyFocusMode already depends on focusMode, selectedVisualType, visuals
 
   // Effect to restore zoom level when report is ready
   useEffect(() => {
@@ -405,10 +311,8 @@ function SimplePowerBIEmbed({
   const eventHandlers = useMemo(() => new Map([
     ['loaded', function () {
       setIsReportReady(true);
-      // Ensure Home page is active and discover visuals
-      ensureHomePage().then(() => {
-        discoverVisuals();
-      });
+      // Ensure Home page is active
+      ensureHomePage();
     }],
     ['rendered', function() {
       // Ensure report is marked as ready on render too
@@ -418,12 +322,8 @@ function SimplePowerBIEmbed({
       if (event?.detail?.message) {
         setError(event.detail.message);
       }
-    }],
-    ['pageChanged', function () {
-      // Re-discover visuals on page change
-      discoverVisuals();
     }]
-  ]), [discoverVisuals, ensureHomePage]);
+  ]), [ensureHomePage]);
 
   if (!variantPreviewTheme || isLoading) {
     return (
@@ -490,76 +390,8 @@ function SimplePowerBIEmbed({
 
   return (
     <div className="w-full h-full relative overflow-visible">
-      {/* Focus Mode Controls */}
-      {focusMode && selectedVisualType !== '*' && (
-        <div className="absolute top-2 left-2 z-50 flex items-center gap-2 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
-          {/* Exit Focus Mode Button */}
-          <Button
-            onClick={() => {
-              resetReport();
-              if (onExitFocusMode) {
-                onExitFocusMode();
-              }
-            }}
-            variant="outline"
-            size="sm"
-            className="text-xs"
-            disabled={isResetting}
-          >
-            <Maximize2 className="w-3 h-3 mr-1" />
-            {isResetting ? 'Resetting...' : 'Exit Focus Mode'}
-          </Button>
-
-          {/* Focus mode indicator */}
-          <div className="flex items-center gap-2 px-2 text-xs text-gray-600">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            <span>{selectedVisualType}</span>
-          </div>
-
-          {/* Zoom Controls */}
-          <div className="w-px h-6 bg-gray-300" /> {/* Divider */}
-          <div className="flex items-center gap-1">
-            <Button
-              onClick={zoomOut}
-              variant="outline"
-              size="sm"
-              className="h-8 w-8 p-0"
-              disabled={currentZoom <= 0.25}
-              title="Zoom out"
-            >
-              <ZoomOut className="w-3 h-3" />
-            </Button>
-            <Button
-              onClick={resetZoom}
-              variant="outline"
-              size="sm"
-              className="h-8 px-2 text-xs font-medium"
-              disabled={currentZoom === 1.0}
-              title="Reset zoom"
-            >
-              {Math.round(currentZoom * 100)}%
-            </Button>
-            <Button
-              onClick={zoomIn}
-              variant="outline"
-              size="sm"
-              className="h-8 w-8 p-0"
-              disabled={currentZoom >= 4.0}
-              title="Zoom in"
-            >
-              <ZoomIn className="w-3 h-3" />
-            </Button>
-          </div>
-
-        </div>
-      )}
-      
-      {/* Zoom Controls for regular view */}
-      {!focusMode && (
-        <div className="absolute top-2 left-2 z-50 flex items-center gap-1 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
+      {/* Zoom Controls */}
+      <div className="absolute top-2 left-2 z-50 flex items-center gap-1 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
           <Button
             onClick={zoomOut}
             variant="outline"
@@ -590,8 +422,7 @@ function SimplePowerBIEmbed({
           >
             <ZoomIn className="w-3 h-3" />
           </Button>
-        </div>
-      )}
+      </div>
       
       {/* Reload button - appears on hover */}
       <button
