@@ -7,7 +7,7 @@ import JSONPretty from 'react-json-pretty';
 import 'react-json-pretty/themes/monikai.css';
 import { downloadThemeJson } from '@/lib/utils/theme-export';
 import { computeVariantStyle } from '@/lib/theme-generation/variant-merge-utils';
-import { Toggle } from '@/components/ui/toggle';
+import { Button } from '@/components/ui/button';
 
 interface ThemeJsonViewProps {
   theme: PowerBITheme;
@@ -67,14 +67,15 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
         <div className="flex items-center gap-3">
           <h3 className="text-sm font-medium text-gray-300">Theme JSON</h3>
-          <Toggle
-            pressed={showComputed}
-            onPressedChange={setShowComputed}
-            className="h-7 px-2 text-xs data-[state=on]:bg-purple-600 data-[state=on]:text-white"
+          <Button
+            onClick={() => setShowComputed(!showComputed)}
+            variant="outline"
+            size="sm"
+            className={`h-7 px-2 text-xs ${showComputed ? 'bg-purple-600 text-white hover:bg-purple-700' : ''}`}
           >
             <span className="mr-1">Show Computed Styles</span>
             {showComputed && <span className="text-[10px] opacity-75">(Merged)</span>}
-          </Toggle>
+          </Button>
         </div>
         <div className="flex items-center gap-2">
           <button
