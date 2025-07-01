@@ -1,52 +1,58 @@
 /**
- * Direct mapping of theme visual types to Power BI visual names on the AllVisuals page
+ * Direct mapping of theme visual types to Power BI visual info on the AllVisuals page
  * This mapping is manually maintained based on the actual visuals in the report
  */
-export const VISUAL_NAME_MAPPING: Record<string, string> = {
+export interface VisualInfo {
+  name: string;
+  width: number;
+  height: number;
+}
+
+export const VISUAL_NAME_MAPPING: Record<string, VisualInfo> = {
   // Charts
-  'barChart': '0c42bff8585d88872591',
-  'clusteredBarChart': '45da91cc51bfdbd0b241',
-  'hundredPercentStackedBarChart': '8957f95a5d7eb32bd00e',
-  'columnChart': '72eaf7bf5be97a046887',
-  'clusteredColumnChart': '6581e6c6e4b12494d4e9',
-  'hundredPercentStackedColumnChart': '346ffc43aba74eeda113',
-  'lineChart': '9df16772927cb14b740b',
-  'areaChart': '53a5636c395dd93d600e',
-  'stackedAreaChart': '8593a93f608a43ee637c',
-  'hundredPercentStackedAreaChart': '3b6db527a2c31222a208',
-  'pieChart': '8d274c20db10a2b70095',
-  'donutChart': 'a514429d97b4ca4dc991',
-  'scatterChart': '99e1aabb7966cb303a33',
-  'waterfallChart': '146a6505020a0e20915c',
-  'funnel': 'a5ac24667e85ed3a41e9',
-  'ribbonChart': 'fdde62bac13dc781165c',
-  'lineClusteredColumnComboChart': '821dae2fc80129508370',
-  'lineStackedColumnComboChart': '16d46aec0786b123c92c',
+  'barChart': { name: '0c42bff8585d88872591', width: 401, height: 300 },
+  'clusteredBarChart': { name: '45da91cc51bfdbd0b241', width: 399, height: 300 },
+  'hundredPercentStackedBarChart': { name: '8957f95a5d7eb32bd00e', width: 399, height: 300 },
+  'columnChart': { name: '72eaf7bf5be97a046887', width: 500, height: 300 },
+  'clusteredColumnChart': { name: '6581e6c6e4b12494d4e9', width: 399, height: 300 },
+  'hundredPercentStackedColumnChart': { name: '346ffc43aba74eeda113', width: 400, height: 300 },
+  'lineChart': { name: '9df16772927cb14b740b', width: 399, height: 300 },
+  'areaChart': { name: '53a5636c395dd93d600e', width: 399, height: 300 },
+  'stackedAreaChart': { name: '8593a93f608a43ee637c', width: 399, height: 300 },
+  'hundredPercentStackedAreaChart': { name: '3b6db527a2c31222a208', width: 399, height: 300 },
+  'pieChart': { name: '8d274c20db10a2b70095', width: 399, height: 300 },
+  'donutChart': { name: 'a514429d97b4ca4dc991', width: 401, height: 301 },
+  'scatterChart': { name: '99e1aabb7966cb303a33', width: 401, height: 303 },
+  'waterfallChart': { name: '146a6505020a0e20915c', width: 399, height: 300 },
+  'funnel': { name: 'a5ac24667e85ed3a41e9', width: 399, height: 300 },
+  'ribbonChart': { name: 'fdde62bac13dc781165c', width: 399, height: 300 },
+  'lineClusteredColumnComboChart': { name: '821dae2fc80129508370', width: 399, height: 300 },
+  'lineStackedColumnComboChart': { name: '16d46aec0786b123c92c', width: 399, height: 300 },
   
   // Tables & Matrix
-  'tableEx': '7d512382a74bcf497381',
-  'pivotTable': '4f19c7f044133184b117',
+  'tableEx': { name: '7d512382a74bcf497381', width: 421, height: 300 },
+  'pivotTable': { name: '4f19c7f044133184b117', width: 435, height: 366 },
   
   // Cards & KPIs
-  'cardVisual': '6c51c7e01a5462e95534', // First card visual
-  'kpi': 'adada8fecea45593c511', // First KPI
-  'gauge': 'ec322361c8a20dc86ba4',
+  'cardVisual': { name: '6c51c7e01a5462e95534', width: 401, height: 171 },
+  'kpi': { name: 'adada8fecea45593c511', width: 366, height: 169 },
+  'gauge': { name: 'ec322361c8a20dc86ba4', width: 366, height: 169 },
   
   // Maps
-  'map': 'f2582bc09cb53735c2f5', // Azure Map
-  'filledMap': '8572c49ac022ae502241',
-  'shapeMap': '99d36fad54a7d86a0ea0',
+  'map': { name: 'f2582bc09cb53735c2f5', width: 399, height: 300 },
+  'filledMap': { name: '8572c49ac022ae502241', width: 399, height: 300 },
+  'shapeMap': { name: '99d36fad54a7d86a0ea0', width: 399, height: 300 },
   
   // Slicers
-  'slicer': '8b6109146375509d1031',
-  'textSlicer': 'b3ea7b180a55de0d6de4',
-  'listSlicer': '29174ae220bc24d97277',
+  'slicer': { name: '8b6109146375509d1031', width: 264, height: 150 },
+  'textSlicer': { name: 'b3ea7b180a55de0d6de4', width: 500, height: 180 },
+  'listSlicer': { name: '29174ae220bc24d97277', width: 316, height: 350 },
   
   // Other
-  'actionButton': '7177bfb3b020ee4cee1f',
-  'textbox': '4d46ddf9bc99f8b363c4',
-  'shape': '057aea91daa664c40626',
-  'image': 'a7edc34117d9efa7844d',
+  'actionButton': { name: '7177bfb3b020ee4cee1f', width: 100, height: 40 },
+  'textbox': { name: '4d46ddf9bc99f8b363c4', width: 205, height: 151 },
+  'shape': { name: '057aea91daa664c40626', width: 181, height: 124 },
+  'image': { name: 'a7edc34117d9efa7844d', width: 166, height: 158 },
   
   // Note: Some visual types might not have theme support or might not be included:
   // - decompositionTreeVisual
@@ -57,10 +63,18 @@ export const VISUAL_NAME_MAPPING: Record<string, string> = {
 };
 
 /**
+ * Get the visual info for a theme visual type
+ */
+export function getVisualInfo(visualType: string): VisualInfo | null {
+  return VISUAL_NAME_MAPPING[visualType] || null;
+}
+
+/**
  * Get the visual name for a theme visual type
  */
 export function getVisualName(visualType: string): string | null {
-  return VISUAL_NAME_MAPPING[visualType] || null;
+  const info = VISUAL_NAME_MAPPING[visualType];
+  return info ? info.name : null;
 }
 
 /**

@@ -43,8 +43,6 @@ interface PowerBIPreviewProps {
   onReportReset?: (resetFn: () => void) => void;
   enterFocusMode?: boolean;
   useVisualEmbedding?: boolean;
-  visualWidth?: number;
-  visualHeight?: number;
 }
 
 export function PowerBIPreview({ 
@@ -55,9 +53,7 @@ export function PowerBIPreview({
   onVariantChange,
   onReportReset,
   enterFocusMode,
-  useVisualEmbedding = false,
-  visualWidth = 800,
-  visualHeight = 600
+  useVisualEmbedding = false
 }: PowerBIPreviewProps) {
   // Convert empty string to '*' for consistency with focus mode logic
   const normalizedVisualType = selectedVisualType || '*';
@@ -70,8 +66,7 @@ export function PowerBIPreview({
         selectedVisualType={normalizedVisualType}
         selectedVariant={selectedVariant}
         onReportReset={onReportReset}
-        width={visualWidth}
-        height={visualHeight}
+        onExitFocusMode={onExitFocusMode}
       />
     );
   }

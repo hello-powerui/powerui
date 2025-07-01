@@ -1,6 +1,7 @@
 'use client'
 
 import { Palette, Plus, Upload, Trash2, Edit2, Check, Globe, Lock, Users } from 'lucide-react'
+import Image from 'next/image'
 
 export default function ColorPalettesPage() {
   return (
@@ -131,12 +132,23 @@ export default function ColorPalettesPage() {
             </ol>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="font-medium mb-2">Color Limits:</h4>
-            <p className="text-sm text-gray-600">• Minimum: 1 color</p>
-            <p className="text-sm text-gray-600">• Maximum: 20 colors</p>
-            <p className="text-sm text-gray-600">• Recommended: 5-8 colors for most reports</p>
-          </div>
+          <h3 className="text-lg font-semibold mb-3 mt-8">Understanding Color Palette Limits</h3>
+          
+          <p className="text-gray-700 mb-4 leading-relaxed">
+            When designing color palettes in Power BI, it's important to understand both the technical limitations and practical considerations. While Power BI requires a minimum of one color in your palette to function properly, there is no hard-coded maximum limit enforced by the system. Theoretically, you could create a palette with dozens of colors, but this approach quickly becomes counterproductive.
+          </p>
+          
+          <p className="text-gray-700 mb-4 leading-relaxed">
+            In practice, if you find yourself needing 20 or more distinct colors in a single visualization, it's a strong indicator that your visual is trying to communicate too much information at once. Human perception struggles to differentiate between more than 8-10 colors effectively, especially when they appear in different sizes or are separated spatially on a dashboard. Beyond this threshold, viewers have difficulty associating specific colors with their corresponding data series, defeating the purpose of color coding entirely.
+          </p>
+          
+          <p className="text-gray-700 mb-4 leading-relaxed">
+            We strongly recommend limiting your palettes to 8 colors or fewer for optimal clarity and visual impact. This constraint forces you to be more thoughtful about your data presentation—perhaps grouping less important categories into an "Other" category, using different visual encoding methods like patterns or shapes, or splitting complex visuals into multiple, more focused charts. Remember, the ultimate goal of data visualization is to make information easy to understand and act upon, not to showcase every possible data point in a rainbow of colors.
+          </p>
+          
+          <p className="text-gray-700 mb-6 leading-relaxed">
+            Professional data visualization follows the principle of progressive disclosure: show the most important information prominently, and allow users to drill down for details as needed. By keeping your color palette focused and intentional, you create visualizations that guide viewers to insights rather than overwhelming them with visual noise.
+          </p>
         </div>
       </section>
 
@@ -163,6 +175,18 @@ export default function ColorPalettesPage() {
               <div>
                 <p className="text-gray-700">Copy the palette URL from your browser</p>
                 <p className="text-sm text-gray-500 mt-1">Example: https://coolors.co/palette/264653-2a9d8f-e9c46a</p>
+                <div className="mt-3">
+                  <Image 
+                    src="/coolors-url-location.png" 
+                    alt="Coolors.co URL location - shows where to find and copy the trending palette URL"
+                    width={600}
+                    height={300}
+                    className="rounded-lg border border-gray-200 shadow-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    The URL for trending palettes can be found in your browser's address bar
+                  </p>
+                </div>
               </div>
             </div>
             <div className="flex gap-3">
@@ -275,39 +299,6 @@ export default function ColorPalettesPage() {
         </div>
       </section>
 
-      {/* Best Practices */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Color Palette Best Practices</h2>
-        
-        <div className="space-y-4">
-          <div className="bg-blue-50 rounded-lg p-4">
-            <h4 className="font-medium mb-2">Accessibility</h4>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• Ensure sufficient contrast between colors</li>
-              <li>• Test with colorblind simulation tools</li>
-              <li>• Avoid relying solely on color to convey information</li>
-            </ul>
-          </div>
-
-          <div className="bg-purple-50 rounded-lg p-4">
-            <h4 className="font-medium mb-2">Consistency</h4>
-            <ul className="text-sm text-purple-800 space-y-1">
-              <li>• Use brand colors when available</li>
-              <li>• Maintain color meaning across reports</li>
-              <li>• Limit palette size for clarity (5-8 colors)</li>
-            </ul>
-          </div>
-
-          <div className="bg-green-50 rounded-lg p-4">
-            <h4 className="font-medium mb-2">Visual Hierarchy</h4>
-            <ul className="text-sm text-green-800 space-y-1">
-              <li>• Place primary colors first in the palette</li>
-              <li>• Use vibrant colors for important data</li>
-              <li>• Reserve muted colors for secondary information</li>
-            </ul>
-          </div>
-        </div>
-      </section>
 
       {/* Next Steps */}
       <div className="border-t pt-8">

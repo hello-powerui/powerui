@@ -13,6 +13,16 @@ export interface BlogPostMeta {
 // Add your TSX blog posts here
 export const tsxBlogPosts: BlogPostMeta[] = [
   {
+    slug: 'power-bi-theme-generators',
+    title: 'The Complete Guide to Power BI Theme Generators',
+    date: '2025-01-02',
+    author: 'Power UI Team',
+    excerpt: 'An in-depth comparison of the top Power BI theme generators, their features, limitations, and how they can transform your report design workflow.',
+    tags: ['Power BI', 'Theme Generators', 'Comparison', 'Design Tools'],
+    readingTime: '15 min read',
+    isTsx: true
+  },
+  {
     slug: 'power-bi-design-journey',
     title: 'Your Power BI Design Journey: Resources & Continuous Learning',
     date: '2024-12-24',

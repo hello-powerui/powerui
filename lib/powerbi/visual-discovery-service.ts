@@ -100,6 +100,6 @@ export class VisualDiscoveryService {
    */
   async getAvailableVisualTypes(report: Report): Promise<string[]> {
     const allVisuals = await this.discoverAllVisuals(report);
-    return [...new Set(allVisuals.map(v => v.type))];
+    return Array.from(new Set(allVisuals.map(v => v.type)));
   }
 }

@@ -455,7 +455,7 @@ function VisualPowerBIEmbed({
           cssClassName="visual-container"
           getEmbeddedComponent={(embeddedVisual) => {
             visualRef.current = embeddedVisual as Visual;
-            window.visual = embeddedVisual as Visual;
+            (window as any).visual = embeddedVisual as Visual;
           }}
         />
       </div>

@@ -341,7 +341,7 @@ function ThemeStudioContent() {
         </div>
 
         {/* Preview Panel - Center */}
-        <div className="flex-1 overflow-hidden h-full">
+        <div className="flex-1 overflow-hidden h-full bg-gray-50">
           <ErrorBoundaryWithLogging componentName={viewMode === 'preview' ? 'PowerBIPreview' : 'ThemeJsonView'}>
             {/* Keep Power BI component mounted but hidden when in JSON mode */}
             {(isThemeLoading || !themeStudio.previewTheme) ? (
@@ -372,8 +372,6 @@ function ThemeStudioContent() {
                     }}
                     enterFocusMode={isInFocusMode}
                     useVisualEmbedding={true}
-                    visualWidth={800}
-                    visualHeight={600}
                   />
                 </div>
                 

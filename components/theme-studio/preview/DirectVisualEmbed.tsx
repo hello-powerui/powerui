@@ -5,18 +5,19 @@ import { models, Visual } from 'powerbi-client';
 import { useEffect, useState, useRef, useCallback, memo } from 'react';
 import { powerBIConfig } from '@/lib/powerbi/config';
 import { PowerBIService } from '@/lib/powerbi/service';
-import { getVisualName, hasVisualMapping } from '@/lib/powerbi/visual-name-mapping';
+import { getVisualName, hasVisualMapping, getVisualInfo } from '@/lib/powerbi/visual-name-mapping';
 import { getAllVisualsPage } from '@/lib/powerbi/visual-embed-utils';
 import { Button } from '@/components/ui/button';
-import { ZoomIn, ZoomOut } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ZoomIn, ZoomOut, X, Settings } from 'lucide-react';
 
 interface DirectVisualEmbedProps {
   generatedTheme?: any;
   selectedVisualType?: string;
   selectedVariant?: string;
   onReportReset?: (resetFn: () => void) => void;
-  width?: number;
-  height?: number;
+  onExitFocusMode?: () => void;
 }
 
 function DirectVisualEmbed({ 
@@ -24,8 +25,7 @@ function DirectVisualEmbed({
   selectedVisualType = '*',
   selectedVariant = '*',
   onReportReset,
-  width = 800,
-  height = 600
+  onExitFocusMode
 }: DirectVisualEmbedProps) {
   const [embedConfig, setEmbedConfig] = useState<models.IVisualEmbedConfiguration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +33,10 @@ function DirectVisualEmbed({
   const visualRef = useRef<Visual | null>(null);
   const powerBIService = PowerBIService.getInstance();
   const [currentZoom, setCurrentZoom] = useState(1.0);
+  const [visualDimensions, setVisualDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [customDimensions, setCustomDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [inputDimensions, setInputDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Generate theme with computed variant styles
   const variantPreviewTheme = useCallback(() => {
@@ -64,30 +68,41 @@ function DirectVisualEmbed({
     };
   }, [generatedTheme, selectedVisualType, selectedVariant])();
 
-  // Load visual when theme is ready
+  // Track if visual has been loaded initially
+  const hasLoadedInitially = useRef(false);
+
+  // Load visual only once when component mounts or visual type changes
   useEffect(() => {
     if (!variantPreviewTheme || selectedVisualType === '*' || !hasVisualMapping(selectedVisualType)) {
       return;
     }
+
+    // Reset the loaded flag when visual type changes
+    hasLoadedInitially.current = false;
 
     const loadVisual = async () => {
       try {
         setIsLoading(true);
         setError(null);
         
-        const visualName = getVisualName(selectedVisualType);
-        if (!visualName) {
+        const visualInfo = getVisualInfo(selectedVisualType);
+        if (!visualInfo) {
           throw new Error(`No visual mapping found for type '${selectedVisualType}'`);
         }
 
-        console.log(`Embedding visual '${visualName}' for type '${selectedVisualType}'`);
+        setVisualDimensions({ width: visualInfo.width, height: visualInfo.height });
+        // Initialize custom and input dimensions if not set
+        if (!customDimensions) {
+          setCustomDimensions({ width: visualInfo.width, height: visualInfo.height });
+          setInputDimensions({ width: visualInfo.width, height: visualInfo.height });
+        }
         
         // Get the embed configuration
         const config = await powerBIService.getVisualEmbedConfigWithTheme(
           powerBIConfig.reportId,
           powerBIConfig.workspaceId,
           getAllVisualsPage(),
-          visualName,
+          visualInfo.name,
           variantPreviewTheme
         );
         
@@ -96,6 +111,10 @@ function DirectVisualEmbed({
         delete themeToEmbed.reportPage;
         
         // Create the visual embed configuration
+        // Use custom dimensions if available, otherwise use default
+        const embedWidth = customDimensions?.width || visualInfo.width;
+        const embedHeight = customDimensions?.height || visualInfo.height;
+        
         const visualEmbedConfig: models.IVisualEmbedConfiguration = {
           type: 'visual',
           id: config.id,
@@ -103,17 +122,26 @@ function DirectVisualEmbed({
           accessToken: config.accessToken,
           tokenType: models.TokenType.Embed,
           pageName: getAllVisualsPage(),
-          visualName: visualName,
+          visualName: visualInfo.name,
           settings: {
             filterPaneEnabled: false,
             navContentPaneEnabled: false,
-            background: models.BackgroundType.Transparent
+            visualSettings: {
+              visualHeaders: [
+                {
+                  settings: {
+                    visible: false
+                  }
+                }
+              ]
+            }
           },
           theme: { themeJson: themeToEmbed }
         };
-
+        
         setEmbedConfig(visualEmbedConfig);
         setIsLoading(false);
+        hasLoadedInitially.current = true;
         
       } catch (err) {
         console.error('Failed to load visual:', err);
@@ -122,8 +150,12 @@ function DirectVisualEmbed({
       }
     };
 
-    loadVisual();
-  }, [variantPreviewTheme, selectedVisualType, powerBIService]);
+    // Only load if we haven't loaded this visual yet
+    if (!hasLoadedInitially.current) {
+      loadVisual();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedVisualType, powerBIService, customDimensions]); // Need to reload when dimensions change
 
   // Apply theme updates
   useEffect(() => {
@@ -148,11 +180,9 @@ function DirectVisualEmbed({
 
   // Reset visual
   const resetVisual = useCallback(() => {
-    setEmbedConfig(null);
-    setIsLoading(true);
-    setError(null);
-    // Force a re-render by changing state
+    // Reset zoom only
     setCurrentZoom(1.0);
+    // For visual embedding, we don't need to reload - just reset zoom
   }, []);
 
   // Expose reset function to parent
@@ -165,7 +195,10 @@ function DirectVisualEmbed({
   // Event handlers
   const eventHandlers = new Map([
     ['loaded', function () {
-      console.log('Visual loaded successfully');
+      // Visual loaded successfully
+    }],
+    ['rendered', function() {
+      // Visual rendered
     }],
     ['error', function (event: any) {
       console.error('Visual error:', event);
@@ -181,7 +214,7 @@ function DirectVisualEmbed({
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center bg-gray-50 rounded-lg" style={{ width, height }}>
+      <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
           <p className="text-sm text-gray-600">Loading visual...</p>
@@ -193,7 +226,7 @@ function DirectVisualEmbed({
   // Error state
   if (error) {
     return (
-      <div className="flex items-center justify-center bg-gray-50 rounded-lg" style={{ width, height }}>
+      <div className="flex items-center justify-center h-full">
         <div className="text-center max-w-md">
           <div className="mb-4">
             <svg className="w-12 h-12 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -213,7 +246,7 @@ function DirectVisualEmbed({
   // Unsupported visual type
   if (selectedVisualType === '*' || !hasVisualMapping(selectedVisualType)) {
     return (
-      <div className="flex items-center justify-center bg-gray-50 rounded-lg" style={{ width, height }}>
+      <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <p className="text-sm text-gray-600">
             {selectedVisualType === '*' 
@@ -229,55 +262,155 @@ function DirectVisualEmbed({
   // No embed config
   if (!embedConfig) {
     return (
-      <div className="flex items-center justify-center bg-gray-50 rounded-lg" style={{ width, height }}>
+      <div className="flex items-center justify-center h-full">
         <p className="text-sm text-gray-600">Preparing visual...</p>
       </div>
     );
   }
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-gray-200" style={{ width, height }}>
-      {/* Zoom controls */}
-      <div className="absolute top-2 left-2 z-50 flex items-center gap-1 bg-white rounded-lg shadow-lg p-2 border border-gray-200">
-        <Button onClick={zoomOut} variant="outline" size="sm" className="h-8 w-8 p-0" disabled={currentZoom <= 0.25}>
-          <ZoomOut className="w-3 h-3" />
-        </Button>
-        <Button onClick={resetZoom} variant="outline" size="sm" className="h-8 px-2 text-xs font-medium" disabled={currentZoom === 1.0}>
-          {Math.round(currentZoom * 100)}%
-        </Button>
-        <Button onClick={zoomIn} variant="outline" size="sm" className="h-8 w-8 p-0" disabled={currentZoom >= 4.0}>
-          <ZoomIn className="w-3 h-3" />
-        </Button>
+    <div className="flex flex-col h-full w-full bg-transparent">
+      {/* Fixed header controls */}
+      <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200 flex-shrink-0">
+        {/* Controls */}
+        <div className="flex items-center gap-2">
+          {/* Zoom controls */}
+          <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-1 border border-gray-200">
+            <Button onClick={zoomOut} variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={currentZoom <= 0.25}>
+              <ZoomOut className="w-3 h-3" />
+            </Button>
+            <Button onClick={resetZoom} variant="ghost" size="sm" className="h-8 px-3 text-xs font-medium" disabled={currentZoom === 1.0}>
+              {Math.round(currentZoom * 100)}%
+            </Button>
+            <Button onClick={zoomIn} variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={currentZoom >= 4.0}>
+              <ZoomIn className="w-3 h-3" />
+            </Button>
+          </div>
+          
+          {/* Settings toggle */}
+          <Button 
+            onClick={() => setShowSettings(!showSettings)} 
+            variant="outline" 
+            size="sm" 
+            className={showSettings ? "bg-gray-100" : ""}
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Exit focus mode button */}
+        {onExitFocusMode && (
+          <Button 
+            onClick={onExitFocusMode} 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-2"
+          >
+            <X className="w-4 h-4" />
+            Exit Focus Mode
+          </Button>
+        )}
       </div>
       
-      {/* Visual embed */}
-      <div 
-        className="visual-embed-container" 
-        style={{ 
-          width: '100%', 
-          height: '100%',
-          transform: `scale(${currentZoom})`,
-          transformOrigin: 'top left'
-        }}
-      >
-        <PowerBIEmbed
-          embedConfig={embedConfig}
-          eventHandlers={eventHandlers}
-          cssClassName="direct-visual-container"
-          getEmbeddedComponent={(embeddedVisual) => {
-            visualRef.current = embeddedVisual as Visual;
+      {/* Settings panel */}
+      {showSettings && (
+        <div className="bg-white border-b border-gray-200 p-4">
+          <div className="flex items-end gap-4">
+            <div>
+              <Label htmlFor="width" className="text-xs">Width</Label>
+              <Input
+                id="width"
+                type="number"
+                value={inputDimensions?.width || 0}
+                onChange={(e) => setInputDimensions(prev => ({ 
+                  width: parseInt(e.target.value) || 0, 
+                  height: prev?.height || 0 
+                }))}
+                className="w-24 h-8"
+              />
+            </div>
+            <div>
+              <Label htmlFor="height" className="text-xs">Height</Label>
+              <Input
+                id="height"
+                type="number"
+                value={inputDimensions?.height || 0}
+                onChange={(e) => setInputDimensions(prev => ({ 
+                  width: prev?.width || 0, 
+                  height: parseInt(e.target.value) || 0 
+                }))}
+                className="w-24 h-8"
+              />
+            </div>
+            <Button 
+              onClick={() => {
+                // Apply the input dimensions
+                if (inputDimensions) {
+                  setCustomDimensions(inputDimensions);
+                }
+              }} 
+              size="sm"
+            >
+              Apply
+            </Button>
+            <Button 
+              onClick={() => {
+                if (visualDimensions) {
+                  setCustomDimensions(visualDimensions);
+                  setInputDimensions(visualDimensions);
+                }
+              }} 
+              variant="outline" 
+              size="sm"
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+      )}
+      
+      {/* Direct visual embed with minimal wrapper */}
+      <div className="flex-1 overflow-auto flex items-center justify-center">
+        <div 
+          className="powerbi-visual-embed-direct"
+          style={{ 
+            width: customDimensions ? `${customDimensions.width}px` : '400px',
+            height: customDimensions ? `${customDimensions.height}px` : '300px',
+            flexShrink: 0
           }}
-        />
+        >
+          <PowerBIEmbed
+            embedConfig={embedConfig}
+            eventHandlers={eventHandlers}
+            cssClassName="powerbi-embed-container"
+            getEmbeddedComponent={(embeddedVisual) => {
+              visualRef.current = embeddedVisual as Visual;
+            }}
+          />
+        </div>
       </div>
 
       <style jsx global>{`
-        .direct-visual-container {
-          height: 100%;
-          width: 100%;
+        .powerbi-visual-embed-direct {
+          transform: scale(${currentZoom});
+          transform-origin: top left;
         }
-        .direct-visual-container iframe {
-          border: none;
-          border-radius: 0;
+        .powerbi-embed-container {
+          width: 100% !important;
+          height: 100% !important;
+        }
+        .powerbi-embed-container iframe {
+          border: none !important;
+          display: block;
+          width: 100% !important;
+          height: 100% !important;
+          /* Attempt to fix 1px clipping */
+          box-sizing: border-box !important;
+          overflow: visible !important;
+        }
+        /* Target the iframe content if accessible */
+        .powerbi-embed-container iframe body {
+          overflow: visible !important;
         }
       `}</style>
     </div>

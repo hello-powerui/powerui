@@ -131,6 +131,15 @@ function SimplePowerBIEmbed({
               actionBar: {
                 visible: false
               }
+            },
+            visualSettings: {
+              visualHeaders: [
+                {
+                  settings: {
+                    visible: false
+                  }
+                }
+              ]
             }
           },
           theme: { themeJson: themeToEmbed }
@@ -270,7 +279,16 @@ function SimplePowerBIEmbed({
               navContentPaneEnabled: false,
               layoutType: models.LayoutType.Custom,
               customLayout: { displayOption: models.DisplayOption.ActualSize },
-              bars: { actionBar: { visible: false } }
+              bars: { actionBar: { visible: false } },
+              visualSettings: {
+                visualHeaders: [
+                  {
+                    settings: {
+                      visible: false
+                    }
+                  }
+                ]
+              }
             },
             theme: variantPreviewTheme ? { themeJson: variantPreviewTheme } : undefined
           };
@@ -452,7 +470,16 @@ function SimplePowerBIEmbed({
                     navContentPaneEnabled: false,
                     layoutType: models.LayoutType.Custom,
                     customLayout: { displayOption: models.DisplayOption.ActualSize },
-                    bars: { actionBar: { visible: false } }
+                    bars: { actionBar: { visible: false } },
+                    visualSettings: {
+                      visualHeaders: [
+                        {
+                          settings: {
+                            visible: false
+                          }
+                        }
+                      ]
+                    }
                   },
                   theme: variantPreviewTheme ? { themeJson: variantPreviewTheme } : undefined
                 };
