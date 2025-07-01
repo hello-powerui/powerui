@@ -1,4 +1,6 @@
-import { VisualStyles, VisualStyleProperties } from '@/types/powerbi';
+// Type definitions for visual styles
+type VisualStyleProperties = Record<string, any>;
+type VisualStyles = Record<string, Record<string, VisualStyleProperties>>;
 
 /**
  * Computes the final style for a variant by merging the default "*" style with variant overrides

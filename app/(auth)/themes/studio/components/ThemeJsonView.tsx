@@ -28,7 +28,7 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
       computedVisualStyles[visualType] = {};
       
       Object.keys(variants).forEach(variantName => {
-        const computed = computeVariantStyle(theme.visualStyles, visualType, variantName);
+        const computed = computeVariantStyle(theme.visualStyles!, visualType, variantName);
         if (computed) {
           computedVisualStyles[visualType][variantName] = computed;
         }
