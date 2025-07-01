@@ -2,8 +2,8 @@ import { models, Report, Page, VisualDescriptor } from 'powerbi-client';
 
 // Page names in the Power BI report
 export const REPORT_PAGES = {
-  HOME: 'Home',           // Dashboard page shown by default
-  ALL_VISUALS: 'AllVisuals'  // Page with individual visual samples
+  HOME: '25c6da65b73d6e0cd103',           // Dashboard page (display name: Home)
+  ALL_VISUALS: '97051b42cbd76adb2f5b'     // Visual samples page (display name: AllVisuals)
 } as const;
 
 // Visual type mapping from theme studio to Power BI visual types
