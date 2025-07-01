@@ -7,6 +7,7 @@ import { AZURE_NEUTRAL_PALETTE, DEFAULT_COLOR_PALETTE } from '@/lib/defaults/pal
 import isEqual from 'fast-deep-equal';
 import { cleanupVisualStyles } from '@/lib/utils/theme-helpers';
 import { detectQuickCustomizationsFromVisualStyles, isPropertyControlledByQuickCustomization } from '@/lib/theme-studio/quick-customization-utils';
+import { computeVariantStyle, getPropertySources } from '@/lib/theme-generation/variant-merge-utils';
 
 // Single unified theme structure
 interface StudioTheme {
@@ -105,6 +106,10 @@ interface ThemeStudioState {
   createVariant: (visual: string, variantName: string, initialData?: any) => void;
   deleteVariant: (visual: string, variantName: string) => void;
   renameVariant: (visual: string, oldName: string, newName: string) => void;
+  
+  // Computed style methods (for showing merged styles in UI)
+  getComputedStyle: (visual: string, variant: string) => any;
+  getPropertySource: (visual: string, variant: string, property: string) => 'inherited' | 'overridden' | 'new' | null;
   
   // Loading/saving actions
   setIsSaving: (saving: boolean) => void;
@@ -435,6 +440,28 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
             selectedVariant: newName, // Update selection to the new name
           };
         });
+      },
+      
+      // Computed style methods
+      getComputedStyle: (visual, variant) => {
+        const state = get();
+        return computeVariantStyle(state.theme.visualStyles, visual, variant);
+      },
+      
+      getPropertySource: (visual, variant, property) => {
+        const state = get();
+        const visualStyles = state.theme.visualStyles;
+        
+        if (!visualStyles[visual]) return null;
+        
+        const baseStyle = visualStyles[visual]['*'] || {};
+        const variantStyle = visualStyles[visual][variant] || {};
+        const computedStyle = computeVariantStyle(visualStyles, visual, variant);
+        
+        if (!computedStyle || !(property in computedStyle)) return null;
+        
+        const sources = getPropertySources(baseStyle, variantStyle, computedStyle);
+        return sources.get(property) || null;
       },
 
       // Loading/saving actions

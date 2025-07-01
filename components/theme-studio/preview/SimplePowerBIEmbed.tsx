@@ -53,7 +53,7 @@ function SimplePowerBIEmbed({
   const [isResetting, setIsResetting] = useState(false);
   const hasLoadedReport = useRef(false);
 
-  // Generate theme with selected variant as default
+  // Generate theme with computed variant styles (merged with default)
   const variantPreviewTheme = useMemo(() => {
     if (!generatedTheme || selectedVisualType === '*' || selectedVariant === '*') {
       return generatedTheme;
@@ -65,14 +65,24 @@ function SimplePowerBIEmbed({
       return generatedTheme;
     }
 
-    // Create a modified theme where the selected variant becomes the default (*)
+    // Import the merge utility
+    const { computeVariantStyle } = require('@/lib/theme-generation/variant-merge-utils');
+    
+    // Get the computed style (base merged with variant)
+    const computedStyle = computeVariantStyle(generatedTheme.visualStyles, selectedVisualType, selectedVariant);
+    
+    if (!computedStyle) {
+      return generatedTheme;
+    }
+
+    // Create a modified theme where the default (*) shows the computed result
     return {
       ...generatedTheme,
       visualStyles: {
         ...generatedTheme.visualStyles,
         [selectedVisualType]: {
           ...visualStyles,
-          '*': visualStyles[selectedVariant] // Make selected variant the default
+          '*': computedStyle // Show computed style as default
         }
       }
     };
