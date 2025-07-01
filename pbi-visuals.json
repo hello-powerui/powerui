@@ -1,0 +1,768 @@
+[
+    {
+      "name": "25c6da65b73d6e0cd103",
+      "displayName": "Home",
+      "isActive": true,
+      "visuals": [
+        {
+          "name": "4dbb0fb50e101c25010e",
+          "type": "clusteredColumnChart",
+          "title": "Sales Amount and Sales PY by Quarter",
+          "layout": {
+            "x": 217.88655788655797,
+            "y": 360.08547008547026,
+            "z": 0,
+            "width": 398.88888888888886,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "25c6da65b73d6e0cd103"
+        },
+        {
+          "name": "64366300947ae3a4087a",
+          "type": "barChart",
+          "title": "Sales Amount by Quarter and Continent",
+          "layout": {
+            "x": 215.66433566433574,
+            "y": 30.0854700854701,
+            "z": 1000,
+            "width": 401.1111111111111,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "25c6da65b73d6e0cd103"
+        },
+        {
+          "name": "0719f8a0627230e88bd5",
+          "type": "columnChart",
+          "title": "Sales Amount by Quarter and Continent",
+          "layout": {
+            "x": 644.5532245532248,
+            "y": 30.0854700854701,
+            "z": 2000,
+            "width": 398.88888888888886,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "25c6da65b73d6e0cd103"
+        },
+        {
+          "name": "b7c11e066bb4780bc0ea",
+          "type": "hundredPercentStackedBarChart",
+          "title": "Sales Amount by Quarter and Continent",
+          "layout": {
+            "x": 644.4755244755245,
+            "y": 361.02564102564105,
+            "z": 3000,
+            "width": 398.81895881895883,
+            "height": 299.3628593628594,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "25c6da65b73d6e0cd103"
+        }
+      ]
+    },
+    {
+      "name": "97051b42cbd76adb2f5b",
+      "displayName": "AllVisuals",
+      "isActive": false,
+      "visuals": [
+        {
+          "name": "6581e6c6e4b12494d4e9",
+          "type": "clusteredColumnChart",
+          "title": "Sales Amount and Sales PY by Quarter",
+          "layout": {
+            "x": 24.444444444444443,
+            "y": 365.55555555555554,
+            "z": 0,
+            "width": 398.88888888888886,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "7177bfb3b020ee4cee1f",
+          "type": "actionButton",
+          "title": "Button",
+          "layout": {
+            "x": 988.75,
+            "y": 4257.5,
+            "z": 1000,
+            "width": 100,
+            "height": 40,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "a514429d97b4ca4dc991",
+          "type": "donutChart",
+          "title": "Sales Amount by Day of Week",
+          "layout": {
+            "x": 870,
+            "y": 1697.5,
+            "z": 2000,
+            "width": 401.25,
+            "height": 301.25,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "0c42bff8585d88872591",
+          "type": "barChart",
+          "title": "Sales Amount by Quarter and Continent",
+          "layout": {
+            "x": 22.22222222222222,
+            "y": 35.55555555555556,
+            "z": 3000,
+            "width": 401.1111111111111,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "7d512382a74bcf497381",
+          "type": "tableEx",
+          "title": "Table",
+          "layout": {
+            "x": 335,
+            "y": 2583.75,
+            "z": 4000,
+            "width": 421.25,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "adada8fecea45593c511",
+          "type": "kpi",
+          "title": "Sales Amount and Sales PY by YearMonthNumber",
+          "layout": {
+            "x": 466.25,
+            "y": 2381.25,
+            "z": 5000,
+            "width": 366.25,
+            "height": 168.75,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "f2582bc09cb53735c2f5",
+          "type": "azureMap",
+          "title": "Sales Amount by Country",
+          "layout": {
+            "x": 872.5,
+            "y": 2030,
+            "z": 6000,
+            "width": 398.75,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "4d46ddf9bc99f8b363c4",
+          "type": "textbox",
+          "title": "Text box",
+          "layout": {
+            "x": 601.25,
+            "y": 4411.25,
+            "z": 7000,
+            "width": 205,
+            "height": 151.25,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "a7edc34117d9efa7844d",
+          "type": "image",
+          "title": "Image",
+          "layout": {
+            "x": 590,
+            "y": 4211.25,
+            "z": 8000,
+            "width": 166.25,
+            "height": 157.5,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "057aea91daa664c40626",
+          "type": "shape",
+          "title": "Shape",
+          "layout": {
+            "x": 780,
+            "y": 4228.75,
+            "z": 9000,
+            "width": 181.25,
+            "height": 123.75,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "72eaf7bf5be97a046887",
+          "type": "columnChart",
+          "title": "Sales Amount by Quarter and Continent",
+          "layout": {
+            "x": 451.1111111111111,
+            "y": 35.55555555555556,
+            "z": 10000,
+            "width": 398.88888888888886,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "45da91cc51bfdbd0b241",
+          "type": "clusteredBarChart",
+          "title": "Sales Amount by Quarter and Year",
+          "layout": {
+            "x": 878.8888888888889,
+            "y": 35.55555555555556,
+            "z": 11000,
+            "width": 398.88888888888886,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "8957f95a5d7eb32bd00e",
+          "type": "hundredPercentStackedBarChart",
+          "title": "Sales Amount by Quarter and Continent",
+          "layout": {
+            "x": 451.1111111111111,
+            "y": 351.1111111111111,
+            "z": 12000,
+            "width": 398.88888888888886,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "346ffc43aba74eeda113",
+          "type": "hundredPercentStackedColumnChart",
+          "title": "Sales Amount by Quarter and Continent",
+          "layout": {
+            "x": 870,
+            "y": 343.3333333333333,
+            "z": 13000,
+            "width": 400,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "53a5636c395dd93d600e",
+          "type": "areaChart",
+          "title": "Sales Amount and Sales PM by Date",
+          "layout": {
+            "x": 451.25,
+            "y": 695,
+            "z": 14000,
+            "width": 398.75,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "9df16772927cb14b740b",
+          "type": "lineChart",
+          "title": "Sales Amount by Date",
+          "layout": {
+            "x": 24.444444444444443,
+            "y": 695.5555555555555,
+            "z": 15000,
+            "width": 398.88888888888886,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "8593a93f608a43ee637c",
+          "type": "stackedAreaChart",
+          "title": "Sales Amount and Sales PM by Date",
+          "layout": {
+            "x": 871.1111111111111,
+            "y": 695.5555555555555,
+            "z": 16000,
+            "width": 398.88888888888886,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "3b6db527a2c31222a208",
+          "type": "hundredPercentStackedAreaChart",
+          "title": "Sales Amount by Date and Continent",
+          "layout": {
+            "x": 13.333333333333332,
+            "y": 1034.4444444444443,
+            "z": 17000,
+            "width": 398.88888888888886,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "8d274c20db10a2b70095",
+          "type": "pieChart",
+          "title": "Sales Amount by Day of Week",
+          "layout": {
+            "x": 450,
+            "y": 1697.5,
+            "z": 18000,
+            "width": 398.75,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "aa5a8bc66dab7292b616",
+          "type": "kpi",
+          "title": "Sales Amount and Sales PY by YearQuarter",
+          "layout": {
+            "x": 872.5,
+            "y": 2381.25,
+            "z": 19000,
+            "width": 366.25,
+            "height": 168.75,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "6c51c7e01a5462e95534",
+          "type": "cardVisual",
+          "title": "Card (new)",
+          "layout": {
+            "x": 25,
+            "y": 3360,
+            "z": 20000,
+            "width": 401.25,
+            "height": 171.25,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "5b398401550babd3c0e2",
+          "type": "cardVisual",
+          "title": "Card (new)",
+          "layout": {
+            "x": 806.25,
+            "y": 2720,
+            "z": 21000,
+            "width": 401.25,
+            "height": 172.5,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "16d46aec0786b123c92c",
+          "type": "lineStackedColumnComboChart",
+          "title": "Sales Amount and Sales PY by Quarter and Continent",
+          "layout": {
+            "x": 451.25,
+            "y": 1035,
+            "z": 22000,
+            "width": 398.75,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "821dae2fc80129508370",
+          "type": "lineClusteredColumnComboChart",
+          "title": "Sales Amount and Sales PY by Quarter and Continent",
+          "layout": {
+            "x": 871.25,
+            "y": 1035,
+            "z": 23000,
+            "width": 398.75,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "fdde62bac13dc781165c",
+          "type": "ribbonChart",
+          "title": "Sales Amount by Quarter and Continent",
+          "layout": {
+            "x": 13.75,
+            "y": 1362.5,
+            "z": 24000,
+            "width": 398.75,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "146a6505020a0e20915c",
+          "type": "waterfallChart",
+          "title": "Sales Amount by Quarter and Continent",
+          "layout": {
+            "x": 452.5,
+            "y": 1362.5,
+            "z": 25000,
+            "width": 398.75,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "a5ac24667e85ed3a41e9",
+          "type": "funnel",
+          "title": "Sales Amount by Quarter",
+          "layout": {
+            "x": 871.25,
+            "y": 1362.5,
+            "z": 26000,
+            "width": 398.75,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "99e1aabb7966cb303a33",
+          "type": "scatterChart",
+          "title": "Sales Amount by Day of Week",
+          "layout": {
+            "x": 12.5,
+            "y": 1697.5,
+            "z": 27000,
+            "width": 401.25,
+            "height": 302.5,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "4f19c7f044133184b117",
+          "type": "pivotTable",
+          "title": "Matrix",
+          "layout": {
+            "x": 792.5,
+            "y": 2583.75,
+            "z": 28000,
+            "width": 435,
+            "height": 366.25,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "8572c49ac022ae502241",
+          "type": "filledMap",
+          "title": "Sales Amount by Country",
+          "layout": {
+            "x": 12.5,
+            "y": 2030,
+            "z": 29000,
+            "width": 398.75,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "99d36fad54a7d86a0ea0",
+          "type": "shapeMap",
+          "title": "Sales Amount by State",
+          "layout": {
+            "x": 450,
+            "y": 2030,
+            "z": 30000,
+            "width": 398.75,
+            "height": 300,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "ec322361c8a20dc86ba4",
+          "type": "gauge",
+          "title": "Sales Amount and Sales PY",
+          "layout": {
+            "x": 22.5,
+            "y": 2381.25,
+            "z": 31000,
+            "width": 366.25,
+            "height": 168.75,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "8b6109146375509d1031",
+          "type": "slicer",
+          "title": "Slicer",
+          "layout": {
+            "x": 22.5,
+            "y": 2592.5,
+            "z": 32000,
+            "width": 263.75,
+            "height": 150,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "3c362e509150d4be220d",
+          "type": "decompositionTreeVisual",
+          "title": "Decomposition tree",
+          "layout": {
+            "x": 46.25,
+            "y": 2883.75,
+            "z": 33000,
+            "width": 480,
+            "height": 327.5,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "d1233b7f604093c253e3",
+          "type": "qnaVisual",
+          "title": "Q&A",
+          "layout": {
+            "x": 342.5,
+            "y": 2892.5,
+            "z": 34000,
+            "width": 406.25,
+            "height": 427.5,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "5be8cecf7989a3885379",
+          "type": "cardVisual",
+          "title": "Card (new)",
+          "layout": {
+            "x": 438.75,
+            "y": 3360,
+            "z": 35000,
+            "width": 401.25,
+            "height": 171.25,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "f072b1a1900d368800d9",
+          "type": "cardVisual",
+          "title": "Card (new)",
+          "layout": {
+            "x": 855,
+            "y": 3360,
+            "z": 36000,
+            "width": 401.25,
+            "height": 308.75,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "a152f21be400aeda2692",
+          "type": "cardVisual",
+          "title": "Card (new)",
+          "layout": {
+            "x": 33.75,
+            "y": 3552.5,
+            "z": 37000,
+            "width": 690,
+            "height": 145,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "84aef77d9b597d658376",
+          "type": "advancedSlicerVisual",
+          "title": "Country",
+          "layout": {
+            "x": 46.25,
+            "y": 3733.75,
+            "z": 38000,
+            "width": 500,
+            "height": 180,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "b7dd05a01eb081327cd6",
+          "type": "pageNavigator",
+          "title": "Page navigator",
+          "layout": {
+            "x": 50.625,
+            "y": 3974.375,
+            "z": 39000,
+            "width": 800,
+            "height": 50,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "af77a72ae211a02e07b9",
+          "type": "bookmarkNavigator",
+          "title": "Bookmark navigator",
+          "layout": {
+            "x": 50.625,
+            "y": 4075.625,
+            "z": 40000,
+            "width": 800,
+            "height": 42.5,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "b3ea7b180a55de0d6de4",
+          "type": "textSlicer",
+          "title": "Country",
+          "layout": {
+            "x": 51.25,
+            "y": 4188.75,
+            "z": 41000,
+            "width": 500,
+            "height": 180,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        },
+        {
+          "name": "29174ae220bc24d97277",
+          "type": "listSlicer",
+          "title": "Continent",
+          "layout": {
+            "x": 51.25,
+            "y": 4411.25,
+            "z": 42000,
+            "width": 316.25,
+            "height": 350,
+            "displayState": {
+              "mode": 0
+            }
+          },
+          "pageName": "97051b42cbd76adb2f5b"
+        }
+      ]
+    }
+  ]

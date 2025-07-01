@@ -5,7 +5,6 @@ import { models, Report, Page, VisualDescriptor } from 'powerbi-client';
 import { useEffect, useState, useRef, useMemo, useCallback, memo } from 'react';
 import { powerBIConfig } from '@/lib/powerbi/config';
 import { PowerBIService } from '@/lib/powerbi/service';
-import { generateFocusedVisualLayout, generateDefaultLayout, VisualInfo } from '@/lib/powerbi/visual-focus-utils';
 import { getHomePage } from '@/lib/powerbi/visual-embed-utils';
 import { 
   Select,
@@ -24,7 +23,7 @@ interface SimplePowerBIEmbedProps {
   onExitFocusMode?: () => void;
   onVariantChange?: (variant: string) => void;
   onReportReset?: (resetFn: () => void) => void;
-  enterFocusMode?: boolean;
+  enterFocusMode?: boolean; // Kept for compatibility but ignored
 }
 
 // Global types are defined in types/global.d.ts
@@ -45,8 +44,6 @@ function SimplePowerBIEmbed({
   const maxRetries = 3;
   const reportRef = useRef<Report | null>(null);
   const powerBIService = PowerBIService.getInstance();
-  const [focusMode, setFocusMode] = useState(false);
-  const [visuals, setVisuals] = useState<VisualInfo[]>([]);
   const currentPageRef = useRef<Page | null>(null);
   const [isReportReady, setIsReportReady] = useState(false);
   const [currentZoom, setCurrentZoom] = useState(1.0);

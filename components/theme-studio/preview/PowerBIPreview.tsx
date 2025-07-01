@@ -19,8 +19,8 @@ const SimplePowerBIEmbed = dynamic(
   }
 );
 
-const VisualPowerBIEmbed = dynamic(
-  () => import('./VisualPowerBIEmbed'),
+const DirectVisualEmbed = dynamic(
+  () => import('./DirectVisualEmbed'),
   { 
     ssr: false,
     loading: () => (
@@ -62,10 +62,10 @@ export function PowerBIPreview({
   // Convert empty string to '*' for consistency with focus mode logic
   const normalizedVisualType = selectedVisualType || '*';
   
-  // Use visual embedding only when in focus mode with a specific visual type
+  // Use visual embedding when in focus mode with a specific visual type
   if (useVisualEmbedding && enterFocusMode && normalizedVisualType !== '*') {
     return (
-      <VisualPowerBIEmbed 
+      <DirectVisualEmbed 
         generatedTheme={generatedTheme} 
         selectedVisualType={normalizedVisualType}
         selectedVariant={selectedVariant}
@@ -76,7 +76,7 @@ export function PowerBIPreview({
     );
   }
   
-  // Fall back to full report embedding with focus mode
+  // Default: show full report (Home page)
   return (
     <SimplePowerBIEmbed 
       generatedTheme={generatedTheme} 
@@ -85,7 +85,7 @@ export function PowerBIPreview({
       onExitFocusMode={onExitFocusMode}
       onVariantChange={onVariantChange}
       onReportReset={onReportReset}
-      enterFocusMode={enterFocusMode}
+      enterFocusMode={false} // Never use old focus mode
     />
   );
 }

@@ -9,8 +9,10 @@ import {
   generateVisualEmbedConfig, 
   isVisualTypeSupported,
   findVisualByType,
-  getAllVisualsPage
+  getAllVisualsPage,
+  getPowerBIVisualTypes
 } from '@/lib/powerbi/visual-embed-utils';
+import { VisualDiscoveryService } from '@/lib/powerbi/visual-discovery-service';
 import { Button } from '@/components/ui/button';
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 
