@@ -1,11 +1,13 @@
 import { powerBIConfig } from './config';
 
 export interface EmbedConfig {
-  type: 'report';
+  type: 'report' | 'visual';
   id: string;
   embedUrl: string;
   accessToken: string;
   tokenType: number;
+  pageName?: string;
+  visualName?: string;
   theme?: any;
   settings?: {
     panes?: {
@@ -17,6 +19,8 @@ export interface EmbedConfig {
       };
     };
     background?: string;
+    filterPaneEnabled?: boolean;
+    navContentPaneEnabled?: boolean;
   };
 }
 
@@ -133,6 +137,36 @@ export class PowerBIService {
         filters: { visible: false },
         pageNavigation: { visible: false },
       },
+      background: 'transparent',
+    };
+
+    return embedConfig;
+  }
+
+  // Generate visual embed configuration with theme
+  async getVisualEmbedConfigWithTheme(
+    reportId: string,
+    workspaceId: string,
+    pageName: string,
+    visualName: string,
+    theme?: any
+  ): Promise<EmbedConfig> {
+    const embedConfig = await this.getEmbedToken(reportId, workspaceId);
+
+    // Convert to visual embed config
+    embedConfig.type = 'visual';
+    embedConfig.pageName = pageName;
+    embedConfig.visualName = visualName;
+
+    // Don't wrap theme here - it will be wrapped by the caller
+    if (theme) {
+      embedConfig.theme = theme;
+    }
+
+    // Add default settings for visual embedding
+    embedConfig.settings = {
+      filterPaneEnabled: false,
+      navContentPaneEnabled: false,
       background: 'transparent',
     };
 

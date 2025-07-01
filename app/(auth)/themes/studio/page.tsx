@@ -371,6 +371,9 @@ function ThemeStudioContent() {
                       setTimeout(() => setReportResetFn(() => resetFn), 0);
                     }}
                     enterFocusMode={isInFocusMode}
+                    useVisualEmbedding={true}
+                    visualWidth={800}
+                    visualHeight={600}
                   />
                 </div>
                 
