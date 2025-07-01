@@ -17,6 +17,7 @@ interface StateAwarePropertySectionProps {
   level: number;
   hideTitle?: boolean;
   SchemaForm: React.ComponentType<any>;
+  isVisualContext?: boolean;
 }
 
 export function StateAwarePropertySection({
@@ -27,7 +28,8 @@ export function StateAwarePropertySection({
   path,
   level,
   hideTitle,
-  SchemaForm
+  SchemaForm,
+  isVisualContext
 }: StateAwarePropertySectionProps) {
   const globalSelectedState = useThemeStudioStore(state => state.selectedState) || 'default';
   const trackChangeRef = useThemeChanges(state => state.trackChange);
@@ -283,6 +285,7 @@ export function StateAwarePropertySection({
                     path={[...path, globalSelectedState, propName]}
                     level={level + 1}
                     hideTitle={false}
+                    isVisualContext={isVisualContext}
                   />
                 </ConnectedProperty>
               );

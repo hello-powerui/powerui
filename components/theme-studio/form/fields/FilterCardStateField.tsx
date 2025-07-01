@@ -17,6 +17,7 @@ interface FilterCardStateFieldProps {
   level: number;
   hideTitle?: boolean;
   SchemaForm: React.ComponentType<any>;
+  isVisualContext?: boolean;
 }
 
 export function FilterCardStateField({
@@ -27,7 +28,8 @@ export function FilterCardStateField({
   path,
   level,
   hideTitle,
-  SchemaForm
+  SchemaForm,
+  isVisualContext
 }: FilterCardStateFieldProps) {
   const trackChangeRef = useThemeChanges(state => state.trackChange);
   
@@ -131,6 +133,7 @@ export function FilterCardStateField({
                     path={[...path, selectedState, propName]}
                     level={level + 1}
                     hideTitle={false}
+                    isVisualContext={isVisualContext}
                   />
                 </ConnectedProperty>
               );

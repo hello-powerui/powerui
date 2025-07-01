@@ -52,16 +52,6 @@ export function SchemaForm({
 }: SchemaFormProps) {
   const trackChangeRef = useThemeChanges(state => state.trackChange);
   
-  // Debug logging
-  if (path.includes('visualStyles') || isVisualContext) {
-    console.log('[SchemaForm] Rendering:', {
-      path: path.join('.'),
-      isVisualContext,
-      schemaType: schema.type,
-      level
-    });
-  }
-  
   
   // Handle value updates
   const handleChange = useCallback((newValue: any) => {
@@ -461,12 +451,6 @@ export function SchemaForm({
   if (propertyName && (schema.type === 'string' || schema.type === 'number')) {
     // Font family detection
     if (propertyName === 'fontFamily' || propertyName.endsWith('FontFamily')) {
-      console.log('[SchemaForm] Font family field detected:', {
-        propertyName,
-        path: path.join('.'),
-        isVisualContext,
-        value
-      });
       // Use VisualFontFamilyField for visual context, regular FontFamilyField otherwise
       if (isVisualContext) {
         return (

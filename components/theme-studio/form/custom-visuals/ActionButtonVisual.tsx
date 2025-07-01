@@ -201,6 +201,7 @@ export function ActionButtonVisual({
                     path={[...path, 'fill', 'show']}
                     level={level + 1}
                     hideTitle={true}
+                    isVisualContext={true}
                   />
                 </div>
               )}
@@ -217,6 +218,7 @@ export function ActionButtonVisual({
                     path={[...path, 'text', 'show']}
                     level={level + 1}
                     hideTitle={true}
+                    isVisualContext={true}
                   />
                 </div>
               )}
@@ -249,6 +251,7 @@ export function ActionButtonVisual({
                   level={level + 1}
                   hideTitle={true}
                   SchemaForm={SchemaForm}
+                  isVisualContext={true}
                 />
                   </CollapsibleSection>
                 )}
@@ -272,6 +275,7 @@ export function ActionButtonVisual({
                   level={level + 1}
                   hideTitle={true}
                   SchemaForm={SchemaForm}
+                  isVisualContext={true}
                 />
                   </CollapsibleSection>
                 )}
@@ -322,6 +326,7 @@ export function ActionButtonVisual({
                     level={level + 1}
                     hideTitle={true}
                     SchemaForm={SchemaForm}
+                    isVisualContext={true}
                   />
                     </CollapsibleSection>
                   );
@@ -362,6 +367,7 @@ export function ActionButtonVisual({
                               path={[...path, propName, '0', itemPropName]}
                               level={level + 2}
                               hideTitle={false}
+                              isVisualContext={true}
                             />
                           ))
                         )}
@@ -407,6 +413,7 @@ export function ActionButtonVisual({
                               path={[...path, propName, '0', itemPropName]}
                               level={level + 2}
                               hideTitle={false}
+                              isVisualContext={true}
                             />
                           ))
                         )}
