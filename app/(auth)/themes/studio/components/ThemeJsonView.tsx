@@ -1,25 +1,55 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { PowerBITheme } from '@/lib/theme-studio/types';
 import { toast } from 'sonner';
 import JSONPretty from 'react-json-pretty';
 import 'react-json-pretty/themes/monikai.css';
 import { downloadThemeJson } from '@/lib/utils/theme-export';
+import { computeVariantStyle } from '@/lib/theme-generation/variant-merge-utils';
+import { Toggle } from '@/components/ui/toggle';
 
 interface ThemeJsonViewProps {
   theme: PowerBITheme;
 }
 
 export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
+  const [showComputed, setShowComputed] = useState(false);
   
+  const computedTheme = useMemo(() => {
+    if (!theme || !showComputed || !theme.visualStyles) {
+      return theme;
+    }
+
+    // Create a new theme with computed styles
+    const computedVisualStyles: Record<string, any> = {};
+
+    Object.entries(theme.visualStyles).forEach(([visualType, variants]) => {
+      computedVisualStyles[visualType] = {};
+      
+      Object.keys(variants).forEach(variantName => {
+        const computed = computeVariantStyle(theme.visualStyles, visualType, variantName);
+        if (computed) {
+          computedVisualStyles[visualType][variantName] = computed;
+        }
+      });
+    });
+
+    return {
+      ...theme,
+      visualStyles: computedVisualStyles
+    };
+  }, [theme, showComputed]);
+
   const formattedJson = useMemo(() => {
-    if (!theme) {
+    const themeToDisplay = showComputed ? computedTheme : theme;
+    
+    if (!themeToDisplay) {
       return JSON.stringify({ error: 'No theme data available' }, null, 2);
     }
     
-    return JSON.stringify(theme, null, 2);
-  }, [theme]);
+    return JSON.stringify(themeToDisplay, null, 2);
+  }, [theme, computedTheme, showComputed]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(formattedJson);
@@ -27,14 +57,25 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
   };
 
   const downloadJson = () => {
-    downloadThemeJson(theme);
+    const themeToDownload = showComputed ? computedTheme : theme;
+    downloadThemeJson(themeToDownload);
   };
 
   return (
     <div className="h-full flex flex-col bg-gray-900">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
-        <h3 className="text-sm font-medium text-gray-300">Theme JSON</h3>
+        <div className="flex items-center gap-3">
+          <h3 className="text-sm font-medium text-gray-300">Theme JSON</h3>
+          <Toggle
+            pressed={showComputed}
+            onPressedChange={setShowComputed}
+            className="h-7 px-2 text-xs data-[state=on]:bg-purple-600 data-[state=on]:text-white"
+          >
+            <span className="mr-1">Show Computed Styles</span>
+            {showComputed && <span className="text-[10px] opacity-75">(Merged)</span>}
+          </Toggle>
+        </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleCopy}
@@ -72,7 +113,7 @@ export function ThemeJsonView({ theme }: ThemeJsonViewProps) {
         }}>
           <JSONPretty 
             id="json-pretty"
-            data={theme}
+            data={showComputed ? computedTheme : theme}
           />
           
           {/* Fallback: Show raw JSON if JSONPretty doesn't render */}
