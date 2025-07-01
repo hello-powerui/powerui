@@ -6,6 +6,7 @@ import { useEffect, useState, useRef, useMemo, useCallback, memo } from 'react';
 import { powerBIConfig } from '@/lib/powerbi/config';
 import { PowerBIService } from '@/lib/powerbi/service';
 import { generateFocusedVisualLayout, generateDefaultLayout, VisualInfo } from '@/lib/powerbi/visual-focus-utils';
+import { getHomePage } from '@/lib/powerbi/visual-embed-utils';
 import { 
   Select,
   SelectContent,
@@ -190,6 +191,23 @@ function SimplePowerBIEmbed({
       return () => clearTimeout(timeoutId);
     }
   }, [variantPreviewTheme, isReportReady]);
+
+  // Ensure report shows Home page by default
+  const ensureHomePage = useCallback(async () => {
+    if (!reportRef.current) return;
+    
+    try {
+      const pages = await reportRef.current.getPages();
+      const homePage = pages.find(p => p.name === getHomePage());
+      
+      if (homePage && !homePage.isActive) {
+        await homePage.setActive();
+        console.log('Navigated to Home page');
+      }
+    } catch (error) {
+      console.error('Error navigating to Home page:', error);
+    }
+  }, []);
 
   // Discover visuals in the report
   const discoverVisuals = useCallback(async () => {
@@ -390,8 +408,10 @@ function SimplePowerBIEmbed({
   const eventHandlers = useMemo(() => new Map([
     ['loaded', function () {
       setIsReportReady(true);
-      // Discover visuals immediately after report loads
-      discoverVisuals();
+      // Ensure Home page is active and discover visuals
+      ensureHomePage().then(() => {
+        discoverVisuals();
+      });
     }],
     ['rendered', function() {
       // Ensure report is marked as ready on render too
@@ -406,7 +426,7 @@ function SimplePowerBIEmbed({
       // Re-discover visuals on page change
       discoverVisuals();
     }]
-  ]), [discoverVisuals]);
+  ]), [discoverVisuals, ensureHomePage]);
 
   if (!variantPreviewTheme || isLoading) {
     return (

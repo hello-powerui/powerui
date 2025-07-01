@@ -62,8 +62,8 @@ export function PowerBIPreview({
   // Convert empty string to '*' for consistency with focus mode logic
   const normalizedVisualType = selectedVisualType || '*';
   
-  // Use visual embedding if enabled and a specific visual type is selected
-  if (useVisualEmbedding && normalizedVisualType !== '*') {
+  // Use visual embedding only when in focus mode with a specific visual type
+  if (useVisualEmbedding && enterFocusMode && normalizedVisualType !== '*') {
     return (
       <VisualPowerBIEmbed 
         generatedTheme={generatedTheme} 

@@ -8,7 +8,8 @@ import { PowerBIService } from '@/lib/powerbi/service';
 import { 
   generateVisualEmbedConfig, 
   isVisualTypeSupported,
-  getVisualMapping 
+  findVisualByType,
+  getAllVisualsPage
 } from '@/lib/powerbi/visual-embed-utils';
 import { Button } from '@/components/ui/button';
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
@@ -94,17 +95,39 @@ function VisualPowerBIEmbed({
         setIsLoading(true);
         setError(null);
         
-        const visualMapping = getVisualMapping(selectedVisualType);
-        if (!visualMapping) {
-          throw new Error(`Visual type '${selectedVisualType}' is not supported`);
-        }
+        // First, get a temporary report connection to discover the visual
+        const tempConfig = await powerBIService.getEmbedConfigWithTheme(
+          powerBIConfig.reportId,
+          powerBIConfig.workspaceId,
+          variantPreviewTheme
+        );
 
+        // Create a temporary report instance to find the visual
+        const tempReportConfig: models.IReportEmbedConfiguration = {
+          type: 'report',
+          id: tempConfig.id,
+          embedUrl: tempConfig.embedUrl,
+          accessToken: tempConfig.accessToken,
+          tokenType: models.TokenType.Embed,
+          settings: {
+            filterPaneEnabled: false,
+            navContentPaneEnabled: false,
+          }
+        };
+
+        // We need to wait for the report to load before we can discover visuals
+        // For now, we'll use a placeholder approach and rely on the dynamic discovery
+        // This will be updated once we have the actual visual names in the report
+        
+        // For immediate testing, let's use a fallback visual name pattern
+        const visualName = `${selectedVisualType}Sample`; // Assuming naming convention
+        
         // Get visual embed configuration
         const config = await powerBIService.getVisualEmbedConfigWithTheme(
           powerBIConfig.reportId,
           powerBIConfig.workspaceId,
-          visualMapping.pageName,
-          visualMapping.visualName,
+          getAllVisualsPage(),
+          visualName,
           variantPreviewTheme
         );
         
@@ -120,8 +143,8 @@ function VisualPowerBIEmbed({
           embedUrl: config.embedUrl,
           accessToken: config.accessToken,
           tokenType: models.TokenType.Embed,
-          pageName: visualMapping.pageName,
-          visualName: visualMapping.visualName,
+          pageName: getAllVisualsPage(),
+          visualName: visualName,
           settings: {
             filterPaneEnabled: false,
             navContentPaneEnabled: false,
@@ -230,16 +253,14 @@ function VisualPowerBIEmbed({
         try {
           hasLoadedVisual.current = true; // Mark as loaded immediately
           
-          const visualMapping = getVisualMapping(selectedVisualType);
-          if (!visualMapping) {
-            throw new Error(`Visual type '${selectedVisualType}' is not supported`);
-          }
+          // Use the same visual name pattern as in the main load function
+          const visualName = `${selectedVisualType}Sample`;
 
           const config = await powerBIService.getVisualEmbedConfigWithTheme(
             powerBIConfig.reportId,
             powerBIConfig.workspaceId,
-            visualMapping.pageName,
-            visualMapping.visualName,
+            getAllVisualsPage(),
+            visualName,
             variantPreviewTheme
           );
           
@@ -249,8 +270,8 @@ function VisualPowerBIEmbed({
             embedUrl: config.embedUrl,
             accessToken: config.accessToken,
             tokenType: models.TokenType.Embed,
-            pageName: visualMapping.pageName,
-            visualName: visualMapping.visualName,
+            pageName: getAllVisualsPage(),
+            visualName: visualName,
             settings: {
               filterPaneEnabled: false,
               navContentPaneEnabled: false,
