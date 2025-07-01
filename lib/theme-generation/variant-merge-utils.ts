@@ -65,54 +65,92 @@ export function mergeStyles(
 }
 
 /**
- * Merges two arrays of Power BI property objects by matching $id values
- * This handles the common pattern where properties have an $id field for identification
+ * Merges two arrays of Power BI property objects
+ * For arrays without $id, merges by index. For arrays with $id, merges by matching $id.
  */
 function mergePropertyArrays(baseArray: any[], overrideArray: any[]): any[] {
-  // Create a map of base items by $id for efficient lookup
-  const baseMap = new Map<string, any>();
-  const baseWithoutId: any[] = [];
+  // Check if arrays use $id pattern
+  const hasIds = baseArray.some(item => item && typeof item === 'object' && '$id' in item) ||
+                 overrideArray.some(item => item && typeof item === 'object' && '$id' in item);
   
-  baseArray.forEach(item => {
-    if (item && typeof item === 'object' && '$id' in item) {
-      baseMap.set(item.$id, item);
-    } else {
-      baseWithoutId.push(item);
-    }
-  });
-  
-  // Process override items
-  const result: any[] = [];
-  const processedIds = new Set<string>();
-  
-  overrideArray.forEach(overrideItem => {
-    if (overrideItem && typeof overrideItem === 'object' && '$id' in overrideItem) {
-      const baseItem = baseMap.get(overrideItem.$id);
-      if (baseItem) {
-        // Merge matching items
-        result.push(mergeStyles(baseItem, overrideItem));
-        processedIds.add(overrideItem.$id);
+  if (hasIds) {
+    // Use $id-based merging
+    const baseMap = new Map<string, any>();
+    const baseWithoutId: any[] = [];
+    
+    baseArray.forEach(item => {
+      if (item && typeof item === 'object' && '$id' in item) {
+        baseMap.set(item.$id, item);
       } else {
-        // New item from override
-        result.push(overrideItem);
+        baseWithoutId.push(item);
       }
-    } else {
-      // Items without $id are added as-is
-      result.push(overrideItem);
+    });
+    
+    const result: any[] = [];
+    const processedIds = new Set<string>();
+    
+    overrideArray.forEach(overrideItem => {
+      if (overrideItem && typeof overrideItem === 'object' && '$id' in overrideItem) {
+        const baseItem = baseMap.get(overrideItem.$id);
+        if (baseItem) {
+          // Merge matching items
+          result.push(mergeStyles(baseItem, overrideItem));
+          processedIds.add(overrideItem.$id);
+        } else {
+          // New item from override
+          result.push(overrideItem);
+        }
+      } else {
+        // Items without $id - merge with first base item without $id if exists
+        if (baseWithoutId.length > 0) {
+          result.push(mergeStyles(baseWithoutId[0], overrideItem));
+          baseWithoutId.shift(); // Remove the merged item
+        } else {
+          result.push(overrideItem);
+        }
+      }
+    });
+    
+    // Add base items that weren't overridden
+    baseMap.forEach((item, id) => {
+      if (!processedIds.has(id)) {
+        result.push(item);
+      }
+    });
+    
+    // Add remaining base items without $id
+    result.push(...baseWithoutId);
+    
+    return result;
+  } else {
+    // For arrays without $id, merge by index
+    const maxLength = Math.max(baseArray.length, overrideArray.length);
+    const result: any[] = [];
+    
+    for (let i = 0; i < maxLength; i++) {
+      const baseItem = baseArray[i];
+      const overrideItem = overrideArray[i];
+      
+      if (baseItem !== undefined && overrideItem !== undefined) {
+        // Both arrays have items at this index - merge them
+        if (typeof baseItem === 'object' && typeof overrideItem === 'object' && 
+            baseItem !== null && overrideItem !== null) {
+          result.push(mergeStyles(baseItem, overrideItem));
+        } else {
+          // Non-object values - override wins
+          result.push(overrideItem);
+        }
+      } else if (overrideItem !== undefined) {
+        // Only override has item at this index
+        result.push(overrideItem);
+      } else {
+        // Only base has item at this index
+        result.push(baseItem);
+      }
     }
-  });
-  
-  // Add base items that weren't overridden
-  baseMap.forEach((item, id) => {
-    if (!processedIds.has(id)) {
-      result.push(item);
-    }
-  });
-  
-  // Add base items without $id
-  result.push(...baseWithoutId);
-  
-  return result;
+    
+    return result;
+  }
 }
 
 /**
