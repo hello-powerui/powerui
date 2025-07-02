@@ -116,12 +116,12 @@ export function VisualsSection({
             onSelectedVariantChange('*');
           }}
         >
-          <SelectTrigger className="h-9 text-sm w-[220px] font-medium">
+          <SelectTrigger className="h-9 text-sm w-[280px] font-medium">
             <SelectValue placeholder="Select visual">
               {selectedVisual && (
                 <div className="flex items-center gap-2">
                   <VisualIcon visualType={selectedVisual} size={20} />
-                  <span>{formatVisualName(selectedVisual)}</span>
+                  <span className="whitespace-nowrap">{formatVisualName(selectedVisual)}</span>
                 </div>
               )}
             </SelectValue>
@@ -131,7 +131,7 @@ export function VisualsSection({
               <SelectItem key={visual} value={visual} className="text-sm">
                 <div className="flex items-center gap-2">
                   <VisualIcon visualType={visual} size={20} />
-                  <span>{formatVisualName(visual)}</span>
+                  <span className="whitespace-nowrap">{formatVisualName(visual)}</span>
                 </div>
               </SelectItem>
             ))}

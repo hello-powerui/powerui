@@ -54,12 +54,13 @@ export const VISUAL_NAME_MAPPING: Record<string, VisualInfo> = {
   'shape': { name: '057aea91daa664c40626', width: 181, height: 124 },
   'image': { name: 'a7edc34117d9efa7844d', width: 166, height: 158 },
   
-  // Note: Some visual types might not have theme support or might not be included:
-  // - decompositionTreeVisual
-  // - qnaVisual
-  // - advancedSlicerVisual
-  // - pageNavigator
-  // - bookmarkNavigator
+  // Additional visuals
+  'treemap': { name: 'e379160300035930e00a', width: 400, height: 300 },
+  'bookmarkNavigator': { name: 'af77a72ae211a02e07b9', width: 800, height: 40 },
+  'pageNavigator': { name: 'b7dd05a01eb081327cd6', width: 800, height: 40 },
+  'advancedSlicerVisual': { name: '84aef77d9b597d658376', width: 300, height: 200 },
+  'decompositionTreeVisual': { name: '3c362e509150d4be220d', width: 600, height: 400 },
+  'qnaVisual': { name: 'd1233b7f604093c253e3', width: 400, height: 300 }
 };
 
 /**

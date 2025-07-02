@@ -8,6 +8,7 @@ import { StructuralColorsTab } from '@/components/theme-studio/typography/Struct
 import { VisualsSection } from './VisualsSection';
 import { GlobalSection } from './GlobalSection';
 import { CanvasSection } from './CanvasSection';
+import { getMappedVisualTypes } from '@/lib/powerbi/visual-name-mapping';
 
 
 interface VisualStylesPanelProps {
@@ -66,9 +67,14 @@ function VisualStylesPanelComponent({
     const loadSchema = async () => {
       try {
         await schemaLoader.loadSchema();
-        const types = schemaLoader.getVisualTypes();
+        const allTypes = schemaLoader.getVisualTypes();
         const canvas = schemaLoader.getCanvasTypes();
-        setVisualTypes(types);
+        
+        // Filter visual types to only include those with mappings
+        const mappedTypes = getMappedVisualTypes();
+        const filteredTypes = allTypes.filter(type => mappedTypes.includes(type));
+        
+        setVisualTypes(filteredTypes);
         setCanvasTypes(canvas);
         setSchemaLoaded(true);
       } catch (error) {
