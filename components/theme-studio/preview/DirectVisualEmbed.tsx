@@ -127,7 +127,7 @@ function DirectVisualEmbed({
             type: models.PageSizeType.Custom,
             width: pageWidth,
             height: pageHeight
-          },
+          } as models.ICustomPageSize,
           displayOption: models.DisplayOption.ActualSize,
           pagesLayout: {
             [getAllVisualsPage()]: {
@@ -219,6 +219,7 @@ function DirectVisualEmbed({
   // Update layout when dimensions change
   useEffect(() => {
     if (reportRef.current && pageRef.current && customDimensions && hasLoadedInitially.current) {
+      const report = reportRef.current; // Capture ref value for async closure
       const updateLayout = async () => {
         try {
           const visualInfo = getVisualInfo(selectedVisualType);
@@ -234,7 +235,7 @@ function DirectVisualEmbed({
               type: models.PageSizeType.Custom,
               width: pageWidth,
               height: pageHeight
-            },
+            } as models.ICustomPageSize,
             displayOption: models.DisplayOption.ActualSize,
             pagesLayout: {
               [getAllVisualsPage()]: {
@@ -258,7 +259,7 @@ function DirectVisualEmbed({
             }
           };
 
-          await reportRef.current.updateSettings({
+          await report.updateSettings({
             layoutType: models.LayoutType.Custom,
             customLayout: customLayout
           });
