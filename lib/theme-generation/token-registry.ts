@@ -76,19 +76,19 @@ export const TOKEN_REGISTRY: Record<string, TokenDefinition> = {
   '@text-success': {
     name: 'Success text',
     category: 'Text',
-    light: (p) => p.success?.['700'] || '#059669',
+    light: (p) => p.success?.['500'] || '#22C55E',
     dark: (p) => p.success?.['300'] || '#6EE7B7'
   },
   '@text-warning': {
     name: 'Warning text',
     category: 'Text',
-    light: (p) => p.warning?.['700'] || '#D97706',
+    light: (p) => p.warning?.['500'] || '#FFC107',
     dark: (p) => p.warning?.['300'] || '#FCD34D'
   },
   '@text-error': {
     name: 'Error text',
     category: 'Text',
-    light: (p) => p.error?.['700'] || '#DC2626',
+    light: (p) => p.error?.['500'] || '#F87171',
     dark: (p) => p.error?.['300'] || '#FCA5A5'
   },
   

@@ -77,6 +77,7 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
   const [showFontDialog, setShowFontDialog] = useState(false);
   const [fontAnalysis, setFontAnalysis] = useState<ReturnType<typeof analyzeFonts> | null>(null);
   const [selectedFont, setSelectedFont] = useState<string>('');
+  const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { loadTheme, updateTheme } = useThemeStudioStore();
@@ -146,42 +147,90 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
     reader.readAsText(file);
   };
 
-  const handleImport = () => {
+  const handleImport = async () => {
     if (fileContent) {
-      let processedTheme = { ...fileContent };
+      setIsImporting(true);
+      setError(null);
       
-      // If font dialog was shown, normalize fonts to selected font
-      if (showFontDialog && selectedFont) {
-        // Update global font family
-        processedTheme.fontFamily = selectedFont;
+      try {
+        let processedTheme = { ...fileContent };
         
-        // Update all text classes to use selected font
-        if (processedTheme.textClasses) {
-          const updatedTextClasses: any = {};
-          Object.entries(processedTheme.textClasses).forEach(([key, value]: [string, any]) => {
-            updatedTextClasses[key] = {
-              ...value,
-              fontFace: selectedFont
-            };
-          });
-          processedTheme.textClasses = updatedTextClasses;
+        // If font dialog was shown, normalize fonts to selected font
+        if (showFontDialog && selectedFont) {
+          // Update global font family
+          processedTheme.fontFamily = selectedFont;
+          
+          // Update all text classes to use selected font
+          if (processedTheme.textClasses) {
+            const updatedTextClasses: any = {};
+            Object.entries(processedTheme.textClasses).forEach(([key, value]: [string, any]) => {
+              updatedTextClasses[key] = {
+                ...value,
+                fontFace: selectedFont
+              };
+            });
+            processedTheme.textClasses = updatedTextClasses;
+          }
         }
+        
+        // Set theme name from file or use filename
+        const themeName = processedTheme.name || selectedFile?.name.replace('.json', '') || 'Imported Theme';
+        
+        // Create a data color palette from the imported theme if it has dataColors
+        let colorPaletteId: string | undefined;
+        if (processedTheme.dataColors && Array.isArray(processedTheme.dataColors) && processedTheme.dataColors.length > 0) {
+          try {
+            // Create a new color palette with the imported colors
+            const paletteName = `${themeName} - Data Colors`;
+            const response = await fetch('/api/palettes/color', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                name: paletteName,
+                description: `Data colors imported from ${selectedFile?.name}`,
+                colors: processedTheme.dataColors
+              }),
+            });
+            
+            if (response.ok) {
+              const { palette } = await response.json();
+              colorPaletteId = palette.id;
+            } else {
+              const errorText = await response.text();
+              console.error('Failed to create color palette:', errorText);
+              // Don't fail the import if palette creation fails, just use default
+            }
+          } catch (error) {
+            console.error('Error creating color palette:', error);
+            // Don't fail the import if palette creation fails, just use default
+          }
+        }
+        
+        // Load the theme with the new color palette ID if created
+        const themeToLoad = {
+          ...processedTheme,
+          ...(colorPaletteId && { colorPaletteId })
+        };
+        
+        loadTheme(themeToLoad);
+        updateTheme({ 
+          name: themeName,
+          description: `Imported from ${selectedFile?.name}`
+        });
+        
+        if (onImport) {
+          onImport(processedTheme);
+        }
+        
+        onClose();
+      } catch (err) {
+        console.error('Error importing theme:', err);
+        setError('Failed to import theme. Please try again.');
+      } finally {
+        setIsImporting(false);
       }
-      
-      // Set theme name from file or use filename
-      const themeName = processedTheme.name || selectedFile?.name.replace('.json', '') || 'Imported Theme';
-      
-      loadTheme(processedTheme);
-      updateTheme({ 
-        name: themeName,
-        description: `Imported from ${selectedFile?.name}`
-      });
-      
-      if (onImport) {
-        onImport(processedTheme);
-      }
-      
-      onClose();
     }
   };
 
@@ -193,6 +242,7 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
     setShowFontDialog(false);
     setFontAnalysis(null);
     setSelectedFont('');
+    setIsImporting(false);
   };
 
   return (
@@ -296,6 +346,23 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
                   )}
                 </dl>
               </div>
+
+              {/* Theme Colors Notice */}
+              <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+                <div className="flex items-start gap-2">
+                  <svg className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-sm text-green-900">Data Colors Will Be Saved</h4>
+                    <p className="text-xs text-green-700 mt-1">
+                      When you import this theme, the data colors palette will be saved to your theme database. 
+                      For light/dark mode support, you'll need to use tokens for neutral and state colors 
+                      (success, warning, error) rather than hardcoded values.
+                    </p>
+                  </div>
+                </div>
+              </div>
               
               {/* Font Selection Dialog */}
               {showFontDialog && fontAnalysis && (
@@ -375,9 +442,9 @@ export function ImportThemeModal({ isOpen, onClose, onImport }: ImportThemeModal
           )}
           <Button
             onClick={handleImport}
-            disabled={!fileContent || !!error}
+            disabled={!fileContent || !!error || isImporting}
           >
-            Import Theme
+            {isImporting ? 'Importing...' : 'Import Theme'}
           </Button>
         </div>
       </DialogContent>

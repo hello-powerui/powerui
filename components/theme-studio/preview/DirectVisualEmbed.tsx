@@ -134,6 +134,12 @@ function DirectVisualEmbed({
                   }
                 }
               ]
+            },
+            layoutType: models.LayoutType.Custom,
+            customLayout: {
+              x: -1,
+              y: -1,
+              displayOption: models.DisplayOption.ActualSize
             }
           },
           theme: { themeJson: themeToEmbed }
