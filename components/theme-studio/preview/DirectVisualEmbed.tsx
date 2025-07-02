@@ -1,7 +1,7 @@
 'use client';
 
 import { PowerBIEmbed } from 'powerbi-client-react';
-import { models, Visual } from 'powerbi-client';
+import { models, Visual, Report, Page } from 'powerbi-client';
 import { useEffect, useState, useRef, useCallback, memo } from 'react';
 import { powerBIConfig } from '@/lib/powerbi/config';
 import { PowerBIService } from '@/lib/powerbi/service';
@@ -27,10 +27,11 @@ function DirectVisualEmbed({
   onReportReset,
   onExitFocusMode
 }: DirectVisualEmbedProps) {
-  const [embedConfig, setEmbedConfig] = useState<models.IVisualEmbedConfiguration | null>(null);
+  const [embedConfig, setEmbedConfig] = useState<models.IReportEmbedConfiguration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const visualRef = useRef<Visual | null>(null);
+  const reportRef = useRef<Report | null>(null);
+  const pageRef = useRef<Page | null>(null);
   const powerBIService = PowerBIService.getInstance();
   const [currentZoom, setCurrentZoom] = useState(1.0);
   const [visualDimensions, setVisualDimensions] = useState<{ width: number; height: number } | null>(null);
@@ -110,22 +111,59 @@ function DirectVisualEmbed({
         const themeToEmbed = { ...variantPreviewTheme };
         delete themeToEmbed.reportPage;
         
-        // Create the visual embed configuration
+        // Create report embed configuration with custom layout
         // Use custom dimensions if available, otherwise use default
         const embedWidth = customDimensions?.width || visualInfo.width;
         const embedHeight = customDimensions?.height || visualInfo.height;
         
-        const visualEmbedConfig: models.IVisualEmbedConfiguration = {
-          type: 'visual',
+        // Create custom layout with only the focused visual visible
+        // Add padding around the visual to prevent cutoff
+        const padding = 100;
+        const pageWidth = embedWidth + (padding * 2);
+        const pageHeight = embedHeight + (padding * 2);
+        
+        const customLayout: models.ICustomLayout = {
+          pageSize: {
+            type: models.PageSizeType.Custom,
+            width: pageWidth,
+            height: pageHeight
+          },
+          displayOption: models.DisplayOption.ActualSize,
+          pagesLayout: {
+            [getAllVisualsPage()]: {
+              defaultLayout: {
+                displayState: {
+                  mode: models.VisualContainerDisplayMode.Hidden
+                }
+              },
+              visualsLayout: {
+                [visualInfo.name]: {
+                  x: padding, // Center the visual with padding
+                  y: padding,
+                  width: embedWidth,
+                  height: embedHeight,
+                  displayState: {
+                    mode: models.VisualContainerDisplayMode.Visible
+                  }
+                }
+              }
+            }
+          }
+        };
+        
+        const reportEmbedConfig: models.IReportEmbedConfiguration = {
+          type: 'report',
           id: config.id,
           embedUrl: config.embedUrl,
           accessToken: config.accessToken,
           tokenType: models.TokenType.Embed,
           pageName: getAllVisualsPage(),
-          visualName: visualInfo.name,
           settings: {
             filterPaneEnabled: false,
             navContentPaneEnabled: false,
+            layoutType: models.LayoutType.Custom,
+            customLayout: customLayout,
+            background: models.BackgroundType.Transparent,
             visualSettings: {
               visualHeaders: [
                 {
@@ -134,18 +172,12 @@ function DirectVisualEmbed({
                   }
                 }
               ]
-            },
-            layoutType: models.LayoutType.Custom,
-            customLayout: {
-              x: -1,
-              y: -1,
-              displayOption: models.DisplayOption.ActualSize
             }
           },
           theme: { themeJson: themeToEmbed }
         };
         
-        setEmbedConfig(visualEmbedConfig);
+        setEmbedConfig(reportEmbedConfig);
         setIsLoading(false);
         hasLoadedInitially.current = true;
         
@@ -165,16 +197,16 @@ function DirectVisualEmbed({
 
   // Apply theme updates
   useEffect(() => {
-    if (visualRef.current && variantPreviewTheme) {
+    if (reportRef.current && variantPreviewTheme) {
       const timeoutId = setTimeout(async () => {
         try {
-          if (!visualRef.current || typeof visualRef.current.applyTheme !== 'function') {
+          if (!reportRef.current || typeof reportRef.current.applyTheme !== 'function') {
             return;
           }
           
           const themeToApply = { ...variantPreviewTheme };
           delete themeToApply.reportPage;
-          await visualRef.current.applyTheme({ themeJson: themeToApply });
+          await reportRef.current.applyTheme({ themeJson: themeToApply });
         } catch (err) {
           console.error('Error applying theme update:', err);
         }
@@ -183,6 +215,61 @@ function DirectVisualEmbed({
       return () => clearTimeout(timeoutId);
     }
   }, [variantPreviewTheme]);
+
+  // Update layout when dimensions change
+  useEffect(() => {
+    if (reportRef.current && pageRef.current && customDimensions && hasLoadedInitially.current) {
+      const updateLayout = async () => {
+        try {
+          const visualInfo = getVisualInfo(selectedVisualType);
+          if (!visualInfo) return;
+
+          // Update custom layout with new dimensions
+          const padding = 100;
+          const pageWidth = customDimensions.width + (padding * 2);
+          const pageHeight = customDimensions.height + (padding * 2);
+          
+          const customLayout: models.ICustomLayout = {
+            pageSize: {
+              type: models.PageSizeType.Custom,
+              width: pageWidth,
+              height: pageHeight
+            },
+            displayOption: models.DisplayOption.ActualSize,
+            pagesLayout: {
+              [getAllVisualsPage()]: {
+                defaultLayout: {
+                  displayState: {
+                    mode: models.VisualContainerDisplayMode.Hidden
+                  }
+                },
+                visualsLayout: {
+                  [visualInfo.name]: {
+                    x: padding,
+                    y: padding,
+                    width: customDimensions.width,
+                    height: customDimensions.height,
+                    displayState: {
+                      mode: models.VisualContainerDisplayMode.Visible
+                    }
+                  }
+                }
+              }
+            }
+          };
+
+          await reportRef.current.updateSettings({
+            layoutType: models.LayoutType.Custom,
+            customLayout: customLayout
+          });
+        } catch (err) {
+          console.error('Error updating layout:', err);
+        }
+      };
+
+      updateLayout();
+    }
+  }, [customDimensions, selectedVisualType]);
 
   // Reset visual
   const resetVisual = useCallback(() => {
@@ -200,15 +287,61 @@ function DirectVisualEmbed({
 
   // Event handlers
   const eventHandlers = new Map([
-    ['loaded', function () {
-      // Visual loaded successfully
+    ['loaded', async function () {
+      // Report loaded successfully
+      console.log('Report loaded for visual focus mode');
+      
+      if (reportRef.current) {
+        try {
+          // Get the AllVisuals page
+          const pages = await reportRef.current.getPages();
+          const allVisualsPage = pages.find(p => p.name === getAllVisualsPage());
+          
+          if (allVisualsPage) {
+            pageRef.current = allVisualsPage;
+            
+            // Set the page as active if it's not already
+            if (!allVisualsPage.isActive) {
+              await allVisualsPage.setActive();
+            }
+            
+            // The custom layout should have already hidden all visuals except the focused one
+            const visualInfo = getVisualInfo(selectedVisualType);
+            if (visualInfo) {
+              console.log(`Focused visual: ${visualInfo.name} (other visuals hidden by default layout)`);
+            }
+          }
+        } catch (err) {
+          console.error('Error setting up visual focus mode:', err);
+        }
+      }
+    }],
+    ['pageChanged', async function (event: any) {
+      if (reportRef.current) {
+        const pages = await reportRef.current.getPages();
+        const activePage = pages.find(p => p.isActive);
+        if (activePage) {
+          pageRef.current = activePage;
+          
+          // Hide all other visuals on the page
+          const visualInfo = getVisualInfo(selectedVisualType);
+          if (visualInfo) {
+            const visuals = await activePage.getVisuals();
+            for (const visual of visuals) {
+              if (visual.name !== visualInfo.name) {
+                await visual.setVisualDisplayState(models.VisualContainerDisplayMode.Hidden);
+              }
+            }
+          }
+        }
+      }
     }],
     ['rendered', function() {
-      // Visual rendered
+      // Report rendered
     }],
     ['error', function (event: any) {
-      console.error('Visual error:', event);
-      setError(event?.detail?.message || 'Visual loading error');
+      console.error('Report error:', event);
+      setError(event?.detail?.message || 'Report loading error');
     }]
   ]);
 
@@ -375,31 +508,34 @@ function DirectVisualEmbed({
         </div>
       )}
       
-      {/* Direct visual embed with minimal wrapper */}
-      <div className="flex-1 overflow-auto flex items-center justify-center">
+      {/* Report embed container - fills available space */}
+      <div className="flex-1 overflow-auto bg-gray-50 flex items-center justify-center">
         <div 
-          className="powerbi-visual-embed-direct"
+          className="powerbi-report-embed-container"
           style={{ 
-            width: customDimensions ? `${customDimensions.width}px` : '400px',
-            height: customDimensions ? `${customDimensions.height}px` : '300px',
-            flexShrink: 0
+            width: '100%',
+            height: '100%',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
           <PowerBIEmbed
             embedConfig={embedConfig}
             eventHandlers={eventHandlers}
             cssClassName="powerbi-embed-container"
-            getEmbeddedComponent={(embeddedVisual) => {
-              visualRef.current = embeddedVisual as Visual;
+            getEmbeddedComponent={(embeddedReport) => {
+              reportRef.current = embeddedReport as Report;
             }}
           />
         </div>
       </div>
 
       <style jsx global>{`
-        .powerbi-visual-embed-direct {
+        .powerbi-report-embed-container {
           transform: scale(${currentZoom});
-          transform-origin: top left;
+          transform-origin: center center;
         }
         .powerbi-embed-container {
           width: 100% !important;
@@ -410,13 +546,6 @@ function DirectVisualEmbed({
           display: block;
           width: 100% !important;
           height: 100% !important;
-          /* Attempt to fix 1px clipping */
-          box-sizing: border-box !important;
-          overflow: visible !important;
-        }
-        /* Target the iframe content if accessible */
-        .powerbi-embed-container iframe body {
-          overflow: visible !important;
         }
       `}</style>
     </div>
