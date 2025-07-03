@@ -158,6 +158,44 @@ export class ClientPreviewGenerator {
       });
     }
     
+    // Handle bookmarkNavigator shape property - requires $id: 'default' (Power BI bug)
+    if (visualStyles.bookmarkNavigator) {
+      Object.keys(visualStyles.bookmarkNavigator).forEach(variant => {
+        const variantStyles = visualStyles.bookmarkNavigator[variant];
+        
+        if (variantStyles && variantStyles.shape) {
+          // Ensure shape has $id: 'default' in first item
+          if (Array.isArray(variantStyles.shape) && 
+              variantStyles.shape.length > 0 && 
+              !variantStyles.shape[0].$id) {
+            variantStyles.shape[0] = {
+              $id: 'default',
+              ...variantStyles.shape[0]
+            };
+          }
+        }
+      });
+    }
+    
+    // Handle pageNavigator shape property - requires $id: 'default' (Power BI bug)
+    if (visualStyles.pageNavigator) {
+      Object.keys(visualStyles.pageNavigator).forEach(variant => {
+        const variantStyles = visualStyles.pageNavigator[variant];
+        
+        if (variantStyles && variantStyles.shape) {
+          // Ensure shape has $id: 'default' in first item
+          if (Array.isArray(variantStyles.shape) && 
+              variantStyles.shape.length > 0 && 
+              !variantStyles.shape[0].$id) {
+            variantStyles.shape[0] = {
+              $id: 'default',
+              ...variantStyles.shape[0]
+            };
+          }
+        }
+      });
+    }
+    
     // Add other Power BI quirks here as needed
   }
 }
