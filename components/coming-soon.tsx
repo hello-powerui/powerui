@@ -4,9 +4,39 @@ import { useEffect, useState } from 'react';
 
 export default function ComingSoonPage() {
   const [mounted, setMounted] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
 
   useEffect(() => {
     setMounted(true);
+    
+    // Launch date: Tuesday, July 8th 2025 at 9AM EST
+    const launchDate = new Date('2025-07-08T09:00:00-05:00');
+    
+    const updateCountdown = () => {
+      const now = new Date();
+      const difference = launchDate.getTime() - now.getTime();
+      
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+        
+        setTimeRemaining({ days, hours, minutes, seconds });
+      } else {
+        setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    };
+    
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -37,11 +67,45 @@ export default function ComingSoonPage() {
           <div className={`h-3 w-3 bg-pink-500 rounded-full ${mounted ? 'animate-pulse delay-300' : ''}`}></div>
         </div>
 
-        {/* Teaser */}
-        <div className="mt-8">
-          <p className="text-gray-400 text-lg">
-            Launching soon
+        {/* Countdown */}
+        <div className="mt-12">
+          <p className="text-gray-400 text-lg mb-6">
+            Launching Tuesday, July 8th 2025 at 9AM EST
           </p>
+          <div className="flex justify-center space-x-4 md:space-x-8">
+            <div className="text-center">
+              <div className="bg-gray-800 bg-opacity-50 rounded-lg p-4 md:p-6 backdrop-blur-sm border border-gray-700">
+                <div className="text-3xl md:text-5xl font-bold text-white">
+                  {String(timeRemaining.days).padStart(2, '0')}
+                </div>
+                <div className="text-gray-400 text-sm mt-1">Days</div>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="bg-gray-800 bg-opacity-50 rounded-lg p-4 md:p-6 backdrop-blur-sm border border-gray-700">
+                <div className="text-3xl md:text-5xl font-bold text-white">
+                  {String(timeRemaining.hours).padStart(2, '0')}
+                </div>
+                <div className="text-gray-400 text-sm mt-1">Hours</div>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="bg-gray-800 bg-opacity-50 rounded-lg p-4 md:p-6 backdrop-blur-sm border border-gray-700">
+                <div className="text-3xl md:text-5xl font-bold text-white">
+                  {String(timeRemaining.minutes).padStart(2, '0')}
+                </div>
+                <div className="text-gray-400 text-sm mt-1">Minutes</div>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="bg-gray-800 bg-opacity-50 rounded-lg p-4 md:p-6 backdrop-blur-sm border border-gray-700">
+                <div className="text-3xl md:text-5xl font-bold text-white">
+                  {String(timeRemaining.seconds).padStart(2, '0')}
+                </div>
+                <div className="text-gray-400 text-sm mt-1">Seconds</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}
