@@ -40,6 +40,12 @@ export function StateAwarePropertySection({
   const isFillProperty = path && path.length >= 2 && path[path.length - 1] === 'fill' && 
     (path.includes('shape') || path.includes('actionButton'));
   
+  // Check if this is a fillCustom property for advancedSlicerVisual
+  // Note: The schema doesn't show $id support for fillCustom, but we're adding it
+  // as it may be a Power BI schema bug and the visual might actually support states
+  const isFillCustomProperty = path && path.length >= 2 && path[path.length - 1] === 'fillCustom' && 
+    path.includes('advancedSlicerVisual');
+  
   // Check if this is a text property for actionButton
   const isTextProperty = path && path.length >= 2 && path[path.length - 1] === 'text' && 
     path.includes('actionButton');
@@ -49,7 +55,7 @@ export function StateAwarePropertySection({
     let cleanArray = [...arrayValue];
     let needsCleanup = false;
     
-    if (isFillProperty || isTextProperty) {
+    if (isFillProperty || isFillCustomProperty || isTextProperty) {
       // Check if we need cleanup
       const hasShowInStateObjects = cleanArray.some(item => item.$id && 'show' in item);
       const showOnlyObjects = cleanArray.filter(item => !item.$id && Object.keys(item).length === 1 && 'show' in item);
@@ -110,7 +116,7 @@ export function StateAwarePropertySection({
     let workingArray = [...arrayValue];
 
     // For fill/text properties, ensure clean structure
-    if (isFillProperty || isTextProperty) {
+    if (isFillProperty || isFillCustomProperty || isTextProperty) {
       // Remove any duplicate show objects
       const showObjects = workingArray.filter(item => !item.$id && 'show' in item);
       if (showObjects.length > 1) {
@@ -170,7 +176,7 @@ export function StateAwarePropertySection({
           workingArray.push({ ...updates, $id: globalSelectedState });
         }
       }
-    } else if (isFillProperty) {
+    } else if (isFillProperty || isFillCustomProperty) {
       // For fill properties in shape/actionButton, handle show property separately
       if ('show' in updates) {
         // Find or create the show object
@@ -265,7 +271,7 @@ export function StateAwarePropertySection({
                     schema={{ ...propSchema, title: contextualTitle }}
                     value={(() => {
                       // For fill properties and show prop, get value from the separate object
-                      if (isFillProperty && propName === 'show') {
+                      if ((isFillProperty || isFillCustomProperty) && propName === 'show') {
                         const showObject = normalizedArray.find(item => !item.$id && 'show' in item);
                         return showObject?.show ?? true;
                       }

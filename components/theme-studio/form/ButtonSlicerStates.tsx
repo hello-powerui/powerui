@@ -34,6 +34,14 @@ const BUTTON_SLICER_STATES = {
   ]
 };
 
+// Simple states for advancedSlicerVisual
+const ADVANCED_SLICER_STATES = [
+  { value: 'default', label: 'Default' },
+  { value: 'selected', label: 'Selected' },
+  { value: 'hover', label: 'Hover' },
+  { value: 'press', label: 'Press' },
+];
+
 // Simple states for other visuals
 const SIMPLE_STATES = [
   { value: 'default', label: 'Default' },
@@ -47,7 +55,7 @@ export function ButtonSlicerStates({
   onSelectedStateChange,
   visualType
 }: ButtonSlicerStatesProps) {
-  // Check if this is a button slicer
+  // Check if this is a button slicer or advanced slicer visual
   const isButtonSlicer = visualType === 'advancedSlicerVisual' || visualType === 'buttonSlicer';
   
   if (!isButtonSlicer) {
@@ -83,12 +91,14 @@ export function ButtonSlicerStates({
     );
   }
   
-  // For button slicer, show advanced state selector
+  // For button slicer only, show advanced state selector
   return (
     <Card className="mb-3 p-4 border-gray-200 shadow-sm">
       <div className="space-y-3">
         <div>
-          <h3 className="text-sm font-semibold text-gray-900">Button Slicer States</h3>
+          <h3 className="text-sm font-semibold text-gray-900">
+            {visualType === 'advancedSlicerVisual' ? 'Advanced Slicer States' : 'Button Slicer States'}
+          </h3>
           <p className="text-xs text-gray-600 mt-1 leading-relaxed">
             Configure appearance for different interaction and selection states.
           </p>

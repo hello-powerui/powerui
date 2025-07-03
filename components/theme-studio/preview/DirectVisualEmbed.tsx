@@ -164,6 +164,20 @@ function DirectVisualEmbed({
             layoutType: models.LayoutType.Custom,
             customLayout: customLayout,
             background: models.BackgroundType.Transparent,
+            // Enable interactions
+            bars: {
+              actionBar: {
+                visible: false
+              }
+            },
+            panes: {
+              filters: {
+                visible: false
+              },
+              pageNavigation: {
+                visible: false
+              }
+            },
             visualSettings: {
               visualHeaders: [
                 {
@@ -351,6 +365,23 @@ function DirectVisualEmbed({
   const zoomOut = useCallback(() => setCurrentZoom(prev => Math.max(prev - 0.25, 0.25)), []);
   const resetZoom = useCallback(() => setCurrentZoom(1.0), []);
 
+  // Get page background color from theme
+  const getPageBackgroundColor = () => {
+    try {
+      const pageStyles = variantPreviewTheme?.visualStyles?.page?.['*'];
+      if (pageStyles?.background?.[0]?.color?.solid?.color) {
+        return pageStyles.background[0].color.solid.color;
+      }
+      // Fall back to outspace color if background not set
+      if (pageStyles?.outspace?.[0]?.color?.solid?.color) {
+        return pageStyles.outspace[0].color.solid.color;
+      }
+    } catch (err) {
+      // Silent fail - use default
+    }
+    return '#f9fafb'; // Default to gray-50
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -510,7 +541,12 @@ function DirectVisualEmbed({
       )}
       
       {/* Report embed container - fills available space */}
-      <div className="flex-1 overflow-auto bg-gray-50 flex items-center justify-center">
+      <div 
+        className="flex-1 overflow-auto flex items-center justify-center"
+        style={{
+          backgroundColor: getPageBackgroundColor()
+        }}
+      >
         <div 
           className="powerbi-report-embed-container"
           style={{ 

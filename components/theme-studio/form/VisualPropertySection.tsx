@@ -63,7 +63,9 @@ export function VisualPropertySection({
     >
       <div className="space-y-2">
         {/* Check if this section has state support */}
-        {sectionSchema.items?.properties?.$id ? (
+        {/* Special case: fillCustom in advancedSlicerVisual should support states even though schema doesn't show it */}
+        {(sectionSchema.items?.properties?.$id || 
+          (name === 'fillCustom' && path.includes('advancedSlicerVisual'))) ? (
           // This is a state-driven property - pass the entire schema
           <ConnectedProperty isLast={true}>
             <SchemaForm
