@@ -68,8 +68,8 @@ export const TOKEN_REGISTRY: Record<string, TokenDefinition> = {
   '@text-on-brand': {
     name: 'Text on brand background',
     category: 'Text',
-    light: (p) => p.neutral?.['25'] || '#FAFAFA',
-    dark: (p) => p.neutral?.['900'] || '#1A1A1A'
+    light: (p) => p.neutral?.['25'] || '#FFFFFF',
+    dark: (p) => p.neutral?.['25'] || '#FFFFFF'
   },
   
   // Text - States

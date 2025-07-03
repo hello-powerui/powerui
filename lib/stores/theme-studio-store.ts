@@ -39,6 +39,12 @@ interface StudioTheme {
   
   // Visual Styles
   visualStyles: Record<string, any>;
+  
+  // Studio Metadata (not exported to Power BI)
+  studioMetadata?: {
+    visualDimensions?: Record<string, Record<string, { width: number; height: number }>>;
+    // Can add other studio-specific settings here in the future
+  };
 }
 
 // Resolved runtime data (not stored)
@@ -482,7 +488,7 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       setValidationErrors: (errors) => set({ validationErrors: errors }),
       
       saveTheme: async () => {
-        const { theme } = get();
+        const { theme, visualDimensions } = get();
         
         // Set saving state
         set({ isSaving: true });
@@ -495,10 +501,19 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           // Extract only the theme data fields, excluding metadata
           const { id, ...themeDataFields } = theme;
           
+          // Include visual dimensions in studioMetadata
+          const themeWithMetadata = {
+            ...themeDataFields,
+            studioMetadata: {
+              visualDimensions: visualDimensions,
+              // Can add other studio settings here
+            }
+          };
+          
           const payload = {
             name: theme.name,
             description: theme.description,
-            themeData: themeDataFields // Send only the theme configuration data
+            themeData: themeWithMetadata // Send theme data with studio metadata
           };
           
           const response = await fetch(url, {
@@ -558,11 +573,16 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
             borderStyle: 'default',
             backgroundStyle: 'default'
           },
-          visualStyles: visualStyles
+          visualStyles: visualStyles,
+          studioMetadata: loadedTheme.studioMetadata
         };
         
+        // Extract visual dimensions from studio metadata
+        const visualDimensions = loadedTheme.studioMetadata?.visualDimensions || {};
+        
         set({
-          theme
+          theme,
+          visualDimensions
         });
       },
 

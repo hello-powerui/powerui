@@ -7,22 +7,22 @@ export function generateBrandPalette(hexColor: string): ColorPalette {
   // Convert input color to OKLCH
   const baseColor = hexToOklch(hexColor);
   
-  // Define shade mappings with perceptually uniform lightness values
+  // Define shade mappings with improved dark end distinction
   // Brand colors typically have higher chroma than neutrals
-  // Adjusted dark end for better distinction
+  // Adjusted to prevent shades 800-950 from being too similar or too close to black
   const shadeConfig = [
-    { name: '25', lightnessTarget: 0.97, chromaFactor: 0.15 },
-    { name: '50', lightnessTarget: 0.95, chromaFactor: 0.25 },
-    { name: '100', lightnessTarget: 0.90, chromaFactor: 0.4 },
-    { name: '200', lightnessTarget: 0.82, chromaFactor: 0.6 },
-    { name: '300', lightnessTarget: 0.71, chromaFactor: 0.8 },
-    { name: '400', lightnessTarget: 0.58, chromaFactor: 0.9 },
-    { name: '500', lightnessTarget: 0.45, chromaFactor: 1.0 }, // Base color
-    { name: '600', lightnessTarget: 0.36, chromaFactor: 0.95 },
-    { name: '700', lightnessTarget: 0.28, chromaFactor: 0.85 },
-    { name: '800', lightnessTarget: 0.21, chromaFactor: 0.7 },
-    { name: '900', lightnessTarget: 0.14, chromaFactor: 0.5 },
-    { name: '950', lightnessTarget: 0.08, chromaFactor: 0.3 }
+    { name: '25', lightnessTarget: 0.97, chromaFactor: 0.15 },  // L=97%
+    { name: '50', lightnessTarget: 0.95, chromaFactor: 0.25 },  // L=95%
+    { name: '100', lightnessTarget: 0.90, chromaFactor: 0.4 },   // L=90%
+    { name: '200', lightnessTarget: 0.82, chromaFactor: 0.6 },   // L=82%
+    { name: '300', lightnessTarget: 0.73, chromaFactor: 0.8 },   // L=73%
+    { name: '400', lightnessTarget: 0.64, chromaFactor: 0.9 },   // L=64%
+    { name: '500', lightnessTarget: 0.54, chromaFactor: 1.0 },   // L=54% - Base color
+    { name: '600', lightnessTarget: 0.44, chromaFactor: 0.95 },  // L=44%
+    { name: '700', lightnessTarget: 0.34, chromaFactor: 0.85 },  // L=34%
+    { name: '800', lightnessTarget: 0.26, chromaFactor: 0.7 },   // L=26%
+    { name: '900', lightnessTarget: 0.20, chromaFactor: 0.5 },   // L=20%
+    { name: '950', lightnessTarget: 0.15, chromaFactor: 0.3 }    // L=15%
   ];
 
   const palette: ColorPalette = {};

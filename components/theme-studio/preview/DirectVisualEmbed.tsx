@@ -10,8 +10,9 @@ import { getAllVisualsPage } from '@/lib/powerbi/visual-embed-utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ZoomIn, ZoomOut, X, Settings } from 'lucide-react';
+import { ZoomIn, ZoomOut, X, Settings, Info } from 'lucide-react';
 import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
+import { HelpTooltip } from '@/components/theme-studio/HelpTooltip';
 
 interface DirectVisualEmbedProps {
   generatedTheme?: any;
@@ -41,7 +42,7 @@ function DirectVisualEmbed({
   const [showSettings, setShowSettings] = useState(false);
   
   // Get store functions for visual dimensions
-  const { getVisualDimensions, setVisualDimensions: saveVisualDimensions } = useThemeStudioStore();
+  const { getVisualDimensions, setVisualDimensions: saveVisualDimensions, clearVisualDimensions } = useThemeStudioStore();
 
   // Generate theme with computed variant styles
   const variantPreviewTheme = useCallback(() => {
@@ -468,7 +469,7 @@ function DirectVisualEmbed({
   return (
     <div className="flex flex-col h-full w-full bg-transparent">
       {/* Fixed header controls */}
-      <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200 flex-shrink-0">
+      <div className="flex items-center justify-between py-2.5 px-4 bg-white border-b border-gray-200 flex-shrink-0">
         {/* Controls */}
         <div className="flex items-center gap-2">
           {/* Zoom controls */}
@@ -512,58 +513,112 @@ function DirectVisualEmbed({
       {/* Settings panel */}
       {showSettings && (
         <div className="bg-white border-b border-gray-200 p-4">
-          <div className="flex items-end gap-4">
-            <div>
-              <Label htmlFor="width" className="text-xs">Width</Label>
-              <Input
-                id="width"
-                type="number"
-                value={inputDimensions?.width || 0}
-                onChange={(e) => setInputDimensions(prev => ({ 
-                  width: parseInt(e.target.value) || 0, 
-                  height: prev?.height || 0 
-                }))}
-                className="w-24 h-8"
-              />
-            </div>
-            <div>
-              <Label htmlFor="height" className="text-xs">Height</Label>
-              <Input
-                id="height"
-                type="number"
-                value={inputDimensions?.height || 0}
-                onChange={(e) => setInputDimensions(prev => ({ 
-                  width: prev?.width || 0, 
-                  height: parseInt(e.target.value) || 0 
-                }))}
-                className="w-24 h-8"
-              />
-            </div>
-            <Button 
-              onClick={() => {
-                // Apply the input dimensions and save them
-                if (inputDimensions && selectedVisualType && selectedVariant) {
-                  setCustomDimensions(inputDimensions);
-                  // Save dimensions to store
-                  saveVisualDimensions(selectedVisualType, selectedVariant, inputDimensions);
+          <div className="space-y-3">
+            {/* Header with info */}
+            <div className="flex items-center gap-2">
+              <h4 className="text-sm font-medium text-gray-900">Visual Dimensions</h4>
+              <HelpTooltip 
+                content={
+                  <div className="space-y-2">
+                    <p>Customize the preview dimensions for this visual type and variant.</p>
+                    <p className="text-xs">• These dimensions are saved per visual/variant combination</p>
+                    <p className="text-xs">• They persist across editing sessions</p>
+                    <p className="text-xs">• They only affect the preview, not the actual Power BI theme</p>
+                    <p className="text-xs mt-2 font-medium">Default dimensions come from Power BI's standard visual sizes</p>
+                  </div>
                 }
-              }} 
-              size="sm"
-            >
-              Apply
-            </Button>
-            <Button 
-              onClick={() => {
-                if (visualDimensions) {
-                  setCustomDimensions(visualDimensions);
-                  setInputDimensions(visualDimensions);
-                }
-              }} 
-              variant="outline" 
-              size="sm"
-            >
-              Reset
-            </Button>
+              />
+              {/* Show current visual info */}
+              <div className="ml-auto text-xs text-gray-500">
+                {getVisualName(selectedVisualType || '*')} 
+                {selectedVariant && selectedVariant !== '*' && ` - ${selectedVariant}`}
+              </div>
+            </div>
+            
+            {/* Dimension inputs */}
+            <div className="flex items-end gap-4">
+              <div className="flex items-end gap-3">
+                <div>
+                  <Label htmlFor="width" className="text-xs text-gray-600 mb-1">Width (px)</Label>
+                  <Input
+                    id="width"
+                    type="number"
+                    value={inputDimensions?.width || 0}
+                    onChange={(e) => setInputDimensions(prev => ({ 
+                      width: parseInt(e.target.value) || 0, 
+                      height: prev?.height || 0 
+                    }))}
+                    className="w-24 h-8"
+                    min="50"
+                    max="2000"
+                  />
+                </div>
+                <span className="text-gray-400 mb-2">×</span>
+                <div>
+                  <Label htmlFor="height" className="text-xs text-gray-600 mb-1">Height (px)</Label>
+                  <Input
+                    id="height"
+                    type="number"
+                    value={inputDimensions?.height || 0}
+                    onChange={(e) => setInputDimensions(prev => ({ 
+                      width: prev?.width || 0, 
+                      height: parseInt(e.target.value) || 0 
+                    }))}
+                    className="w-24 h-8"
+                    min="50"
+                    max="2000"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 ml-4">
+                <Button 
+                  onClick={() => {
+                    // Apply the input dimensions and save them
+                    if (inputDimensions && selectedVisualType && selectedVariant) {
+                      setCustomDimensions(inputDimensions);
+                      // Save dimensions to store
+                      saveVisualDimensions(selectedVisualType, selectedVariant, inputDimensions);
+                    }
+                  }} 
+                  size="sm"
+                  className="bg-gray-900 text-white hover:bg-gray-800"
+                >
+                  Save & Apply
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (visualDimensions) {
+                      setCustomDimensions(visualDimensions);
+                      setInputDimensions(visualDimensions);
+                      // Also clear saved dimensions for this visual/variant
+                      if (selectedVisualType && selectedVariant) {
+                        clearVisualDimensions(selectedVisualType, selectedVariant);
+                      }
+                    }
+                  }} 
+                  variant="outline" 
+                  size="sm"
+                >
+                  Reset to Default
+                </Button>
+              </div>
+              
+              {/* Status indicator */}
+              <div className="ml-auto">
+                {getVisualDimensions(selectedVisualType || '', selectedVariant || '') ? (
+                  <span className="text-xs text-green-600 flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    Custom dimensions saved
+                  </span>
+                ) : (
+                  <span className="text-xs text-gray-500 flex items-center gap-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                    Using default dimensions
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
