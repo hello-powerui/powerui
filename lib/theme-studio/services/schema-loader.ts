@@ -191,15 +191,12 @@ export class SchemaLoader {
         if (propSchema.type === 'array' && 
             propSchema.items?.type === 'object' && 
             propSchema.items.properties?.$id) {
-          console.log(`Found state-driven property '${propName}' for ${visualType}`);
           return true;
         }
       }
       
-      console.log(`No state-driven properties found for ${visualType}`, visualProps);
       return false;
     } catch (error) {
-      console.error('Error checking state-driven properties:', error);
       return false;
     }
   }

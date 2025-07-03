@@ -24,7 +24,7 @@ export function NumberSchemaField({ schema, value, onChange, path, hideTitle, in
       onChange={onChange}
       min={schema.minimum}
       max={schema.maximum}
-      step={schema.type === 'integer' ? 1 : 0.01}
+      step={1}
       description={schema.description}
       path={path}
       isPercentage={isPercentage}

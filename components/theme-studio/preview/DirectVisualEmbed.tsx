@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ZoomIn, ZoomOut, X, Settings } from 'lucide-react';
+import { useThemeStudioStore } from '@/lib/stores/theme-studio-store';
 
 interface DirectVisualEmbedProps {
   generatedTheme?: any;
@@ -38,6 +39,9 @@ function DirectVisualEmbed({
   const [customDimensions, setCustomDimensions] = useState<{ width: number; height: number } | null>(null);
   const [inputDimensions, setInputDimensions] = useState<{ width: number; height: number } | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  
+  // Get store functions for visual dimensions
+  const { getVisualDimensions, setVisualDimensions: saveVisualDimensions } = useThemeStudioStore();
 
   // Generate theme with computed variant styles
   const variantPreviewTheme = useCallback(() => {
@@ -71,15 +75,19 @@ function DirectVisualEmbed({
 
   // Track if visual has been loaded initially
   const hasLoadedInitially = useRef(false);
+  const lastLoadedVisual = useRef<string>('');
 
-  // Load visual only once when component mounts or visual type changes
+  // Load visual only when component mounts or visual type changes (not variant)
   useEffect(() => {
     if (!variantPreviewTheme || selectedVisualType === '*' || !hasVisualMapping(selectedVisualType)) {
       return;
     }
 
-    // Reset the loaded flag when visual type changes
-    hasLoadedInitially.current = false;
+    // Reset the loaded flag only when visual type changes (not variant)
+    if (lastLoadedVisual.current !== selectedVisualType) {
+      hasLoadedInitially.current = false;
+      lastLoadedVisual.current = selectedVisualType;
+    }
 
     const loadVisual = async () => {
       try {
@@ -89,13 +97,6 @@ function DirectVisualEmbed({
         const visualInfo = getVisualInfo(selectedVisualType);
         if (!visualInfo) {
           throw new Error(`No visual mapping found for type '${selectedVisualType}'`);
-        }
-
-        setVisualDimensions({ width: visualInfo.width, height: visualInfo.height });
-        // Initialize custom and input dimensions if not set
-        if (!customDimensions) {
-          setCustomDimensions({ width: visualInfo.width, height: visualInfo.height });
-          setInputDimensions({ width: visualInfo.width, height: visualInfo.height });
         }
         
         // Get the embed configuration
@@ -112,9 +113,12 @@ function DirectVisualEmbed({
         delete themeToEmbed.reportPage;
         
         // Create report embed configuration with custom layout
-        // Use custom dimensions if available, otherwise use default
-        const embedWidth = customDimensions?.width || visualInfo.width;
-        const embedHeight = customDimensions?.height || visualInfo.height;
+        // Check if we should use saved dimensions or defaults for this visual
+        const savedDims = getVisualDimensions(selectedVisualType, selectedVariant);
+        
+        // Use saved dimensions if available, otherwise use visual defaults
+        const embedWidth = savedDims?.width || visualInfo.width;
+        const embedHeight = savedDims?.height || visualInfo.height;
         
         // Create custom layout with only the focused visual visible
         // Add padding around the visual to prevent cutoff
@@ -207,7 +211,7 @@ function DirectVisualEmbed({
       loadVisual();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedVisualType, powerBIService, customDimensions]); // Need to reload when dimensions change
+  }, [selectedVisualType, powerBIService]); // Reload only when visual type changes
 
   // Apply theme updates
   useEffect(() => {
@@ -229,6 +233,24 @@ function DirectVisualEmbed({
       return () => clearTimeout(timeoutId);
     }
   }, [variantPreviewTheme]);
+
+  // Reset dimensions when visual type changes
+  useEffect(() => {
+    if (!selectedVisualType || selectedVisualType === '*' || !hasVisualMapping(selectedVisualType)) {
+      return;
+    }
+
+    const visualInfo = getVisualInfo(selectedVisualType);
+    if (!visualInfo) return;
+    
+    // Check for saved dimensions for this visual/variant combo
+    const savedDimensions = getVisualDimensions(selectedVisualType, selectedVariant);
+    const dimensionsToUse = savedDimensions || { width: visualInfo.width, height: visualInfo.height };
+    
+    setVisualDimensions({ width: visualInfo.width, height: visualInfo.height }); // Always store defaults
+    setCustomDimensions(dimensionsToUse);
+    setInputDimensions(dimensionsToUse);
+  }, [selectedVisualType, selectedVariant, getVisualDimensions]); // Run when visual type OR variant changes
 
   // Update layout when dimensions change
   useEffect(() => {
@@ -288,10 +310,14 @@ function DirectVisualEmbed({
 
   // Reset visual
   const resetVisual = useCallback(() => {
-    // Reset zoom only
+    // Reset zoom
     setCurrentZoom(1.0);
-    // For visual embedding, we don't need to reload - just reset zoom
-  }, []);
+    // Reset dimensions to default if available
+    if (visualDimensions) {
+      setCustomDimensions(visualDimensions);
+      setInputDimensions(visualDimensions);
+    }
+  }, [visualDimensions]);
 
   // Expose reset function to parent
   useEffect(() => {
@@ -515,9 +541,11 @@ function DirectVisualEmbed({
             </div>
             <Button 
               onClick={() => {
-                // Apply the input dimensions
-                if (inputDimensions) {
+                // Apply the input dimensions and save them
+                if (inputDimensions && selectedVisualType && selectedVariant) {
                   setCustomDimensions(inputDimensions);
+                  // Save dimensions to store
+                  saveVisualDimensions(selectedVisualType, selectedVariant, inputDimensions);
                 }
               }} 
               size="sm"

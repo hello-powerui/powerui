@@ -40,8 +40,28 @@ export function VisualPropertySection({
   
   
   const handleSectionReset = () => {
-    // Reset the entire section to inherit from global/defaults
-    onChange({ ...value, [name]: undefined });
+    // Check if this is a state-driven property
+    const isStateDriven = sectionSchema.items?.properties?.$id || 
+      (name === 'fillCustom' && path.includes('advancedSlicerVisual'));
+    
+    if (isStateDriven) {
+      // For state-driven properties, only clear the current state
+      const globalSelectedState = useThemeStudioStore.getState().selectedState || 'default';
+      const currentArray = Array.isArray(value[name]) ? value[name] : [];
+      
+      // Remove only the current state
+      const newArray = currentArray.filter((item: any) => item.$id !== globalSelectedState);
+      
+      // If array is now empty, set to undefined to remove the section
+      if (newArray.length === 0) {
+        onChange({ ...value, [name]: undefined });
+      } else {
+        onChange({ ...value, [name]: newArray });
+      }
+    } else {
+      // For non-state-driven properties, reset the entire section
+      onChange({ ...value, [name]: undefined });
+    }
   };
   
   const sectionPath = [...path, name];
@@ -52,6 +72,13 @@ export function VisualPropertySection({
   // Check if section has actual content
   const sectionHasContent = hasActualContent(value[name]);
   
+  // Check if this is a state-driven property
+  const isStateDriven = sectionSchema.items?.properties?.$id || 
+    (name === 'fillCustom' && path.includes('advancedSlicerVisual'));
+  
+  // Get current state for state-driven properties
+  const globalSelectedState = useThemeStudioStore(state => state.selectedState) || 'default';
+  
   return (
     <CollapsibleSection
       id={`${path.join('-')}-${name}`}
@@ -59,7 +86,11 @@ export function VisualPropertySection({
       defaultOpen={false}
       onClear={handleSectionReset}
       hasContent={sectionHasContent}
-      clearMessage={`Clear all ${title.toLowerCase()} settings? This will remove any customizations and use default values.`}
+      clearMessage={
+        isStateDriven 
+          ? `Clear ${globalSelectedState} state for ${title.toLowerCase()}? This will remove customizations for this state only.`
+          : `Clear all ${title.toLowerCase()} settings? This will remove any customizations and use default values.`
+      }
     >
       <div className="space-y-2">
         {/* Check if this section has state support */}

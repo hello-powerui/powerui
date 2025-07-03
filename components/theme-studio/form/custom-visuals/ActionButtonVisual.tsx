@@ -87,9 +87,9 @@ export function ActionButtonVisual({
   
   // Get fill show value - look for the show property in the fill array
   const fillShowValue = (() => {
-    if (!value?.fill || !Array.isArray(value.fill)) return true;
+    if (!value?.fill || !Array.isArray(value.fill)) return false;
     const showObject = value.fill.find((item: any) => !item.$id && 'show' in item);
-    return showObject?.show ?? true;
+    return showObject?.show ?? false;
   })();
   
   const handleFillShowChange = (newShow: boolean) => {
@@ -106,9 +106,9 @@ export function ActionButtonVisual({
   
   // Get text show value - look for the show property in the text array
   const textShowValue = (() => {
-    if (!value?.text || !Array.isArray(value.text)) return true;
+    if (!value?.text || !Array.isArray(value.text)) return false;
     const showObject = value.text.find((item: any) => !item.$id && 'show' in item);
-    return showObject?.show ?? true;
+    return showObject?.show ?? false;
   })();
   
   const handleTextShowChange = (newShow: boolean) => {

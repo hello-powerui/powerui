@@ -51,6 +51,9 @@ export class ClientPreviewGenerator {
     // Apply visual styles with token resolution
     if (input.visualStyles && Object.keys(input.visualStyles).length > 0) {
       theme.visualStyles = replaceTokens(input.visualStyles, tokenResolver, input.dataColors);
+      
+      // Post-processing for Power BI schema quirks
+      this.applyPowerBIQuirks(theme.visualStyles);
     }
     
     return theme;
@@ -88,6 +91,74 @@ export class ClientPreviewGenerator {
     }
     
     return formatted;
+  }
+  
+  /**
+   * Apply Power BI specific quirks and workarounds
+   */
+  private applyPowerBIQuirks(visualStyles: any): void {
+    // Clean up all visual styles
+    Object.keys(visualStyles).forEach(visualType => {
+      const visual = visualStyles[visualType];
+      
+      Object.keys(visual || {}).forEach(variant => {
+        const variantStyles = visual[variant];
+        
+        // Clean up empty objects in arrays (common in state-driven properties)
+        Object.keys(variantStyles || {}).forEach(property => {
+          if (Array.isArray(variantStyles[property])) {
+            // Remove empty objects (objects with no meaningful content)
+            variantStyles[property] = variantStyles[property].filter((item: any) => {
+              if (!item || typeof item !== 'object') return false;
+              const keys = Object.keys(item);
+              
+              // Empty object
+              if (keys.length === 0) return false;
+              
+              // Object with only undefined/null/empty values
+              const hasContent = keys.some(key => {
+                const value = item[key];
+                // Check for meaningful content (not undefined, null, or empty string)
+                if (value === undefined || value === null || value === '') return false;
+                // Check for empty nested objects/arrays
+                if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) return false;
+                if (Array.isArray(value) && value.length === 0) return false;
+                return true;
+              });
+              
+              return hasContent;
+            });
+            
+            // If array is now empty, remove the property
+            if (variantStyles[property].length === 0) {
+              delete variantStyles[property];
+            }
+          }
+        });
+      });
+    });
+    
+    // Handle advancedSlicerVisual specific quirks
+    if (visualStyles.advancedSlicerVisual) {
+      Object.keys(visualStyles.advancedSlicerVisual).forEach(variant => {
+        const variantStyles = visualStyles.advancedSlicerVisual[variant];
+        
+        // shapeCustomRectangle - requires $id: 'default' (Power BI bug)
+        if (variantStyles && variantStyles.shapeCustomRectangle) {
+          // Ensure shapeCustomRectangle has $id: 'default' in first item
+          if (Array.isArray(variantStyles.shapeCustomRectangle) && 
+              variantStyles.shapeCustomRectangle.length > 0 && 
+              !variantStyles.shapeCustomRectangle[0].$id) {
+            variantStyles.shapeCustomRectangle[0] = {
+              $id: 'default',
+              ...variantStyles.shapeCustomRectangle[0]
+            };
+          }
+        }
+      });
+    }
+    
+    // Add other Power BI quirks here as needed
   }
 }
 

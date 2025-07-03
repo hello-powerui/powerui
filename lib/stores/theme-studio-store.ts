@@ -72,6 +72,9 @@ interface ThemeStudioState {
   validationErrors: SchemaValidationError[];
   activeTab: 'color' | 'typography' | 'style';
   
+  // Visual dimensions per variant (for preview purposes only)
+  visualDimensions: Record<string, Record<string, { width: number; height: number }>>;
+  
   // Theme actions (simplified and unified)
   updateTheme: (updates: Partial<StudioTheme>) => void;
   setColorPaletteId: (paletteId: string) => void;
@@ -126,6 +129,11 @@ interface ThemeStudioState {
   clearStructuralColors: () => void;
   clearTextClasses: () => void;
   clearVisualSection: (visual: string, variant: string, section: string) => void;
+  
+  // Visual dimension actions
+  setVisualDimensions: (visual: string, variant: string, dimensions: { width: number; height: number }) => void;
+  getVisualDimensions: (visual: string, variant: string) => { width: number; height: number } | null;
+  clearVisualDimensions: (visual: string, variant: string) => void;
 }
 
 const defaultStudioTheme: StudioTheme = {
@@ -179,6 +187,9 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
       isLoading: false,
       isGenerating: false,
       validationErrors: [],
+      
+      // Visual dimensions
+      visualDimensions: {},
 
       // Theme actions (simplified and unified)
       updateTheme: (updates) =>
@@ -564,7 +575,8 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           selectedState: 'default',
           selectedSection: 'global',
           expandedPanels: [],
-          validationErrors: []
+          validationErrors: [],
+          visualDimensions: {}
         });
       },
 
@@ -582,7 +594,73 @@ export const useThemeStudioStore = create<ThemeStudioState>()(
           selectedState: 'default',
           selectedSection: 'typography', // Keep default as typography
           expandedPanels: [],
-          validationErrors: []
+          validationErrors: [],
+          visualDimensions: {} // Reset visual dimensions
+        });
+      },
+      
+      // Clear section actions
+      clearTypography: () => {
+        set((state) => ({
+          theme: { ...state.theme, textClasses: {} }
+        }));
+      },
+      
+      clearStructuralColors: () => {
+        set((state) => ({
+          theme: { ...state.theme, structuralColors: {} }
+        }));
+      },
+      
+      clearTextClasses: () => {
+        set((state) => ({
+          theme: { ...state.theme, textClasses: {} }
+        }));
+      },
+      
+      clearVisualSection: (visual, variant, section) => {
+        set((state) => {
+          const newVisualStyles = { ...state.theme.visualStyles };
+          if (newVisualStyles[visual]?.[variant]) {
+            const variantData = newVisualStyles[visual][variant];
+            if (Array.isArray(variantData[section])) {
+              delete variantData[section];
+            }
+          }
+          return {
+            theme: { ...state.theme, visualStyles: newVisualStyles }
+          };
+        });
+      },
+      
+      // Visual dimension actions
+      setVisualDimensions: (visual, variant, dimensions) => {
+        set((state) => {
+          const newDimensions = { ...state.visualDimensions };
+          if (!newDimensions[visual]) {
+            newDimensions[visual] = {};
+          }
+          newDimensions[visual][variant] = dimensions;
+          return { visualDimensions: newDimensions };
+        });
+      },
+      
+      getVisualDimensions: (visual, variant) => {
+        const state = get();
+        return state.visualDimensions[visual]?.[variant] || null;
+      },
+      
+      clearVisualDimensions: (visual, variant) => {
+        set((state) => {
+          const newDimensions = { ...state.visualDimensions };
+          if (newDimensions[visual]?.[variant]) {
+            delete newDimensions[visual][variant];
+            // Clean up empty visual object
+            if (Object.keys(newDimensions[visual]).length === 0) {
+              delete newDimensions[visual];
+            }
+          }
+          return { visualDimensions: newDimensions };
         });
       },
 

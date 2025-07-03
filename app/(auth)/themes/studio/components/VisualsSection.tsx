@@ -43,10 +43,6 @@ export function VisualsSection({
   onEnterFocusMode,
   schemaLoader,
 }: VisualsSectionProps) {
-  console.log('[VisualsSection] Received visualSettings:', visualSettings);
-  console.log('[VisualsSection] Selected visual/variant:', selectedVisual, selectedVariant);
-  console.log('[VisualsSection] Visual data:', visualSettings[selectedVisual]?.[selectedVariant]);
-  
   const visualVariants = selectedVisual ? getVisualVariants(selectedVisual) : [];
 
   const formatVisualName = (visual: string) => {
@@ -178,11 +174,7 @@ export function VisualsSection({
                   schemaLoader?.getPropertySchema(['visualStyles', selectedVisual]) ||
                   { type: 'object' }
                 }
-                value={(() => {
-                  const val = { '*': visualSettings[selectedVisual]?.[selectedVariant] || {} };
-                  console.log('[VisualsSection] Passing to SchemaForm:', val);
-                  return val;
-                })()}
+                value={{ '*': visualSettings[selectedVisual]?.[selectedVariant] || {} }}
                 onChange={handleSchemaFormChange}
                 schemaLoader={schemaLoader}
                 path={['visualStyles', selectedVisual, selectedVariant]}

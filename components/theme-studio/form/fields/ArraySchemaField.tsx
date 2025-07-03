@@ -61,10 +61,13 @@ export function ArraySchemaField({
     // Check if we're in a card visual context
     const isCardVisual = path.includes('card') || path.includes('cardVisual');
     
+    // Check if we're in an advanced slicer visual context (needed for fillCustom)
+    const isAdvancedSlicerVisual = path.includes('advancedSlicerVisual');
+    
     // For card visual, certain properties need default state even if not in schema
     const cardPropertiesNeedingDefault = [
       'referenceLabelLayout', 'referenceLabel', 'border', 'grid', 'overFlow',
-      'rotation', 'shapeCustomRectangle', 'smallMultiplesAccentBar', 
+      'rotation', 'smallMultiplesAccentBar', 
       'smallMultiplesBorder', 'smallMultiplesCellBackGround', 'smallMultiplesGrid',
       'smallMultiplesHeader', 'smallMultiplesLayout', 'smallMultiplesOuterShape',
       'smallMultiplesOverFlow'
@@ -73,7 +76,10 @@ export function ArraySchemaField({
     const shouldForceStateSupport = isCardVisual && 
       cardPropertiesNeedingDefault.includes(path[path.length - 1]);
     
-    if (hasStateSupport || shouldForceStateSupport) {
+    // For advanced slicer visual, fillCustom needs state support even if not in schema
+    const isAdvancedSlicerFillCustom = isAdvancedSlicerVisual && path[path.length - 1] === 'fillCustom';
+    
+    if (hasStateSupport || shouldForceStateSupport || isAdvancedSlicerFillCustom) {
       // Check if this is the filterCard property with Available/Applied states
       const isFilterCard = path[path.length - 1] === 'filterCard' && 
         schema.items.properties.$id?.anyOf?.[0]?.enum?.includes('Available');
@@ -93,23 +99,22 @@ export function ArraySchemaField({
           />
         );
       } else {
-        // For card visual properties without $id in schema, ensure default state
-        if (shouldForceStateSupport && !hasStateSupport) {
+        // For properties without $id in schema but needing state support, ensure default state
+        if ((shouldForceStateSupport || isAdvancedSlicerFillCustom) && !hasStateSupport) {
           const ensuredValue = Array.isArray(value) ? value : [];
           const hasDefault = ensuredValue.some(item => item.$id === 'default');
           
           if (!hasDefault && ensuredValue.length > 0) {
-            // Add $id: 'default' to first item if it exists
+            // Add $id: 'default' to first item if it exists and has content
             const newValue = [...ensuredValue];
             if (newValue[0] && Object.keys(newValue[0]).length > 0) {
               newValue[0] = { $id: 'default', ...newValue[0] };
               onChange(newValue);
             }
-          } else if (!hasDefault && ensuredValue.length === 0) {
-            // Create default item
-            onChange([{ $id: 'default' }]);
           }
+          // Don't create empty default items - let the user add content first
         }
+        
         
         return (
           <StateAwarePropertySection

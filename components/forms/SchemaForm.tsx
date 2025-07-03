@@ -106,7 +106,7 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
             {...fieldProps}
             min={resolvedSchema.minimum}
             max={resolvedSchema.maximum}
-            step={resolvedSchema.multipleOf}
+            step={1}
           />
         );
 
