@@ -30,14 +30,7 @@ export function CanvasSection({
   };
 
   return (
-    <div className="p-4">
-      {/* Description */}
-      <div className="mb-4">
-        <p className="text-sm text-gray-700">
-          Configure canvas-level settings for your Power BI report including page layout, report behavior, and filter pane appearance
-        </p>
-      </div>
-
+    <div className="p-4 space-y-2">
       {/* Canvas Layout Section */}
       <CanvasLayoutSection
         visualSettings={visualSettings}

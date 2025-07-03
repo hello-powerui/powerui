@@ -20,14 +20,7 @@ export function GlobalSection({
   schemaLoaded,
 }: GlobalSectionProps) {
   return (
-    <div className="p-4">
-      {/* Description */}
-      <div className="mb-4">
-        <p className="text-sm text-gray-700">
-          Define global visual properties that apply across all visuals in your Power BI reports
-        </p>
-      </div>
-      
+    <div className="p-4 space-y-2">
       {/* Global Settings Property Selector */}
       {schemaLoader && schemaLoaded ? (
         <GlobalPropertySelector

@@ -248,7 +248,7 @@ export function VisualPropertiesPanel({
             
             {/* Property sections */}
             {specificSections.length > 0 && (
-              <div className="-space-y-px">
+              <div className="space-y-2">
                 {specificSections.map(({ name, schema: sectionSchema, title }) => (
                   <VisualPropertySection
                     key={name}
@@ -271,7 +271,7 @@ export function VisualPropertiesPanel({
             )}
           </div>
         ) : (
-          <div className="-space-y-px">
+          <div className="space-y-2">
             {generalSections.length > 0 ? (
               generalSections.map(({ name, schema: sectionSchema, title }) => (
                 <VisualPropertySection

@@ -198,7 +198,7 @@ export function GlobalPropertySelector({
       {Object.keys(structuredProperties).length > 0 && (
         <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">Global Visual Sections</h4>
-          <div className="-space-y-px">
+          <div className="space-y-2">
             {Object.entries(structuredProperties).map(([key, schema]) => {
               const sectionSchema = schema as any;
               // Use the title from the schema if available, otherwise format the key
@@ -346,7 +346,7 @@ export function GlobalPropertySelector({
         </div>
         
         {selectedComplexProperties.length > 0 ? (
-          <div className="-space-y-px">
+          <div className="space-y-2">
           {selectedComplexProperties.map(propertyName => {
             const schema = complexProperties[propertyName];
             if (!schema) return null;

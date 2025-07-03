@@ -61,10 +61,10 @@ export function CollapsibleSection({
     <Collapsible.Root 
       open={isOpen} 
       onOpenChange={setIsOpen} 
-      className={`${className}`}
+      className={`bg-white border border-gray-200 rounded-md ${className}`}
     >
       <div 
-        className="flex items-center justify-between w-full px-2 py-2.5 hover:bg-gray-50 rounded-md transition-colors group"
+        className="flex items-center justify-between w-full px-3 py-2.5 hover:bg-gray-50 rounded-t-md transition-colors group"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -146,7 +146,7 @@ export function CollapsibleSection({
       </div>
         
       <Collapsible.Content className="data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up overflow-hidden">
-        <div className="relative pl-7 pr-3 py-3">
+        <div className="relative px-3 py-3 border-t border-gray-100">
           {/* Content area with improved spacing */}
           <div className="space-y-3">
             {children}

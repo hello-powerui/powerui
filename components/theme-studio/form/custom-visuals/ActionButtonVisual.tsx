@@ -230,7 +230,7 @@ export function ActionButtonVisual({
               onSelectedStateChange={setSelectedState}
               hasStateDrivenProperties={true}
             >
-              <div className="-space-y-px">
+              <div className="space-y-2">
             
                 {/* Fill Properties (state-aware) - using schema without show */}
                 {fillSchemaWithoutShow && fillShowValue && (

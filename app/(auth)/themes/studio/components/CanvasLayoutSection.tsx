@@ -54,7 +54,7 @@ export function CanvasLayoutSection({
           </div>
         </div>
       ) : (
-        <div className="-space-y-px">
+        <div className="space-y-2">
           {/* Debug info */}
           {schemaLoaded && canvasTypes.length === 0 && (
             <p className="text-xs text-gray-600 mb-2">No canvas properties available in schema</p>

@@ -140,16 +140,8 @@ export function StructuralColorsTab() {
 
   return (
     <div>
-      <div className="mb-4">
-        <p className="text-sm text-gray-700">
-          Configure structural colors that define the overall theme appearance
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          These colors are used as base colors throughout your Power BI reports
-        </p>
-      </div>
       
-      <div className="-space-y-px">
+      <div className="space-y-2">
         {Object.entries(STRUCTURAL_COLOR_GROUPS).map(([groupName, { colors, description }]) => {
           // Check if any colors in this group have custom values
           const hasCustomColors = colors.some(colorKey => (structuralColors as any)[colorKey] !== undefined);

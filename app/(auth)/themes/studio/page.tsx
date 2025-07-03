@@ -397,6 +397,8 @@ function ThemeStudioContent() {
               }}
               hasChanges={(path) => themeStudio.changedPaths.has(path.join('.'))}
               onEnterFocusMode={() => setIsInFocusMode(true)}
+              isVisible={showVisualStyles}
+              onToggleVisibility={setShowVisualStyles}
             />
           </ErrorBoundaryWithLogging>
         </div>

@@ -9,6 +9,9 @@ import { VisualsSection } from './VisualsSection';
 import { GlobalSection } from './GlobalSection';
 import { CanvasSection } from './CanvasSection';
 import { getMappedVisualTypes } from '@/lib/powerbi/visual-name-mapping';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { THEME_STUDIO_TYPOGRAPHY } from '@/components/theme-studio/constants/typography';
 
 
 interface VisualStylesPanelProps {
@@ -29,6 +32,8 @@ interface VisualStylesPanelProps {
   trackChange: (path: string[]) => void;
   hasChanges: (path: string[]) => boolean;
   onEnterFocusMode?: () => void;
+  isVisible: boolean;
+  onToggleVisibility: (visible: boolean) => void;
 }
 
 function VisualStylesPanelComponent({
@@ -49,6 +54,8 @@ function VisualStylesPanelComponent({
   trackChange,
   hasChanges,
   onEnterFocusMode,
+  isVisible,
+  onToggleVisibility,
 }: VisualStylesPanelProps) {
   const [schemaLoader, setSchemaLoader] = useState<SchemaLoader | null>(null);
   const [schemaLoaded, setSchemaLoaded] = useState(false);
@@ -150,12 +157,42 @@ function VisualStylesPanelComponent({
     }
   };
 
+  if (!isVisible) {
+    return (
+      <div className="h-full flex flex-col items-center py-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onToggleVisibility(true)}
+          className="mb-4"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </Button>
+        <div className="flex flex-col items-center gap-2 text-gray-600">
+          <span className={`writing-mode-vertical ${THEME_STUDIO_TYPOGRAPHY.description.size}`}>Visual Styles</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full flex flex-col bg-white">
-      {/* Figma-style Header */}
-      <div className="border-b border-gray-200">
+    <div className="h-full flex flex-col bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        {/* Title Section */}
+        <div className="flex items-center justify-between px-4 py-2.5">
+          <h2 className={`${THEME_STUDIO_TYPOGRAPHY.panelHeader.size} ${THEME_STUDIO_TYPOGRAPHY.panelHeader.weight}`}>Visual Styles</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onToggleVisibility(false)}
+            className="hover:bg-gray-100 h-7 w-7 p-0"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
         {/* Tabs Row - Figma/Vercel style buttons */}
-        <div className="flex items-center gap-1 p-2">
+        <div className="flex items-center gap-1 px-2 pb-2">
           <button
             onClick={() => onSelectedSectionChange('typography')}
             className={cn(
@@ -215,8 +252,19 @@ function VisualStylesPanelComponent({
         </div>
       </div>
       
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Scrollable Content */}
+      <div 
+        className="flex-1 overflow-y-auto"
+        style={{
+          backgroundImage: `repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(0, 0, 0, 0.015) 10px,
+            rgba(0, 0, 0, 0.015) 20px
+          )`
+        }}
+      >
         <div className="pb-20">
           {renderSection()}
         </div>

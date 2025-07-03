@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Palette, Loader2, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ChangeIndicator } from '@/components/theme-studio/ui/change-indicator';
 import { HelpTooltip } from '@/components/theme-studio/HelpTooltip';
@@ -135,7 +135,6 @@ function FoundationPanelComponent({
           <ChevronRight className="w-4 h-4" />
         </Button>
         <div className="flex flex-col items-center gap-2 text-gray-600">
-          <Palette className="w-5 h-5" />
           <span className={`writing-mode-vertical ${THEME_STUDIO_TYPOGRAPHY.description.size}`}>Theme Foundation</span>
         </div>
       </div>
@@ -147,22 +146,19 @@ function FoundationPanelComponent({
       <div className="h-full flex flex-col">
         {/* Header */}
         <div className="border-b border-gray-200 bg-white">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-2">
-              <Palette className="w-5 h-5 text-gray-700" />
-              <h2 className={`${THEME_STUDIO_TYPOGRAPHY.panelHeader.size} ${THEME_STUDIO_TYPOGRAPHY.panelHeader.weight}`}>Theme Foundation</h2>
-            </div>
+          <div className="flex items-center justify-between px-4 py-2.5">
+            <h2 className={`${THEME_STUDIO_TYPOGRAPHY.panelHeader.size} ${THEME_STUDIO_TYPOGRAPHY.panelHeader.weight}`}>Theme Foundation</h2>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onToggleVisibility(false)}
-              className="hover:bg-gray-100"
+              className="hover:bg-gray-100 h-7 w-7 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
           </div>
           {/* Tabs Row - Figma/Vercel style buttons */}
-          <div className="flex items-center gap-1 p-2">
+          <div className="flex items-center gap-1 px-2 pb-2">
             <button
               onClick={() => setActiveTab('foundation')}
               className={cn(

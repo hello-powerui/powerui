@@ -258,11 +258,6 @@ export function TypographyTab() {
   return (
     <div>
       <div className="mb-4">
-        <div className="mb-2">
-          <p className="text-sm text-gray-700">
-            Configure text styles for different elements in your Power BI reports
-          </p>
-        </div>
         
         {/* Font Family Selector */}
         <div className="bg-gray-50 rounded-md p-3 mt-3">
@@ -335,7 +330,7 @@ export function TypographyTab() {
         </div>
       </div>
       
-      <div className="-space-y-px">
+      <div className="space-y-2">
         {TEXT_CLASS_INFO.map(({ name, description, usage }) => {
           const textClass = (localTextClasses as any)[name] || {};
           const colorValue = getColorValue(textClass.color);
